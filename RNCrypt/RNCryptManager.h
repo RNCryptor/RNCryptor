@@ -28,9 +28,9 @@
 #import <CommonCrypto/CommonCryptor.h>
 #import <CommonCrypto/CommonKeyDerivation.h>
 
-extern NSString * const kRNCryptManagerErrorDomain;
+extern NSString *const kRNCryptManagerErrorDomain;
 
-/** AES Encrypter/Decrypter for Mac and iOS.
+/** AES Encryptor/Decryptor for Mac and iOS.
  
  Provides an easy-to-use, Objective-C interface to the AES functionality of
  CommonCrypto. Simplifies correct handling of password stretching (PBKDF2),
@@ -40,8 +40,41 @@ extern NSString * const kRNCryptManagerErrorDomain;
  Requires Security.framework.
  */
 
+typedef struct
+{
+  CCAlgorithm algorithm;  // kCCAlgorithmAES128
+  size_t keySize;         // kCCKeySizeAES128
+  size_t blockSize;       // kCCBlockSizeAES128
+  size_t IVSize;          // kCCBlockSizeAES128
+  size_t saltSize;        // 8
+  uint PBKDFRounds;       // 10000 (~80ms on an iPhone 4)
+  size_t readBlockSize;   // 1024
+} RNCryptManagerConfiguration;
 
 @interface RNCryptManager : NSObject
+
+///---------------------------------------------------------------------------------------
+/// @name Creating a CryptManager
+///---------------------------------------------------------------------------------------
+
+/** Shared instance with default configuration.
+*/
++ (RNCryptManager *)sharedManager;
+
+/** Creates a default RNCryptManager
+*
+* Default manager uses AES 128 with an 8 byte salt and 10000 PBKDF rounds.
+*/
+- (RNCryptManager *)init;
+
+/** Creates a configured RNCryptManager
+* @param configuration Configuration structure. This cannot be changed once set.
+*/
+- (RNCryptManager *)initWithConfiguration:(RNCryptManagerConfiguration)configuration;
+
+/** Returns default RNCryptManager configuration. This can be modified and handed to initWithConfiguration:.
+*/
++ (RNCryptManagerConfiguration)defaultConfiguration;
 
 ///---------------------------------------------------------------------------------------
 /// @name Encrypt/Decrypt In Memory
@@ -51,15 +84,15 @@ extern NSString * const kRNCryptManagerErrorDomain;
   
  @param data The data to encrypt
  @param password A password. Generally this is human-provided. An AES key will be generated from this.
- @param iv Out parameter set to the randomly generated IV. This may not be `NULL`.
+ @param IV Out parameter set to the randomly generated IV. This may not be `NULL`.
  @param salt Out parameter set to the randomly generated salt. This may not be `NULL`.
  @param error Out parameter used if an error occurs. May be `NULL` if no error is required.
  @return Returns the encrypted data, or `nil` if there is an error.
  */
 
-+ (NSData *)encryptedDataForData:(NSData *)data
+- (NSData *)encryptedDataForData:(NSData *)data
                         password:(NSString *)password
-                              iv:(NSData **)iv
+                              IV:(NSData **)IV
                             salt:(NSData **)salt
                            error:(NSError **)error;
 
@@ -67,15 +100,15 @@ extern NSString * const kRNCryptManagerErrorDomain;
  
  @param data The data to decrypt
  @param password A password. Generally this is human-provided. An AES key will be generated from this using the same algorithm as in the encrypt methods.
- @param iv The IV (generally provided by encrypt methods)
+ @param IV The IV (generally provided by encrypt methods)
  @param salt The salt (generally provided by encrypt methods)
  @param error Out parameter used if an error occurs. May be `NULL` if no error is required.
  @return Returns the decrypted data, or `nil` if there is an error.
  */
 
-+ (NSData *)decryptedDataForData:(NSData *)data
-                        password:(NSString *)password 
-                              iv:(NSData *)iv
+- (NSData *)decryptedDataForData:(NSData *)data
+                        password:(NSString *)password
+                              IV:(NSData *)IV
                             salt:(NSData *)salt
                            error:(NSError **)error;
 
@@ -92,7 +125,7 @@ extern NSString * const kRNCryptManagerErrorDomain;
  @return Returns `YES` if successful. Return `NO` and sets `error` if there is an error.
  */
 
-+ (BOOL)encryptFromStream:(NSInputStream *)fromStream
+- (BOOL)encryptFromStream:(NSInputStream *)fromStream
                  toStream:(NSOutputStream *)toStream
                  password:(NSString *)password
                     error:(NSError **)error;
@@ -105,7 +138,7 @@ extern NSString * const kRNCryptManagerErrorDomain;
  @param error Out parameter used if an error occurs. May be `NULL` if no error is required.
  @return Returns `YES` if successful. Return `NO` and sets `error` if there is an error.
  */
-+ (BOOL)decryptFromStream:(NSInputStream *)fromStream
+- (BOOL)decryptFromStream:(NSInputStream *)fromStream
                  toStream:(NSOutputStream *)toStream
                  password:(NSString *)password
                     error:(NSError **)error;
