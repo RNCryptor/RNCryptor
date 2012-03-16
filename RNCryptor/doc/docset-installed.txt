@@ -1,0 +1,4 @@
+Documentation set was installed to Xcode!
+
+Path: /Users/rnapier/Library/Developer/Shared/Documentation/DocSets/net.robnapier.RNCrypt.docset
+Time: 2012-03-16 03:38:18 +0000

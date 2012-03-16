@@ -1,5 +1,5 @@
 //
-//  RNCryptManager.m
+//  RNCryptor.m
 //
 //  Copyright (c) 2012 Rob Napier
 //
@@ -24,7 +24,7 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-#import "RNCryptManager.h"
+#import "RNCryptor.h"
 
 // According to Apple documentation, you can use a single buffer
 // to do in-place encryption or decryption. This does not work
@@ -35,7 +35,7 @@
 //static const NSUInteger kMaxReadSize = 1024;
 
 NSString *const
-    kRNCryptManagerErrorDomain = @"net.robnapier.RNCryptManager";
+    kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
 
 @interface NSOutputStream (Data)
 - (BOOL)_RNwriteData:(NSData *)data error:(NSError **)error;
@@ -93,32 +93,32 @@ NSString *const
 
 @end
 
-@interface RNCryptManager ()
-@property (nonatomic, readonly, assign) RNCryptManagerConfiguration configuration;
+@interface RNCryptor ()
+@property (nonatomic, readonly, assign) RNCryptorConfiguration configuration;
 
 @end
 
-@implementation RNCryptManager
+@implementation RNCryptor
 @synthesize configuration = configuration_;
 
 
-+ (id)sharedManager
++ (id)AES128Cryptor
 {
   static dispatch_once_t once;
   static id sharedInstance = nil;
 
   dispatch_once(&once, ^{
-    sharedInstance = [[self alloc] initWithConfiguration:[self defaultConfiguration]];
+    sharedInstance = [[self alloc] initWithConfiguration:[self AES128Configuration]];
   });
   return sharedInstance;
 }
 
-- (RNCryptManager *)init
+- (RNCryptor *)init
 {
-  return [self initWithConfiguration:[RNCryptManager defaultConfiguration]];
+  return [self initWithConfiguration:[RNCryptor AES128Configuration]];
 }
 
-- (RNCryptManager *)initWithConfiguration:(RNCryptManagerConfiguration)configuration
+- (RNCryptor *)initWithConfiguration:(RNCryptorConfiguration)configuration
 {
   self = [super init];
   if (self)
@@ -128,9 +128,9 @@ NSString *const
   return self;
 }
 
-+ (RNCryptManagerConfiguration)defaultConfiguration
++ (RNCryptorConfiguration)AES128Configuration
 {
-  RNCryptManagerConfiguration configuration = {
+  RNCryptorConfiguration configuration = {
       .algorithm = kCCAlgorithmAES128,
       .keySize = kCCKeySizeAES128,
       .blockSize = kCCBlockSizeAES128,
@@ -190,7 +190,7 @@ NSString *const
   {
     if (error)
     {
-      *error = [NSError errorWithDomain:kRNCryptManagerErrorDomain
+      *error = [NSError errorWithDomain:kRNCryptorErrorDomain
                                    code:result
                                userInfo:nil];
     }
@@ -277,7 +277,7 @@ NSString *const
   {
     if (error)
     {
-      *error = [NSError errorWithDomain:kRNCryptManagerErrorDomain
+      *error = [NSError errorWithDomain:kRNCryptorErrorDomain
                                    code:result
                                userInfo:nil];
     }
@@ -423,7 +423,7 @@ NSString *const
   {
     if (error)
     {
-      *error = [NSError errorWithDomain:kRNCryptManagerErrorDomain
+      *error = [NSError errorWithDomain:kRNCryptorErrorDomain
                                    code:result
                                userInfo:nil];
     }
@@ -469,7 +469,7 @@ NSString *const
       if (error)
       {
         *error = [NSError
-            errorWithDomain:kRNCryptManagerErrorDomain
+            errorWithDomain:kRNCryptorErrorDomain
                        code:result
                    userInfo:nil];
       }

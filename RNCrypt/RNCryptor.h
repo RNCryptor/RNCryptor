@@ -1,5 +1,5 @@
 //
-//  RNCryptManager.h
+//  RNCryptor.h
 //
 //  Copyright (c) 2012 Rob Napier
 //
@@ -51,7 +51,7 @@ typedef struct
   size_t readBlockSize;   // 1024
 } RNCryptManagerConfiguration;
 
-@interface RNCryptManager : NSObject
+@interface RNCryptor : NSObject
 
 ///---------------------------------------------------------------------------------------
 /// @name Creating a CryptManager
@@ -59,18 +59,18 @@ typedef struct
 
 /** Shared instance with default configuration.
 */
-+ (RNCryptManager *)sharedManager;
++ (RNCryptor *)sharedManager;
 
 /** Creates a default RNCryptManager
 *
 * Default manager uses AES 128 with an 8 byte salt and 10000 PBKDF rounds.
 */
-- (RNCryptManager *)init;
+- (RNCryptor *)init;
 
 /** Creates a configured RNCryptManager
 * @param configuration Configuration structure. This cannot be changed once set.
 */
-- (RNCryptManager *)initWithConfiguration:(RNCryptManagerConfiguration)configuration;
+- (RNCryptor *)initWithConfiguration:(RNCryptManagerConfiguration)configuration;
 
 /** Returns default RNCryptManager configuration. This can be modified and handed to initWithConfiguration:.
 */
