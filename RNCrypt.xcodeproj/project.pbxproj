@@ -8,13 +8,16 @@
 
 /* Begin PBXBuildFile section */
 		FB7564F41512D3C4007B806B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7564F31512D3C4007B806B /* Foundation.framework */; };
-		FB7564FA1512D3C4007B806B /* RNCrypt.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7564F91512D3C4007B806B /* RNCrypt.m */; };
 		FB7565021512D3C4007B806B /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7565011512D3C4007B806B /* SenTestingKit.framework */; };
 		FB7565041512D3C4007B806B /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7565031512D3C4007B806B /* UIKit.framework */; };
 		FB7565051512D3C4007B806B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7564F31512D3C4007B806B /* Foundation.framework */; };
 		FB7565081512D3C4007B806B /* libRNCrypt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7564F01512D3C4007B806B /* libRNCrypt.a */; };
 		FB75650E1512D3C4007B806B /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = FB75650C1512D3C4007B806B /* InfoPlist.strings */; };
 		FB7565111512D3C5007B806B /* RNCryptTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565101512D3C5007B806B /* RNCryptTests.m */; };
+		FB75651D1512D3E9007B806B /* RNCryptManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FB75651B1512D3E9007B806B /* RNCryptManager.m */; };
+		FB75651E1512D3E9007B806B /* RNCryptManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FB75651B1512D3E9007B806B /* RNCryptManager.m */; };
+		FB75651F1512D7F8007B806B /* RNCryptManager.h in Headers */ = {isa = PBXBuildFile; fileRef = FB75651A1512D3E9007B806B /* RNCryptManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FB7565241512D9BE007B806B /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7565221512D9A8007B806B /* Security.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,16 +33,17 @@
 /* Begin PBXFileReference section */
 		FB7564F01512D3C4007B806B /* libRNCrypt.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNCrypt.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB7564F31512D3C4007B806B /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		FB7564F71512D3C4007B806B /* RNCrypt-Prefix.pch */ = {isa = PBXFileReference; path = "RNCrypt-Prefix.pch"; sourceTree = "<group>"; };
-		FB7564F81512D3C4007B806B /* RNCrypt.h */ = {isa = PBXFileReference; path = RNCrypt.h; sourceTree = "<group>"; };
-		FB7564F91512D3C4007B806B /* RNCrypt.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNCrypt.m; sourceTree = "<group>"; };
+		FB7564F71512D3C4007B806B /* RNCrypt-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RNCrypt-Prefix.pch"; sourceTree = "<group>"; };
 		FB7565001512D3C4007B806B /* RNCryptTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RNCryptTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB7565011512D3C4007B806B /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
 		FB7565031512D3C4007B806B /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
-		FB75650B1512D3C4007B806B /* RNCryptTests-Info.plist */ = {isa = PBXFileReference; path = "RNCryptTests-Info.plist"; sourceTree = "<group>"; };
+		FB75650B1512D3C4007B806B /* RNCryptTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "RNCryptTests-Info.plist"; sourceTree = "<group>"; };
 		FB75650D1512D3C4007B806B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		FB75650F1512D3C4007B806B /* RNCryptTests.h */ = {isa = PBXFileReference; path = RNCryptTests.h; sourceTree = "<group>"; };
+		FB75650F1512D3C4007B806B /* RNCryptTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNCryptTests.h; sourceTree = "<group>"; };
 		FB7565101512D3C5007B806B /* RNCryptTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNCryptTests.m; sourceTree = "<group>"; };
+		FB75651A1512D3E9007B806B /* RNCryptManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCryptManager.h; sourceTree = "<group>"; };
+		FB75651B1512D3E9007B806B /* RNCryptManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCryptManager.m; sourceTree = "<group>"; };
+		FB7565221512D9A8007B806B /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +63,7 @@
 				FB7565041512D3C4007B806B /* UIKit.framework in Frameworks */,
 				FB7565051512D3C4007B806B /* Foundation.framework in Frameworks */,
 				FB7565081512D3C4007B806B /* libRNCrypt.a in Frameworks */,
+				FB7565241512D9BE007B806B /* Security.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -68,6 +73,7 @@
 		FB7564E51512D3C4007B806B = {
 			isa = PBXGroup;
 			children = (
+				FB7565221512D9A8007B806B /* Security.framework */,
 				FB7564F51512D3C4007B806B /* RNCrypt */,
 				FB7565091512D3C4007B806B /* RNCryptTests */,
 				FB7564F21512D3C4007B806B /* Frameworks */,
@@ -97,8 +103,8 @@
 		FB7564F51512D3C4007B806B /* RNCrypt */ = {
 			isa = PBXGroup;
 			children = (
-				FB7564F81512D3C4007B806B /* RNCrypt.h */,
-				FB7564F91512D3C4007B806B /* RNCrypt.m */,
+				FB75651A1512D3E9007B806B /* RNCryptManager.h */,
+				FB75651B1512D3E9007B806B /* RNCryptManager.m */,
 				FB7564F61512D3C4007B806B /* Supporting Files */,
 			);
 			path = RNCrypt;
@@ -138,6 +144,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FB75651F1512D7F8007B806B /* RNCryptManager.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -186,7 +193,9 @@
 		FB7564E71512D3C4007B806B /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				CLASSPREFIX = RN;
 				LastUpgradeCheck = 0430;
+				ORGANIZATIONNAME = "Rob Napier";
 			};
 			buildConfigurationList = FB7564EA1512D3C4007B806B /* Build configuration list for PBXProject "RNCrypt" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -238,7 +247,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FB7564FA1512D3C4007B806B /* RNCrypt.m in Sources */,
+				FB75651D1512D3E9007B806B /* RNCryptManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -247,6 +256,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FB7565111512D3C5007B806B /* RNCryptTests.m in Sources */,
+				FB75651E1512D3E9007B806B /* RNCryptManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -387,6 +397,7 @@
 				FB7565161512D3C5007B806B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		FB7565171512D3C5007B806B /* Build configuration list for PBXNativeTarget "RNCryptTests" */ = {
 			isa = XCConfigurationList;
@@ -395,6 +406,7 @@
 				FB7565191512D3C5007B806B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
