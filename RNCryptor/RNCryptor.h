@@ -17,7 +17,7 @@
 //
 //  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
 //  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
 //  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 //  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 //  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
@@ -57,7 +57,12 @@ typedef struct
 /// @name Creating an RNCryptor
 ///---------------------------------------------------------------------------------------
 
+/** Default cryptor - AES-128 + HMAC-SHA256
+*/
++ (RNCryptor *)defaultCryptor;
+
 /** AES 128-bit cryptor
+* 8 byte salt. 10000 PBKDF rounds.
 */
 + (RNCryptor *)AES128Cryptor;
 
@@ -75,6 +80,77 @@ typedef struct
 /** Returns default configuration for AES-128. This can be modified and handed to initWithConfiguration:.
 */
 + (RNCryptorConfiguration)AES128Configuration;
+
+///---------------------------------------------------------------------------------------
+/// @name Encrypt/Decrypt with NSStream
+///---------------------------------------------------------------------------------------
+
+/** Encrypts stream
+*
+* @param fromStream The stream to encrypt
+* @param toStream The stream to write encrypteddata to
+* @param encryptionKey Correctly sized encryption key. May not be nil
+* @param IV Initialization vector. May be `nil`, but this is strongly discouraged.
+* @param HMACKey If non-`nil`, an HMAC of the encrypted data will be appended to the stream
+* @param error Out parameter used if an error occurs. May be `NULL` if no error is required.
+*
+* @return Returns `YES` if successful. Return `NO` and sets `error` if there is an error.
+*
+*/
+- (BOOL)encryptFromStream:(NSInputStream *)fromStream
+                 toStream:(NSOutputStream *)toStream
+            encryptionKey:(NSData *)encryptionKey
+                       IV:(NSData *)IV
+                  HMACKey:(NSData *)HMACKey
+                    error:(NSError **)error;
+
+/** Decrypts stream
+*
+* @param fromStream The stream to decrypt
+* @param toStream The stream to write decrypted data to
+* @param encryptionKey Correctly sized encryption key. May not be nil
+* @param IV Initialization vector. May be `nil`, but this is strongly discouraged.
+* @param HMACKey If non-`nil`, HMAC will be verified
+* @param error Out parameter used if an error occurs. May be `NULL` if no error is required.
+*
+* @return Returns `YES` if successful. Return `NO` and sets `error` if there is an error.
+*
+*/
+- (BOOL)decryptFromStream:(NSInputStream *)fromStream
+                 toStream:(NSOutputStream *)toStream
+            encryptionKey:(NSData *)encryptionKey
+                       IV:(NSData *)IV
+                  HMACKey:(NSData *)HMACKey
+                    error:(NSError **)error;
+
+
+/** Encrypts stream against a password, with a randomly generated IV and salt. IV and salt will be prepended to resulting stream.
+ 
+ @param fromStream The stream to encrypt
+ @param toStream The stream to write encrypted data to
+ @param password A password. Generally this is human-provided. An AES key will be generated from this.
+ @param error Out parameter used if an error occurs. May be `NULL` if no error is required.
+ @return Returns `YES` if successful. Return `NO` and sets `error` if there is an error.
+ */
+
+- (BOOL)encryptFromStream:(NSInputStream *)fromStream
+                 toStream:(NSOutputStream *)toStream
+                 password:(NSString *)password
+                    error:(NSError **)error;
+
+/** Decrypts data using a password. IV and salt must be at the beginning of the stream, as provided by encryptFromStream:toStream:password:error:.
+ 
+ @param fromStream The stream to decrypt
+ @param toStream The stream to write decrypted data to
+ @param password A password. Generally this is human-provided. An AES key will be generated from this using the same algorithm as in the encrypt methods.
+ @param error Out parameter used if an error occurs. May be `NULL` if no error is required.
+ @return Returns `YES` if successful. Return `NO` and sets `error` if there is an error.
+ */
+- (BOOL)decryptFromStream:(NSInputStream *)fromStream
+                 toStream:(NSOutputStream *)toStream
+                 password:(NSString *)password
+                    error:(NSError **)error;
+
 //
 /////---------------------------------------------------------------------------------------
 ///// @name Encrypt/Decrypt In Memory
@@ -111,36 +187,4 @@ typedef struct
 //                              IV:(NSData *)IV
 //                            salt:(NSData *)salt
 //                           error:(NSError **)error;
-
-///---------------------------------------------------------------------------------------
-/// @name Encrypt/Decrypt with NSStream
-///---------------------------------------------------------------------------------------
-
-/** Encrypts stream against a password, with a randomly generated IV and salt. IV and salt will be prepended to resulting stream.
- 
- @param fromStream The stream to encrypt
- @param toStream The stream to write encrypted data to
- @param password A password. Generally this is human-provided. An AES key will be generated from this.
- @param error Out parameter used if an error occurs. May be `NULL` if no error is required.
- @return Returns `YES` if successful. Return `NO` and sets `error` if there is an error.
- */
-
-- (BOOL)encryptFromStream:(NSInputStream *)fromStream
-                 toStream:(NSOutputStream *)toStream
-                 password:(NSString *)password
-                    error:(NSError **)error;
-
-/** Decrypts data using a password. IV and salt must be at the beginning of the stream, as provided by encryptFromStream:toStream:password:error:.
- 
- @param fromStream The stream to decrypt
- @param toStream The stream to write decrypted data to
- @param password A password. Generally this is human-provided. An AES key will be generated from this using the same algorithm as in the encrypt methods.
- @param error Out parameter used if an error occurs. May be `NULL` if no error is required.
- @return Returns `YES` if successful. Return `NO` and sets `error` if there is an error.
- */
-- (BOOL)decryptFromStream:(NSInputStream *)fromStream
-                 toStream:(NSOutputStream *)toStream
-                 password:(NSString *)password
-                    error:(NSError **)error;
-
 @end

@@ -17,7 +17,7 @@
 //
 //  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
 //  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
 //  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 //  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 //  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
@@ -101,6 +101,11 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
 @synthesize configuration = configuration_;
 
 
++ (RNCryptor *)defaultCryptor
+{
+  return [self AES128Cryptor];
+}
+
 + (id)AES128Cryptor
 {
   static dispatch_once_t once;
@@ -154,8 +159,8 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
   return data;
 }
 
-- (NSData *)AESKeyForPassword:(NSString *)password
-                         salt:(NSData *)salt
+- (NSData *)keyForPassword:(NSString *)password
+                      salt:(NSData *)salt
 {
   NSMutableData *
       derivedKey = [NSMutableData dataWithLength:self.configuration.keySize];
@@ -215,51 +220,14 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
 - (BOOL)applyOperation:(CCOperation)operation
             fromStream:(NSInputStream *)inStream
               toStream:(NSOutputStream *)outStream
-              password:(NSString *)password
+         encryptionKey:(NSData *)key
+                    IV:(NSData *)iv
+               HMACKey:(NSData *)HMACKey
                  error:(NSError **)error
 {
-
-  NSAssert([inStream streamStatus] != NSStreamStatusNotOpen,
-  @"fromStream must be open");
-  NSAssert([outStream streamStatus] != NSStreamStatusNotOpen,
-  @"toStream must be open");
-  NSAssert([password length] > 0,
-  @"Can't proceed with no password");
-
-  // Generate the IV and salt, or read them from the stream
-  NSData *iv;
-  NSData *salt;
-  switch (operation)
-  {
-    case kCCEncrypt:
-      // Generate a random IV for this file.
-      iv = [self randomDataOfLength:self.configuration.IVSize];
-      salt = [self randomDataOfLength:self.configuration.saltSize];
-
-      if (![outStream _RNWriteData:iv error:error] ||
-          ![outStream _RNWriteData:salt error:error])
-      {
-        return NO;
-      }
-      break;
-    case kCCDecrypt:
-      // Read the IV and salt from the encrypted file
-      if (![inStream _RNGetData:&iv
-                      maxLength:self.configuration.IVSize
-                          error:error] ||
-          ![inStream _RNGetData:&salt
-                      maxLength:self.configuration.saltSize
-                          error:error])
-      {
-        return NO;
-      }
-      break;
-    default:
-      NSAssert(NO, @"Unknown operation: %d", operation);
-      break;
-  }
-
-  NSData *key = [self AESKeyForPassword:password salt:salt];
+  // FIXME: Implement HMAC checking
+  NSAssert([inStream streamStatus] != NSStreamStatusNotOpen, @"fromStream must be open");
+  NSAssert([outStream streamStatus] != NSStreamStatusNotOpen, @"toStream must be open");
 
   // Create the cryptor
   CCCryptorRef cryptor = NULL;
@@ -285,8 +253,8 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
   }
 
   // Calculate the buffer size and create the buffers.
-  // The MAX() check isn't really necessary, but is a safety in 
-  // case RNCRYPTMANAGER_USE_SAME_BUFFER is enabled, since both
+  // The MAX() check isn't really necessary, but is a safety in
+  // case RNCRYPTOR_USE_SAME_BUFFER is enabled, since both
   // buffers will be the same. This just guarantees the the read
   // buffer will always be large enough, even during decryption.
   const size_t readBlockSize = self.configuration.readBlockSize;
@@ -321,11 +289,7 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
                              dstBufferSize, // dataOutAvailable
                              &dstLength);   // dataOutMoved
 
-    if (![self processResult:result
-                       bytes:dstBytes
-                      length:dstLength
-                    toStream:outStream
-                       error:error])
+    if (![self processResult:result bytes:dstBytes length:dstLength toStream:outStream error:error])
     {
       CCCryptorRelease(cryptor);
       return NO;
@@ -359,28 +323,63 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
   return YES;
 }
 
-- (BOOL)encryptFromStream:(NSInputStream *)fromStream
-                 toStream:(NSOutputStream *)toStream
-                 password:(NSString *)password
-                    error:(NSError **)error
+- (BOOL)encryptFromStream:(NSInputStream *)inStream toStream:(NSOutputStream *)outStream encryptionKey:(NSData *)key IV:(NSData *)iv HMACKey:(NSData *)HMACKey error:(NSError **)error
 {
-  return [self applyOperation:kCCEncrypt
-                   fromStream:fromStream
-                     toStream:toStream
-                     password:password
-                        error:error];
+  return [self applyOperation:kCCEncrypt fromStream:inStream toStream:outStream encryptionKey:key IV:iv HMACKey:HMACKey error:error];
 }
 
-- (BOOL)decryptFromStream:(NSInputStream *)fromStream
-                 toStream:(NSOutputStream *)toStream
+- (BOOL)decryptFromStream:(NSInputStream *)inStream
+                 toStream:(NSOutputStream *)outStream
+            encryptionKey:(NSData *)encryptionKey
+                       IV:(NSData *)IV
+                  HMACKey:(NSData *)HMACKey
+                    error:(NSError **)error
+{
+  return [self applyOperation:kCCDecrypt fromStream:inStream toStream:outStream encryptionKey:encryptionKey IV:IV HMACKey:HMACKey error:error];
+}
+
+- (BOOL)encryptFromStream:(NSInputStream *)inStream
+                 toStream:(NSOutputStream *)outStream
                  password:(NSString *)password
                     error:(NSError **)error
 {
-  return [self applyOperation:kCCDecrypt
-                   fromStream:fromStream
-                     toStream:toStream
-                     password:password
-                        error:error];
+  // Generate a random IV and salts and write them to stream
+  NSData *iv = [self randomDataOfLength:self.configuration.IVSize];
+  NSData *encryptionSalt = [self randomDataOfLength:self.configuration.saltSize];
+  NSData *encryptionKey = [self keyForPassword:password salt:encryptionSalt];
+  NSData *HMACSalt = [self randomDataOfLength:self.configuration.saltSize];
+  NSData *HMACKey = [self keyForPassword:password salt:HMACSalt];
+
+  if (![outStream _RNWriteData:iv error:error] ||
+      ![outStream _RNWriteData:encryptionSalt error:error] ||
+      ![outStream _RNWriteData:HMACSalt error:error])
+  {
+    return NO;
+  }
+
+  return [self encryptFromStream:inStream toStream:outStream encryptionKey:encryptionKey IV:iv HMACKey:HMACKey error:error];
+}
+
+- (BOOL)decryptFromStream:(NSInputStream *)inStream
+                 toStream:(NSOutputStream *)outStream
+                 password:(NSString *)password
+                    error:(NSError **)error
+{
+  NSData *iv;
+  NSData *encryptionSalt;
+  NSData *HMACSalt;
+  // Read the IV and salts from the encrypted file
+  if (![inStream _RNGetData:&iv maxLength:self.configuration.IVSize error:error] ||
+      ![inStream _RNGetData:&encryptionSalt maxLength:self.configuration.saltSize error:error] ||
+      ![inStream _RNGetData:&HMACSalt maxLength:self.configuration.saltSize error:error])
+  {
+    return NO;
+  }
+
+  NSData *encryptionKey = [self keyForPassword:password salt:encryptionSalt];
+  NSData *HMACKey = [self keyForPassword:password salt:HMACSalt];
+
+  return [self decryptFromStream:inStream toStream:outStream encryptionKey:encryptionKey IV:iv HMACKey:HMACKey error:error];
 }
 
 //- (NSData *)encryptedDataForData:(NSData *)data
