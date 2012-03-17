@@ -183,204 +183,316 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
   return derivedKey;
 }
 
-- (BOOL)processResult:(CCCryptorStatus)result
-                bytes:(uint8_t *)bytes
-               length:(size_t)length
-             toStream:(NSOutputStream *)outStream
-                error:(NSError **)error
+//- (BOOL)processResult:(CCCryptorStatus)result
+//                bytes:(uint8_t *)bytes
+//               length:(size_t)length
+//             toStream:(NSOutputStream *)outStream
+//                error:(NSError **)error
+//{
+//
+//  if (result != kCCSuccess)
+//  {
+//    if (error)
+//    {
+//      *error = [NSError errorWithDomain:kRNCryptorErrorDomain
+//                                   code:result
+//                               userInfo:nil];
+//    }
+//    // Don't assert here. It could just be a bad password
+//    NSLog(@"Could not process data: %d", result);
+//    return NO;
+//  }
+//
+//  if (length > 0)
+//  {
+//    if ([outStream write:bytes maxLength:length] != length)
+//    {
+//      if (error)
+//      {
+//        *error = [outStream streamError];
+//      }
+//      return NO;
+//    }
+//  }
+//  return YES;
+//}
+//
+//- (BOOL)applyOperation:(CCOperation)operation
+//            fromStream:(NSInputStream *)inStream
+//              toStream:(NSOutputStream *)outStream
+//         encryptionKey:(NSData *)key
+//                    IV:(NSData *)iv
+//               HMACKey:(NSData *)HMACKey
+//                 error:(NSError **)error
+//{
+//  // FIXME: Implement HMAC checking
+//  NSAssert([inStream streamStatus] != NSStreamStatusNotOpen, @"fromStream must be open");
+//  NSAssert([outStream streamStatus] != NSStreamStatusNotOpen, @"toStream must be open");
+//
+//  // Create the cryptor
+//  CCCryptorRef cryptor = NULL;
+//  CCCryptorStatus result;
+//  result = CCCryptorCreate(operation,             // operation
+//                           self.configuration.algorithm,            // algorithm
+//                           kCCOptionPKCS7Padding, // options
+//                           key.bytes,             // key
+//                           key.length,            // key length
+//                           iv.bytes,              // IV
+//                           &cryptor);             // OUT cryptorRef
+//
+//  if (result != kCCSuccess || cryptor == NULL)
+//  {
+//    if (error)
+//    {
+//      *error = [NSError errorWithDomain:kRNCryptorErrorDomain
+//                                   code:result
+//                               userInfo:nil];
+//    }
+//    NSAssert(NO, @"Could not create cryptor: %d", result);
+//    return NO;
+//  }
+//
+//  // Calculate the buffer size and create the buffers.
+//  // The MAX() check isn't really necessary, but is a safety in
+//  // case RNCRYPTOR_USE_SAME_BUFFER is enabled, since both
+//  // buffers will be the same. This just guarantees the the read
+//  // buffer will always be large enough, even during decryption.
+//  const size_t readBlockSize = self.configuration.readBlockSize;
+//  size_t dstBufferSize = MAX(CCCryptorGetOutputLength(cryptor, // cryptor
+//                                                      readBlockSize, // input length
+//                                                      true), // final
+//  readBlockSize);
+//
+//  NSMutableData *dstData = [NSMutableData dataWithLength:dstBufferSize];
+//
+//  NSMutableData *
+//#if RNCRYPTOR_USE_SAME_BUFFER
+//  srcData = dstData;
+//#else
+//      // See explanation at top of file
+//      srcData = [NSMutableData dataWithLength:readBlockSize];
+//#endif
+//
+//  uint8_t *srcBytes = srcData.mutableBytes;
+//  uint8_t *dstBytes = dstData.mutableBytes;
+//
+//  // Read and write the data in blocks
+//  ssize_t srcLength;
+//  size_t dstLength = 0;
+//
+//  while ((srcLength = [inStream read:srcBytes maxLength:readBlockSize]) > 0)
+//  {
+//    result = CCCryptorUpdate(cryptor,       // cryptor
+//                             srcBytes,      // dataIn
+//                             (size_t)srcLength,     // dataInLength (verified > 0 above)
+//                             dstBytes,      // dataOut
+//                             dstBufferSize, // dataOutAvailable
+//                             &dstLength);   // dataOutMoved
+//
+//    if (![self processResult:result bytes:dstBytes length:dstLength toStream:outStream error:error])
+//    {
+//      CCCryptorRelease(cryptor);
+//      return NO;
+//    }
+//  }
+//  if (srcLength != 0)
+//  {
+//    if (error)
+//    {
+//      *error = [inStream streamError];
+//      return NO;
+//    }
+//  }
+//
+//  // Write the final block
+//  result = CCCryptorFinal(cryptor,        // cryptor
+//                          dstBytes,       // dataOut
+//                          dstBufferSize,  // dataOutAvailable
+//                          &dstLength);    // dataOutMoved
+//  if (![self processResult:result
+//                     bytes:dstBytes
+//                    length:dstLength
+//                  toStream:outStream
+//                     error:error])
+//  {
+//    CCCryptorRelease(cryptor);
+//    return NO;
+//  }
+//
+//  CCCryptorRelease(cryptor);
+//  return YES;
+//}
+
+
+- (BOOL)performOperation:(CCOperation)operation readBlock:(RNCryptorReadBlock)readBlock writeBlock:(RNCryptorWriteBlock)writeBlock encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV error:(NSError **)error
 {
-
-  if (result != kCCSuccess)
-  {
-    if (error)
-    {
-      *error = [NSError errorWithDomain:kRNCryptorErrorDomain
-                                   code:result
-                               userInfo:nil];
-    }
-    // Don't assert here. It could just be a bad password
-    NSLog(@"Could not process data: %d", result);
-    return NO;
-  }
-
-  if (length > 0)
-  {
-    if ([outStream write:bytes maxLength:length] != length)
-    {
-      if (error)
-      {
-        *error = [outStream streamError];
-      }
-      return NO;
-    }
-  }
-  return YES;
-}
-
-- (BOOL)applyOperation:(CCOperation)operation
-            fromStream:(NSInputStream *)inStream
-              toStream:(NSOutputStream *)outStream
-         encryptionKey:(NSData *)key
-                    IV:(NSData *)iv
-               HMACKey:(NSData *)HMACKey
-                 error:(NSError **)error
-{
-  // FIXME: Implement HMAC checking
-  NSAssert([inStream streamStatus] != NSStreamStatusNotOpen, @"fromStream must be open");
-  NSAssert([outStream streamStatus] != NSStreamStatusNotOpen, @"toStream must be open");
-
-  // Create the cryptor
+// Create the cryptor
   CCCryptorRef cryptor = NULL;
-  CCCryptorStatus result;
-  result = CCCryptorCreate(operation,             // operation
-                           self.configuration.algorithm,            // algorithm
-                           kCCOptionPKCS7Padding, // options
-                           key.bytes,             // key
-                           key.length,            // key length
-                           iv.bytes,              // IV
-                           &cryptor);             // OUT cryptorRef
+  CCCryptorStatus cryptorStatus;
+  cryptorStatus = CCCryptorCreate(operation,             // operation
+                                  self.configuration.algorithm,            // algorithm
+                                  kCCOptionPKCS7Padding, // options
+                                  encryptionKey.bytes,             // key
+                                  encryptionKey.length,            // key length
+                                  IV.bytes,              // IV
+                                  &cryptor);             // OUT cryptorRef
 
-  if (result != kCCSuccess || cryptor == NULL)
+  if (cryptorStatus != kCCSuccess || cryptor == NULL)
   {
     if (error)
     {
-      *error = [NSError errorWithDomain:kRNCryptorErrorDomain
-                                   code:result
-                               userInfo:nil];
+      *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:cryptorStatus userInfo:nil];
     }
-    NSAssert(NO, @"Could not create cryptor: %d", result);
+    NSAssert(NO, @"Could not create cryptor: %d", cryptorStatus);
     return NO;
   }
 
-  // Calculate the buffer size and create the buffers.
-  // The MAX() check isn't really necessary, but is a safety in
-  // case RNCRYPTOR_USE_SAME_BUFFER is enabled, since both
-  // buffers will be the same. This just guarantees the the read
-  // buffer will always be large enough, even during decryption.
-  const size_t readBlockSize = self.configuration.readBlockSize;
-  size_t dstBufferSize = MAX(CCCryptorGetOutputLength(cryptor, // cryptor
-                                                      readBlockSize, // input length
-                                                      true), // final
-  readBlockSize);
+  NSData *inData;
+  BOOL stop = NO;
+  NSMutableData *outData = [NSMutableData data];
+  size_t dataOutMoved;
 
-  NSMutableData *dstData = [NSMutableData dataWithLength:dstBufferSize];
-
-  NSMutableData *
-#if RNCRYPTOR_USE_SAME_BUFFER
-  srcData = dstData;
-#else
-      // See explanation at top of file
-      srcData = [NSMutableData dataWithLength:readBlockSize];
-#endif
-
-  uint8_t *srcBytes = srcData.mutableBytes;
-  uint8_t *dstBytes = dstData.mutableBytes;
-
-  // Read and write the data in blocks
-  ssize_t srcLength;
-  size_t dstLength = 0;
-
-  while ((srcLength = [inStream read:srcBytes maxLength:readBlockSize]) > 0)
+  while (!stop)
   {
-    result = CCCryptorUpdate(cryptor,       // cryptor
-                             srcBytes,      // dataIn
-                             (size_t)srcLength,     // dataInLength (verified > 0 above)
-                             dstBytes,      // dataOut
-                             dstBufferSize, // dataOutAvailable
-                             &dstLength);   // dataOutMoved
-
-    if (![self processResult:result bytes:dstBytes length:dstLength toStream:outStream error:error])
+    BOOL readResult = readBlock(&inData, &stop, error);
+    if (! readResult)
     {
       CCCryptorRelease(cryptor);
       return NO;
     }
-  }
-  if (srcLength != 0)
-  {
-    if (error)
+
+    [outData setLength:CCCryptorGetOutputLength(cryptor, [inData length], true)];
+    cryptorStatus = CCCryptorUpdate(cryptor,       // cryptor
+                                    inData.bytes,      // dataIn
+                                    inData.length,     // dataInLength (verified > 0 above)
+                                    outData.mutableBytes,      // dataOut
+                                    outData.length, // dataOutAvailable
+                                    &dataOutMoved);   // dataOutMoved
+
+    if (cryptorStatus != kCCSuccess)
     {
-      *error = [inStream streamError];
+      if (error)
+      {
+        *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:cryptorStatus userInfo:nil];
+      }
+      NSLog(@"[%s] Could not process data: %d", __PRETTY_FUNCTION__, cryptorStatus);
+      CCCryptorRelease(cryptor);
       return NO;
+    }
+
+    if (dataOutMoved > 0)
+    {
+      [outData setLength:dataOutMoved];
+
+      if (! writeBlock(outData, error))
+      {
+        CCCryptorRelease(cryptor);
+        return NO;
+      }
     }
   }
 
   // Write the final block
-  result = CCCryptorFinal(cryptor,        // cryptor
-                          dstBytes,       // dataOut
-                          dstBufferSize,  // dataOutAvailable
-                          &dstLength);    // dataOutMoved
-  if (![self processResult:result
-                     bytes:dstBytes
-                    length:dstLength
-                  toStream:outStream
-                     error:error])
+  cryptorStatus = CCCryptorFinal(cryptor,        // cryptor
+                                 outData.mutableBytes,       // dataOut
+                                 outData.length,  // dataOutAvailable
+                                 &dataOutMoved);    // dataOutMoved
+  if (cryptorStatus != kCCSuccess)
   {
+    if (error)
+    {
+      *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:cryptorStatus userInfo:nil];
+    }
+    NSLog(@"[%s] Could not process data: %d", __PRETTY_FUNCTION__, cryptorStatus);
     CCCryptorRelease(cryptor);
     return NO;
+  }
+
+  if (dataOutMoved > 0)
+  {
+    [outData setLength:dataOutMoved];
+
+    if (! writeBlock(outData, error))
+    {
+      CCCryptorRelease(cryptor);
+      return NO;
+    }
   }
 
   CCCryptorRelease(cryptor);
   return YES;
 }
 
-- (BOOL)encryptFromStream:(NSInputStream *)inStream toStream:(NSOutputStream *)outStream encryptionKey:(NSData *)key IV:(NSData *)iv HMACKey:(NSData *)HMACKey error:(NSError **)error
+- (BOOL)encryptWithReadBlock:(RNCryptorReadBlock)readBlock writeBlock:(RNCryptorWriteBlock)writeBlock encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV HMACKey:(NSData *)HMACKey error:(NSError **)error
 {
-  return [self applyOperation:kCCEncrypt fromStream:inStream toStream:outStream encryptionKey:key IV:iv HMACKey:HMACKey error:error];
+  return [self performOperation:kCCEncrypt readBlock:readBlock writeBlock:writeBlock encryptionKey:encryptionKey IV:IV error:error];
+
 }
 
-- (BOOL)decryptFromStream:(NSInputStream *)inStream
-                 toStream:(NSOutputStream *)outStream
-            encryptionKey:(NSData *)encryptionKey
-                       IV:(NSData *)IV
-                  HMACKey:(NSData *)HMACKey
-                    error:(NSError **)error
+- (BOOL)decryptWithReadBlock:(RNCryptorReadBlock)readBlock writeBlock:(RNCryptorWriteBlock)writeBlock encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV HMACKey:(NSData *)HMACKey error:(NSError **)error
 {
-  return [self applyOperation:kCCDecrypt fromStream:inStream toStream:outStream encryptionKey:encryptionKey IV:IV HMACKey:HMACKey error:error];
+  return [self performOperation:kCCDecrypt readBlock:readBlock writeBlock:writeBlock encryptionKey:encryptionKey IV:IV error:error];
 }
 
-- (BOOL)encryptFromStream:(NSInputStream *)inStream
-                 toStream:(NSOutputStream *)outStream
-                 password:(NSString *)password
-                    error:(NSError **)error
-{
-  // Generate a random IV and salts and write them to stream
-  NSData *iv = [self randomDataOfLength:self.configuration.IVSize];
-  NSData *encryptionSalt = [self randomDataOfLength:self.configuration.saltSize];
-  NSData *encryptionKey = [self keyForPassword:password salt:encryptionSalt];
-  NSData *HMACSalt = [self randomDataOfLength:self.configuration.saltSize];
-  NSData *HMACKey = [self keyForPassword:password salt:HMACSalt];
 
-  if (![outStream _RNWriteData:iv error:error] ||
-      ![outStream _RNWriteData:encryptionSalt error:error] ||
-      ![outStream _RNWriteData:HMACSalt error:error])
-  {
-    return NO;
-  }
-
-  return [self encryptFromStream:inStream toStream:outStream encryptionKey:encryptionKey IV:iv HMACKey:HMACKey error:error];
-}
-
-- (BOOL)decryptFromStream:(NSInputStream *)inStream
-                 toStream:(NSOutputStream *)outStream
-                 password:(NSString *)password
-                    error:(NSError **)error
-{
-  NSData *iv;
-  NSData *encryptionSalt;
-  NSData *HMACSalt;
-  // Read the IV and salts from the encrypted file
-  if (![inStream _RNGetData:&iv maxLength:self.configuration.IVSize error:error] ||
-      ![inStream _RNGetData:&encryptionSalt maxLength:self.configuration.saltSize error:error] ||
-      ![inStream _RNGetData:&HMACSalt maxLength:self.configuration.saltSize error:error])
-  {
-    return NO;
-  }
-
-  NSData *encryptionKey = [self keyForPassword:password salt:encryptionSalt];
-  NSData *HMACKey = [self keyForPassword:password salt:HMACSalt];
-
-  return [self decryptFromStream:inStream toStream:outStream encryptionKey:encryptionKey IV:iv HMACKey:HMACKey error:error];
-}
+//- (BOOL)encryptFromStream:(NSInputStream *)inStream toStream:(NSOutputStream *)outStream encryptionKey:(NSData *)key IV:(NSData *)iv HMACKey:(NSData *)HMACKey error:(NSError **)error
+//{
+//  return [self applyOperation:kCCEncrypt fromStream:inStream toStream:outStream encryptionKey:key IV:iv HMACKey:HMACKey error:error];
+//}
+//
+//- (BOOL)decryptFromStream:(NSInputStream *)inStream
+//                 toStream:(NSOutputStream *)outStream
+//            encryptionKey:(NSData *)encryptionKey
+//                       IV:(NSData *)IV
+//                  HMACKey:(NSData *)HMACKey
+//                    error:(NSError **)error
+//{
+//  return [self applyOperation:kCCDecrypt fromStream:inStream toStream:outStream encryptionKey:encryptionKey IV:IV HMACKey:HMACKey error:error];
+//}
+//
+//- (BOOL)encryptFromStream:(NSInputStream *)inStream
+//                 toStream:(NSOutputStream *)outStream
+//                 password:(NSString *)password
+//                    error:(NSError **)error
+//{
+//  // Generate a random IV and salts and write them to stream
+//  NSData *iv = [self randomDataOfLength:self.configuration.IVSize];
+//  NSData *encryptionSalt = [self randomDataOfLength:self.configuration.saltSize];
+//  NSData *encryptionKey = [self keyForPassword:password salt:encryptionSalt];
+//  NSData *HMACSalt = [self randomDataOfLength:self.configuration.saltSize];
+//  NSData *HMACKey = [self keyForPassword:password salt:HMACSalt];
+//
+//  if (![outStream _RNWriteData:iv error:error] ||
+//      ![outStream _RNWriteData:encryptionSalt error:error] ||
+//      ![outStream _RNWriteData:HMACSalt error:error])
+//  {
+//    return NO;
+//  }
+//
+//  return [self encryptFromStream:inStream toStream:outStream encryptionKey:encryptionKey IV:iv HMACKey:HMACKey error:error];
+//}
+//
+//- (BOOL)decryptFromStream:(NSInputStream *)inStream
+//                 toStream:(NSOutputStream *)outStream
+//                 password:(NSString *)password
+//                    error:(NSError **)error
+//{
+//  NSData *iv;
+//  NSData *encryptionSalt;
+//  NSData *HMACSalt;
+//  // Read the IV and salts from the encrypted file
+//  if (![inStream _RNGetData:&iv maxLength:self.configuration.IVSize error:error] ||
+//      ![inStream _RNGetData:&encryptionSalt maxLength:self.configuration.saltSize error:error] ||
+//      ![inStream _RNGetData:&HMACSalt maxLength:self.configuration.saltSize error:error])
+//  {
+//    return NO;
+//  }
+//
+//  NSData *encryptionKey = [self keyForPassword:password salt:encryptionSalt];
+//  NSData *HMACKey = [self keyForPassword:password salt:HMACSalt];
+//
+//  return [self decryptFromStream:inStream toStream:outStream encryptionKey:encryptionKey IV:iv HMACKey:HMACKey error:error];
+//}
 
 //- (NSData *)encryptedDataForData:(NSData *)data
 //                        password:(NSString *)password
