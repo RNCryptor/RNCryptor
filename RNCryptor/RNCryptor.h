@@ -103,6 +103,11 @@ typedef BOOL (^RNCryptorWriteBlock)(NSData *writeData, NSError **error);
                      HMACKey:(NSData *)HMACKey
                        error:(NSError **)error;
 
+
+- (RNCryptorReadBlock)readBlockForData:(NSData *)data;
+
+- (RNCryptorWriteBlock)writeBlockForData:(NSMutableData *)data;
+
 ///** Encrypts stream
 //*
 //* @param fromStream The stream to encrypt

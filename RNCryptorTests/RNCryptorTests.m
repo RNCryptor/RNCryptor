@@ -52,54 +52,32 @@
 {
   RNCryptor *cryptor = [RNCryptor AES128Cryptor];
 
-  __block NSData *data = [cryptor randomDataOfLength:1024];
+  NSData *data = [cryptor randomDataOfLength:1024];
   NSData *key = [cryptor randomDataOfLength:kCCKeySizeAES128];
   NSData *iv = [cryptor randomDataOfLength:kCCBlockSizeAES128];
 
-  __block NSMutableData *encrypted = [NSMutableData data];
-
-  RNCryptorReadBlock readBlock = ^BOOL(NSData **readData, BOOL *stop, NSError **error) {
-    *readData = data;
-    *stop = YES;
-    return YES;
-  };
-
-  RNCryptorWriteBlock writeBlock = ^BOOL(NSData *encryptedData, NSError **error) {
-      [encrypted appendData:encryptedData];
-      return YES;
-    };
+  NSMutableData *encryptedData = [NSMutableData data];
 
   NSError *error;
-  STAssertTrue([cryptor encryptWithReadBlock:readBlock
-                                  writeBlock:writeBlock
+  STAssertTrue([cryptor encryptWithReadBlock:[cryptor readBlockForData:data]
+                                  writeBlock:[cryptor writeBlockForData:encryptedData]
                                encryptionKey:key
                                           IV:iv
                                      HMACKey:nil
                                        error:&error], @"Failed to encrypt:", error);
 
-  STAssertNotNil(encrypted, @"Encrypted should be non-nil");
+  STAssertNotNil(encryptedData, @"Encrypted should be non-nil");
 
-  __block NSMutableData *decrypted = [NSMutableData data];
+  NSMutableData *decryptedData = [NSMutableData data];
 
-  readBlock = ^BOOL(NSData **readData, BOOL *stop, NSError **error) {
-    *readData = encrypted;
-    *stop = YES;
-    return YES;
-  };
-
-  writeBlock = ^BOOL(NSData *encryptedData, NSError **error) {
-    [decrypted appendData:encryptedData];
-    return YES;
-  };
-
-  STAssertTrue([cryptor decryptWithReadBlock:readBlock
-                                  writeBlock:writeBlock
+  STAssertTrue([cryptor decryptWithReadBlock:[cryptor readBlockForData:encryptedData]
+                                  writeBlock:[cryptor writeBlockForData:decryptedData]
                                encryptionKey:key
                                           IV:iv
                                      HMACKey:nil
                                        error:&error], @"Failed to decrypt:", error);
 
-  STAssertEqualObjects(decrypted, data, @"Decrypt does not match original");
+  STAssertEqualObjects(decryptedData, data, @"Decrypt does not match original");
 }
 
 - (RNCryptorReadBlock)streamReadBlockForData:(NSData *)data

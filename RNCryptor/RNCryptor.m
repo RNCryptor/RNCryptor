@@ -434,6 +434,23 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
   return [self performOperation:kCCDecrypt readBlock:readBlock writeBlock:writeBlock encryptionKey:encryptionKey IV:IV error:error];
 }
 
+- (RNCryptorReadBlock)readBlockForData:(NSData *)data
+{
+  return ^BOOL(NSData **readData, BOOL *stop, NSError **error) {
+    *readData = data;
+    *stop = YES;
+    return YES;
+  };
+}
+
+- (RNCryptorWriteBlock)writeBlockForData:(NSMutableData *)data
+{
+  return ^BOOL(NSData *encryptedData, NSError **error) {
+      [data appendData:encryptedData];
+      return YES;
+    };
+}
+
 
 //- (BOOL)encryptFromStream:(NSInputStream *)inStream toStream:(NSOutputStream *)outStream encryptionKey:(NSData *)key IV:(NSData *)iv HMACKey:(NSData *)HMACKey error:(NSError **)error
 //{
