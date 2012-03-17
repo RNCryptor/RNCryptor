@@ -73,15 +73,18 @@
 
   NSMutableData *decryptedData = [NSMutableData data];
 
+  NSMutableData *decryptHMAC;
+
   STAssertTrue([cryptor decryptWithReadBlock:[cryptor readBlockForData:encryptedData]
                                   writeBlock:[cryptor writeBlockForData:decryptedData]
                                encryptionKey:key
                                           IV:iv
                                      HMACKey:HMACkey
-                                        HMAC:HMAC
+                                        HMAC:&decryptHMAC
                                        error:&error], @"Failed to decrypt:", error);
 
   STAssertEqualObjects(decryptedData, data, @"Decrypt does not match original");
+  STAssertEqualObjects(HMAC, decryptHMAC, @"HMAC do not match");
 }
 
 - (RNCryptorReadBlock)streamReadBlockForData:(NSData *)data
