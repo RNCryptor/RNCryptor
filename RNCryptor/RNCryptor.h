@@ -75,42 +75,42 @@ typedef struct
 /** Returns default configuration for AES-128. This can be modified and handed to initWithConfiguration:.
 */
 + (RNCryptorConfiguration)AES128Configuration;
-
-///---------------------------------------------------------------------------------------
-/// @name Encrypt/Decrypt In Memory
-///---------------------------------------------------------------------------------------
-
-/** Encrypts data against a password, with a randomly generated IV and salt
-  
- @param data The data to encrypt
- @param password A password. Generally this is human-provided. An AES key will be generated from this.
- @param IV Out parameter set to the randomly generated IV. This may not be `NULL`.
- @param salt Out parameter set to the randomly generated salt. This may not be `NULL`.
- @param error Out parameter used if an error occurs. May be `NULL` if no error is required.
- @return Returns the encrypted data, or `nil` if there is an error.
- */
-
-- (NSData *)encryptedDataForData:(NSData *)data
-                        password:(NSString *)password
-                              IV:(NSData **)IV
-                            salt:(NSData **)salt
-                           error:(NSError **)error;
-
-/** Decrypts data using a password, IV and salt
- 
- @param data The data to decrypt
- @param password A password. Generally this is human-provided. An AES key will be generated from this using the same algorithm as in the encrypt methods.
- @param IV The IV (generally provided by encrypt methods)
- @param salt The salt (generally provided by encrypt methods)
- @param error Out parameter used if an error occurs. May be `NULL` if no error is required.
- @return Returns the decrypted data, or `nil` if there is an error.
- */
-
-- (NSData *)decryptedDataForData:(NSData *)data
-                        password:(NSString *)password
-                              IV:(NSData *)IV
-                            salt:(NSData *)salt
-                           error:(NSError **)error;
+//
+/////---------------------------------------------------------------------------------------
+///// @name Encrypt/Decrypt In Memory
+/////---------------------------------------------------------------------------------------
+//
+///** Encrypts data against a password, with a randomly generated IV and salt
+//
+// @param data The data to encrypt
+// @param password A password. Generally this is human-provided. An AES key will be generated from this.
+// @param IV Out parameter set to the randomly generated IV. This may not be `NULL`.
+// @param salt Out parameter set to the randomly generated salt. This may not be `NULL`.
+// @param error Out parameter used if an error occurs. May be `NULL` if no error is required.
+// @return Returns the encrypted data, or `nil` if there is an error.
+// */
+//
+//- (NSData *)encryptedDataForData:(NSData *)data
+//                        password:(NSString *)password
+//                              IV:(NSData **)IV
+//                            salt:(NSData **)salt
+//                           error:(NSError **)error;
+//
+///** Decrypts data using a password, IV and salt
+//
+// @param data The data to decrypt
+// @param password A password. Generally this is human-provided. An AES key will be generated from this using the same algorithm as in the encrypt methods.
+// @param IV The IV (generally provided by encrypt methods)
+// @param salt The salt (generally provided by encrypt methods)
+// @param error Out parameter used if an error occurs. May be `NULL` if no error is required.
+// @return Returns the decrypted data, or `nil` if there is an error.
+// */
+//
+//- (NSData *)decryptedDataForData:(NSData *)data
+//                        password:(NSString *)password
+//                              IV:(NSData *)IV
+//                            salt:(NSData *)salt
+//                           error:(NSError **)error;
 
 ///---------------------------------------------------------------------------------------
 /// @name Encrypt/Decrypt with NSStream

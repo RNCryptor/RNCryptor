@@ -30,19 +30,18 @@
 // to do in-place encryption or decryption. This does not work
 // in cases where you call CCCryptUpdate multiple times and you
 // have padding enabled. radar://9930555
-#define RNCRYPTMANAGER_USE_SAME_BUFFER 0
+#define RNCRYPTOR_USE_SAME_BUFFER 0
 
 //static const NSUInteger kMaxReadSize = 1024;
 
-NSString *const
-    kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
+NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
 
 @interface NSOutputStream (Data)
-- (BOOL)_RNwriteData:(NSData *)data error:(NSError **)error;
+- (BOOL)_RNWriteData:(NSData *)data error:(NSError **)error;
 @end
 
 @implementation NSOutputStream (Data)
-- (BOOL)_RNwriteData:(NSData *)data error:(NSError **)error
+- (BOOL)_RNWriteData:(NSData *)data error:(NSError **)error
 {
   // Writing 0 bytes will close the output stream.
   // This is an undocumented side-effect. radar://9930518
@@ -65,14 +64,14 @@ NSString *const
 @end
 
 @interface NSInputStream (Data)
-- (BOOL)_RNgetData:(NSData **)data
+- (BOOL)_RNGetData:(NSData **)data
          maxLength:(NSUInteger)maxLength
              error:(NSError **)error;
 @end
 
 @implementation NSInputStream (Data)
 
-- (BOOL)_RNgetData:(NSData **)data
+- (BOOL)_RNGetData:(NSData **)data
          maxLength:(NSUInteger)maxLength
              error:(NSError **)error
 {
@@ -237,18 +236,18 @@ NSString *const
       iv = [self randomDataOfLength:self.configuration.IVSize];
       salt = [self randomDataOfLength:self.configuration.saltSize];
 
-      if (![outStream _RNwriteData:iv error:error] ||
-          ![outStream _RNwriteData:salt error:error])
+      if (![outStream _RNWriteData:iv error:error] ||
+          ![outStream _RNWriteData:salt error:error])
       {
         return NO;
       }
       break;
     case kCCDecrypt:
       // Read the IV and salt from the encrypted file
-      if (![inStream _RNgetData:&iv
+      if (![inStream _RNGetData:&iv
                       maxLength:self.configuration.IVSize
                           error:error] ||
-          ![inStream _RNgetData:&salt
+          ![inStream _RNGetData:&salt
                       maxLength:self.configuration.saltSize
                           error:error])
       {
@@ -299,7 +298,7 @@ NSString *const
   NSMutableData *dstData = [NSMutableData dataWithLength:dstBufferSize];
 
   NSMutableData *
-#if RNCRYPTMANAGER_USE_SAME_BUFFER
+#if RNCRYPTOR_USE_SAME_BUFFER
   srcData = dstData;
 #else
       // See explanation at top of file
@@ -384,101 +383,101 @@ NSString *const
                         error:error];
 }
 
-- (NSData *)encryptedDataForData:(NSData *)data
-                        password:(NSString *)password
-                              IV:(NSData **)IV
-                            salt:(NSData **)salt
-                           error:(NSError **)error
-{
-  NSAssert(IV, @"IV must not be NULL");
-  NSAssert(salt, @"salt must not be NULL");
-
-  *IV = [self randomDataOfLength:self.configuration.IVSize];
-  *salt = [self randomDataOfLength:self.configuration.saltSize];
-
-  NSData *key = [self AESKeyForPassword:password salt:*salt];
-
-  size_t outLength;
-  NSMutableData *
-      cipherData = [NSMutableData dataWithLength:data.length + self.configuration.blockSize];
-
-  CCCryptorStatus
-      result = CCCrypt(kCCEncrypt, // operation
-                       self.configuration.algorithm, // Algorithm
-                       kCCOptionPKCS7Padding, // options
-                       key.bytes, // key
-                       key.length, // key length
-                       (*IV).bytes,// iv
-                       data.bytes, // dataIn
-                       data.length, // dataInLength,
-                       cipherData.mutableBytes, // dataOut
-                       cipherData.length, // dataOutAvailable
-                       &outLength); // dataOutMoved
-
-  if (result == kCCSuccess)
-  {
-    cipherData.length = outLength;
-  }
-  else
-  {
-    if (error)
-    {
-      *error = [NSError errorWithDomain:kRNCryptorErrorDomain
-                                   code:result
-                               userInfo:nil];
-    }
-    return nil;
-  }
-
-  return cipherData;
-}
-
-- (NSData *)decryptedDataForData:(NSData *)data
-                        password:(NSString *)password
-                              IV:(NSData *)IV
-                            salt:(NSData *)salt
-                           error:(NSError **)error
-{
-
-  NSData *key = [self AESKeyForPassword:password salt:salt];
-
-  size_t outLength;
-  NSMutableData *
-      decryptedData = [NSMutableData dataWithLength:data.length];
-  CCCryptorStatus
-      result = CCCrypt(kCCDecrypt, // operation
-                       self.configuration.algorithm, // Algorithm
-                       kCCOptionPKCS7Padding, // options
-                       key.bytes, // key
-                       key.length, // key length
-                       IV.bytes,// iv
-                       data.bytes, // dataIn
-                       data.length, // dataInLength,
-                       decryptedData.mutableBytes, // dataOut
-                       decryptedData.length, // dataOutAvailable
-                       &outLength); // dataOutMoved
-
-  if (result == kCCSuccess)
-  {
-    [decryptedData setLength:outLength];
-  }
-  else
-  {
-    if (result != kCCSuccess)
-    {
-      if (error)
-      {
-        *error = [NSError
-            errorWithDomain:kRNCryptorErrorDomain
-                       code:result
-                   userInfo:nil];
-      }
-      return nil;
-    }
-  }
-
-  return decryptedData;
-}
+//- (NSData *)encryptedDataForData:(NSData *)data
+//                        password:(NSString *)password
+//                              IV:(NSData **)IV
+//                            salt:(NSData **)salt
+//                           error:(NSError **)error
+//{
+//  NSAssert(IV, @"IV must not be NULL");
+//  NSAssert(salt, @"salt must not be NULL");
+//
+//  *IV = [self randomDataOfLength:self.configuration.IVSize];
+//  *salt = [self randomDataOfLength:self.configuration.saltSize];
+//
+//  NSData *key = [self AESKeyForPassword:password salt:*salt];
+//
+//  size_t outLength;
+//  NSMutableData *
+//      cipherData = [NSMutableData dataWithLength:data.length + self.configuration.blockSize];
+//
+//  CCCryptorStatus
+//      result = CCCrypt(kCCEncrypt, // operation
+//                       self.configuration.algorithm, // Algorithm
+//                       kCCOptionPKCS7Padding, // options
+//                       key.bytes, // key
+//                       key.length, // key length
+//                       (*IV).bytes,// iv
+//                       data.bytes, // dataIn
+//                       data.length, // dataInLength,
+//                       cipherData.mutableBytes, // dataOut
+//                       cipherData.length, // dataOutAvailable
+//                       &outLength); // dataOutMoved
+//
+//  if (result == kCCSuccess)
+//  {
+//    cipherData.length = outLength;
+//  }
+//  else
+//  {
+//    if (error)
+//    {
+//      *error = [NSError errorWithDomain:kRNCryptorErrorDomain
+//                                   code:result
+//                               userInfo:nil];
+//    }
+//    return nil;
+//  }
+//
+//  return cipherData;
+//}
+//
+//- (NSData *)decryptedDataForData:(NSData *)data
+//                        password:(NSString *)password
+//                              IV:(NSData *)IV
+//                            salt:(NSData *)salt
+//                           error:(NSError **)error
+//{
+//
+//  NSData *key = [self AESKeyForPassword:password salt:salt];
+//
+//  size_t outLength;
+//  NSMutableData *
+//      decryptedData = [NSMutableData dataWithLength:data.length];
+//  CCCryptorStatus
+//      result = CCCrypt(kCCDecrypt, // operation
+//                       self.configuration.algorithm, // Algorithm
+//                       kCCOptionPKCS7Padding, // options
+//                       key.bytes, // key
+//                       key.length, // key length
+//                       IV.bytes,// iv
+//                       data.bytes, // dataIn
+//                       data.length, // dataInLength,
+//                       decryptedData.mutableBytes, // dataOut
+//                       decryptedData.length, // dataOutAvailable
+//                       &outLength); // dataOutMoved
+//
+//  if (result == kCCSuccess)
+//  {
+//    [decryptedData setLength:outLength];
+//  }
+//  else
+//  {
+//    if (result != kCCSuccess)
+//    {
+//      if (error)
+//      {
+//        *error = [NSError
+//            errorWithDomain:kRNCryptorErrorDomain
+//                       code:result
+//                   userInfo:nil];
+//      }
+//      return nil;
+//    }
+//  }
+//
+//  return decryptedData;
+//}
 
 
 @end

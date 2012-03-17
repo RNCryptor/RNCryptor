@@ -17,7 +17,7 @@
 //
 //  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
 //  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
 //  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 //  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 //  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
@@ -26,27 +26,52 @@
 
 
 #import "RNCryptorTests.h"
+#import "RNCryptor.h"
 
 @implementation RNCryptorTests
 
 - (void)setUp
 {
-    [super setUp];
-    
-    // Set-up code here.
+  [super setUp];
+
+  // Set-up code here.
 }
 
 - (void)tearDown
 {
-    // Tear-down code here.
-    
-    [super tearDown];
+  // Tear-down code here.
+
+  [super tearDown];
 }
 
-- (void)testExample
+- (void)testSimple
 {
-//    STFail(@"Unit tests are not implemented yet in RNCryptTests");
-  STAssertNil(nil, @"nil");
+  NSData *data = [@"Test" dataUsingEncoding:NSUTF8StringEncoding];
+  NSString *password = @"Password";
+
+  RNCryptor *cryptor = [RNCryptor AES128Cryptor];
+  NSInputStream *encryptStream = [NSInputStream inputStreamWithData:data];
+  [encryptStream open];
+  NSOutputStream *encryptedStream = [NSOutputStream outputStreamToMemory];
+  [encryptedStream open];
+  NSError *error;
+  STAssertTrue([cryptor encryptFromStream:encryptStream toStream:encryptedStream password:password error:&error], @"Failed encryption:%@", error);
+  [encryptStream close];
+  [encryptedStream close];
+
+  NSData *encrypted = [encryptedStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
+
+  NSInputStream *decryptStream = [NSInputStream inputStreamWithData:encrypted];
+  [decryptStream open];
+  NSOutputStream *decryptedStream = [NSOutputStream outputStreamToMemory];
+  [decryptedStream open];
+  STAssertTrue([cryptor decryptFromStream:decryptStream toStream:decryptedStream password:password error:&error], @"Failed decryption:%@", error);
+  [decryptStream close];
+  [decryptedStream close];
+
+  NSData *decrypted = [decryptedStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
+
+  STAssertEqualObjects(data, decrypted, @"Encrypted and decrypted data do not match:%@:%@", data, decrypted);
 }
 
 @end
