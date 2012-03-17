@@ -28,6 +28,10 @@
 #import "RNCryptorTests.h"
 #import "RNCryptor.h"
 
+@interface RNCryptor (Private)
+- (NSData *)randomDataOfLength:(size_t)length;
+@end
+
 @implementation RNCryptorTests
 
 - (void)setUp
@@ -42,6 +46,42 @@
   // Tear-down code here.
 
   [super tearDown];
+}
+
+- (void)testLowLevel
+{
+  RNCryptor *cryptor = [RNCryptor AES128Cryptor];
+
+  NSData *data = [cryptor randomDataOfLength:1024];
+  NSData *key = [cryptor randomDataOfLength:kCCKeySizeAES128];
+  NSData *iv = [cryptor randomDataOfLength:kCCBlockSizeAES128];
+
+  NSInputStream *encryptStream = [NSInputStream inputStreamWithData:data];
+  [encryptStream open];
+  NSOutputStream *encryptedStream = [NSOutputStream outputStreamToMemory];
+  [encryptedStream open];
+  NSError *error;
+
+  STAssertTrue([cryptor encryptFromStream:encryptStream toStream:encryptedStream encryptionKey:key IV:iv HMACKey:nil error:&error], @"Failed encryption:%@", error);
+
+  [encryptStream close];
+  [encryptedStream close];
+
+  NSData *encrypted = [encryptedStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
+
+  NSInputStream *decryptStream = [NSInputStream inputStreamWithData:encrypted];
+  [decryptStream open];
+  NSOutputStream *decryptedStream = [NSOutputStream outputStreamToMemory];
+  [decryptedStream open];
+
+  STAssertTrue([cryptor decryptFromStream:decryptStream toStream:decryptedStream encryptionKey:key IV:iv HMACKey:nil error:&error], @"Failed decryption:%@", error);
+
+  [decryptStream close];
+  [decryptedStream close];
+
+  NSData *decrypted = [decryptedStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
+
+  STAssertEqualObjects(data, decrypted, @"Encrypted and decrypted data do not match:%@:%@", data, decrypted);
 }
 
 - (void)testSimple
@@ -71,7 +111,7 @@
 
   NSData *decrypted = [decryptedStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
 
-  STAssertEqualObjects(data, decrypted, @"Encrypted and decrypted data do not match:%@:%@", data, decrypted);
+  STAssertEqualObjects(data, decrypted, @"Encrypted and decrypted data do not match");
 }
 
 @end
