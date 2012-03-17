@@ -54,16 +54,19 @@
 
   NSData *data = [cryptor randomDataOfLength:1024];
   NSData *key = [cryptor randomDataOfLength:kCCKeySizeAES128];
+  NSData *HMACkey = [cryptor randomDataOfLength:kCCKeySizeAES128];
   NSData *iv = [cryptor randomDataOfLength:kCCBlockSizeAES128];
 
   NSMutableData *encryptedData = [NSMutableData data];
+  NSData *HMAC;
 
   NSError *error;
   STAssertTrue([cryptor encryptWithReadBlock:[cryptor readBlockForData:data]
                                   writeBlock:[cryptor writeBlockForData:encryptedData]
                                encryptionKey:key
                                           IV:iv
-                                     HMACKey:nil
+                                     HMACKey:HMACkey
+                                        HMAC:&HMAC
                                        error:&error], @"Failed to encrypt:", error);
 
   STAssertNotNil(encryptedData, @"Encrypted should be non-nil");
@@ -74,7 +77,8 @@
                                   writeBlock:[cryptor writeBlockForData:decryptedData]
                                encryptionKey:key
                                           IV:iv
-                                     HMACKey:nil
+                                     HMACKey:HMACkey
+                                        HMAC:HMAC
                                        error:&error], @"Failed to decrypt:", error);
 
   STAssertEqualObjects(decryptedData, data, @"Decrypt does not match original");
@@ -144,6 +148,7 @@
                                encryptionKey:key
                                           IV:iv
                                      HMACKey:nil
+                                        HMAC:nil
                                        error:&error], @"Failed to encrypt:", error);
 
   [encryptedStream close];
@@ -160,6 +165,7 @@
                                encryptionKey:key
                                           IV:iv
                                      HMACKey:nil
+                                        HMAC:nil
                                        error:&error], @"Failed to decrypt:", error);
 
   [decryptedStream close];

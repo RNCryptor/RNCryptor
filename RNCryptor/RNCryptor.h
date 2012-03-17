@@ -48,7 +48,8 @@ typedef struct
   size_t IVSize;          // kCCBlockSizeAES128
   size_t saltSize;        // 8
   uint PBKDFRounds;       // 10000 (~80ms on an iPhone 4)
-  size_t readBlockSize;   // 1024
+  CCHmacAlgorithm HMACAlgorithm;  // kCCHmacAlgSHA256
+  size_t HMACLength;  // CC_SHA1_DIGEST_LENGTH
 } RNCryptorConfiguration;
 
 typedef BOOL (^RNCryptorReadBlock)(NSData **readData, BOOL *stop, NSError **error);
@@ -94,6 +95,7 @@ typedef BOOL (^RNCryptorWriteBlock)(NSData *writeData, NSError **error);
                encryptionKey:(NSData *)encryptionKey
                           IV:(NSData *)IV
                      HMACKey:(NSData *)HMACKey
+                        HMAC:(NSData **)HMAC
                        error:(NSError **)error;
 
 - (BOOL)decryptWithReadBlock:(RNCryptorReadBlock)readBlock
@@ -101,6 +103,7 @@ typedef BOOL (^RNCryptorWriteBlock)(NSData *writeData, NSError **error);
                encryptionKey:(NSData *)encryptionKey
                           IV:(NSData *)IV
                      HMACKey:(NSData *)HMACKey
+                        HMAC:(NSData *)HMAC
                        error:(NSError **)error;
 
 
