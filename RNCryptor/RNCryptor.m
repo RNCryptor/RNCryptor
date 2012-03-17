@@ -450,11 +450,9 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
   return [self performOperation:kCCEncrypt readBlock:readBlock writeBlock:writeBlock encryptionKey:encryptionKey IV:IV HMACKey:HMACKey HMAC:HMAC error:error];
 }
 
-- (BOOL)decryptWithReadBlock:(RNCryptorReadBlock)readBlock writeBlock:(RNCryptorWriteBlock)writeBlock encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV HMACKey:(NSData *)HMACKey HMAC:(NSData *)HMAC error:(NSError **)error
+- (BOOL)decryptWithReadBlock:(RNCryptorReadBlock)readBlock writeBlock:(RNCryptorWriteBlock)writeBlock encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV HMACKey:(NSData *)HMACKey HMAC:(NSData **)HMAC error:(NSError **)error
 {
-  NSData *computedHMAC;
-  BOOL result = [self performOperation:kCCDecrypt readBlock:readBlock writeBlock:writeBlock encryptionKey:encryptionKey IV:IV HMACKey:HMACKey HMAC:&computedHMAC error:error];
-  return (result && (!HMAC || [HMAC isEqualToData:computedHMAC]));
+  return [self performOperation:kCCDecrypt readBlock:readBlock writeBlock:writeBlock encryptionKey:encryptionKey IV:IV HMACKey:HMACKey HMAC:HMAC error:error];
 }
 
 - (RNCryptorReadBlock)readBlockForData:(NSData *)data

@@ -103,7 +103,7 @@ typedef BOOL (^RNCryptorWriteBlock)(NSData *writeData, NSError **error);
                encryptionKey:(NSData *)encryptionKey
                           IV:(NSData *)IV
                      HMACKey:(NSData *)HMACKey
-                        HMAC:(NSData *)HMAC
+                        HMAC:(NSData **)HMAC
                        error:(NSError **)error;
 
 
