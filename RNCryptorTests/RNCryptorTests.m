@@ -217,4 +217,24 @@
   STAssertEqualObjects(decryptedData, data, @"Decrypted data does not match");
 }
 
+- (void)testCorruption
+{
+  RNCryptor *cryptor = [RNCryptor AES128Cryptor];
+
+  NSData *data = [cryptor randomDataOfLength:1024];
+  NSString *password = @"Passw0rd!";
+
+  NSError *error;
+
+  NSData *encryptedData = [cryptor encryptData:data password:password error:&error];
+
+  NSMutableData *corruptData = [encryptedData mutableCopy];
+  [corruptData replaceBytesInRange:NSMakeRange(100,100) withBytes:[[cryptor randomDataOfLength:100] bytes]];
+
+  NSData *decryptedData = [cryptor decryptData:corruptData password:password error:&error];
+
+  STAssertNil(decryptedData, @"Data should not have decrypted");
+  STAssertEquals([error code], 1, @"Should have received error 1");
+}
+
 @end
