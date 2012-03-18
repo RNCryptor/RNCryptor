@@ -464,5 +464,47 @@ NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   return [self decryptFromStream:input toStream:output encryptionKey:encryptionKey IV:IV HMACKey:HMACKey error:error];
 }
 
+- (NSData *)encryptData:(NSData *)plaintext password:(NSString *)password error:(NSError **)error
+{
+  NSInputStream *encryptInputStream = [NSInputStream inputStreamWithData:plaintext];
+  NSOutputStream *encryptOutputStream = [NSOutputStream outputStreamToMemory];
+
+  BOOL result = [self encryptFromStream:encryptInputStream toStream:encryptOutputStream password:password error:error];
+
+  [encryptOutputStream close];
+  [encryptInputStream close];
+
+  if (result)
+  {
+    return [encryptOutputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
+  }
+  else
+  {
+    return nil;
+  }
+}
+
+- (NSData *)decryptData:(NSData *)ciphertext password:(NSString *)password error:(NSError **)error
+{
+  NSInputStream *decryptInputStream = [NSInputStream inputStreamWithData:ciphertext];
+  NSOutputStream *decryptOutputStream = [NSOutputStream outputStreamToMemory];
+
+  BOOL result = [self decryptFromStream:decryptInputStream toStream:decryptOutputStream password:password error:error];
+
+  [decryptOutputStream close];
+  [decryptInputStream close];
+
+  if (result)
+  {
+    return [decryptOutputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
+  }
+  else
+  {
+    return nil;
+  }
+
+}
+
+
 
 @end

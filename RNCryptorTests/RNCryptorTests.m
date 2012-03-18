@@ -202,5 +202,19 @@
   STAssertFalse([data isEqualToData:[decryptOutputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey]], @"Decryption doesn't match");
 }
 
+- (void)testData
+{
+  RNCryptor *cryptor = [RNCryptor AES128Cryptor];
+
+  NSData *data = [cryptor randomDataOfLength:1024];
+  NSString *password = @"Passw0rd!";
+
+  NSError *error;
+
+  NSData *encryptedData = [cryptor encryptData:data password:password error:&error];
+  NSData *decryptedData = [cryptor decryptData:encryptedData password:password error:&error];
+
+  STAssertEqualObjects(decryptedData, data, @"Decrypted data does not match");
+}
 
 @end

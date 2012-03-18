@@ -62,10 +62,6 @@ typedef struct
   size_t HMACLength;  // CC_SHA1_DIGEST_LENGTH
 } RNCryptorConfiguration;
 
-//typedef BOOL (^RNCryptorReadBlock)(NSData **readData, BOOL *stop, NSError **error);
-//typedef BOOL (^RNCryptorWriteBlock)(NSData *writeData, NSError **error);
-
-
 @interface RNCryptor : NSObject
 
 ///---------------------------------------------------------------------------------------
@@ -139,4 +135,6 @@ typedef void (^RNCryptorWriteCallback)(NSData *writeData);
                  password:(NSString *)password
                     error:(NSError **)error;
 
+- (NSData *)encryptData:(NSData *)plaintext password:(NSString *)password error:(NSError **)error;
+- (NSData *)decryptData:(NSData *)ciphertext password:(NSString *)password error:(NSError **)error;
 @end
