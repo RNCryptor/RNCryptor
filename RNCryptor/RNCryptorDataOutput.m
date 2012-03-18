@@ -58,7 +58,7 @@
   return YES;
 }
 
-- (NSData *)HMAC
+- (NSData *)computedHMAC
 {
   NSMutableData *HMAC = [NSMutableData dataWithLength:CC_SHA1_DIGEST_LENGTH];
   CCHmac(kCCHmacAlgSHA1, [self.HMACKey bytes], [self.HMACKey length], [self.data bytes], [self.data length], [HMAC mutableBytes]);

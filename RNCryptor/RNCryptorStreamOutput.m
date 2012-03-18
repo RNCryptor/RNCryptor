@@ -1,5 +1,5 @@
 //
-//  RNCryptorDataInputStream
+//  RNCryptorStreamOutput
 //
 //  Copyright (c) 2012 Rob Napier
 //
@@ -22,45 +22,48 @@
 //  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 //  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //  DEALINGS IN THE SOFTWARE.
-//#import "RNCryptorDataInputStream.h"
+//
 
-#import <CommonCrypto/CommonHMAC.h>
-#import "RNCryptorDataInput.h"
+#import "RNCryptorStreamOutput.h"
 
-@interface RNCryptorDataInput ()
-@property (nonatomic, readwrite, copy) NSData *data;
-@property (nonatomic, readwrite, copy) NSData *HMACKey;
+@interface RNCryptorStreamOutput ()
+@property (nonatomic, readwrite, assign) CCHmacContext HMACContext;
+@property (nonatomic, readwrite, strong) NSOutputStream *stream;
 @end
 
-@implementation RNCryptorDataInput
-@synthesize data = data_;
-@synthesize HMACKey = HMACKey_;
+@implementation RNCryptorStreamOutput
+@synthesize HMACContext = HMACContext_;
+@synthesize stream = stream_;
 
 
-- (id)initWithData:(NSData *)data HMACKey:(NSData *)HMACKey
+- (id)initWithStream:(NSOutputStream *)stream HMACKey:(NSData *)HMACKey
 {
   self = [super init];
   if (self)
   {
-    data_ = [data copy];
-    HMACKey_ = [HMACKey copy];
+    stream_ = stream;
+    [stream open];
+    CCHmacInit(&HMACContext_, kCCHmacAlgSHA256, [HMACKey bytes], [HMACKey length]);
   }
   return self;
-}
-
-- (BOOL)getData:(NSData **)data shouldStop:(BOOL *)stop error:(NSError **)error
-{
-  *data = self.data;
-  *stop = YES;
-  return YES;
 }
 
 - (NSData *)computedHMAC
 {
   NSMutableData *HMAC = [NSMutableData dataWithLength:CC_SHA1_DIGEST_LENGTH];
-  CCHmac(kCCHmacAlgSHA1, [self.HMACKey bytes], [self.HMACKey length], [self.data bytes], [self.data length], [HMAC mutableBytes]);
+  CCHmacFinal(&HMACContext_, [HMAC mutableBytes]);
   return HMAC;
 }
 
+- (BOOL)writeData:(NSMutableData *)data error:(NSError **)error
+{
+  NSInteger length = [self.stream write:[data bytes] maxLength:[data length]];
+  if (length < 0)
+  {
+    *error = [self.stream streamError];
+  }
+
+  return (length >= 0);
+}
 
 @end

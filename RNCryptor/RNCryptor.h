@@ -29,12 +29,12 @@
 #import <CommonCrypto/CommonKeyDerivation.h>
 
 @protocol RNCryptorInput <NSObject>
-@property (nonatomic, readonly) NSData *HMAC;
+@property (nonatomic, readonly) NSData *computedHMAC;
 - (BOOL)getData:(NSData **)data shouldStop:(BOOL *)stop error:(NSError **)error;
 @end
 
 @protocol RNCryptorOutput <NSObject>
-@property (nonatomic, readonly) NSData *HMAC;
+@property (nonatomic, readonly) NSData *computedHMAC;
 - (BOOL)writeData:(NSMutableData *)data error:(NSError **)error;
 @end
 
@@ -99,7 +99,6 @@ typedef struct
 ///---------------------------------------------------------------------------------------
 /// @name Encrypt/Decrypt with NSStream
 ///---------------------------------------------------------------------------------------
-
 
 - (BOOL)encryptWithInput:(id<RNCryptorInput>)input
                   output:(id<RNCryptorOutput>)output
