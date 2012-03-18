@@ -114,6 +114,15 @@ typedef void (^RNCryptorWriteCallback)(NSData *writeData);
                  footer:(NSData **)footer
                    error:(NSError **)error;
 
+- (BOOL)encryptFromStream:(NSInputStream *)input
+                 toStream:(NSOutputStream *)output
+            encryptionKey:(NSData *)encryptionKey
+                       IV:(NSData *)IV
+                  HMACKey:(NSData *)HMACKey
+           cipherTextHMAC:(NSData **)HMAC
+                    error:(NSError **)error;
+
+
 
 
 //- (BOOL)encryptFromStream:(NSInputStream *)input

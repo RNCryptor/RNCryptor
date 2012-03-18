@@ -339,6 +339,33 @@ NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
    return YES;
 }
 
+- (BOOL)encryptFromStream:(NSInputStream *)input toStream:(NSOutputStream *)output encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV HMACKey:(NSData *)HMACKey cipherTextHMAC:(NSData **)HMAC error:(NSError **)error
+{
+  __block CCHmacContext encryptHMACContext;
+  CCHmacInit(&encryptHMACContext, kCCHmacAlgSHA1, HMACKey.bytes, HMACKey.length);
+
+  RNCryptorWriteCallback writeCallback = ^void(NSData *writeData) {
+    CCHmacUpdate(&encryptHMACContext, writeData.bytes, writeData.length);
+  };
+
+  BOOL result = [self performOperation:kCCEncrypt
+                              fromStream:input
+                            readCallback:nil
+                                toStream:output
+                           writeCallback:writeCallback
+                           encryptionKey:encryptionKey
+                                      IV:IV
+                              footerSize:0
+                                  footer:nil
+                                   error:error];
+
+  *HMAC = [NSMutableData dataWithLength:CC_SHA1_DIGEST_LENGTH];
+  CCHmacFinal(&encryptHMACContext, [(NSMutableData *)*HMAC mutableBytes]);
+
+  return result;
+}
+
+
 //- (BOOL)encryptFromStream:(NSInputStream *)input
 //                readCallback:(RNCryptorReadCallback)readBlock
 //                  toStream:(NSOutputStream *)output

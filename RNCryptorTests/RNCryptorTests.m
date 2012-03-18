@@ -145,28 +145,10 @@
   NSError *error;
   NSInputStream *encryptInputStream = [NSInputStream inputStreamWithData:data];
   NSOutputStream *encryptOutputStream = [NSOutputStream outputStreamToMemory];
+  NSData *encryptHMACData;
 
-  __block CCHmacContext encryptHMACContext;
-  CCHmacInit(&encryptHMACContext, kCCHmacAlgSHA1, HMACkey.bytes, HMACkey.length);
-
-  RNCryptorWriteCallback writeCallback = ^void(NSData *writeData) {
-    CCHmacUpdate(&encryptHMACContext, writeData.bytes, writeData.length);
-  };
-
-  STAssertTrue([cryptor performOperation:kCCEncrypt
-                              fromStream:encryptInputStream
-                            readCallback:nil
-                                toStream:encryptOutputStream
-                           writeCallback:writeCallback
-                           encryptionKey:key
-                                      IV:IV
-                              footerSize:0
-                                  footer:nil
-                                   error:&error],
+  STAssertTrue([cryptor encryptFromStream:encryptInputStream toStream:encryptOutputStream encryptionKey:key IV:IV HMACKey:HMACkey cipherTextHMAC:&encryptHMACData error:&error],
   @"Encrypt failed:%@", error);
-
-  NSMutableData *encryptHMACData = [NSMutableData dataWithLength:CC_SHA1_DIGEST_LENGTH];
-  CCHmacFinal(&encryptHMACContext, [encryptHMACData mutableBytes]);
 
   [encryptOutputStream write:[encryptHMACData bytes] maxLength:[encryptHMACData length]];
   [encryptOutputStream close];
