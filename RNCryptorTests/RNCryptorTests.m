@@ -27,10 +27,6 @@
 
 #import "RNCryptorTests.h"
 #import "RNCryptor.h"
-#import "RNCryptorDataInput.h"
-#import "RNCryptorDataOutput.h"
-#import "RNCryptorStreamOutput.h"
-#import "RNCryptorStreamInput.h"
 
 @interface RNCryptor (Private)
 - (NSData *)randomDataOfLength:(size_t)length;
@@ -52,37 +48,37 @@
   [super tearDown];
 }
 
-- (void)testData
-{
-  RNCryptor *cryptor = [RNCryptor AES128Cryptor];
-
-  NSData *data = [cryptor randomDataOfLength:1024];
-  NSData *key = [cryptor randomDataOfLength:kCCKeySizeAES128];
-  NSData *HMACkey = [cryptor randomDataOfLength:kCCKeySizeAES128];
-  NSData *IV = [cryptor randomDataOfLength:kCCBlockSizeAES128];
-
-  NSError *error;
-  RNCryptorDataOutput *encryptedStream = [[RNCryptorDataOutput alloc] initWithHMACKey:HMACkey];
-  STAssertTrue([cryptor encryptWithInput:[[RNCryptorDataInput alloc] initWithData:data HMACKey:nil]
-                                  output:encryptedStream
-                           encryptionKey:key
-                                      IV:IV
-                                   error:&error], @"Failed to encrypt:%@", error);
-
-  STAssertTrue([[encryptedStream data] length] > 0, @"No encrypted data");
-  STAssertEquals([[encryptedStream computedHMAC] length], (NSUInteger)CC_SHA1_DIGEST_LENGTH, @"HMAC incorrect length:%d", [[encryptedStream computedHMAC] length]);
-
-  RNCryptorDataInput *decryptStream = [[RNCryptorDataInput alloc] initWithData:[encryptedStream data] HMACKey:HMACkey];
-  RNCryptorDataOutput *decryptedStream = [[RNCryptorDataOutput alloc] initWithHMACKey:nil];
-  STAssertTrue([cryptor decryptWithInput:decryptStream
-                                  output:decryptedStream
-                           encryptionKey:key
-                                      IV:IV
-                                   error:&error], @"Failed to decrypt:%@", error);
-
-  STAssertEqualObjects([decryptedStream data], data, @"Data does not match.");
-  STAssertEqualObjects([encryptedStream computedHMAC], [decryptStream computedHMAC], @"HMAC does not match.");
-}
+//- (void)testData
+//{
+//  RNCryptor *cryptor = [RNCryptor AES128Cryptor];
+//
+//  NSData *data = [cryptor randomDataOfLength:1024];
+//  NSData *key = [cryptor randomDataOfLength:kCCKeySizeAES128];
+//  NSData *HMACkey = [cryptor randomDataOfLength:kCCKeySizeAES128];
+//  NSData *IV = [cryptor randomDataOfLength:kCCBlockSizeAES128];
+//
+//  NSError *error;
+//  RNCryptorDataOutput *encryptedStream = [[RNCryptorDataOutput alloc] initWithHMACKey:HMACkey];
+//  STAssertTrue([cryptor encryptWithInput:[[RNCryptorDataInput alloc] initWithData:data HMACKey:nil]
+//                                  output:encryptedStream
+//                           encryptionKey:key
+//                                      IV:IV
+//                                   error:&error], @"Failed to encrypt:%@", error);
+//
+//  STAssertTrue([[encryptedStream data] length] > 0, @"No encrypted data");
+//  STAssertEquals([[encryptedStream computedHMAC] length], (NSUInteger)CC_SHA1_DIGEST_LENGTH, @"HMAC incorrect length:%d", [[encryptedStream computedHMAC] length]);
+//
+//  RNCryptorDataInput *decryptStream = [[RNCryptorDataInput alloc] initWithData:[encryptedStream data] HMACKey:HMACkey];
+//  RNCryptorDataOutput *decryptedStream = [[RNCryptorDataOutput alloc] initWithHMACKey:nil];
+//  STAssertTrue([cryptor decryptWithInput:decryptStream
+//                                  output:decryptedStream
+//                           encryptionKey:key
+//                                      IV:IV
+//                                   error:&error], @"Failed to decrypt:%@", error);
+//
+//  STAssertEqualObjects([decryptedStream data], data, @"Data does not match.");
+//  STAssertEqualObjects([encryptedStream computedHMAC], [decryptStream computedHMAC], @"HMAC does not match.");
+//}
 
 - (void)testStream
 {
@@ -96,27 +92,28 @@
   NSError *error;
   NSInputStream *encryptInputStream = [NSInputStream inputStreamWithData:data];
   NSOutputStream *encryptOutputStream = [NSOutputStream outputStreamToMemory];
-  RNCryptorStreamInput *encryptInput = [[RNCryptorStreamInput alloc] initWithStream:encryptInputStream HMACKey:nil HMACLocation:kRNCryptorHMACLocationNone];
-  RNCryptorStreamOutput *encryptOutput = [[RNCryptorStreamOutput alloc] initWithStream:encryptOutputStream HMACKey:HMACkey];
 
-  STAssertTrue([cryptor encryptWithInput:encryptInput output:encryptOutput encryptionKey:key IV:IV error:&error],
+  STAssertTrue([cryptor performOperation:kCCEncrypt fromStream:encryptInputStream readCallback:nil toStream:encryptOutputStream writeCallback:nil encryptionKey:key IV:IV footerSize:0 footer:nil error:&error],
   @"Encrypt failed:%@", error);
-  [encryptOutputStream write:[[encryptOutput computedHMAC] bytes] maxLength:[[encryptOutput computedHMAC] length]];
+
   [encryptOutputStream close];
   [encryptInputStream close];
 
-  NSInputStream *decryptInputStream = [NSInputStream inputStreamWithData:[encryptOutputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey]];
-  NSOutputStream *decryptOutputStream = [NSOutputStream outputStreamToMemory];
-  RNCryptorStreamInput *decryptInput = [[RNCryptorStreamInput alloc] initWithStream:decryptInputStream HMACKey:HMACkey HMACLocation:kRNCryptorHMACLocationEnd];
-  RNCryptorStreamOutput *decryptOutput = [[RNCryptorStreamOutput alloc] initWithStream:decryptOutputStream HMACKey:nil];
+  NSData *encryptedData = [encryptOutputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
+  STAssertTrue([encryptedData length] >= [data length], @"Encrypted data too short: %d/%d", [encryptedData length], [data length]);
 
-  STAssertTrue([cryptor encryptWithInput:decryptInput output:decryptOutput encryptionKey:key IV:IV error:&error],
+
+  NSInputStream *decryptInputStream = [NSInputStream inputStreamWithData:encryptedData];
+  NSOutputStream *decryptOutputStream = [NSOutputStream outputStreamToMemory];
+
+  STAssertTrue([cryptor performOperation:kCCDecrypt fromStream:decryptInputStream readCallback:nil toStream:decryptOutputStream writeCallback:nil encryptionKey:key IV:IV footerSize:0 footer:nil error:&error],
   @"Decrypt failed:%@", error);
+
+
   [encryptOutputStream close];
   [encryptInputStream close];
 
   STAssertEqualObjects(data, [decryptOutputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey], @"Decryption doesn't match");
-  STAssertEqualObjects([decryptInput expectedHMAC], [decryptOutput computedHMAC], @"HMAC does not match");
 }
 
 @end

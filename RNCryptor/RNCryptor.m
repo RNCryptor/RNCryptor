@@ -185,7 +185,7 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
 - (BOOL)processResult:(CCCryptorStatus)cryptorStatus
                 data:(NSMutableData *)outData
                length:(size_t)length
-             output:(id<RNCryptorOutput>)output
+             output:(NSOutputStream *)output
                 error:(NSError **)error
 {
   if (cryptorStatus != kCCSuccess)
@@ -194,7 +194,7 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
     {
       *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:cryptorStatus userInfo:nil];
     }
-    NSLog(@"[%s] Could not process data: %d", __PRETTY_FUNCTION__, cryptorStatus);
+    NSLog(@"%s Could not process data: %d", __PRETTY_FUNCTION__, cryptorStatus);
     return NO;
   }
 
@@ -202,64 +202,117 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
   {
     [outData setLength:length];
 
-    if (! [output writeData:outData error:error])
+    [output open];
+    NSInteger wroteLength = [output write:[outData bytes] maxLength:[outData length]];
+    if (wroteLength < 0)
     {
-      return NO;
+      *error = [output streamError];
     }
+
+    return (wroteLength >= 0);
   }
   return YES;
 }
 
-- (BOOL)performOperation:(CCOperation)operation input:(id<RNCryptorInput>)input output:(id<RNCryptorOutput>)output encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV error:(NSError **)error
+- (BOOL)performOperation:(CCOperation)operation
+              fromStream:(NSInputStream *)input
+            readCallback:(RNCryptorReadCallback)readBlock
+                toStream:(NSOutputStream *)output
+           writeCallback:(RNCryptorWriteCallback)writeBlock
+           encryptionKey:(NSData *)encryptionKey
+                      IV:(NSData *)IV
+             footerSize:(NSUInteger)footerSize
+                 footer:(NSData **)footer
+                   error:(NSError **)error
 {
  // Create the cryptor
-   CCCryptorRef cryptor = NULL;
-   CCCryptorStatus cryptorStatus;
-   cryptorStatus = CCCryptorCreate(operation,             // operation
-                                   self.configuration.algorithm,            // algorithm
-                                   kCCOptionPKCS7Padding, // options
-                                   encryptionKey.bytes,             // key
-                                   encryptionKey.length,            // key length
-                                   IV.bytes,              // IV
-                                   &cryptor);             // OUT cryptorRef
+  CCCryptorRef cryptor = NULL;
+  CCCryptorStatus cryptorStatus;
+  cryptorStatus = CCCryptorCreate(operation,             // operation
+                                  self.configuration.algorithm,            // algorithm
+                                  kCCOptionPKCS7Padding, // options
+                                  encryptionKey.bytes,             // key
+                                  encryptionKey.length,            // key length
+                                  IV.bytes,              // IV
+                                  &cryptor);             // OUT cryptorRef
 
-   if (cryptorStatus != kCCSuccess || cryptor == NULL)
-   {
-     if (error)
-     {
-       *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:cryptorStatus userInfo:nil];
-     }
-     NSAssert(NO, @"Could not create cryptor: %d", cryptorStatus);
-     return NO;
-   }
+  if (cryptorStatus != kCCSuccess || cryptor == NULL)
+  {
+    if (error)
+    {
+      *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:cryptorStatus userInfo:nil];
+    }
+    NSAssert(NO, @"Could not create cryptor: %d", cryptorStatus);
+    return NO;
+  }
 
-   NSData *inData;
-   BOOL stop = NO;
-   NSMutableData *outData = [NSMutableData data];
-   size_t dataOutMoved;
+  const NSUInteger kBufferSize = 1024;  // FIXME: Adapt to footer size
+  NSMutableData *readBuffer = [NSMutableData data];
 
-   while (!stop)
-   {
-     BOOL readResult = [input getData:&inData shouldStop:&stop error:error];
-     if (! readResult)
-     {
-       CCCryptorRelease(cryptor);
-       return NO;
-     }
+  // Read ahead
+  NSMutableData *readAheadBuffer = [NSMutableData dataWithLength:kBufferSize];   // FIXME: Pull out duplicate below?
+  [input open];
+  NSInteger length = [input read:[readAheadBuffer mutableBytes] maxLength:[readAheadBuffer length]];
+  if (length >= 0)
+  {
+    [readAheadBuffer setLength:(NSUInteger)length];
+  }
 
-     [outData setLength:CCCryptorGetOutputLength(cryptor, [inData length], true)];
-     cryptorStatus = CCCryptorUpdate(cryptor,       // cryptor
-                                     inData.bytes,      // dataIn
-                                     inData.length,     // dataInLength (verified > 0 above)
-                                     outData.mutableBytes,      // dataOut
-                                     outData.length, // dataOutAvailable
-                                     &dataOutMoved);   // dataOutMoved
-     if (![self processResult:cryptorStatus data:outData length:dataOutMoved output:output error:error])
-     {
-       CCCryptorRelease(cryptor);
-       return NO;
-     }
-   }
+  NSMutableData *outData = [NSMutableData data];
+  BOOL stop = NO;
+  size_t dataOutMoved;
+  while (!stop)
+  {
+    // Error
+    if ([input streamStatus] == NSStreamStatusError)
+    {
+      stop = YES;
+      *error = [input streamError];
+      CCCryptorRelease(cryptor);
+      return NO;
+    }
+
+    // Not at end (read-ahead has a full block). Read another block.
+    if ([input streamStatus] != NSStreamStatusAtEnd)
+    {
+      readBuffer = readAheadBuffer;
+      readAheadBuffer = [NSMutableData dataWithLength:kBufferSize];
+      length = [input read:[readAheadBuffer mutableBytes] maxLength:kBufferSize];
+      if (length >= 0)
+      {
+        [readAheadBuffer setLength:(NSUInteger)length];
+      }
+    }
+
+    // At end now?
+    if ([input streamStatus] == NSStreamStatusAtEnd)
+    {
+      // Put everything together
+      [readBuffer appendData:readAheadBuffer];
+      readAheadBuffer = nil;
+      stop = YES;
+      if (footer)
+      {
+        *footer = [readBuffer subdataWithRange:NSMakeRange([readBuffer length] - footerSize - 1, footerSize)];
+        [readBuffer setLength:[readBuffer length] - footerSize];
+      }
+    }
+
+    [outData setLength:CCCryptorGetOutputLength(cryptor, [readBuffer length], true)];
+    cryptorStatus = CCCryptorUpdate(cryptor,       // cryptor
+                                    readBuffer.bytes,      // dataIn
+                                    readBuffer.length,     // dataInLength (verified > 0 above)
+                                    outData.mutableBytes,      // dataOut
+                                    outData.length, // dataOutAvailable
+                                    &dataOutMoved);   // dataOutMoved
+    if (![self processResult:cryptorStatus data:outData length:dataOutMoved output:output error:error])
+    {
+      CCCryptorRelease(cryptor);
+      return NO;
+    }
+  }
+
+  [outData setLength:CCCryptorGetOutputLength(cryptor, kBufferSize, true)];
 
    // Write the final block
    cryptorStatus = CCCryptorFinal(cryptor,        // cryptor
@@ -276,14 +329,20 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
    return YES;
 }
 
-- (BOOL)encryptWithInput:(id<RNCryptorInput>)input output:(id<RNCryptorOutput>)output encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV error:(NSError **)error
-{
-  return [self performOperation:kCCEncrypt input:input output:output encryptionKey:encryptionKey IV:IV error:error];
-}
-
-- (BOOL)decryptWithInput:(id<RNCryptorInput>)input output:(id<RNCryptorOutput>)output encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV error:(NSError **)error
-{
-  return [self performOperation:kCCDecrypt input:input output:output encryptionKey:encryptionKey IV:IV error:error];
-}
+//- (BOOL)encryptFromStream:(NSInputStream *)input
+//                readCallback:(RNCryptorReadCallback)readBlock
+//                  toStream:(NSOutputStream *)output
+//               writeCallback:(RNCryptorWriteCallback)writeBlock
+//           encryptionKey:(NSData *)encryptionKey
+//                      IV:(NSData *)IV
+//                   error:(NSError **)error;
+//{
+//  return [self performOperation:kCCEncrypt fromStream:input readCallback:readBlock toStream:output writeCallback:writeBlock encryptionKey:encryptionKey IV:IV error:error];
+//}
+//
+//- (BOOL)decryptWithInput:(id<RNCryptorInput>)input output:(id<RNCryptorOutput>)output encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV error:(NSError **)error
+//{
+//  return [self performOperation:kCCDecrypt input:input output:output encryptionKey:encryptionKey IV:IV error:error];
+//}
 
 @end

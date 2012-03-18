@@ -100,17 +100,35 @@ typedef struct
 /// @name Encrypt/Decrypt with NSStream
 ///---------------------------------------------------------------------------------------
 
-- (BOOL)encryptWithInput:(id<RNCryptorInput>)input
-                  output:(id<RNCryptorOutput>)output
+typedef void (^RNCryptorReadCallback)(NSData *);
+typedef void (^RNCryptorWriteCallback)(NSData *);
+
+- (BOOL)performOperation:(CCOperation)operation
+              fromStream:(NSInputStream *)input
+            readCallback:(RNCryptorReadCallback)readBlock
+                toStream:(NSOutputStream *)output
+           writeCallback:(RNCryptorWriteCallback)writeBlock
            encryptionKey:(NSData *)encryptionKey
                       IV:(NSData *)IV
+             footerSize:(NSUInteger)footerSize
+                 footer:(NSData **)footer
                    error:(NSError **)error;
 
-- (BOOL)decryptWithInput:(id<RNCryptorInput>)input
-                  output:(id<RNCryptorOutput>)output
-           encryptionKey:(NSData *)encryptionKey
-                      IV:(NSData *)IV
-                   error:(NSError **)error;
+
+
+//- (BOOL)encryptFromStream:(NSInputStream *)input
+//                readCallback:(RNCryptorReadCallback)readBlock
+//                  toStream:(NSOutputStream *)output
+//               writeCallback:(RNCryptorWriteCallback)writeBlock
+//           encryptionKey:(NSData *)encryptionKey
+//                      IV:(NSData *)IV
+//                   error:(NSError **)error;
+//
+//- (BOOL)decryptWithInput:(id<RNCryptorInput>)input
+//                  output:(id<RNCryptorOutput>)output
+//           encryptionKey:(NSData *)encryptionKey
+//                      IV:(NSData *)IV
+//                   error:(NSError **)error;
 
 
 
