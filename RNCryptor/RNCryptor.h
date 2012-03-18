@@ -100,8 +100,8 @@ typedef struct
 /// @name Encrypt/Decrypt with NSStream
 ///---------------------------------------------------------------------------------------
 
-typedef void (^RNCryptorReadCallback)(NSData *);
-typedef void (^RNCryptorWriteCallback)(NSData *);
+typedef void (^RNCryptorReadCallback)(NSData *readData);
+typedef void (^RNCryptorWriteCallback)(NSData *writeData);
 
 - (BOOL)performOperation:(CCOperation)operation
               fromStream:(NSInputStream *)input

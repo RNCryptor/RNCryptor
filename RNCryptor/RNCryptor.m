@@ -26,6 +26,8 @@
 
 #import "RNCryptor.h"
 
+NSUInteger kSmallestBlockSize = 1024;
+
 // According to Apple documentation, you can use a single buffer
 // to do in-place encryption or decryption. This does not work
 // in cases where you call CCCryptUpdate multiple times and you
@@ -185,7 +187,8 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
 - (BOOL)processResult:(CCCryptorStatus)cryptorStatus
                 data:(NSMutableData *)outData
                length:(size_t)length
-             output:(NSOutputStream *)output
+             callback:(RNCryptorWriteCallback)writeCallback
+               output:(NSOutputStream *)output
                 error:(NSError **)error
 {
   if (cryptorStatus != kCCSuccess)
@@ -209,16 +212,23 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
       *error = [output streamError];
     }
 
+    writeCallback(outData);
+
     return (wroteLength >= 0);
   }
   return YES;
 }
 
+NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
+{
+  return ((size + unit - 1) / unit) * unit;
+}
+
 - (BOOL)performOperation:(CCOperation)operation
               fromStream:(NSInputStream *)input
-            readCallback:(RNCryptorReadCallback)readBlock
+            readCallback:(RNCryptorReadCallback)readCallback
                 toStream:(NSOutputStream *)output
-           writeCallback:(RNCryptorWriteCallback)writeBlock
+           writeCallback:(RNCryptorWriteCallback)writeCallback
            encryptionKey:(NSData *)encryptionKey
                       IV:(NSData *)IV
              footerSize:(NSUInteger)footerSize
@@ -246,11 +256,11 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
     return NO;
   }
 
-  const NSUInteger kBufferSize = 1024;  // FIXME: Adapt to footer size
+  const NSUInteger bufferSize = NextMultipleOfUnit(MAX(footerSize + 1, kSmallestBlockSize), self.configuration.blockSize);
   NSMutableData *readBuffer = [NSMutableData data];
 
   // Read ahead
-  NSMutableData *readAheadBuffer = [NSMutableData dataWithLength:kBufferSize];   // FIXME: Pull out duplicate below?
+  NSMutableData *readAheadBuffer = [NSMutableData dataWithLength:bufferSize];
   [input open];
   NSInteger length = [input read:[readAheadBuffer mutableBytes] maxLength:[readAheadBuffer length]];
   if (length >= 0)
@@ -266,7 +276,6 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
     // Error
     if ([input streamStatus] == NSStreamStatusError)
     {
-      stop = YES;
       *error = [input streamError];
       CCCryptorRelease(cryptor);
       return NO;
@@ -276,8 +285,8 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
     if ([input streamStatus] != NSStreamStatusAtEnd)
     {
       readBuffer = readAheadBuffer;
-      readAheadBuffer = [NSMutableData dataWithLength:kBufferSize];
-      length = [input read:[readAheadBuffer mutableBytes] maxLength:kBufferSize];
+      readAheadBuffer = [NSMutableData dataWithLength:bufferSize];
+      length = [input read:[readAheadBuffer mutableBytes] maxLength:bufferSize];
       if (length >= 0)
       {
         [readAheadBuffer setLength:(NSUInteger)length];
@@ -298,6 +307,7 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
       }
     }
 
+    readCallback(readBuffer);
     [outData setLength:CCCryptorGetOutputLength(cryptor, [readBuffer length], true)];
     cryptorStatus = CCCryptorUpdate(cryptor,       // cryptor
                                     readBuffer.bytes,      // dataIn
@@ -305,21 +315,21 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
                                     outData.mutableBytes,      // dataOut
                                     outData.length, // dataOutAvailable
                                     &dataOutMoved);   // dataOutMoved
-    if (![self processResult:cryptorStatus data:outData length:dataOutMoved output:output error:error])
+    if (![self processResult:cryptorStatus data:outData length:dataOutMoved callback:writeCallback output:output error:error])
     {
       CCCryptorRelease(cryptor);
       return NO;
     }
   }
 
-  [outData setLength:CCCryptorGetOutputLength(cryptor, kBufferSize, true)];
+  [outData setLength:CCCryptorGetOutputLength(cryptor, bufferSize, true)];
 
    // Write the final block
    cryptorStatus = CCCryptorFinal(cryptor,        // cryptor
                                   outData.mutableBytes,       // dataOut
                                   outData.length,  // dataOutAvailable
                                   &dataOutMoved);    // dataOutMoved
-  if (![self processResult:cryptorStatus data:outData length:dataOutMoved output:output error:error])
+  if (![self processResult:cryptorStatus data:outData length:dataOutMoved callback:writeCallback output:output error:error])
    {
      CCCryptorRelease(cryptor);
      return NO;

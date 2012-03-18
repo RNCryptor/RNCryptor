@@ -18,15 +18,6 @@
 		FB75651E1512D3E9007B806B /* RNCryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB75651B1512D3E9007B806B /* RNCryptor.m */; };
 		FB75651F1512D7F8007B806B /* RNCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB75651A1512D3E9007B806B /* RNCryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FB7565241512D9BE007B806B /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7565221512D9A8007B806B /* Security.framework */; };
-		FB7565241512D9BE007B8076 /* RNCryptorDataInput.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8075 /* RNCryptorDataInput.m */; };
-		FB7565241512D9BE007B8077 /* RNCryptorDataInput.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8075 /* RNCryptorDataInput.m */; };
-		FB7565241512D9BE007B8079 /* RNCryptorDataInput.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8078 /* RNCryptorDataInput.h */; };
-		FB7565241512D9BE007B807B /* RNCryptorDataOutput.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B807A /* RNCryptorDataOutput.m */; };
-		FB7565241512D9BE007B807D /* RNCryptorDataOutput.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B807C /* RNCryptorDataOutput.h */; };
-		FB7565241512D9BE007B807F /* RNCryptorStreamInput.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B807E /* RNCryptorStreamInput.m */; };
-		FB7565241512D9BE007B8081 /* RNCryptorStreamInput.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8080 /* RNCryptorStreamInput.h */; };
-		FB7565241512D9BE007B8083 /* RNCryptorStreamOutput.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8082 /* RNCryptorStreamOutput.m */; };
-		FB7565241512D9BE007B8085 /* RNCryptorStreamOutput.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8084 /* RNCryptorStreamOutput.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,14 +44,6 @@
 		FB75651A1512D3E9007B806B /* RNCryptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCryptor.h; sourceTree = "<group>"; };
 		FB75651B1512D3E9007B806B /* RNCryptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCryptor.m; sourceTree = "<group>"; };
 		FB7565221512D9A8007B806B /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
-		FB7565241512D9BE007B8075 /* RNCryptorDataInput.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCryptorDataInput.m; sourceTree = "<group>"; };
-		FB7565241512D9BE007B8078 /* RNCryptorDataInput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCryptorDataInput.h; sourceTree = "<group>"; };
-		FB7565241512D9BE007B807A /* RNCryptorDataOutput.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCryptorDataOutput.m; sourceTree = "<group>"; };
-		FB7565241512D9BE007B807C /* RNCryptorDataOutput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCryptorDataOutput.h; sourceTree = "<group>"; };
-		FB7565241512D9BE007B807E /* RNCryptorStreamInput.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCryptorStreamInput.m; sourceTree = "<group>"; };
-		FB7565241512D9BE007B8080 /* RNCryptorStreamInput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCryptorStreamInput.h; sourceTree = "<group>"; };
-		FB7565241512D9BE007B8082 /* RNCryptorStreamOutput.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCryptorStreamOutput.m; sourceTree = "<group>"; };
-		FB7565241512D9BE007B8084 /* RNCryptorStreamOutput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCryptorStreamOutput.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,14 +103,6 @@
 		FB7564F51512D3C4007B806B /* RNCryptor */ = {
 			isa = PBXGroup;
 			children = (
-				FB7565241512D9BE007B8084 /* RNCryptorStreamOutput.h */,
-				FB7565241512D9BE007B8082 /* RNCryptorStreamOutput.m */,
-				FB7565241512D9BE007B8080 /* RNCryptorStreamInput.h */,
-				FB7565241512D9BE007B807E /* RNCryptorStreamInput.m */,
-				FB7565241512D9BE007B807A /* RNCryptorDataOutput.m */,
-				FB7565241512D9BE007B807C /* RNCryptorDataOutput.h */,
-				FB7565241512D9BE007B8075 /* RNCryptorDataInput.m */,
-				FB7565241512D9BE007B8078 /* RNCryptorDataInput.h */,
 				FB75651A1512D3E9007B806B /* RNCryptor.h */,
 				FB75651B1512D3E9007B806B /* RNCryptor.m */,
 				FB7564F61512D3C4007B806B /* Supporting Files */,
@@ -170,10 +145,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				FB75651F1512D7F8007B806B /* RNCryptor.h in Headers */,
-				FB7565241512D9BE007B8079 /* RNCryptorDataInput.h in Headers */,
-				FB7565241512D9BE007B807D /* RNCryptorDataOutput.h in Headers */,
-				FB7565241512D9BE007B8081 /* RNCryptorStreamInput.h in Headers */,
-				FB7565241512D9BE007B8085 /* RNCryptorStreamOutput.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -277,10 +248,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				FB75651D1512D3E9007B806B /* RNCryptor.m in Sources */,
-				FB7565241512D9BE007B8076 /* RNCryptorDataInput.m in Sources */,
-				FB7565241512D9BE007B807B /* RNCryptorDataOutput.m in Sources */,
-				FB7565241512D9BE007B807F /* RNCryptorStreamInput.m in Sources */,
-				FB7565241512D9BE007B8083 /* RNCryptorStreamOutput.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -290,7 +257,6 @@
 			files = (
 				FB7565111512D3C5007B806B /* RNCryptorTests.m in Sources */,
 				FB75651E1512D3E9007B806B /* RNCryptor.m in Sources */,
-				FB7565241512D9BE007B8077 /* RNCryptorDataInput.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
