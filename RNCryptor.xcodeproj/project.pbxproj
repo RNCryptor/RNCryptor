@@ -18,6 +18,16 @@
 		FB75651E1512D3E9007B806B /* RNCryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB75651B1512D3E9007B806B /* RNCryptor.m */; };
 		FB75651F1512D7F8007B806B /* RNCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB75651A1512D3E9007B806B /* RNCryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FB7565241512D9BE007B806B /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7565221512D9A8007B806B /* Security.framework */; };
+		FB7565241512D9BE007B806D /* RNCryptorInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B806C /* RNCryptorInputStream.m */; };
+		FB7565241512D9BE007B806E /* RNCryptorInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B806C /* RNCryptorInputStream.m */; };
+		FB7565241512D9BE007B8070 /* RNCryptorInputStream.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B806F /* RNCryptorInputStream.h */; };
+		FB7565241512D9BE007B8072 /* RNCryptorOutputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8071 /* RNCryptorOutputStream.m */; };
+		FB7565241512D9BE007B8074 /* RNCryptorOutputStream.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8073 /* RNCryptorOutputStream.h */; };
+		FB7565241512D9BE007B8076 /* RNCryptorDataInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8075 /* RNCryptorDataInputStream.m */; };
+		FB7565241512D9BE007B8077 /* RNCryptorDataInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8075 /* RNCryptorDataInputStream.m */; };
+		FB7565241512D9BE007B8079 /* RNCryptorDataInputStream.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8078 /* RNCryptorDataInputStream.h */; };
+		FB7565241512D9BE007B807B /* RNCryptorDataOutputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B807A /* RNCryptorDataOutputStream.m */; };
+		FB7565241512D9BE007B807D /* RNCryptorDataOutputStream.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B807C /* RNCryptorDataOutputStream.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +54,14 @@
 		FB75651A1512D3E9007B806B /* RNCryptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCryptor.h; sourceTree = "<group>"; };
 		FB75651B1512D3E9007B806B /* RNCryptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCryptor.m; sourceTree = "<group>"; };
 		FB7565221512D9A8007B806B /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		FB7565241512D9BE007B806C /* RNCryptorInputStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCryptorInputStream.m; sourceTree = "<group>"; };
+		FB7565241512D9BE007B806F /* RNCryptorInputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCryptorInputStream.h; sourceTree = "<group>"; };
+		FB7565241512D9BE007B8071 /* RNCryptorOutputStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCryptorOutputStream.m; sourceTree = "<group>"; };
+		FB7565241512D9BE007B8073 /* RNCryptorOutputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCryptorOutputStream.h; sourceTree = "<group>"; };
+		FB7565241512D9BE007B8075 /* RNCryptorDataInputStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCryptorDataInputStream.m; sourceTree = "<group>"; };
+		FB7565241512D9BE007B8078 /* RNCryptorDataInputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCryptorDataInputStream.h; sourceTree = "<group>"; };
+		FB7565241512D9BE007B807A /* RNCryptorDataOutputStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCryptorDataOutputStream.m; sourceTree = "<group>"; };
+		FB7565241512D9BE007B807C /* RNCryptorDataOutputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCryptorDataOutputStream.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,6 +139,14 @@
 		FB7565091512D3C4007B806B /* RNCryptorTests */ = {
 			isa = PBXGroup;
 			children = (
+				FB7565241512D9BE007B807C /* RNCryptorDataOutputStream.h */,
+				FB7565241512D9BE007B807A /* RNCryptorDataOutputStream.m */,
+				FB7565241512D9BE007B8078 /* RNCryptorDataInputStream.h */,
+				FB7565241512D9BE007B8075 /* RNCryptorDataInputStream.m */,
+				FB7565241512D9BE007B8073 /* RNCryptorOutputStream.h */,
+				FB7565241512D9BE007B8071 /* RNCryptorOutputStream.m */,
+				FB7565241512D9BE007B806F /* RNCryptorInputStream.h */,
+				FB7565241512D9BE007B806C /* RNCryptorInputStream.m */,
 				FB75650F1512D3C4007B806B /* RNCryptorTests.h */,
 				FB7565101512D3C5007B806B /* RNCryptorTests.m */,
 				FB75650A1512D3C4007B806B /* Supporting Files */,
@@ -145,6 +171,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				FB75651F1512D7F8007B806B /* RNCryptor.h in Headers */,
+				FB7565241512D9BE007B8070 /* RNCryptorInputStream.h in Headers */,
+				FB7565241512D9BE007B8074 /* RNCryptorOutputStream.h in Headers */,
+				FB7565241512D9BE007B8079 /* RNCryptorDataInputStream.h in Headers */,
+				FB7565241512D9BE007B807D /* RNCryptorDataOutputStream.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -248,6 +278,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				FB75651D1512D3E9007B806B /* RNCryptor.m in Sources */,
+				FB7565241512D9BE007B806D /* RNCryptorInputStream.m in Sources */,
+				FB7565241512D9BE007B8072 /* RNCryptorOutputStream.m in Sources */,
+				FB7565241512D9BE007B8076 /* RNCryptorDataInputStream.m in Sources */,
+				FB7565241512D9BE007B807B /* RNCryptorDataOutputStream.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -257,6 +291,8 @@
 			files = (
 				FB7565111512D3C5007B806B /* RNCryptorTests.m in Sources */,
 				FB75651E1512D3E9007B806B /* RNCryptor.m in Sources */,
+				FB7565241512D9BE007B806E /* RNCryptorInputStream.m in Sources */,
+				FB7565241512D9BE007B8077 /* RNCryptorDataInputStream.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

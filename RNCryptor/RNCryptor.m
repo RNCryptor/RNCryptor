@@ -25,6 +25,8 @@
 //
 
 #import "RNCryptor.h"
+#import "RNCryptorInputStream.h"
+#import "RNCryptorOutputStream.h"
 
 // According to Apple documentation, you can use a single buffer
 // to do in-place encryption or decryption. This does not work
@@ -324,10 +326,158 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
 //  return YES;
 //}
 
+//- (BOOL)processResult:(CCCryptorStatus)cryptorStatus
+//                data:(NSMutableData *)outData
+//               length:(size_t)length
+//             writeBlock:(RNCryptorWriteBlock)writeBlock
+//                error:(NSError **)error
+//{
+//  if (cryptorStatus != kCCSuccess)
+//  {
+//    if (error)
+//    {
+//      *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:cryptorStatus userInfo:nil];
+//    }
+//    NSLog(@"[%s] Could not process data: %d", __PRETTY_FUNCTION__, cryptorStatus);
+//    return NO;
+//  }
+//
+//  if (length > 0)
+//  {
+//    [outData setLength:length];
+//
+//    if (! writeBlock(outData, error))
+//    {
+//      return NO;
+//    }
+//  }
+//  return YES;
+//}
+//
+//- (BOOL)performOperation:(CCOperation)operation readBlock:(RNCryptorReadBlock)readBlock writeBlock:(RNCryptorWriteBlock)writeBlock encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV HMACKey:(NSData *)HMACKey HMAC:(NSData **)HMAC error:(NSError **)error
+//{
+//// Create the cryptor
+//  CCCryptorRef cryptor = NULL;
+//  CCCryptorStatus cryptorStatus;
+//  cryptorStatus = CCCryptorCreate(operation,             // operation
+//                                  self.configuration.algorithm,            // algorithm
+//                                  kCCOptionPKCS7Padding, // options
+//                                  encryptionKey.bytes,             // key
+//                                  encryptionKey.length,            // key length
+//                                  IV.bytes,              // IV
+//                                  &cryptor);             // OUT cryptorRef
+//
+//  if (cryptorStatus != kCCSuccess || cryptor == NULL)
+//  {
+//    if (error)
+//    {
+//      *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:cryptorStatus userInfo:nil];
+//    }
+//    NSAssert(NO, @"Could not create cryptor: %d", cryptorStatus);
+//    return NO;
+//  }
+//
+//  NSData *inData;
+//  BOOL stop = NO;
+//  NSMutableData *outData = [NSMutableData data];
+//  size_t dataOutMoved;
+//
+//  CCHmacContext HmacContext;
+//  if (HMACKey)
+//  {
+//    CCHmacInit(&HmacContext, self.configuration.HMACAlgorithm, [HMACKey bytes], [HMACKey length]);
+//  }
+//
+//  while (!stop)
+//  {
+//    BOOL readResult = readBlock(&inData, &stop, error);
+//    if (! readResult)
+//    {
+//      CCCryptorRelease(cryptor);
+//      return NO;
+//    }
+//
+//    if (HMACKey && operation == kCCDecrypt)
+//    {
+//      CCHmacUpdate(&HmacContext, [inData bytes], [inData length]);
+//    }
+//
+//    [outData setLength:CCCryptorGetOutputLength(cryptor, [inData length], true)];
+//    cryptorStatus = CCCryptorUpdate(cryptor,       // cryptor
+//                                    inData.bytes,      // dataIn
+//                                    inData.length,     // dataInLength (verified > 0 above)
+//                                    outData.mutableBytes,      // dataOut
+//                                    outData.length, // dataOutAvailable
+//                                    &dataOutMoved);   // dataOutMoved
+//    if (![self processResult:cryptorStatus data:outData length:dataOutMoved writeBlock:writeBlock error:error])
+//    {
+//      CCCryptorRelease(cryptor);
+//      return NO;
+//    }
+//
+//    if (HMACKey && operation == kCCEncrypt)
+//    {
+//      CCHmacUpdate(&HmacContext, [outData bytes], [outData length]);
+//    }
+//  }
+//
+//  // Write the final block
+//  cryptorStatus = CCCryptorFinal(cryptor,        // cryptor
+//                                 outData.mutableBytes,       // dataOut
+//                                 outData.length,  // dataOutAvailable
+//                                 &dataOutMoved);    // dataOutMoved
+//  if (![self processResult:cryptorStatus data:outData length:dataOutMoved writeBlock:writeBlock error:error])
+//  {
+//    CCCryptorRelease(cryptor);
+//    return NO;
+//  }
+//
+//  if (HMACKey && operation == kCCEncrypt)
+//  {
+//    CCHmacUpdate(&HmacContext, [outData bytes], [outData length]);
+//  }
+//
+//  if (HMACKey)
+//  {
+//    *HMAC = [NSMutableData dataWithLength:self.configuration.HMACLength];
+//    CCHmacFinal(&HmacContext, [(NSMutableData *)*HMAC mutableBytes]);
+//  }
+//
+//  CCCryptorRelease(cryptor);
+//  return YES;
+//}
+//
+//- (BOOL)encryptWithReadBlock:(RNCryptorReadBlock)readBlock writeBlock:(RNCryptorWriteBlock)writeBlock encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV HMACKey:(NSData *)HMACKey HMAC:(NSData **)HMAC error:(NSError **)error
+//{
+//  return [self performOperation:kCCEncrypt readBlock:readBlock writeBlock:writeBlock encryptionKey:encryptionKey IV:IV HMACKey:HMACKey HMAC:HMAC error:error];
+//}
+//
+//- (BOOL)decryptWithReadBlock:(RNCryptorReadBlock)readBlock writeBlock:(RNCryptorWriteBlock)writeBlock encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV HMACKey:(NSData *)HMACKey HMAC:(NSData **)HMAC error:(NSError **)error
+//{
+//  return [self performOperation:kCCDecrypt readBlock:readBlock writeBlock:writeBlock encryptionKey:encryptionKey IV:IV HMACKey:HMACKey HMAC:HMAC error:error];
+//}
+//
+//- (RNCryptorReadBlock)readBlockForData:(NSData *)data
+//{
+//  return ^BOOL(NSData **readData, BOOL *stop, NSError **error) {
+//    *readData = data;
+//    *stop = YES;
+//    return YES;
+//  };
+//}
+//
+//- (RNCryptorWriteBlock)writeBlockForData:(NSMutableData *)data
+//{
+//  return ^BOOL(NSData *encryptedData, NSError **error) {
+//      [data appendData:encryptedData];
+//      return YES;
+//    };
+//}
+
 - (BOOL)processResult:(CCCryptorStatus)cryptorStatus
                 data:(NSMutableData *)outData
                length:(size_t)length
-             writeBlock:(RNCryptorWriteBlock)writeBlock
+             output:(RNCryptorOutputStream *)output
                 error:(NSError **)error
 {
   if (cryptorStatus != kCCSuccess)
@@ -344,7 +494,7 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
   {
     [outData setLength:length];
 
-    if (! writeBlock(outData, error))
+    if (! [output writeData:outData error:error])
     {
       return NO;
     }
@@ -352,125 +502,83 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
   return YES;
 }
 
-- (BOOL)performOperation:(CCOperation)operation readBlock:(RNCryptorReadBlock)readBlock writeBlock:(RNCryptorWriteBlock)writeBlock encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV HMACKey:(NSData *)HMACKey HMAC:(NSData **)HMAC error:(NSError **)error
+- (BOOL)performOperation:(CCOperation)operation input:(RNCryptorInputStream *)input output:(RNCryptorOutputStream *)output encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV error:(NSError **)error
 {
-// Create the cryptor
-  CCCryptorRef cryptor = NULL;
-  CCCryptorStatus cryptorStatus;
-  cryptorStatus = CCCryptorCreate(operation,             // operation
-                                  self.configuration.algorithm,            // algorithm
-                                  kCCOptionPKCS7Padding, // options
-                                  encryptionKey.bytes,             // key
-                                  encryptionKey.length,            // key length
-                                  IV.bytes,              // IV
-                                  &cryptor);             // OUT cryptorRef
+ // Create the cryptor
+   CCCryptorRef cryptor = NULL;
+   CCCryptorStatus cryptorStatus;
+   cryptorStatus = CCCryptorCreate(operation,             // operation
+                                   self.configuration.algorithm,            // algorithm
+                                   kCCOptionPKCS7Padding, // options
+                                   encryptionKey.bytes,             // key
+                                   encryptionKey.length,            // key length
+                                   IV.bytes,              // IV
+                                   &cryptor);             // OUT cryptorRef
 
-  if (cryptorStatus != kCCSuccess || cryptor == NULL)
-  {
-    if (error)
-    {
-      *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:cryptorStatus userInfo:nil];
-    }
-    NSAssert(NO, @"Could not create cryptor: %d", cryptorStatus);
-    return NO;
-  }
+   if (cryptorStatus != kCCSuccess || cryptor == NULL)
+   {
+     if (error)
+     {
+       *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:cryptorStatus userInfo:nil];
+     }
+     NSAssert(NO, @"Could not create cryptor: %d", cryptorStatus);
+     return NO;
+   }
 
-  NSData *inData;
-  BOOL stop = NO;
-  NSMutableData *outData = [NSMutableData data];
-  size_t dataOutMoved;
+   NSData *inData;
+   BOOL stop = NO;
+   NSMutableData *outData = [NSMutableData data];
+   size_t dataOutMoved;
 
-  CCHmacContext HmacContext;
-  if (HMACKey)
-  {
-    CCHmacInit(&HmacContext, self.configuration.HMACAlgorithm, [HMACKey bytes], [HMACKey length]);
-  }
+   while (!stop)
+   {
+     BOOL readResult = [input getData:&inData shouldStop:&stop error:error];
+     if (! readResult)
+     {
+       CCCryptorRelease(cryptor);
+       return NO;
+     }
 
-  while (!stop)
-  {
-    BOOL readResult = readBlock(&inData, &stop, error);
-    if (! readResult)
-    {
-      CCCryptorRelease(cryptor);
-      return NO;
-    }
+     [outData setLength:CCCryptorGetOutputLength(cryptor, [inData length], true)];
+     cryptorStatus = CCCryptorUpdate(cryptor,       // cryptor
+                                     inData.bytes,      // dataIn
+                                     inData.length,     // dataInLength (verified > 0 above)
+                                     outData.mutableBytes,      // dataOut
+                                     outData.length, // dataOutAvailable
+                                     &dataOutMoved);   // dataOutMoved
+     if (![self processResult:cryptorStatus data:outData length:dataOutMoved output:output error:error])
+     {
+       CCCryptorRelease(cryptor);
+       return NO;
+     }
+   }
 
-    if (HMACKey && operation == kCCDecrypt)
-    {
-      CCHmacUpdate(&HmacContext, [inData bytes], [inData length]);
-    }
+   // Write the final block
+   cryptorStatus = CCCryptorFinal(cryptor,        // cryptor
+                                  outData.mutableBytes,       // dataOut
+                                  outData.length,  // dataOutAvailable
+                                  &dataOutMoved);    // dataOutMoved
+  if (![self processResult:cryptorStatus data:outData length:dataOutMoved output:output error:error])
+   {
+     CCCryptorRelease(cryptor);
+     return NO;
+   }
 
-    [outData setLength:CCCryptorGetOutputLength(cryptor, [inData length], true)];
-    cryptorStatus = CCCryptorUpdate(cryptor,       // cryptor
-                                    inData.bytes,      // dataIn
-                                    inData.length,     // dataInLength (verified > 0 above)
-                                    outData.mutableBytes,      // dataOut
-                                    outData.length, // dataOutAvailable
-                                    &dataOutMoved);   // dataOutMoved
-    if (![self processResult:cryptorStatus data:outData length:dataOutMoved writeBlock:writeBlock error:error])
-    {
-      CCCryptorRelease(cryptor);
-      return NO;
-    }
-
-    if (HMACKey && operation == kCCEncrypt)
-    {
-      CCHmacUpdate(&HmacContext, [outData bytes], [outData length]);
-    }
-  }
-
-  // Write the final block
-  cryptorStatus = CCCryptorFinal(cryptor,        // cryptor
-                                 outData.mutableBytes,       // dataOut
-                                 outData.length,  // dataOutAvailable
-                                 &dataOutMoved);    // dataOutMoved
-  if (![self processResult:cryptorStatus data:outData length:dataOutMoved writeBlock:writeBlock error:error])
-  {
-    CCCryptorRelease(cryptor);
-    return NO;
-  }
-
-  if (HMACKey && operation == kCCEncrypt)
-  {
-    CCHmacUpdate(&HmacContext, [outData bytes], [outData length]);
-  }
-
-  if (HMACKey)
-  {
-    *HMAC = [NSMutableData dataWithLength:self.configuration.HMACLength];
-    CCHmacFinal(&HmacContext, [(NSMutableData *)*HMAC mutableBytes]);
-  }
-
-  CCCryptorRelease(cryptor);
-  return YES;
+   CCCryptorRelease(cryptor);
+   return YES;
 }
 
-- (BOOL)encryptWithReadBlock:(RNCryptorReadBlock)readBlock writeBlock:(RNCryptorWriteBlock)writeBlock encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV HMACKey:(NSData *)HMACKey HMAC:(NSData **)HMAC error:(NSError **)error
+- (BOOL)encryptWithInput:(RNCryptorInputStream *)input output:(RNCryptorOutputStream *)output encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV error:(NSError **)error
 {
-  return [self performOperation:kCCEncrypt readBlock:readBlock writeBlock:writeBlock encryptionKey:encryptionKey IV:IV HMACKey:HMACKey HMAC:HMAC error:error];
+  return [self performOperation:kCCEncrypt input:input output:output encryptionKey:encryptionKey IV:IV error:error];
 }
 
-- (BOOL)decryptWithReadBlock:(RNCryptorReadBlock)readBlock writeBlock:(RNCryptorWriteBlock)writeBlock encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV HMACKey:(NSData *)HMACKey HMAC:(NSData **)HMAC error:(NSError **)error
+- (BOOL)decryptWithInput:(RNCryptorInputStream *)input output:(RNCryptorOutputStream *)output encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV error:(NSError **)error
 {
-  return [self performOperation:kCCDecrypt readBlock:readBlock writeBlock:writeBlock encryptionKey:encryptionKey IV:IV HMACKey:HMACKey HMAC:HMAC error:error];
+  return [self performOperation:kCCDecrypt input:input output:output encryptionKey:encryptionKey IV:IV error:error];
 }
 
-- (RNCryptorReadBlock)readBlockForData:(NSData *)data
-{
-  return ^BOOL(NSData **readData, BOOL *stop, NSError **error) {
-    *readData = data;
-    *stop = YES;
-    return YES;
-  };
-}
 
-- (RNCryptorWriteBlock)writeBlockForData:(NSMutableData *)data
-{
-  return ^BOOL(NSData *encryptedData, NSError **error) {
-      [data appendData:encryptedData];
-      return YES;
-    };
-}
 
 //- (BOOL)encryptFromStream:(NSInputStream *)inStream toStream:(NSOutputStream *)outStream encryptionKey:(NSData *)key IV:(NSData *)iv HMACKey:(NSData *)HMACKey error:(NSError **)error
 //{

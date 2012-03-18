@@ -28,6 +28,9 @@
 #import <CommonCrypto/CommonCryptor.h>
 #import <CommonCrypto/CommonKeyDerivation.h>
 
+@class RNCryptorInputStream;
+@class RNCryptorOutputStream;
+
 extern NSString *const kRNCryptorErrorDomain;
 
 /** AES Encryptor/Decryptor for Mac and iOS.
@@ -52,8 +55,8 @@ typedef struct
   size_t HMACLength;  // CC_SHA1_DIGEST_LENGTH
 } RNCryptorConfiguration;
 
-typedef BOOL (^RNCryptorReadBlock)(NSData **readData, BOOL *stop, NSError **error);
-typedef BOOL (^RNCryptorWriteBlock)(NSData *writeData, NSError **error);
+//typedef BOOL (^RNCryptorReadBlock)(NSData **readData, BOOL *stop, NSError **error);
+//typedef BOOL (^RNCryptorWriteBlock)(NSData *writeData, NSError **error);
 
 
 @interface RNCryptor : NSObject
@@ -90,26 +93,38 @@ typedef BOOL (^RNCryptorWriteBlock)(NSData *writeData, NSError **error);
 /// @name Encrypt/Decrypt with NSStream
 ///---------------------------------------------------------------------------------------
 
-- (BOOL)encryptWithReadBlock:(RNCryptorReadBlock)readBlock
-                  writeBlock:(RNCryptorWriteBlock)writeBlock
-               encryptionKey:(NSData *)encryptionKey
-                          IV:(NSData *)IV
-                     HMACKey:(NSData *)HMACKey
-                        HMAC:(NSData **)HMAC
-                       error:(NSError **)error;
+//- (BOOL)encryptWithReadBlock:(RNCryptorReadBlock)readBlock
+//                  writeBlock:(RNCryptorWriteBlock)writeBlock
+//               encryptionKey:(NSData *)encryptionKey
+//                          IV:(NSData *)IV
+//                     HMACKey:(NSData *)HMACKey
+//                        HMAC:(NSData **)HMAC
+//                       error:(NSError **)error;
+//
+//- (BOOL)decryptWithReadBlock:(RNCryptorReadBlock)readBlock
+//                  writeBlock:(RNCryptorWriteBlock)writeBlock
+//               encryptionKey:(NSData *)encryptionKey
+//                          IV:(NSData *)IV
+//                     HMACKey:(NSData *)HMACKey
+//                        HMAC:(NSData **)HMAC
+//                       error:(NSError **)error;
 
-- (BOOL)decryptWithReadBlock:(RNCryptorReadBlock)readBlock
-                  writeBlock:(RNCryptorWriteBlock)writeBlock
-               encryptionKey:(NSData *)encryptionKey
-                          IV:(NSData *)IV
-                     HMACKey:(NSData *)HMACKey
-                        HMAC:(NSData **)HMAC
-                       error:(NSError **)error;
+- (BOOL)encryptWithInput:(RNCryptorInputStream *)input
+                  output:(RNCryptorOutputStream *)output
+           encryptionKey:(NSData *)encryptionKey
+                      IV:(NSData *)IV
+                   error:(NSError **)error;
+
+- (BOOL)decryptWithInput:(RNCryptorInputStream *)input
+                  output:(RNCryptorOutputStream *)output
+           encryptionKey:(NSData *)encryptionKey
+                      IV:(NSData *)IV
+                   error:(NSError **)error;
 
 
-- (RNCryptorReadBlock)readBlockForData:(NSData *)data;
-
-- (RNCryptorWriteBlock)writeBlockForData:(NSMutableData *)data;
+//- (RNCryptorReadBlock)readBlockForData:(NSData *)data;
+//
+//- (RNCryptorWriteBlock)writeBlockForData:(NSMutableData *)data;
 
 ///** Encrypts stream
 //*
