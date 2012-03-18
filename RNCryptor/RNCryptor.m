@@ -36,61 +36,61 @@ NSUInteger kSmallestBlockSize = 1024;
 
 NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
 
-//@interface NSOutputStream (Data)
-//- (BOOL)_RNWriteData:(NSData *)data error:(NSError **)error;
-//@end
-//
-//@implementation NSOutputStream (Data)
-//- (BOOL)_RNWriteData:(NSData *)data error:(NSError **)error
-//{
-//  // Writing 0 bytes will close the output stream.
-//  // This is an undocumented side-effect. radar://9930518
-//  if (data.length > 0)
-//  {
-//    NSInteger bytesWritten = [self write:data.bytes
-//                               maxLength:data.length];
-//    if (bytesWritten != data.length)
-//    {
-//      if (error)
-//      {
-//        *error = [self streamError];
-//      }
-//      return NO;
-//    }
-//  }
-//  return YES;
-//}
-//
-//@end
+@interface NSOutputStream (Data)
+- (BOOL)_RNWriteData:(NSData *)data error:(NSError **)error;
+@end
 
-//@interface NSInputStream (Data)
-//- (BOOL)_RNGetData:(NSData **)data
-//         maxLength:(NSUInteger)maxLength
-//             error:(NSError **)error;
-//@end
-//
-//@implementation NSInputStream (Data)
-//
-//- (BOOL)_RNGetData:(NSData **)data
-//         maxLength:(NSUInteger)maxLength
-//             error:(NSError **)error
-//{
-//
-//  NSMutableData *buffer = [NSMutableData dataWithLength:maxLength];
-//  if ([self read:buffer.mutableBytes maxLength:maxLength] < 0)
-//  {
-//    if (error)
-//    {
-//      *error = [self streamError];
-//      return NO;
-//    }
-//  }
-//
-//  *data = buffer;
-//  return YES;
-//}
-//
-//@end
+@implementation NSOutputStream (Data)
+- (BOOL)_RNWriteData:(NSData *)data error:(NSError **)error
+{
+  // Writing 0 bytes will close the output stream.
+  // This is an undocumented side-effect. radar://9930518
+  if (data.length > 0)
+  {
+    NSInteger bytesWritten = [self write:data.bytes
+                               maxLength:data.length];
+    if (bytesWritten != data.length)
+    {
+      if (error)
+      {
+        *error = [self streamError];
+      }
+      return NO;
+    }
+  }
+  return YES;
+}
+
+@end
+
+@interface NSInputStream (Data)
+- (BOOL)_RNGetData:(NSData **)data
+         maxLength:(NSUInteger)maxLength
+             error:(NSError **)error;
+@end
+
+@implementation NSInputStream (Data)
+
+- (BOOL)_RNGetData:(NSData **)data
+         maxLength:(NSUInteger)maxLength
+             error:(NSError **)error
+{
+
+  NSMutableData *buffer = [NSMutableData dataWithLength:maxLength];
+  if ([self read:buffer.mutableBytes maxLength:maxLength] < 0)
+  {
+    if (error)
+    {
+      *error = [self streamError];
+      return NO;
+    }
+  }
+
+  *data = buffer;
+  return YES;
+}
+
+@end
 
 @interface RNCryptor ()
 @property (nonatomic, readonly, assign) RNCryptorConfiguration configuration;
@@ -206,15 +206,15 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
     [outData setLength:length];
 
     [output open];
-    NSInteger wroteLength = [output write:[outData bytes] maxLength:[outData length]];
-    if (wroteLength < 0)
+    if (! [output _RNWriteData:outData error:error])
     {
-      *error = [output streamError];
+      return NO;
     }
 
-    writeCallback(outData);
-
-    return (wroteLength >= 0);
+    if (writeCallback)
+    {
+      writeCallback(outData);
+    }
   }
   return YES;
 }
@@ -302,12 +302,15 @@ NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
       stop = YES;
       if (footer && footerSize > 0)
       {
-        *footer = [readBuffer subdataWithRange:NSMakeRange([readBuffer length] - footerSize - 1, footerSize)];
+        *footer = [readBuffer subdataWithRange:NSMakeRange([readBuffer length] - footerSize, footerSize)];
         [readBuffer setLength:[readBuffer length] - footerSize];
       }
     }
 
-    readCallback(readBuffer);
+    if (readCallback)
+    {
+      readCallback(readBuffer);
+    }
     [outData setLength:CCCryptorGetOutputLength(cryptor, [readBuffer length], true)];
     cryptorStatus = CCCryptorUpdate(cryptor,       // cryptor
                                     readBuffer.bytes,      // dataIn
@@ -364,12 +367,15 @@ NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
                                   footer:nil
                                    error:error];
 
-  if (HMACKey)
+  if (HMACKey && result)
   {
     NSMutableData *HMACData = [NSMutableData dataWithLength:CC_SHA1_DIGEST_LENGTH];
     CCHmacFinal(&HMACContext, [HMACData mutableBytes]);
 
-    [output write:HMACData.bytes maxLength:HMACData.length];
+    if (! [output _RNWriteData:HMACData error:error])
+    {
+      return NO;
+    }
   }
 
   return result;
@@ -390,11 +396,11 @@ NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   }
 
   NSData *streamHMACData;
-  BOOL result = [self performOperation:kCCEncrypt
+  BOOL result = [self performOperation:kCCDecrypt
                               fromStream:input
-                            readCallback:nil
+                            readCallback:readCallback
                                 toStream:output
-                           writeCallback:readCallback
+                           writeCallback:nil
                            encryptionKey:encryptionKey
                                       IV:IV
                               footerSize:HMACKey ? CC_SHA1_DIGEST_LENGTH : 0
@@ -406,28 +412,57 @@ NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
     NSMutableData *computedHMACData = [NSMutableData dataWithLength:CC_SHA1_DIGEST_LENGTH];
     CCHmacFinal(&HMACContext, [computedHMACData mutableBytes]);
 
-    result = [computedHMACData isEqualToData:streamHMACData];
+    if (! [computedHMACData isEqualToData:streamHMACData])
+    {
+      result = NO;
+      *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:1 userInfo:nil]; // FIXME: Better error reports
+    }
   }
 
   return result;
 }
 
+- (BOOL)encryptFromStream:(NSInputStream *)input toStream:(NSOutputStream *)output password:(NSString *)password error:(NSError **)error
+{
+  NSData *encryptionKeySalt = [self randomDataOfLength:self.configuration.saltSize];
+  NSData *encryptionKey = [self keyForPassword:password salt:encryptionKeySalt];
 
+  NSData *HMACKeySalt = [self randomDataOfLength:self.configuration.saltSize];
+  NSData *HMACKey = [self keyForPassword:password salt:HMACKeySalt];
 
-//- (BOOL)encryptFromStream:(NSInputStream *)input
-//                readCallback:(RNCryptorReadCallback)readBlock
-//                  toStream:(NSOutputStream *)output
-//               writeCallback:(RNCryptorWriteCallback)writeBlock
-//           encryptionKey:(NSData *)encryptionKey
-//                      IV:(NSData *)IV
-//                   error:(NSError **)error;
-//{
-//  return [self performOperation:kCCEncrypt fromStream:input readCallback:readBlock toStream:output writeCallback:writeBlock encryptionKey:encryptionKey IV:IV error:error];
-//}
-//
-//- (BOOL)decryptWithInput:(id<RNCryptorInput>)input output:(id<RNCryptorOutput>)output encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV error:(NSError **)error
-//{
-//  return [self performOperation:kCCDecrypt input:input output:output encryptionKey:encryptionKey IV:IV error:error];
-//}
+  NSData *IV = [self randomDataOfLength:self.configuration.blockSize];
+
+  [output open];
+  if (! [output _RNWriteData:encryptionKeySalt error:error] ||
+      ! [output _RNWriteData:HMACKeySalt error:error] ||
+      ! [output _RNWriteData:IV error:error]
+    )
+  {
+    return NO;
+  }
+
+  return [self encryptFromStream:input toStream:output encryptionKey:encryptionKey IV:IV HMACKey:HMACKey error:error];
+}
+
+- (BOOL)decryptFromStream:(NSInputStream *)input toStream:(NSOutputStream *)output password:(NSString *)password error:(NSError **)error
+{
+  NSData *encryptionKeySalt;
+  NSData *HMACKeySalt;
+  NSData *IV;
+
+  [input open];
+  if (! [input _RNGetData:&encryptionKeySalt maxLength:self.configuration.saltSize error:error] ||
+      ! [input _RNGetData:&HMACKeySalt maxLength:self.configuration.saltSize error:error] ||
+      ! [input _RNGetData:&IV maxLength:self.configuration.blockSize error:error])
+  {
+    return NO;
+  }
+
+  NSData *encryptionKey = [self keyForPassword:password salt:encryptionKeySalt];
+  NSData *HMACKey = [self keyForPassword:password salt:HMACKeySalt];
+
+  return [self decryptFromStream:input toStream:output encryptionKey:encryptionKey IV:IV HMACKey:HMACKey error:error];
+}
+
 
 @end

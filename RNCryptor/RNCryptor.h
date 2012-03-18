@@ -128,6 +128,15 @@ typedef void (^RNCryptorWriteCallback)(NSData *writeData);
                   HMACKey:(NSData *)HMACKey
                     error:(NSError **)error;
 
+- (BOOL)encryptFromStream:(NSInputStream *)input
+                 toStream:(NSOutputStream *)output
+                 password:(NSString *)password
+                    error:(NSError **)error;
 
+
+- (BOOL)decryptFromStream:(NSInputStream *)input
+                 toStream:(NSOutputStream *)output
+                 password:(NSString *)password
+                    error:(NSError **)error;
 
 @end
