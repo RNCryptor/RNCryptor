@@ -145,12 +145,10 @@
   NSError *error;
   NSInputStream *encryptInputStream = [NSInputStream inputStreamWithData:data];
   NSOutputStream *encryptOutputStream = [NSOutputStream outputStreamToMemory];
-  NSData *encryptHMACData;
 
-  STAssertTrue([cryptor encryptFromStream:encryptInputStream toStream:encryptOutputStream encryptionKey:key IV:IV HMACKey:HMACkey cipherTextHMAC:&encryptHMACData error:&error],
+  STAssertTrue([cryptor encryptFromStream:encryptInputStream toStream:encryptOutputStream encryptionKey:key IV:IV HMACKey:HMACkey error:&error],
   @"Encrypt failed:%@", error);
 
-  [encryptOutputStream write:[encryptHMACData bytes] maxLength:[encryptHMACData length]];
   [encryptOutputStream close];
   [encryptInputStream close];
 
@@ -160,35 +158,13 @@
   NSInputStream *decryptInputStream = [NSInputStream inputStreamWithData:encryptedData];
   NSOutputStream *decryptOutputStream = [NSOutputStream outputStreamToMemory];
 
-  __block CCHmacContext decryptHMACContext;
-  CCHmacInit(&decryptHMACContext, kCCHmacAlgSHA1, HMACkey.bytes, HMACkey.length);
-
-  RNCryptorWriteCallback readCallback = ^void(NSData *readData) {
-    CCHmacUpdate(&decryptHMACContext, readData.bytes, readData.length);
-  };
-
-  NSData *footer;
-  STAssertTrue([cryptor performOperation:kCCDecrypt
-                              fromStream:decryptInputStream
-                            readCallback:readCallback
-                                toStream:decryptOutputStream
-                           writeCallback:nil
-                           encryptionKey:key
-                                      IV:IV
-                              footerSize:CC_SHA1_DIGEST_LENGTH
-                                  footer:&footer
-                                   error:&error],
+  STAssertTrue([cryptor decryptFromStream:decryptInputStream toStream:decryptOutputStream encryptionKey:key IV:IV HMACKey:HMACkey error:&error],
   @"Decrypt failed:%@", error);
 
   [encryptOutputStream close];
   [encryptInputStream close];
 
-  NSMutableData *decryptHMACData = [NSMutableData dataWithLength:CC_SHA1_DIGEST_LENGTH];
-  CCHmacFinal(&decryptHMACContext, [decryptHMACData mutableBytes]);
-
   STAssertEqualObjects(data, [decryptOutputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey], @"Decryption doesn't match");
-
-  STAssertEqualObjects(footer, decryptHMACData, @"HMAC not equal");
 }
 
 @end

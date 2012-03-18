@@ -300,7 +300,7 @@ NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
       [readBuffer appendData:readAheadBuffer];
       readAheadBuffer = nil;
       stop = YES;
-      if (footer)
+      if (footer && footerSize > 0)
       {
         *footer = [readBuffer subdataWithRange:NSMakeRange([readBuffer length] - footerSize - 1, footerSize)];
         [readBuffer setLength:[readBuffer length] - footerSize];
@@ -339,14 +339,19 @@ NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
    return YES;
 }
 
-- (BOOL)encryptFromStream:(NSInputStream *)input toStream:(NSOutputStream *)output encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV HMACKey:(NSData *)HMACKey cipherTextHMAC:(NSData **)HMAC error:(NSError **)error
+- (BOOL)encryptFromStream:(NSInputStream *)input toStream:(NSOutputStream *)output encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV HMACKey:(NSData *)HMACKey error:(NSError **)error
 {
-  __block CCHmacContext encryptHMACContext;
-  CCHmacInit(&encryptHMACContext, kCCHmacAlgSHA1, HMACKey.bytes, HMACKey.length);
+  RNCryptorWriteCallback writeCallback = nil;
+  __block CCHmacContext HMACContext;
 
-  RNCryptorWriteCallback writeCallback = ^void(NSData *writeData) {
-    CCHmacUpdate(&encryptHMACContext, writeData.bytes, writeData.length);
-  };
+  if (HMACKey)
+  {
+    CCHmacInit(&HMACContext, kCCHmacAlgSHA1, HMACKey.bytes, HMACKey.length);
+
+    writeCallback = ^void(NSData *writeData) {
+      CCHmacUpdate(&HMACContext, writeData.bytes, writeData.length);
+    };
+  }
 
   BOOL result = [self performOperation:kCCEncrypt
                               fromStream:input
@@ -359,11 +364,54 @@ NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
                                   footer:nil
                                    error:error];
 
-  *HMAC = [NSMutableData dataWithLength:CC_SHA1_DIGEST_LENGTH];
-  CCHmacFinal(&encryptHMACContext, [(NSMutableData *)*HMAC mutableBytes]);
+  if (HMACKey)
+  {
+    NSMutableData *HMACData = [NSMutableData dataWithLength:CC_SHA1_DIGEST_LENGTH];
+    CCHmacFinal(&HMACContext, [HMACData mutableBytes]);
+
+    [output write:HMACData.bytes maxLength:HMACData.length];
+  }
 
   return result;
 }
+
+- (BOOL)decryptFromStream:(NSInputStream *)input toStream:(NSOutputStream *)output encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV HMACKey:(NSData *)HMACKey error:(NSError **)error
+{
+  RNCryptorWriteCallback readCallback = nil;
+  __block CCHmacContext HMACContext;
+
+  if (HMACKey)
+  {
+    CCHmacInit(&HMACContext, kCCHmacAlgSHA1, HMACKey.bytes, HMACKey.length);
+
+    readCallback = ^void(NSData *readData) {
+      CCHmacUpdate(&HMACContext, readData.bytes, readData.length);
+    };
+  }
+
+  NSData *streamHMACData;
+  BOOL result = [self performOperation:kCCEncrypt
+                              fromStream:input
+                            readCallback:nil
+                                toStream:output
+                           writeCallback:readCallback
+                           encryptionKey:encryptionKey
+                                      IV:IV
+                              footerSize:HMACKey ? CC_SHA1_DIGEST_LENGTH : 0
+                                  footer:&streamHMACData
+                                   error:error];
+
+  if (result && HMACKey)
+  {
+    NSMutableData *computedHMACData = [NSMutableData dataWithLength:CC_SHA1_DIGEST_LENGTH];
+    CCHmacFinal(&HMACContext, [computedHMACData mutableBytes]);
+
+    result = [computedHMACData isEqualToData:streamHMACData];
+  }
+
+  return result;
+}
+
 
 
 //- (BOOL)encryptFromStream:(NSInputStream *)input
