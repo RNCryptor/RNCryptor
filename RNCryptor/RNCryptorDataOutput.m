@@ -1,5 +1,5 @@
 //
-//  RNCryptorDataInputStream
+//  RNCryptorDataOutputStream
 //
 //  Copyright (c) 2012 Rob Napier
 //
@@ -22,36 +22,39 @@
 //  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 //  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //  DEALINGS IN THE SOFTWARE.
-//#import "RNCryptorDataInputStream.h"
 
 #import <CommonCrypto/CommonHMAC.h>
-#import "RNCryptorDataInputStream.h"
+#import "RNCryptorDataOutput.h"
 
-@interface RNCryptorDataInputStream ()
-@property (nonatomic, readwrite, copy) NSData *data;
+@interface RNCryptorDataOutput ()
+@property (nonatomic, readwrite, strong) NSMutableData *mutableData;
 @property (nonatomic, readwrite, copy) NSData *HMACKey;
 @end
 
-@implementation RNCryptorDataInputStream
-@synthesize data = data_;
+@implementation RNCryptorDataOutput
+@synthesize mutableData = mutableData_;
 @synthesize HMACKey = HMACKey_;
 
 
-- (id)initWithData:(NSData *)data HMACKey:(NSData *)HMACKey
+- (id)initWithHMACKey:(NSData *)HMACKey
 {
   self = [super init];
   if (self)
   {
-    data_ = [data copy];
-    HMACKey_ = [HMACKey copy];
+    mutableData_ = [NSMutableData data];
+    HMACKey_ = HMACKey;
   }
   return self;
 }
 
-- (BOOL)getData:(NSData **)data shouldStop:(BOOL *)stop error:(NSError **)error
+- (NSData *)data
 {
-  *data = self.data;
-  *stop = YES;
+  return [self mutableData];
+}
+
+- (BOOL)writeData:(NSMutableData *)data error:(NSError **)error
+{
+  [self.mutableData appendData:data];
   return YES;
 }
 
@@ -61,6 +64,5 @@
   CCHmac(kCCHmacAlgSHA1, [self.HMACKey bytes], [self.HMACKey length], [self.data bytes], [self.data length], [HMAC mutableBytes]);
   return HMAC;
 }
-
 
 @end

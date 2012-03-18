@@ -1,5 +1,5 @@
 //
-//  RNCryptorDataInputStream
+//  RNCryptorDataOutputStream
 //
 //  Copyright (c) 2012 Rob Napier
 //
@@ -22,11 +22,10 @@
 //  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 //  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //  DEALINGS IN THE SOFTWARE.
-//#import <Foundation/Foundation.h>
-
 
 #import "RNCryptor.h"
 
-@interface RNCryptorDataInputStream : NSObject <RNCryptorInputStream>
-- (id)initWithData:(NSData *)data HMACKey:(NSData *)HMACKey;
+@interface RNCryptorDataOutput : NSObject <RNCryptorOutput>
+@property (nonatomic, readonly) NSData *data;
+- (id)initWithHMACKey:(NSData *)HMACKey;
 @end
