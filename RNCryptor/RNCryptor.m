@@ -25,8 +25,6 @@
 //
 
 #import "RNCryptor.h"
-#import "RNCryptorInputStream.h"
-#import "RNCryptorOutputStream.h"
 
 // According to Apple documentation, you can use a single buffer
 // to do in-place encryption or decryption. This does not work
@@ -477,7 +475,7 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
 - (BOOL)processResult:(CCCryptorStatus)cryptorStatus
                 data:(NSMutableData *)outData
                length:(size_t)length
-             output:(RNCryptorOutputStream *)output
+             output:(id<RNCryptorOutputStream>)output
                 error:(NSError **)error
 {
   if (cryptorStatus != kCCSuccess)
@@ -502,7 +500,7 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
   return YES;
 }
 
-- (BOOL)performOperation:(CCOperation)operation input:(RNCryptorInputStream *)input output:(RNCryptorOutputStream *)output encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV error:(NSError **)error
+- (BOOL)performOperation:(CCOperation)operation input:(id<RNCryptorInputStream>)input output:(id<RNCryptorOutputStream>)output encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV error:(NSError **)error
 {
  // Create the cryptor
    CCCryptorRef cryptor = NULL;
@@ -568,12 +566,12 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
    return YES;
 }
 
-- (BOOL)encryptWithInput:(RNCryptorInputStream *)input output:(RNCryptorOutputStream *)output encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV error:(NSError **)error
+- (BOOL)encryptWithInput:(id<RNCryptorInputStream>)input output:(id<RNCryptorOutputStream>)output encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV error:(NSError **)error
 {
   return [self performOperation:kCCEncrypt input:input output:output encryptionKey:encryptionKey IV:IV error:error];
 }
 
-- (BOOL)decryptWithInput:(RNCryptorInputStream *)input output:(RNCryptorOutputStream *)output encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV error:(NSError **)error
+- (BOOL)decryptWithInput:(id<RNCryptorInputStream>)input output:(id<RNCryptorOutputStream>)output encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV error:(NSError **)error
 {
   return [self performOperation:kCCDecrypt input:input output:output encryptionKey:encryptionKey IV:IV error:error];
 }

@@ -28,8 +28,17 @@
 #import <CommonCrypto/CommonCryptor.h>
 #import <CommonCrypto/CommonKeyDerivation.h>
 
-@class RNCryptorInputStream;
-@class RNCryptorOutputStream;
+@protocol RNCryptorStream <NSObject>
+@property (nonatomic, readonly) NSData *HMAC;
+@end
+
+@protocol RNCryptorInputStream <RNCryptorStream>
+- (BOOL)getData:(NSData **)data shouldStop:(BOOL *)stop error:(NSError **)error;
+@end
+
+@protocol RNCryptorOutputStream <RNCryptorStream>
+- (BOOL)writeData:(NSMutableData *)data error:(NSError **)error;
+@end
 
 extern NSString *const kRNCryptorErrorDomain;
 
@@ -109,14 +118,14 @@ typedef struct
 //                        HMAC:(NSData **)HMAC
 //                       error:(NSError **)error;
 
-- (BOOL)encryptWithInput:(RNCryptorInputStream *)input
-                  output:(RNCryptorOutputStream *)output
+- (BOOL)encryptWithInput:(id<RNCryptorInputStream>)input
+                  output:(id<RNCryptorOutputStream>)output
            encryptionKey:(NSData *)encryptionKey
                       IV:(NSData *)IV
                    error:(NSError **)error;
 
-- (BOOL)decryptWithInput:(RNCryptorInputStream *)input
-                  output:(RNCryptorOutputStream *)output
+- (BOOL)decryptWithInput:(id<RNCryptorInputStream>)input
+                  output:(id<RNCryptorOutputStream>)output
            encryptionKey:(NSData *)encryptionKey
                       IV:(NSData *)IV
                    error:(NSError **)error;

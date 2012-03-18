@@ -1,5 +1,5 @@
 //
-//  RNCryptorOutputStream
+//  RNCryptorDataOutputStream
 //
 //  Copyright (c) 2012 Rob Napier
 //
@@ -22,24 +22,11 @@
 //  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 //  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //  DEALINGS IN THE SOFTWARE.
-//#import "RNCryptorOutputStream.h"
 
-#import "RNCryptorOutputStream.h"
+#import "RNCryptorDataOutputStream.h"
+#import "RNCryptor.h"
 
-@interface RNCryptorOutputStream ()
-@end
-
-@implementation RNCryptorOutputStream
-
-- (BOOL)writeData:(NSMutableData *)data error:(NSError **)error
-{
-  NSAssert(NO, @"Abstract");
-  return NO;
-}
-
-- (NSData *)HMAC
-{
-  NSAssert(NO, @"Abstract");
-  return nil;
-}
+@interface RNCryptorDataOutputStream : NSObject <RNCryptorOutputStream>
+@property (nonatomic, readonly) NSData *data;
+- (id)initWithHMACKey:(NSData *)HMACKey;
 @end

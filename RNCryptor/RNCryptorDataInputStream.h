@@ -25,8 +25,8 @@
 //#import <Foundation/Foundation.h>
 
 
-#import "RNCryptorInputStream.h"
+#import "RNCryptor.h"
 
-@interface RNCryptorDataInputStream : RNCryptorInputStream
+@interface RNCryptorDataInputStream : NSObject <RNCryptorInputStream>
 - (id)initWithData:(NSData *)data HMACKey:(NSData *)HMACKey;
 @end
