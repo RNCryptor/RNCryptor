@@ -4,7 +4,8 @@ Encryptor/Decryptor for iOS
  
 Provides an easy-to-use, Objective-C interface to the AES functionality of CommonCrypto. Simplifies correct handling of
 password stretching (PBKDF2), salting, and IV. For more information on these terms, see ["Properly encrypting with AES
-with CommonCrypto."](http://robnapier.net/blog/aes-commoncrypto-564) Also includes automatic HMAC handling to integrity-check messages.
+with CommonCrypto,"](http://robnapier.net/blog/aes-commoncrypto-564) and [iOS 5 Programming Pushing the Limits](http://iosptl.com), Chapter 11.
+Also includes automatic HMAC handling to integrity-check messages.
 
 `RNCryptor` is immutable, stateless and thread-safe. A given cryptor object may be used simultaneously on multiple
 threads, and can be reused to encrypt or decrypt an arbitrary number of independent messages.
