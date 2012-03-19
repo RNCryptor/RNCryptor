@@ -24,13 +24,11 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-
 #import "RNCryptorTests.h"
 #import "RNCryptor.h"
-
-@interface RNCryptor (Private)
-- (NSData *)randomDataOfLength:(size_t)length;
-@end
+#import "RNEncryptor.h"
+#import "RNCryptorSettings.h"
+#import "RNDecryptor.h"
 
 @implementation RNCryptorTests
 
@@ -50,7 +48,7 @@
 
 - (void)testStream
 {
-  RNCryptor *cryptor = [RNCryptor AES128Cryptor];
+  RNCryptor *cryptor = [[RNCryptor alloc] initWithSettings:[RNCryptorSettings defaultSettings]];
 
   NSData *data = [cryptor randomDataOfLength:1024];
   NSData *key = [cryptor randomDataOfLength:kCCKeySizeAES128];
@@ -103,18 +101,18 @@
 
 - (void)testHMAC
 {
-  RNCryptor *cryptor = [RNCryptor AES128Cryptor];
+  RNEncryptor *encryptor = [RNEncryptor defaultEncryptor];
 
-  NSData *data = [cryptor randomDataOfLength:1024];
-  NSData *key = [cryptor randomDataOfLength:kCCKeySizeAES128];
-  NSData *HMACkey = [cryptor randomDataOfLength:kCCKeySizeAES128];
-  NSData *IV = [cryptor randomDataOfLength:kCCBlockSizeAES128];
+  NSData *data = [encryptor randomDataOfLength:1024];
+  NSData *key = [encryptor randomDataOfLength:kCCKeySizeAES128];
+  NSData *HMACkey = [encryptor randomDataOfLength:kCCKeySizeAES128];
+  NSData *IV = [encryptor randomDataOfLength:kCCBlockSizeAES128];
 
   NSError *error;
   NSInputStream *encryptInputStream = [NSInputStream inputStreamWithData:data];
   NSOutputStream *encryptOutputStream = [NSOutputStream outputStreamToMemory];
 
-  STAssertTrue([cryptor encryptFromStream:encryptInputStream toStream:encryptOutputStream encryptionKey:key IV:IV HMACKey:HMACkey error:&error],
+  STAssertTrue([encryptor encryptFromStream:encryptInputStream toStream:encryptOutputStream encryptionKey:key IV:IV HMACKey:HMACkey error:&error],
   @"Encrypt failed:%@", error);
 
   [encryptOutputStream close];
@@ -126,7 +124,9 @@
   NSInputStream *decryptInputStream = [NSInputStream inputStreamWithData:encryptedData];
   NSOutputStream *decryptOutputStream = [NSOutputStream outputStreamToMemory];
 
-  STAssertTrue([cryptor decryptFromStream:decryptInputStream toStream:decryptOutputStream encryptionKey:key IV:IV HMACKey:HMACkey error:&error],
+  RNDecryptor *decryptor = [RNDecryptor defaultDecryptor];
+
+  STAssertTrue([decryptor decryptFromStream:decryptInputStream toStream:decryptOutputStream encryptionKey:key IV:IV HMACKey:HMACkey error:&error],
   @"Decrypt failed:%@", error);
 
   [decryptOutputStream close];
@@ -137,9 +137,9 @@
 
 - (void)testSimple
 {
-  RNCryptor *cryptor = [RNCryptor AES128Cryptor];
+  RNEncryptor *encryptor = [RNEncryptor defaultEncryptor];
 
-  NSData *data = [cryptor randomDataOfLength:1024];
+  NSData *data = [encryptor  randomDataOfLength:1024];
   NSString *password = @"Passw0rd!";
 
   NSError *error;
@@ -147,7 +147,7 @@
   NSInputStream *encryptInputStream = [NSInputStream inputStreamWithData:data];
   NSOutputStream *encryptOutputStream = [NSOutputStream outputStreamToMemory];
 
-  STAssertTrue([cryptor encryptFromStream:encryptInputStream toStream:encryptOutputStream password:password error:&error],
+  STAssertTrue([encryptor  encryptFromStream:encryptInputStream toStream:encryptOutputStream password:password error:&error],
   @"Encrypt failed:%@", error);
 
   [encryptOutputStream close];
@@ -159,7 +159,7 @@
   NSInputStream *decryptInputStream = [NSInputStream inputStreamWithData:encryptedData];
   NSOutputStream *decryptOutputStream = [NSOutputStream outputStreamToMemory];
 
-  STAssertTrue([cryptor decryptFromStream:decryptInputStream toStream:decryptOutputStream password:password error:&error],
+  STAssertTrue([[RNDecryptor defaultDecryptor] decryptFromStream:decryptInputStream toStream:decryptOutputStream password:password error:&error],
   @"Decrypt failed:%@", error);
 
   [decryptOutputStream close];
@@ -170,9 +170,9 @@
 
 - (void)testSimpleFail
 {
-  RNCryptor *cryptor = [RNCryptor AES128Cryptor];
+  RNEncryptor *encryptor = [RNEncryptor defaultEncryptor];
 
-  NSData *data = [cryptor randomDataOfLength:1024];
+  NSData *data = [encryptor randomDataOfLength:1024];
   NSString *password = @"Passw0rd!";
   NSString *badPassword = @"NotThePassword";
 
@@ -181,7 +181,7 @@
   NSInputStream *encryptInputStream = [NSInputStream inputStreamWithData:data];
   NSOutputStream *encryptOutputStream = [NSOutputStream outputStreamToMemory];
 
-  STAssertTrue([cryptor encryptFromStream:encryptInputStream toStream:encryptOutputStream password:password error:&error],
+  STAssertTrue([encryptor encryptFromStream:encryptInputStream toStream:encryptOutputStream password:password error:&error],
     @"Encrypt failed:%@", error);
 
   [encryptOutputStream close];
@@ -193,7 +193,7 @@
   NSInputStream *decryptInputStream = [NSInputStream inputStreamWithData:encryptedData];
   NSOutputStream *decryptOutputStream = [NSOutputStream outputStreamToMemory];
 
-  STAssertFalse([cryptor decryptFromStream:decryptInputStream toStream:decryptOutputStream password:badPassword error:&error],
+  STAssertFalse([[RNDecryptor defaultDecryptor] decryptFromStream:decryptInputStream toStream:decryptOutputStream password:badPassword error:&error],
     @"Decrypt failed:%@", error);
 
   [decryptOutputStream close];
@@ -204,34 +204,34 @@
 
 - (void)testData
 {
-  RNCryptor *cryptor = [RNCryptor AES128Cryptor];
+  RNEncryptor *encryptor = [RNEncryptor defaultEncryptor];
 
-  NSData *data = [cryptor randomDataOfLength:1024];
+  NSData *data = [encryptor randomDataOfLength:1024];
   NSString *password = @"Passw0rd!";
 
   NSError *error;
 
-  NSData *encryptedData = [cryptor encryptData:data password:password error:&error];
-  NSData *decryptedData = [cryptor decryptData:encryptedData password:password error:&error];
+  NSData *encryptedData = [encryptor encryptData:data password:password error:&error];
+  NSData *decryptedData = [[RNDecryptor defaultDecryptor] decryptData:encryptedData password:password error:&error];
 
   STAssertEqualObjects(decryptedData, data, @"Decrypted data does not match");
 }
 
 - (void)testCorruption
 {
-  RNCryptor *cryptor = [RNCryptor AES128Cryptor];
+  RNEncryptor *encryptor = [RNEncryptor defaultEncryptor];
 
-  NSData *data = [cryptor randomDataOfLength:1024];
+  NSData *data = [encryptor randomDataOfLength:1024];
   NSString *password = @"Passw0rd!";
 
   NSError *error;
 
-  NSData *encryptedData = [cryptor encryptData:data password:password error:&error];
+  NSData *encryptedData = [encryptor encryptData:data password:password error:&error];
 
   NSMutableData *corruptData = [encryptedData mutableCopy];
-  [corruptData replaceBytesInRange:NSMakeRange(100,100) withBytes:[[cryptor randomDataOfLength:100] bytes]];
+  [corruptData replaceBytesInRange:NSMakeRange(100,100) withBytes:[[encryptor randomDataOfLength:100] bytes]];
 
-  NSData *decryptedData = [cryptor decryptData:corruptData password:password error:&error];
+  NSData *decryptedData = [[RNDecryptor defaultDecryptor] decryptData:corruptData password:password error:&error];
 
   STAssertNil(decryptedData, @"Data should not have decrypted");
   STAssertEquals([error code], 1, @"Should have received error 1");
