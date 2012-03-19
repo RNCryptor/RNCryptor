@@ -88,11 +88,6 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
 @implementation RNCryptor
 @synthesize settings = settings_;
 
-- (RNCryptor *)init
-{
-  return [self initWithSettings:[RNCryptorSettings defaultSettings]];
-}
-
 - (RNCryptor *)initWithSettings:(RNCryptorSettings *)settings
 {
   self = [super init];
@@ -115,13 +110,13 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   return data;
 }
 
-+ (RNCryptor *)defaultCryptor
++ (RNCryptor *)AES256Cryptor
 {
   static dispatch_once_t once;
-  static RNCryptor *defaultCryptor = nil;
+  static RNCryptor *AES256Cryptor = nil;
 
-  dispatch_once(&once, ^{ defaultCryptor = [[self alloc] initWithSettings:[RNCryptorSettings defaultSettings]]; });
-  return defaultCryptor;
+  dispatch_once(&once, ^{ AES256Cryptor = [[self alloc] initWithSettings:[RNCryptorSettings AES256Settings]]; });
+  return AES256Cryptor;
 }
 
 - (NSData *)keyForPassword:(NSString *)password salt:(NSData *)salt
@@ -524,13 +519,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
 @synthesize HMACAlgorithm = HMACAlgorithm_;
 @synthesize HMACLength = HMACLength_;
 
-+ (RNCryptorSettings *)defaultSettings
-{
-  return [self AES128Settings];
-
-}
-
-+ (RNCryptorSettings *)AES128Settings
++ (RNCryptorSettings *)AES256Settings
 {
   static dispatch_once_t once;
   static RNCryptorSettings *AES128Settings;
@@ -538,7 +527,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   dispatch_once(&once, ^{
     AES128Settings = [[self alloc] init];
     AES128Settings->algorithm_ = kCCAlgorithmAES128;
-    AES128Settings->keySize_ = kCCKeySizeAES128;
+    AES128Settings->keySize_ = kCCKeySizeAES256;
     AES128Settings->blockSize_ = kCCBlockSizeAES128;
     AES128Settings->IVSize_ = kCCBlockSizeAES128;
     AES128Settings->saltSize_ = 8;

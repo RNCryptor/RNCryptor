@@ -45,7 +45,7 @@
 
 - (void)testStream
 {
-  RNCryptor *cryptor = [[RNCryptor alloc] initWithSettings:[RNCryptorSettings defaultSettings]];
+  RNCryptor *cryptor = [[RNCryptor alloc] initWithSettings:[RNCryptorSettings AES256Settings]];
 
   NSData *data = [cryptor randomDataOfLength:1024];
   NSData *key = [cryptor randomDataOfLength:kCCKeySizeAES128];
@@ -98,7 +98,7 @@
 
 - (void)testHMAC
 {
-  RNCryptor *cryptor = [RNCryptor defaultCryptor];
+  RNCryptor *cryptor = [RNCryptor AES256Cryptor];
 
   NSData *data = [cryptor randomDataOfLength:1024];
   NSData *key = [cryptor randomDataOfLength:kCCKeySizeAES128];
@@ -132,7 +132,7 @@
 
 - (void)testSimple
 {
-  RNCryptor *cryptor = [RNCryptor defaultCryptor];
+  RNCryptor *cryptor = [RNCryptor AES256Cryptor];
 
   NSData *data = [cryptor randomDataOfLength:1024];
   NSString *password = @"Passw0rd!";
@@ -165,7 +165,7 @@
 
 - (void)testSimpleFail
 {
-  RNCryptor *cryptor = [RNCryptor defaultCryptor];
+  RNCryptor *cryptor = [RNCryptor AES256Cryptor];
 
   NSData *data = [cryptor randomDataOfLength:1024];
   NSString *password = @"Passw0rd!";
@@ -200,7 +200,7 @@
 
 - (void)_testDataOfLength:(NSUInteger)length
 {
-  RNCryptor *cryptor = [RNCryptor defaultCryptor];
+  RNCryptor *cryptor = [RNCryptor AES256Cryptor];
 
   NSData *data = [cryptor randomDataOfLength:length];
   NSString *password = @"Passw0rd!";
@@ -220,7 +220,7 @@
 
 - (void)testCorruption
 {
-  RNCryptor *cryptor = [RNCryptor defaultCryptor];
+  RNCryptor *cryptor = [RNCryptor AES256Cryptor];
 
   NSData *data = [cryptor randomDataOfLength:1024];
   NSString *password = @"Passw0rd!";
@@ -260,7 +260,7 @@
 
 - (void)testURL
 {
-  RNCryptor *cryptor = [RNCryptor defaultCryptor];
+  RNCryptor *cryptor = [RNCryptor AES256Cryptor];
 
   NSData *data = [cryptor randomDataOfLength:1024];
   NSString *password = @"Passw0rd!";

@@ -69,7 +69,7 @@ typedef void (^RNCryptorWriteCallback)(NSData *writeData);
 
 @property (nonatomic, readonly) RNCryptorSettings *settings;
 
-+ (RNCryptor *)defaultCryptor;
++ (RNCryptor *)AES256Cryptor;
 
 - (NSData *)keyForPassword:(NSString *)password salt:(NSData *)salt;
 
@@ -140,6 +140,5 @@ typedef void (^RNCryptorWriteCallback)(NSData *writeData);
 @property (nonatomic, readonly) CCHmacAlgorithm HMACAlgorithm;  // kCCHmacAlgSHA256
 @property (nonatomic, readonly) size_t HMACLength;  // CC_SHA256_DIGEST_LENGTH
 
-+ (RNCryptorSettings *)defaultSettings;
-+ (RNCryptorSettings *)AES128Settings;
++ (RNCryptorSettings *)AES256Settings;
 @end
