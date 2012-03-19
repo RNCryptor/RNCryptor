@@ -24,6 +24,7 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
+#import <Foundation/Foundation.h>
 #import "RNCryptorTests.h"
 #import "RNCryptor.h"
 
@@ -293,6 +294,16 @@
 {
   [self _testDataOfLength:1023];
   [self _testDataOfLength:1025];
+}
+
+- (void)testActuallyEncrypting
+{
+  NSData *data = [@"Data" dataUsingEncoding:NSUTF8StringEncoding];
+  NSError *error;
+  NSData *encrypted = [[RNCryptor AES256Cryptor] encryptData:data password:@"password" error:&error];
+
+  NSRange found = [encrypted rangeOfData:data options:0 range:NSMakeRange(0, encrypted.length)];
+  STAssertEquals(found.location, (NSUInteger)NSNotFound, @"Data is not encrypted");
 }
 
 @end

@@ -35,7 +35,7 @@ extern NSString *const kRNCryptorErrorDomain;
 typedef void (^RNCryptorReadCallback)(NSData *readData);
 typedef void (^RNCryptorWriteCallback)(NSData *writeData);
 
-/** AES Encryptor/Decryptor for Mac and iOS.
+/** AES Encryptor/Decryptor for iOS.
  
  Provides an easy-to-use, Objective-C interface to the AES functionality of CommonCrypto. Simplifies correct handling of
  password stretching (PBKDF2), salting, and IV. For more information on these terms, see "Properly encrypting with AES
@@ -44,11 +44,18 @@ typedef void (^RNCryptorWriteCallback)(NSData *writeData);
  RNCryptor is immutable, stateless and thread-safe. A given cryptor object may be used simultaneously on multiple
  threads, and can be reused to encrypt or decrypt an arbitrary number of independent messages.
 
- See Daemonic Dispatches for discussion of several algorithm choices:
+ Links for discussion of several algorithm choices:
    http://www.daemonology.net/blog/2009-06-11-cryptographic-right-answers.html
    http://www.daemonology.net/blog/2009-06-24-encrypt-then-mac.html
- 
+   http://www.daemonology.net/blog/2009-07-31-thoughts-on-AES.html
+     -- Note that the output of PBKDF2 should be considered "random" in this context. I do not believe that the AES-256
+        related-key attacks are generally applicable to the likely uses of this framework (encrypting data against
+        human-generated password, or against true random keys).
+
  Requires Security.framework.
+
+ NOTE: Mac support should be possible, but requires replacing SecCopyRandomBytes() and switching from AES-CTR to AES-CBC.
+       This may be resolved in 10.8.
  */
 
 @interface RNCryptor : NSObject

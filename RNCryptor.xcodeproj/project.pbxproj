@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		FB7564F41512D3C4007B806B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7564F31512D3C4007B806B /* Foundation.framework */; };
 		FB7565021512D3C4007B806B /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7565011512D3C4007B806B /* SenTestingKit.framework */; };
-		FB7565041512D3C4007B806B /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7565031512D3C4007B806B /* UIKit.framework */; };
 		FB7565051512D3C4007B806B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7564F31512D3C4007B806B /* Foundation.framework */; };
 		FB7565081512D3C4007B806B /* libRNCryptor.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7564F01512D3C4007B806B /* libRNCryptor.a */; };
 		FB75650E1512D3C4007B806B /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = FB75650C1512D3C4007B806B /* InfoPlist.strings */; };
@@ -59,7 +58,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				FB7565021512D3C4007B806B /* SenTestingKit.framework in Frameworks */,
-				FB7565041512D3C4007B806B /* UIKit.framework in Frameworks */,
 				FB7565051512D3C4007B806B /* Foundation.framework in Frameworks */,
 				FB7565081512D3C4007B806B /* libRNCryptor.a in Frameworks */,
 				FB7565241512D9BE007B806B /* Security.framework in Frameworks */,
