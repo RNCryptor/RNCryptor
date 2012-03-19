@@ -129,3 +129,17 @@ typedef void (^RNCryptorWriteCallback)(NSData *writeData);
 - (NSData *)encryptData:(NSData *)plaintext password:(NSString *)password error:(NSError **)error;
 
 @end
+
+@interface RNCryptorSettings : NSObject
+@property (nonatomic, readonly) CCAlgorithm algorithm;  // kCCAlgorithmAES128
+@property (nonatomic, readonly) size_t keySize;         // kCCKeySizeAES128
+@property (nonatomic, readonly) size_t blockSize;       // kCCBlockSizeAES128
+@property (nonatomic, readonly) size_t IVSize;          // kCCBlockSizeAES128
+@property (nonatomic, readonly) size_t saltSize;        // 8
+@property (nonatomic, readonly) uint PBKDFRounds;       // 10000 (~80ms on an iPhone 4)
+@property (nonatomic, readonly) CCHmacAlgorithm HMACAlgorithm;  // kCCHmacAlgSHA256
+@property (nonatomic, readonly) size_t HMACLength;  // CC_SHA256_DIGEST_LENGTH
+
++ (RNCryptorSettings *)defaultSettings;
++ (RNCryptorSettings *)AES128Settings;
+@end

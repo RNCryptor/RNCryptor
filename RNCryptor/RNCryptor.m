@@ -25,7 +25,6 @@
 //
 
 #import "RNCryptor.h"
-#import "RNCryptorSettings.h"
 
 NSUInteger kSmallestBlockSize = 1024;
 
@@ -511,6 +510,43 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   {
     return nil;
   }
+}
+
+@end
+
+@implementation RNCryptorSettings
+@synthesize algorithm = algorithm_;
+@synthesize keySize = keySize_;
+@synthesize blockSize = blockSize_;
+@synthesize IVSize = IVSize_;
+@synthesize saltSize = saltSize_;
+@synthesize PBKDFRounds = PBKDFRounds_;
+@synthesize HMACAlgorithm = HMACAlgorithm_;
+@synthesize HMACLength = HMACLength_;
+
++ (RNCryptorSettings *)defaultSettings
+{
+  return [self AES128Settings];
+
+}
+
++ (RNCryptorSettings *)AES128Settings
+{
+  static dispatch_once_t once;
+  static RNCryptorSettings *AES128Settings;
+
+  dispatch_once(&once, ^{
+    AES128Settings = [[self alloc] init];
+    AES128Settings->algorithm_ = kCCAlgorithmAES128;
+    AES128Settings->keySize_ = kCCKeySizeAES128;
+    AES128Settings->blockSize_ = kCCBlockSizeAES128;
+    AES128Settings->IVSize_ = kCCBlockSizeAES128;
+    AES128Settings->saltSize_ = 8;
+    AES128Settings->PBKDFRounds_ = 10000; // ~80ms on an iPhone 4
+    AES128Settings->HMACAlgorithm_ = kCCHmacAlgSHA256;
+    AES128Settings->HMACLength_= CC_SHA256_DIGEST_LENGTH;
+  });
+  return AES128Settings;
 }
 
 @end

@@ -26,7 +26,6 @@
 
 #import "RNCryptorTests.h"
 #import "RNCryptor.h"
-#import "RNCryptorSettings.h"
 
 @implementation RNCryptorTests
 
