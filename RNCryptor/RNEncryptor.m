@@ -127,6 +127,37 @@
   return [self encryptFromStream:input toStream:output encryptionKey:encryptionKey IV:IV HMACKey:HMACKey error:error];
 }
 
+- (BOOL)encryptFromURL:(NSURL *)inURL toURL:(NSURL *)outURL append:(BOOL)append password:(NSString *)password error:(NSError **)error
+{
+  NSInputStream *encryptInputStream = [NSInputStream inputStreamWithURL:inURL];
+  [encryptInputStream open];
+  if (!encryptInputStream)
+  {
+    if (error)
+    {
+      *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:1 userInfo:nil]; // FIXME: Error
+    }
+    return NO;
+  }
+
+  NSOutputStream *encryptOutputStream = [NSOutputStream outputStreamWithURL:outURL append:append];
+  [encryptOutputStream open];
+  if (!encryptOutputStream)
+  {
+    if (error)
+    {
+      *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:1 userInfo:nil]; // FIXME: Error
+    }
+    return NO;
+  }
+
+  BOOL result = [self encryptFromStream:encryptInputStream toStream:encryptOutputStream password:password error:error];
+
+  [encryptOutputStream close];
+  [encryptInputStream close];
+
+  return result;
+}
 
 - (NSData *)encryptData:(NSData *)plaintext password:(NSString *)password error:(NSError **)error
 {
@@ -147,6 +178,5 @@
     return nil;
   }
 }
-
 
 @end

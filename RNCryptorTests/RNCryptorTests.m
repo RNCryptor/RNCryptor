@@ -237,4 +237,50 @@
   STAssertEquals([error code], 1, @"Should have received error 1");
 }
 
+- (NSString *)temporaryFilePath
+{
+  // Thanks to Matt Gallagher
+  NSString *tempFileTemplate = [NSTemporaryDirectory() stringByAppendingPathComponent:@"RNCryptorTest.XXXXXX"];
+  const char *tempFileTemplateCString = [tempFileTemplate fileSystemRepresentation];
+  char *tempFileNameCString = (char *)malloc(strlen(tempFileTemplateCString) + 1);
+  strcpy(tempFileNameCString, tempFileTemplateCString);
+  int fileDescriptor = mkstemp(tempFileNameCString);
+
+  NSAssert(fileDescriptor >= 0, @"Failed to create temporary file");
+
+  NSString *tempFileName =
+      [[NSFileManager defaultManager]
+          stringWithFileSystemRepresentation:tempFileNameCString
+          length:strlen(tempFileNameCString)];
+
+  free(tempFileNameCString);
+  return tempFileName;
+}
+
+- (void)testURL
+{
+  RNEncryptor *encryptor = [RNEncryptor defaultEncryptor];
+
+  NSData *data = [encryptor randomDataOfLength:1024];
+  NSString *password = @"Passw0rd!";
+  NSError *error;
+
+  NSURL *plaintextURL = [NSURL fileURLWithPath:[self temporaryFilePath]];
+  NSURL *ciphertextURL = [NSURL fileURLWithPath:[self temporaryFilePath]];
+  NSURL *decryptedURL = [NSURL fileURLWithPath:[self temporaryFilePath]];
+
+  NSAssert([data writeToURL:plaintextURL options:0 error:&error], @"Couldn't write file:%@", error);
+
+  STAssertTrue([[RNEncryptor defaultEncryptor] encryptFromURL:plaintextURL toURL:ciphertextURL append:NO password:password error:&error], @"Failed to encrypt:%@", error);
+
+  STAssertTrue([[RNDecryptor defaultDecryptor] decryptFromURL:ciphertextURL toURL:decryptedURL append:NO password:password error:&error], @"Failed to decrypt:%@", error);
+
+  NSData *decryptedData = [NSData dataWithContentsOfURL:decryptedURL];
+  STAssertEqualObjects(data, decryptedData, @"Data doesn't match");
+
+  [[NSFileManager defaultManager] removeItemAtURL:plaintextURL error:&error];
+  [[NSFileManager defaultManager] removeItemAtURL:ciphertextURL error:&error];
+  [[NSFileManager defaultManager] removeItemAtURL:decryptedURL error:&error];
+}
+
 @end

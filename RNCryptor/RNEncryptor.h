@@ -43,6 +43,12 @@
                  password:(NSString *)password
                     error:(NSError **)error;
 
+- (BOOL)encryptFromURL:(NSURL *)inURL
+                 toURL:(NSURL *)outURL
+                append:(BOOL)append
+              password:(NSString *)password
+                 error:(NSError **)error;
+
 - (NSData *)encryptData:(NSData *)plaintext password:(NSString *)password error:(NSError **)error;
 
 @end

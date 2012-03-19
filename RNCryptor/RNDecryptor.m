@@ -128,6 +128,19 @@
   return [self decryptFromStream:input toStream:output encryptionKey:encryptionKey IV:IV HMACKey:HMACKey error:error];
 }
 
+- (BOOL)decryptFromURL:(NSURL *)inURL toURL:(NSURL *)outURL append:(BOOL)append password:(NSString *)password error:(NSError **)error
+{
+  NSInputStream *decryptInputStream = [NSInputStream inputStreamWithURL:inURL];
+  NSOutputStream *decryptOutputStream = [NSOutputStream outputStreamWithURL:outURL append:append];
+
+  BOOL result = [self decryptFromStream:decryptInputStream toStream:decryptOutputStream password:password error:error];
+
+  [decryptOutputStream close];
+  [decryptInputStream close];
+
+  return result;
+}
+
 
 - (NSData *)decryptData:(NSData *)ciphertext password:(NSString *)password error:(NSError **)error
 {

@@ -45,5 +45,12 @@
                  password:(NSString *)password
                     error:(NSError **)error;
 
+- (BOOL)decryptFromURL:(NSURL *)inURL
+                 toURL:(NSURL *)outURL
+                append:(BOOL)append
+              password:(NSString *)password
+                 error:(NSError **)error;
+
 - (NSData *)decryptData:(NSData *)ciphertext password:(NSString *)password error:(NSError **)error;
+
 @end
