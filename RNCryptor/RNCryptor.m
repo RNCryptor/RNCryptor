@@ -123,8 +123,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
 {
   NSMutableData *derivedKey = [NSMutableData dataWithLength:self.settings.keySize];
 
-  int
-      result = CCKeyDerivationPBKDF(kCCPBKDF2,            // algorithm
+  int result = CCKeyDerivationPBKDF(kCCPBKDF2,            // algorithm
                                     password.UTF8String,  // password
                                     password.length,  // passwordLength
                                     salt.bytes,           // salt

@@ -35,7 +35,7 @@ extern NSString *const kRNCryptorErrorDomain;
 typedef void (^RNCryptorReadCallback)(NSData *readData);
 typedef void (^RNCryptorWriteCallback)(NSData *writeData);
 
-/** AES Encryptor/Decryptor for iOS.
+/** Encryptor/Decryptor for iOS.
  
  Provides an easy-to-use, Objective-C interface to the AES functionality of CommonCrypto. Simplifies correct handling of
  password stretching (PBKDF2), salting, and IV. For more information on these terms, see "Properly encrypting with AES
