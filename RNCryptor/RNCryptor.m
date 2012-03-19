@@ -181,45 +181,45 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   return YES;
 }
 
-- (BOOL)performOperation:(CCOperation)operation
-              fromStream:(NSInputStream *)input
-            readCallback:(RNCryptorReadCallback)readCallback
-                toStream:(NSOutputStream *)output
-           writeCallback:(RNCryptorWriteCallback)writeCallback
-           encryptionKey:(NSData *)encryptionKey
-                      IV:(NSData *)IV
-             footerSize:(NSUInteger)footerSize
-                 footer:(NSData **)footer
-                   error:(NSError **)error
+- (BOOL)performOperation:(CCOperation)anOperation
+              fromStream:(NSInputStream *)aFromStream
+            readCallback:(RNCryptorReadCallback)aReadCallback
+                toStream:(NSOutputStream *)aToStream
+           writeCallback:(RNCryptorWriteCallback)aWriteCallback
+           encryptionKey:(NSData *)anEncryptionKey
+                      IV:(NSData *)anIV
+             footerSize:(NSUInteger)aFooterSize
+                 footer:(NSData **)aFooter
+                   error:(NSError **)anError
 {
  // Create the cryptor
   CCCryptorRef cryptor = NULL;
   CCCryptorStatus cryptorStatus;
-  cryptorStatus = CCCryptorCreate(operation,             // operation
+  cryptorStatus = CCCryptorCreate(anOperation,             // operation
                                   self.settings.algorithm,            // algorithm
                                   kCCOptionPKCS7Padding, // options
-                                  encryptionKey.bytes,             // key
-                                  encryptionKey.length,            // key length
-                                  IV.bytes,              // IV
+                                  anEncryptionKey.bytes,             // key
+                                  anEncryptionKey.length,            // key length
+                                  anIV.bytes,              // IV
                                   &cryptor);             // OUT cryptorRef
 
   if (cryptorStatus != kCCSuccess || cryptor == NULL)
   {
-    if (error)
+    if (anError)
     {
-      *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:cryptorStatus userInfo:nil];
+      *anError = [NSError errorWithDomain:kRNCryptorErrorDomain code:cryptorStatus userInfo:nil];
     }
     NSAssert(NO, @"Could not create cryptor: %d", cryptorStatus);
     return NO;
   }
 
-  const NSUInteger bufferSize = NextMultipleOfUnit(MAX(footerSize + 1, kSmallestBlockSize), self.settings.blockSize);
+  const NSUInteger bufferSize = NextMultipleOfUnit(MAX(aFooterSize + 1, kSmallestBlockSize), self.settings.blockSize);
   NSMutableData *readBuffer = [NSMutableData data];
 
   // Read ahead
   NSMutableData *readAheadBuffer = [NSMutableData dataWithLength:bufferSize];
-  [input open];
-  NSInteger length = [input read:[readAheadBuffer mutableBytes] maxLength:[readAheadBuffer length]];
+  [aFromStream open];
+  NSInteger length = [aFromStream read:[readAheadBuffer mutableBytes] maxLength:[readAheadBuffer length]];
   if (length >= 0)
   {
     [readAheadBuffer setLength:(NSUInteger)length];
@@ -231,19 +231,19 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   while (!stop)
   {
     // Error
-    if ([input streamStatus] == NSStreamStatusError)
+    if ([aFromStream streamStatus] == NSStreamStatusError)
     {
-      *error = [input streamError];
+      *anError = [aFromStream streamError];
       CCCryptorRelease(cryptor);
       return NO;
     }
 
     // Not at end (read-ahead has a full block). Read another block.
-    if ([input streamStatus] != NSStreamStatusAtEnd)
+    if ([aFromStream streamStatus] != NSStreamStatusAtEnd)
     {
       readBuffer = readAheadBuffer;
       readAheadBuffer = [NSMutableData dataWithLength:bufferSize];
-      length = [input read:[readAheadBuffer mutableBytes] maxLength:bufferSize];
+      length = [aFromStream read:[readAheadBuffer mutableBytes] maxLength:bufferSize];
       if (length >= 0)
       {
         [readAheadBuffer setLength:(NSUInteger)length];
@@ -251,22 +251,22 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
     }
 
     // At end now?
-    if ([input streamStatus] == NSStreamStatusAtEnd)
+    if ([aFromStream streamStatus] == NSStreamStatusAtEnd)
     {
       // Put everything together
       [readBuffer appendData:readAheadBuffer];
       readAheadBuffer = nil;
       stop = YES;
-      if (footer && footerSize > 0)
+      if (aFooter && aFooterSize > 0)
       {
-        *footer = [readBuffer subdataWithRange:NSMakeRange([readBuffer length] - footerSize, footerSize)];
-        [readBuffer setLength:[readBuffer length] - footerSize];
+        *aFooter = [readBuffer subdataWithRange:NSMakeRange([readBuffer length] - aFooterSize, aFooterSize)];
+        [readBuffer setLength:[readBuffer length] - aFooterSize];
       }
     }
 
-    if (readCallback)
+    if (aReadCallback)
     {
-      readCallback(readBuffer);
+      aReadCallback(readBuffer);
     }
     [outData setLength:CCCryptorGetOutputLength(cryptor, [readBuffer length], true)];
     cryptorStatus = CCCryptorUpdate(cryptor,       // cryptor
@@ -275,7 +275,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
                                     outData.mutableBytes,      // dataOut
                                     outData.length, // dataOutAvailable
                                     &dataOutMoved);   // dataOutMoved
-    if (![self processResult:cryptorStatus data:outData length:dataOutMoved callback:writeCallback output:output error:error])
+    if (![self processResult:cryptorStatus data:outData length:dataOutMoved callback:aWriteCallback output:aToStream error:anError])
     {
       CCCryptorRelease(cryptor);
       return NO;
@@ -289,7 +289,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
                                   outData.mutableBytes,       // dataOut
                                   outData.length,  // dataOutAvailable
                                   &dataOutMoved);    // dataOutMoved
-  if (![self processResult:cryptorStatus data:outData length:dataOutMoved callback:writeCallback output:output error:error])
+  if (![self processResult:cryptorStatus data:outData length:dataOutMoved callback:aWriteCallback output:aToStream error:anError])
    {
      CCCryptorRelease(cryptor);
      return NO;
