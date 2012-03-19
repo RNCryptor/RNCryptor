@@ -195,13 +195,18 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
  // Create the cryptor
   CCCryptorRef cryptor = NULL;
   CCCryptorStatus cryptorStatus;
-  cryptorStatus = CCCryptorCreate(anOperation,             // operation
-                                  self.settings.algorithm,            // algorithm
-                                  kCCOptionPKCS7Padding, // options
-                                  anEncryptionKey.bytes,             // key
-                                  anEncryptionKey.length,            // key length
-                                  anIV.bytes,              // IV
-                                  &cryptor);             // OUT cryptorRef
+  cryptorStatus = CCCryptorCreateWithMode(anOperation,
+                                          self.settings.mode,
+                                          self.settings.algorithm,
+                                          self.settings.padding,
+                                          anIV.bytes,
+                                          anEncryptionKey.bytes,
+                                          anEncryptionKey.length,
+                                          NULL, // tweak
+                                          0, // tweakLength
+                                          0, // numRounds (0=default)
+                                          self.settings.modeOptions,
+                                          &cryptor);
 
   if (cryptorStatus != kCCSuccess || cryptor == NULL)
   {
@@ -518,24 +523,31 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
 @synthesize PBKDFRounds = PBKDFRounds_;
 @synthesize HMACAlgorithm = HMACAlgorithm_;
 @synthesize HMACLength = HMACLength_;
+@synthesize mode = mode_;
+@synthesize padding = padding_;
+@synthesize modeOptions = modeOptions_;
+
 
 + (RNCryptorSettings *)AES256Settings
 {
   static dispatch_once_t once;
-  static RNCryptorSettings *AES128Settings;
+  static RNCryptorSettings *AES256Settings;
 
   dispatch_once(&once, ^{
-    AES128Settings = [[self alloc] init];
-    AES128Settings->algorithm_ = kCCAlgorithmAES128;
-    AES128Settings->keySize_ = kCCKeySizeAES256;
-    AES128Settings->blockSize_ = kCCBlockSizeAES128;
-    AES128Settings->IVSize_ = kCCBlockSizeAES128;
-    AES128Settings->saltSize_ = 8;
-    AES128Settings->PBKDFRounds_ = 10000; // ~80ms on an iPhone 4
-    AES128Settings->HMACAlgorithm_ = kCCHmacAlgSHA256;
-    AES128Settings->HMACLength_= CC_SHA256_DIGEST_LENGTH;
+    AES256Settings = [[self alloc] init];
+    AES256Settings->algorithm_ = kCCAlgorithmAES128;
+    AES256Settings->mode_ = kCCModeCTR;
+    AES256Settings->modeOptions_ = kCCModeOptionCTR_LE;
+    AES256Settings->keySize_ = kCCKeySizeAES256;
+    AES256Settings->blockSize_ = kCCBlockSizeAES128;
+    AES256Settings->IVSize_ = kCCBlockSizeAES128;
+    AES256Settings->padding_ = ccNoPadding;
+    AES256Settings->saltSize_ = 8;
+    AES256Settings->PBKDFRounds_ = 10000; // ~80ms on an iPhone 4
+    AES256Settings->HMACAlgorithm_ = kCCHmacAlgSHA256;
+    AES256Settings->HMACLength_= CC_SHA256_DIGEST_LENGTH;
   });
-  return AES128Settings;
+  return AES256Settings;
 }
 
 @end

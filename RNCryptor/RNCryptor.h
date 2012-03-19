@@ -43,6 +43,10 @@ typedef void (^RNCryptorWriteCallback)(NSData *writeData);
 
  RNCryptor is immutable, stateless and thread-safe. A given cryptor object may be used simultaneously on multiple
  threads, and can be reused to encrypt or decrypt an arbitrary number of independent messages.
+
+ See Daemonic Dispatches for discussion of several algorithm choices:
+   http://www.daemonology.net/blog/2009-06-11-cryptographic-right-answers.html
+   http://www.daemonology.net/blog/2009-06-24-encrypt-then-mac.html
  
  Requires Security.framework.
  */
@@ -61,12 +65,15 @@ typedef void (^RNCryptorWriteCallback)(NSData *writeData);
 /// @name Creating an RNCryptor
 ///---------------------------------------------------------------------------------------
 
-/** AES cryptor with 256-bit key. 8-byte salt. HMAC+SHA256. Appropriate for most uses.
+/** Shared AES-256 encryptor
+ *
+ * AES-CTR cryptor with 256-bit key. 8-byte salt. HMAC+SHA256 of ciphertext appended (Encrypt-then-MAC).
+ * Appropriate for most uses.
  *
  */
 + (RNCryptor *)AES256Cryptor;
 
-/** Create a generate cryptor
+/** Create a customiced cryptor
  * @param settings Immutable settings for cryptor.
  */
 
@@ -163,15 +170,16 @@ typedef void (^RNCryptorWriteCallback)(NSData *writeData);
 - (NSData *)keyForPassword:(NSString *)password salt:(NSData *)salt;
 - (NSData *)randomDataOfLength:(size_t)length;
 
-
-
 @end
 
 @interface RNCryptorSettings : NSObject
 @property (nonatomic, readonly) CCAlgorithm algorithm;  // kCCAlgorithmAES128
+@property (nonatomic, readonly) CCMode mode;            // kCCModeCTR
+@property (nonatomic, readonly) CCModeOptions modeOptions;  // kCCModeOptionCTR_LE
 @property (nonatomic, readonly) size_t keySize;         // kCCKeySizeAES256
 @property (nonatomic, readonly) size_t blockSize;       // kCCBlockSizeAES128
 @property (nonatomic, readonly) size_t IVSize;          // kCCBlockSizeAES128
+@property (nonatomic, readonly) CCPadding padding;      // ccNoPadding
 @property (nonatomic, readonly) size_t saltSize;        // 8
 @property (nonatomic, readonly) uint PBKDFRounds;       // 10000 (~80ms on an iPhone 4)
 @property (nonatomic, readonly) CCHmacAlgorithm HMACAlgorithm;  // kCCHmacAlgSHA256
