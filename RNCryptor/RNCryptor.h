@@ -69,6 +69,8 @@ typedef void (^RNCryptorWriteCallback)(NSData *writeData);
 
 @property (nonatomic, readonly) RNCryptorSettings *settings;
 
++ (RNCryptor *)defaultCryptor;
+
 - (NSData *)keyForPassword:(NSString *)password salt:(NSData *)salt;
 
 - (BOOL)performOperation:(CCOperation)operation
@@ -83,5 +85,47 @@ typedef void (^RNCryptorWriteCallback)(NSData *writeData);
                    error:(NSError **)error;
 
 - (NSData *)randomDataOfLength:(size_t)length;
+
+- (BOOL)decryptFromStream:(NSInputStream *)input
+                 toStream:(NSOutputStream *)output
+            encryptionKey:(NSData *)encryptionKey
+                       IV:(NSData *)IV
+                  HMACKey:(NSData *)HMACKey
+                    error:(NSError **)error;
+
+
+
+- (BOOL)decryptFromStream:(NSInputStream *)input
+                 toStream:(NSOutputStream *)output
+                 password:(NSString *)password
+                    error:(NSError **)error;
+
+- (BOOL)decryptFromURL:(NSURL *)inURL
+                 toURL:(NSURL *)outURL
+                append:(BOOL)append
+              password:(NSString *)password
+                 error:(NSError **)error;
+
+- (NSData *)decryptData:(NSData *)ciphertext password:(NSString *)password error:(NSError **)error;
+
+- (BOOL)encryptFromStream:(NSInputStream *)input
+                 toStream:(NSOutputStream *)output
+            encryptionKey:(NSData *)encryptionKey
+                       IV:(NSData *)IV
+                  HMACKey:(NSData *)HMACKey
+                    error:(NSError **)error;
+
+- (BOOL)encryptFromStream:(NSInputStream *)input
+                 toStream:(NSOutputStream *)output
+                 password:(NSString *)password
+                    error:(NSError **)error;
+
+- (BOOL)encryptFromURL:(NSURL *)inURL
+                 toURL:(NSURL *)outURL
+                append:(BOOL)append
+              password:(NSString *)password
+                 error:(NSError **)error;
+
+- (NSData *)encryptData:(NSData *)plaintext password:(NSString *)password error:(NSError **)error;
 
 @end
