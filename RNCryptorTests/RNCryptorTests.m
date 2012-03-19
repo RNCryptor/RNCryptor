@@ -139,7 +139,7 @@
 {
   RNEncryptor *encryptor = [RNEncryptor defaultEncryptor];
 
-  NSData *data = [encryptor  randomDataOfLength:1024];
+  NSData *data = [encryptor randomDataOfLength:1024];
   NSString *password = @"Passw0rd!";
 
   NSError *error;
@@ -147,7 +147,7 @@
   NSInputStream *encryptInputStream = [NSInputStream inputStreamWithData:data];
   NSOutputStream *encryptOutputStream = [NSOutputStream outputStreamToMemory];
 
-  STAssertTrue([encryptor  encryptFromStream:encryptInputStream toStream:encryptOutputStream password:password error:&error],
+  STAssertTrue([encryptor encryptFromStream:encryptInputStream toStream:encryptOutputStream password:password error:&error],
   @"Encrypt failed:%@", error);
 
   [encryptOutputStream close];
@@ -202,11 +202,12 @@
   STAssertFalse([data isEqualToData:[decryptOutputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey]], @"Decryption doesn't match");
 }
 
-- (void)testData
+
+- (void)_testDataOfLength:(NSUInteger)length
 {
   RNEncryptor *encryptor = [RNEncryptor defaultEncryptor];
 
-  NSData *data = [encryptor randomDataOfLength:1024];
+  NSData *data = [encryptor randomDataOfLength:length];
   NSString *password = @"Passw0rd!";
 
   NSError *error;
@@ -215,6 +216,11 @@
   NSData *decryptedData = [[RNDecryptor defaultDecryptor] decryptData:encryptedData password:password error:&error];
 
   STAssertEqualObjects(decryptedData, data, @"Decrypted data does not match");
+}
+
+- (void)testData
+{
+  [self _testDataOfLength:1024];
 }
 
 - (void)testCorruption
@@ -281,6 +287,17 @@
   [[NSFileManager defaultManager] removeItemAtURL:plaintextURL error:&error];
   [[NSFileManager defaultManager] removeItemAtURL:ciphertextURL error:&error];
   [[NSFileManager defaultManager] removeItemAtURL:decryptedURL error:&error];
+}
+
+- (void)testBigData
+{
+  [self _testDataOfLength:1024*1024];
+}
+
+- (void)testOddSizeData
+{
+  [self _testDataOfLength:1023];
+  [self _testDataOfLength:1025];
 }
 
 @end
