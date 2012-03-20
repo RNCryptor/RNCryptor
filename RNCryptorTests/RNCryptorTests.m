@@ -27,6 +27,10 @@
 #import "RNCryptorTests.h"
 #import "RNCryptor.h"
 
+@interface RNCryptor (Private)
+- (NSData *)randomDataOfLength:(size_t)length;
+@end
+
 @implementation RNCryptorTests
 
 - (void)setUp

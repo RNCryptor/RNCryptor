@@ -36,6 +36,10 @@ The same encryption and decryption can be processed from one `NSURL` or `NSStrea
 												   password:password 
 												      error:&error];
 
+# API Documentation
+
+Full API information is available at http://rnapier.github.com/RNCryptor/doc/html/Classes/RNCryptor.html.
+
 # Building
 
 Comes packaged as a static library, but the `RNCryptor.h` and `RNCryptor.m` files can be dropped into any project.

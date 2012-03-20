@@ -40,9 +40,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
 @end
 
 @implementation NSInputStream (RNCryptor)
-- (BOOL)_RNGetData:(NSData **)data
-         maxLength:(NSUInteger)maxLength
-             error:(NSError **)error
+- (BOOL)_RNGetData:(NSData **)data maxLength:(NSUInteger)maxLength error:(NSError **)error
 {
   NSMutableData *buffer = [NSMutableData dataWithLength:maxLength];
   if ([self read:buffer.mutableBytes maxLength:maxLength] < 0)
@@ -98,18 +96,6 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   return self;
 }
 
-- (NSData *)randomDataOfLength:(size_t)length
-{
-  NSMutableData *data = [NSMutableData dataWithLength:length];
-
-  int result = SecRandomCopyBytes(kSecRandomDefault,
-                                  length,
-                                  data.mutableBytes);
-  NSAssert(result == 0, @"Unable to generate random bytes: %d", errno);
-
-  return data;
-}
-
 + (RNCryptor *)AES256Cryptor
 {
   static dispatch_once_t once;
@@ -117,6 +103,16 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
 
   dispatch_once(&once, ^{ AES256Cryptor = [[self alloc] initWithSettings:[RNCryptorSettings AES256Settings]]; });
   return AES256Cryptor;
+}
+
+- (NSData *)randomDataOfLength:(size_t)length
+{
+  NSMutableData *data = [NSMutableData dataWithLength:length];
+
+  int result = SecRandomCopyBytes(kSecRandomDefault, length, data.mutableBytes);
+  NSAssert(result == 0, @"Unable to generate random bytes: %d", errno);
+
+  return data;
 }
 
 - (NSData *)keyForPassword:(NSString *)password salt:(NSData *)salt
@@ -152,7 +148,6 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
     {
       *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:cryptorStatus userInfo:nil];
     }
-    NSLog(@"%s Could not process data: %d", __PRETTY_FUNCTION__, cryptorStatus);
     return NO;
   }
 
@@ -161,8 +156,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
     [outData setLength:length];
 
     [output open];
-    NSInteger bytesWritten = [output write:outData.bytes
-                                 maxLength:outData.length];
+    NSInteger bytesWritten = [output write:outData.bytes maxLength:outData.length];
     if (bytesWritten != outData.length)
     {
       if (error)
@@ -303,7 +297,12 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
    return YES;
 }
 
-- (BOOL)decryptFromStream:(NSInputStream *)input toStream:(NSOutputStream *)output encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV HMACKey:(NSData *)HMACKey error:(NSError **)error
+- (BOOL)decryptFromStream:(NSInputStream *)input
+                 toStream:(NSOutputStream *)output
+            encryptionKey:(NSData *)encryptionKey
+                       IV:(NSData *)IV
+                  HMACKey:(NSData *)HMACKey
+                    error:(NSError **)error
 {
   RNCryptorWriteCallback readCallback = nil;
   __block CCHmacContext HMACContext;
@@ -343,7 +342,6 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
 
   return result;
 }
-
 
 - (BOOL)decryptFromStream:(NSInputStream *)input toStream:(NSOutputStream *)output password:(NSString *)password error:(NSError **)error
 {
@@ -408,7 +406,12 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   }
 }
 
-- (BOOL)encryptFromStream:(NSInputStream *)input toStream:(NSOutputStream *)output encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV HMACKey:(NSData *)HMACKey error:(NSError **)error
+- (BOOL)encryptFromStream:(NSInputStream *)input
+                 toStream:(NSOutputStream *)output
+            encryptionKey:(NSData *)encryptionKey
+                       IV:(NSData *)IV
+                  HMACKey:(NSData *)HMACKey
+                    error:(NSError **)error
 {
   RNCryptorWriteCallback writeCallback = nil;
   __block CCHmacContext HMACContext;

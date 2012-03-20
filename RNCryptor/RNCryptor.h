@@ -35,27 +35,14 @@ extern NSString *const kRNCryptorErrorDomain;
 typedef void (^RNCryptorReadCallback)(NSData *readData);
 typedef void (^RNCryptorWriteCallback)(NSData *writeData);
 
-/** Encryptor/Decryptor for iOS.
- 
- Provides an easy-to-use, Objective-C interface to the AES functionality of CommonCrypto. Simplifies correct handling of
- password stretching (PBKDF2), salting, and IV. For more information on these terms, see "Properly encrypting with AES
- with CommonCrypto" http://robnapier.net/blog/aes-commoncrypto-564
+/** Encryptor/Decryptor for iOS
 
- RNCryptor is immutable, stateless and thread-safe. A given cryptor object may be used simultaneously on multiple
- threads, and can be reused to encrypt or decrypt an arbitrary number of independent messages.
+  Provides an easy-to-use, Objective-C interface to the AES functionality of CommonCrypto. Simplifies correct handling of
+  password stretching (PBKDF2), salting, and IV. For more information on these terms, see "Properly encrypting with AES
+  with CommonCrypto," and iOS 5 Programming Pushing the Limits, Chapter 11. Also includes automatic HMAC handling to integrity-check messages.
 
- Links for discussion of several algorithm choices:
-   http://www.daemonology.net/blog/2009-06-11-cryptographic-right-answers.html
-   http://www.daemonology.net/blog/2009-06-24-encrypt-then-mac.html
-   http://www.daemonology.net/blog/2009-07-31-thoughts-on-AES.html
-     -- Note that the output of PBKDF2 should be considered "random" in this context. I do not believe that the AES-256
-        related-key attacks are generally applicable to the likely uses of this framework (encrypting data against
-        human-generated password, or against true random keys).
-
- Requires Security.framework.
-
- NOTE: Mac support should be possible, but requires replacing SecCopyRandomBytes() and switching from AES-CTR to AES-CBC.
-       This may be resolved in 10.8.
+  RNCryptor is immutable, stateless and thread-safe. A given cryptor object may be used simultaneously on multiple threads,
+  and can be reused to encrypt or decrypt an arbitrary number of independent messages.
  */
 
 @interface RNCryptor : NSObject
@@ -128,8 +115,10 @@ typedef void (^RNCryptorWriteCallback)(NSData *writeData);
 * @param toStream Stream to write. May be opened or unopened.
 * @param encryptionKey Encryption key of correct length for algorithm. This is not a password. No hashing or PBKDF will be applied.
 * @param IV Initialization vector of correct length for algorithm. For "no IV," you must pass a zero-filled block of the correct length. This is strongly discouraged.
-* @param HMACKey HMAC key. This can be of any length. It is discouraged to make this the same as `encryptionKey`.
+* @param HMACKey HMAC key. This can be of any length. It is discouraged to make this the same as `encryptionKey`. If HMACKey is `nil`, no HMAC will be written.
 * @param error If there is an error, this will contain the `NSError` by reference
+* @returns `YES` on success. `NO` on failure, and `error` will contain the error object.
+* @returns `
 */
 - (BOOL)encryptFromStream:(NSInputStream *)fromStream
                  toStream:(NSOutputStream *)toStream
@@ -138,6 +127,18 @@ typedef void (^RNCryptorWriteCallback)(NSData *writeData);
                   HMACKey:(NSData *)HMACKey
                     error:(NSError **)error;
 
+/** Decrypt from a stream, to a stream, provided a key (not password), IV, and optional HMAC key.
+*   The HMAC of the ciphertext will be read from the end of the stream if an HMAC key is provided. If there is an HMAC,
+*   then it must match, or this method will return `NO`.
+*
+* @param fromStream Stream to read. May be opened or unopened.
+* @param toStream Stream to write. May be opened or unopened.
+* @param encryptionKey Encryption key of correct length for algorithm. This is not a password. No hashing or PBKDF will be applied.
+* @param IV Initialization vector of correct length for algorithm. For "no IV," you must pass a zero-filled block of the correct length. This is strongly discouraged.
+* @param HMACKey HMAC key, matching the encryption key.
+* @param error If there is an error, this will contain the `NSError` by reference
+* @returns `YES` on success. `NO` on failure (including HMAC mismatch), and `error` will contain the error object.
+*/
 - (BOOL)decryptFromStream:(NSInputStream *)input
                  toStream:(NSOutputStream *)output
             encryptionKey:(NSData *)encryptionKey
@@ -146,36 +147,103 @@ typedef void (^RNCryptorWriteCallback)(NSData *writeData);
                     error:(NSError **)error;
 
 
+///---------------------------------------------------------------------------------------
+/// @name Password-based operations
+///---------------------------------------------------------------------------------------
 
-- (BOOL)decryptFromStream:(NSInputStream *)input
-                 toStream:(NSOutputStream *)output
+/** Encrypt from a stream, to a stream, provided a password.
+*   Automatically generates required salts and IV. Prepends header and appends HMAC.
+*   Full format is described at https://github.com/rnapier/RNCryptor/wiki/Data-Format
+*
+* @param fromStream Stream to read. May be opened or unopened.
+* @param toStream Stream to write. May be opened or unopened.
+* @param password Password to use for encryption
+* @param error If there is an error, this will contain the `NSError` by reference
+* @returns `YES` on success. `NO` on failure, and `error` will contain the error object.
+*/
+- (BOOL)encryptFromStream:(NSInputStream *)fromStream
+                 toStream:(NSOutputStream *)toStream
                  password:(NSString *)password
                     error:(NSError **)error;
 
-- (BOOL)decryptFromURL:(NSURL *)inURL
-                 toURL:(NSURL *)outURL
+/** Encrypt from a URL, to a URL, provided a password.
+*   Automatically generates required salts and IV. Prepends header and appends HMAC.
+*   Full format is described at https://github.com/rnapier/RNCryptor/wiki/Data-Format
+*
+* @param fromURL URL to read.
+* @param toURL URL to write.
+* @param append Should output be appended rather than overwritng?
+* @param password Password to use for encryption
+* @param error If there is an error, this will contain the `NSError` by reference
+* @returns `YES` on success. `NO` on failure, and `error` will contain the error object.
+*/
+- (BOOL)encryptFromURL:(NSURL *)fromURL
+                 toURL:(NSURL *)toURL
                 append:(BOOL)append
               password:(NSString *)password
                  error:(NSError **)error;
 
-- (NSData *)decryptData:(NSData *)ciphertext password:(NSString *)password error:(NSError **)error;
-
-
-- (BOOL)encryptFromStream:(NSInputStream *)input
-                 toStream:(NSOutputStream *)output
-                 password:(NSString *)password
-                    error:(NSError **)error;
-
-- (BOOL)encryptFromURL:(NSURL *)inURL
-                 toURL:(NSURL *)outURL
-                append:(BOOL)append
-              password:(NSString *)password
-                 error:(NSError **)error;
-
+/** Encrypt data, provided a password.
+*   Automatically generates required salts and IV. Prepends header and appends HMAC.
+*   Full format is described at https://github.com/rnapier/RNCryptor/wiki/Data-Format
+*
+* @param plaintext Data to encrypt
+* @param password Password to use for encryption
+* @param error If there is an error, this will contain the `NSError` by reference
+* @returns Encrypted data, or `nil` if there was an error.
+*/
 - (NSData *)encryptData:(NSData *)plaintext password:(NSString *)password error:(NSError **)error;
 
+/** Decrypt from a stream, to a stream, provided a password.
+*   Stream must be in format described at https://github.com/rnapier/RNCryptor/wiki/Data-Format, with header,
+*   required salts and IV prepended, and HMAC appended.
+*
+* @param fromStream Stream to read. May be opened or unopened.
+* @param toStream Stream to write. May be opened or unopened.
+* @param password Password to use for decryption
+* @returns `YES` on success. `NO` on failure, and `error` will contain the error object.
+* @param error If there is an error, this will contain the `NSError` by reference
+*/
+- (BOOL)decryptFromStream:(NSInputStream *)fromStream
+                 toStream:(NSOutputStream *)toStream
+                 password:(NSString *)password
+                    error:(NSError **)error;
+
+/** Decrypt from a URL, to a URL, provided a password.
+*   URL contents must be in format described at https://github.com/rnapier/RNCryptor/wiki/Data-Format, with header,
+*   required salts and IV prepended, and HMAC appended.
+*
+* @param fromURL URL to read.
+* @param toURL URL to write.
+* @param append Should output be appended rather than overwritng?
+* @param password Password to use for decryption
+* @param error If there is an error, this will contain the `NSError` by reference
+* @returns `YES` on success. `NO` on failure, and `error` will contain the error object.
+*/
+- (BOOL)decryptFromURL:(NSURL *)fromURL
+                 toURL:(NSURL *)toURL
+                append:(BOOL)append
+              password:(NSString *)password
+                 error:(NSError **)error;
+
+/** Decrypt data, provided a password.
+*   Data must be in format described at https://github.com/rnapier/RNCryptor/wiki/Data-Format, with header,
+*   required salts and IV prepended, and HMAC appended.
+*
+* @param ciphertext Data to decrypt
+* @param password Password to use for decryption
+* @param error If there is an error, this will contain the `NSError` by reference
+* @returns Decrypted data, or `nil` if there was an error.
+*/
+- (NSData *)decryptData:(NSData *)ciphertext password:(NSString *)password error:(NSError **)error;
+
+/** Generate key given a password and salt using a PBKDF
+*
+* @param password Password to use for PBKDF
+* @param salt Salt for password
+* @returns Key
+*/
 - (NSData *)keyForPassword:(NSString *)password salt:(NSData *)salt;
-- (NSData *)randomDataOfLength:(size_t)length;
 
 @end
 
