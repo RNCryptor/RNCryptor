@@ -350,12 +350,21 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   NSData *encryptionKeySalt;
   NSData *HMACKeySalt;
   NSData *IV;
+  NSData *header;
 
   [input open];
-  if (! [input _RNGetData:&encryptionKeySalt maxLength:self.settings.saltSize error:error] ||
+  if (! [input _RNGetData:&header maxLength:2 error:error] ||
+      ! [input _RNGetData:&encryptionKeySalt maxLength:self.settings.saltSize error:error] ||
       ! [input _RNGetData:&HMACKeySalt maxLength:self.settings.saltSize error:error] ||
       ! [input _RNGetData:&IV maxLength:self.settings.blockSize error:error])
   {
+    return NO;
+  }
+
+  uint8_t AES128CryptorHeader[2] = {0, 0};
+  if (![header isEqualToData:[NSData dataWithBytes:AES128CryptorHeader length:sizeof(AES128CryptorHeader)]])
+  {
+    *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:1 userInfo:nil]; // FIXME: error
     return NO;
   }
 
@@ -448,7 +457,10 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   NSData *IV = [self randomDataOfLength:self.settings.blockSize];
 
   [output open];
-  if (! [output _RNWriteData:encryptionKeySalt error:error] ||
+  uint8_t header[2] = {0, 0};
+  NSData *headerData = [NSData dataWithBytes:header length:sizeof(header)];
+  if (! [output _RNWriteData:headerData error:error] ||
+      ! [output _RNWriteData:encryptionKeySalt error:error] ||
       ! [output _RNWriteData:HMACKeySalt error:error] ||
       ! [output _RNWriteData:IV error:error]
     )

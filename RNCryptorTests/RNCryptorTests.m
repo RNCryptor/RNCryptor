@@ -24,7 +24,6 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-#import <Foundation/Foundation.h>
 #import "RNCryptorTests.h"
 #import "RNCryptor.h"
 
@@ -198,7 +197,6 @@
   STAssertFalse([data isEqualToData:[decryptOutputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey]], @"Decryption doesn't match");
 }
 
-
 - (void)_testDataOfLength:(NSUInteger)length
 {
   RNCryptor *cryptor = [RNCryptor AES256Cryptor];
@@ -211,7 +209,7 @@
   NSData *encryptedData = [cryptor encryptData:data password:password error:&error];
   NSData *decryptedData = [cryptor decryptData:encryptedData password:password error:&error];
 
-  STAssertEqualObjects(decryptedData, data, @"Decrypted data does not match");
+  STAssertTrue([data isEqualToData:decryptedData], @"Decrypted data does not match"); // Don't use STAssertEqualObjects(). Some data is quite large.
 }
 
 - (void)testData
@@ -304,6 +302,20 @@
 
   NSRange found = [encrypted rangeOfData:data options:0 range:NSMakeRange(0, encrypted.length)];
   STAssertEquals(found.location, (NSUInteger)NSNotFound, @"Data is not encrypted");
+}
+
+- (void)testBadHeader
+{
+  NSData *data = [@"Data" dataUsingEncoding:NSUTF8StringEncoding];
+  NSError *error;
+  NSMutableData *encrypted = [[[RNCryptor AES256Cryptor] encryptData:data password:@"password" error:&error] mutableCopy];
+
+  uint8_t firstByte = 1;
+  [encrypted replaceBytesInRange:NSMakeRange(0, 1) withBytes:&firstByte];
+
+  NSData *decrypted = [[RNCryptor AES256Cryptor] decryptData:encrypted password:@"password" error:&error];
+  STAssertNil(decrypted, @"Decrypt should have failed");
+  STAssertEquals([error code], 1, @"Wrong error code:%d", [error code]);
 }
 
 @end
