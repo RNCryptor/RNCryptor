@@ -27,6 +27,9 @@
 #import "RNCryptorTests.h"
 #import "RNCryptor.h"
 
+NSString * const kGoodPassword = @"Passw0rd!";
+NSString * const kBadPassword = @"NotThePassword";
+
 @interface RNCryptor (Private)
 - (NSData *)randomDataOfLength:(size_t)length;
 @end
@@ -139,14 +142,13 @@
   RNCryptor *cryptor = [RNCryptor AES256Cryptor];
 
   NSData *data = [cryptor randomDataOfLength:1024];
-  NSString *password = @"Passw0rd!";
 
   NSError *error;
 
   NSInputStream *encryptInputStream = [NSInputStream inputStreamWithData:data];
   NSOutputStream *encryptOutputStream = [NSOutputStream outputStreamToMemory];
 
-  STAssertTrue([cryptor encryptFromStream:encryptInputStream toStream:encryptOutputStream password:password error:&error],
+  STAssertTrue([cryptor encryptFromStream:encryptInputStream toStream:encryptOutputStream password:kGoodPassword error:&error],
   @"Encrypt failed:%@", error);
 
   [encryptOutputStream close];
@@ -158,7 +160,7 @@
   NSInputStream *decryptInputStream = [NSInputStream inputStreamWithData:encryptedData];
   NSOutputStream *decryptOutputStream = [NSOutputStream outputStreamToMemory];
 
-  STAssertTrue([cryptor decryptFromStream:decryptInputStream toStream:decryptOutputStream password:password error:&error],
+  STAssertTrue([cryptor decryptFromStream:decryptInputStream toStream:decryptOutputStream password:kGoodPassword error:&error],
   @"Decrypt failed:%@", error);
 
   [decryptOutputStream close];
@@ -172,15 +174,13 @@
   RNCryptor *cryptor = [RNCryptor AES256Cryptor];
 
   NSData *data = [cryptor randomDataOfLength:1024];
-  NSString *password = @"Passw0rd!";
-  NSString *badPassword = @"NotThePassword";
 
   NSError *error;
 
   NSInputStream *encryptInputStream = [NSInputStream inputStreamWithData:data];
   NSOutputStream *encryptOutputStream = [NSOutputStream outputStreamToMemory];
 
-  STAssertTrue([cryptor encryptFromStream:encryptInputStream toStream:encryptOutputStream password:password error:&error],
+  STAssertTrue([cryptor encryptFromStream:encryptInputStream toStream:encryptOutputStream password:kGoodPassword error:&error],
     @"Encrypt failed:%@", error);
 
   [encryptOutputStream close];
@@ -192,7 +192,7 @@
   NSInputStream *decryptInputStream = [NSInputStream inputStreamWithData:encryptedData];
   NSOutputStream *decryptOutputStream = [NSOutputStream outputStreamToMemory];
 
-  STAssertFalse([cryptor decryptFromStream:decryptInputStream toStream:decryptOutputStream password:badPassword error:&error],
+  STAssertFalse([cryptor decryptFromStream:decryptInputStream toStream:decryptOutputStream password:kBadPassword error:&error],
     @"Decrypt failed:%@", error);
 
   [decryptOutputStream close];
@@ -201,19 +201,30 @@
   STAssertFalse([data isEqualToData:[decryptOutputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey]], @"Decryption doesn't match");
 }
 
-- (void)_testDataOfLength:(NSUInteger)length
+- (void)_testDataOfLength:(NSUInteger)length encryptPassword:(NSString *)encryptPassword decryptPassword:(NSString *)decryptPassword
 {
   RNCryptor *cryptor = [RNCryptor AES256Cryptor];
 
   NSData *data = [cryptor randomDataOfLength:length];
-  NSString *password = @"Passw0rd!";
 
   NSError *error;
 
-  NSData *encryptedData = [cryptor encryptData:data password:password error:&error];
-  NSData *decryptedData = [cryptor decryptData:encryptedData password:password error:&error];
+  NSData *encryptedData = [cryptor encryptData:data password:encryptPassword error:&error];
+  NSData *decryptedData = [cryptor decryptData:encryptedData password:decryptPassword error:&error];
 
-  STAssertTrue([data isEqualToData:decryptedData], @"Decrypted data does not match"); // Don't use STAssertEqualObjects(). Some data is quite large.
+  if ([encryptPassword isEqualToString:decryptPassword])
+  {
+    STAssertTrue([data isEqualToData:decryptedData], @"Decrypted data does not match for length:%d", length); // Don't use STAssertEqualObjects(). Some data is quite large.
+  }
+  else
+  {
+    STAssertFalse([data isEqualToData:decryptedData], @"Decrypt should have failed for length:%d", length); // Don't use STAssertEqualObjects(). Some data is quite large.
+  }
+}
+
+- (void)_testDataOfLength:(NSUInteger)length
+{
+ [self _testDataOfLength:length encryptPassword:kGoodPassword decryptPassword:kBadPassword];
 }
 
 - (void)testData
@@ -226,16 +237,15 @@
   RNCryptor *cryptor = [RNCryptor AES256Cryptor];
 
   NSData *data = [cryptor randomDataOfLength:1024];
-  NSString *password = @"Passw0rd!";
 
   NSError *error;
 
-  NSData *encryptedData = [cryptor encryptData:data password:password error:&error];
+  NSData *encryptedData = [cryptor encryptData:data password:kGoodPassword error:&error];
 
   NSMutableData *corruptData = [encryptedData mutableCopy];
   [corruptData replaceBytesInRange:NSMakeRange(100,100) withBytes:[[cryptor randomDataOfLength:100] bytes]];
 
-  NSData *decryptedData = [cryptor decryptData:corruptData password:password error:&error];
+  NSData *decryptedData = [cryptor decryptData:corruptData password:kGoodPassword error:&error];
 
   STAssertNil(decryptedData, @"Data should not have decrypted");
   STAssertEquals([error code], 1, @"Should have received error 1");
@@ -261,12 +271,11 @@
   return tempFileName;
 }
 
-- (void)testURL
+- (void)_testURLWithLength:(NSUInteger)length encryptPassword:(NSString *)encryptPassword decryptPassword:(NSString *)decryptPassword
 {
   RNCryptor *cryptor = [RNCryptor AES256Cryptor];
 
-  NSData *data = [cryptor randomDataOfLength:1024];
-  NSString *password = @"Passw0rd!";
+  NSData *data = [cryptor randomDataOfLength:length];
   NSError *error;
 
   NSURL *plaintextURL = [NSURL fileURLWithPath:[self temporaryFilePath]];
@@ -275,16 +284,36 @@
 
   NSAssert([data writeToURL:plaintextURL options:0 error:&error], @"Couldn't write file:%@", error);
 
-  STAssertTrue([cryptor encryptFromURL:plaintextURL toURL:ciphertextURL append:NO password:password error:&error], @"Failed to encrypt:%@", error);
+  STAssertTrue([cryptor encryptFromURL:plaintextURL toURL:ciphertextURL append:NO password:encryptPassword error:&error], @"Failed to encrypt:%@", error);
 
-  STAssertTrue([cryptor decryptFromURL:ciphertextURL toURL:decryptedURL append:NO password:password error:&error], @"Failed to decrypt:%@", error);
+  BOOL result = [cryptor decryptFromURL:ciphertextURL toURL:decryptedURL append:NO password:decryptPassword error:&error];
+  if ([encryptPassword isEqualToString:decryptPassword])
+  {
+    STAssertTrue(result, @"Failed to decrypt:%@", error);
+    NSData *decryptedData = [NSData dataWithContentsOfURL:decryptedURL];
+    STAssertEqualObjects(data, decryptedData, @"Data doesn't match");
 
-  NSData *decryptedData = [NSData dataWithContentsOfURL:decryptedURL];
-  STAssertEqualObjects(data, decryptedData, @"Data doesn't match");
+  }
+  else
+  {
+    STAssertFalse(result, @"Should have failed");
+  }
 
   [[NSFileManager defaultManager] removeItemAtURL:plaintextURL error:&error];
   [[NSFileManager defaultManager] removeItemAtURL:ciphertextURL error:&error];
   [[NSFileManager defaultManager] removeItemAtURL:decryptedURL error:&error];
+}
+
+- (void)_testURLWithLength:(NSUInteger)length
+{
+  return [self _testURLWithLength:length encryptPassword:kGoodPassword decryptPassword:kGoodPassword];
+}
+
+
+- (void)testURL
+{
+  [self _testURLWithLength:1024];
+
 }
 
 - (void)testBigData
@@ -302,7 +331,7 @@
 {
   NSData *data = [@"Data" dataUsingEncoding:NSUTF8StringEncoding];
   NSError *error;
-  NSData *encrypted = [[RNCryptor AES256Cryptor] encryptData:data password:@"password" error:&error];
+  NSData *encrypted = [[RNCryptor AES256Cryptor] encryptData:data password:kGoodPassword error:&error];
 
   NSRange found = [encrypted rangeOfData:data options:0 range:NSMakeRange(0, encrypted.length)];
   STAssertEquals(found.location, (NSUInteger)NSNotFound, @"Data is not encrypted");
@@ -312,14 +341,99 @@
 {
   NSData *data = [@"Data" dataUsingEncoding:NSUTF8StringEncoding];
   NSError *error;
-  NSMutableData *encrypted = [[[RNCryptor AES256Cryptor] encryptData:data password:@"password" error:&error] mutableCopy];
+  NSMutableData *encrypted = [[[RNCryptor AES256Cryptor] encryptData:data password:kGoodPassword error:&error] mutableCopy];
 
   uint8_t firstByte = 1;
   [encrypted replaceBytesInRange:NSMakeRange(0, 1) withBytes:&firstByte];
 
-  NSData *decrypted = [[RNCryptor AES256Cryptor] decryptData:encrypted password:@"password" error:&error];
+  NSData *decrypted = [[RNCryptor AES256Cryptor] decryptData:encrypted password:kGoodPassword error:&error];
   STAssertNil(decrypted, @"Decrypt should have failed");
   STAssertEquals([error code], 1, @"Wrong error code:%d", [error code]);
+}
+
+- (void)testSmall
+{
+  for (NSUInteger i = 1; i < 32; i++)
+  {
+    [self _testDataOfLength:i];
+  }
+}
+
+- (void)testNearReadBlocksize
+{
+  for (NSUInteger i = 1024 - 10; i < 1024 + 10; i++)
+  {
+    [self _testDataOfLength:i];
+  }
+}
+
+- (void)testNearDoubleReadBlocksize
+{
+  for (NSUInteger i = 2048 - 10; i < 2048 + 10; i++)
+  {
+    [self _testDataOfLength:i];
+  }
+}
+
+- (void)testSmallBadPassword
+{
+  for (NSUInteger i = 1; i < 32; i++)
+  {
+    [self _testDataOfLength:i encryptPassword:kGoodPassword decryptPassword:kBadPassword];
+  }
+}
+
+- (void)testNearReadBlocksizeBadPassword
+{
+  for (NSUInteger i = 1024 - 32; i < 1024 + 32; i++)
+  {
+    [self _testDataOfLength:i encryptPassword:kGoodPassword decryptPassword:kBadPassword];
+  }
+}
+
+- (void)testNearDoubleReadBlocksizeBadPassword
+{
+  for (NSUInteger i = 2048 - 32; i < 2048 + 32; i++)
+  {
+    [self _testDataOfLength:i encryptPassword:kGoodPassword decryptPassword:kBadPassword];
+  }
+}
+
+- (void)testNearTripleReadBlocksizeBadPassword
+{
+  for (NSUInteger i = 3072 - 32; i <= 3072 + 32; i++)
+  {
+    [self _testDataOfLength:i encryptPassword:kGoodPassword decryptPassword:kBadPassword];
+  }
+}
+
+- (void)testURLBadPassword
+{
+  [self _testURLWithLength:1024 encryptPassword:kGoodPassword decryptPassword:kBadPassword];
+}
+
+- (void)testURLSmallBadPassword
+{
+  for (NSUInteger i = 1; i < 32; i++)
+  {
+    [self _testURLWithLength:i encryptPassword:kGoodPassword decryptPassword:kBadPassword];
+  }
+}
+
+- (void)testURLNearReadBlocksize
+{
+  for (NSUInteger i = 1024 - 32; i < 1024 + 32; i++)
+  {
+    [self _testURLWithLength:i];
+  }
+}
+
+- (void)testURLNearReadBlocksizeBadPassword
+{
+  for (NSUInteger i = 1024 - 32; i < 1024 + 32; i++)
+  {
+    [self _testURLWithLength:i encryptPassword:kGoodPassword decryptPassword:kBadPassword];
+  }
 }
 
 @end

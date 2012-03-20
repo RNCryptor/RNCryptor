@@ -174,6 +174,31 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   return YES;
 }
 
+// Reads from stream up to length bytes. Blocks until it reaches the end of the stream, or fills the buffer.
+- (NSMutableData *)readStream:(NSInputStream *)stream length:(NSUInteger)maxLength
+{
+  NSMutableData *data = [NSMutableData dataWithLength:maxLength];
+  uint8_t *readPtr = [data mutableBytes];
+  NSUInteger availableLength = maxLength;
+  [stream open];
+
+  while (availableLength > 0 && [stream streamStatus] != NSStreamStatusAtEnd && [stream streamStatus] != NSStreamStatusError)
+  {
+    NSInteger readLength = [stream read:readPtr maxLength:availableLength];
+    if (readLength >= 0)
+    {
+      readPtr += readLength;
+      availableLength -= readLength;
+    }
+    else
+    {
+      return nil;
+    }
+  }
+  [data setLength:maxLength - availableLength];
+  return data;
+}
+
 - (BOOL)performOperation:(CCOperation)anOperation
               fromStream:(NSInputStream *)aFromStream
             readCallback:(RNCryptorReadCallback)aReadCallback
@@ -215,13 +240,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   NSMutableData *readBuffer = [NSMutableData data];
 
   // Read ahead
-  NSMutableData *readAheadBuffer = [NSMutableData dataWithLength:bufferSize];
-  [aFromStream open];
-  NSInteger length = [aFromStream read:[readAheadBuffer mutableBytes] maxLength:[readAheadBuffer length]];
-  if (length >= 0)
-  {
-    [readAheadBuffer setLength:(NSUInteger)length];
-  }
+  NSMutableData *readAheadBuffer = [self readStream:aFromStream length:bufferSize];
 
   NSMutableData *outData = [NSMutableData data];
   BOOL stop = NO;
@@ -240,12 +259,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
     if ([aFromStream streamStatus] != NSStreamStatusAtEnd)
     {
       readBuffer = readAheadBuffer;
-      readAheadBuffer = [NSMutableData dataWithLength:bufferSize];
-      length = [aFromStream read:[readAheadBuffer mutableBytes] maxLength:bufferSize];
-      if (length >= 0)
-      {
-        [readAheadBuffer setLength:(NSUInteger)length];
-      }
+      readAheadBuffer = [self readStream:aFromStream length:bufferSize];
     }
 
     // At end now?

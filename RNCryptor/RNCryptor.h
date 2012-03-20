@@ -139,8 +139,8 @@ typedef void (^RNCryptorWriteCallback)(NSData *writeData);
 * @param error If there is an error, this will contain the `NSError` by reference
 * @returns `YES` on success. `NO` on failure (including HMAC mismatch), and `error` will contain the error object.
 */
-- (BOOL)decryptFromStream:(NSInputStream *)input
-                 toStream:(NSOutputStream *)output
+- (BOOL)decryptFromStream:(NSInputStream *)fromStream
+                 toStream:(NSOutputStream *)toStream
             encryptionKey:(NSData *)encryptionKey
                        IV:(NSData *)IV
                   HMACKey:(NSData *)HMACKey
