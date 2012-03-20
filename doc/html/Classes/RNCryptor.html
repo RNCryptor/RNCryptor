@@ -54,9 +54,25 @@
 	
 	<option value="instance_methods">Instance Methods</option>
 	
+	<option value="//api/name/decryptData:password:error:">&nbsp;&nbsp;&nbsp;&nbsp;- decryptData:password:error:</option>
+	
+	<option value="//api/name/decryptFromStream:toStream:encryptionKey:IV:HMACKey:error:">&nbsp;&nbsp;&nbsp;&nbsp;- decryptFromStream:toStream:encryptionKey:IV:HMACKey:error:</option>
+	
+	<option value="//api/name/decryptFromStream:toStream:password:error:">&nbsp;&nbsp;&nbsp;&nbsp;- decryptFromStream:toStream:password:error:</option>
+	
+	<option value="//api/name/decryptFromURL:toURL:append:password:error:">&nbsp;&nbsp;&nbsp;&nbsp;- decryptFromURL:toURL:append:password:error:</option>
+	
+	<option value="//api/name/encryptData:password:error:">&nbsp;&nbsp;&nbsp;&nbsp;- encryptData:password:error:</option>
+	
 	<option value="//api/name/encryptFromStream:toStream:encryptionKey:IV:HMACKey:error:">&nbsp;&nbsp;&nbsp;&nbsp;- encryptFromStream:toStream:encryptionKey:IV:HMACKey:error:</option>
 	
+	<option value="//api/name/encryptFromStream:toStream:password:error:">&nbsp;&nbsp;&nbsp;&nbsp;- encryptFromStream:toStream:password:error:</option>
+	
+	<option value="//api/name/encryptFromURL:toURL:append:password:error:">&nbsp;&nbsp;&nbsp;&nbsp;- encryptFromURL:toURL:append:password:error:</option>
+	
 	<option value="//api/name/initWithSettings:">&nbsp;&nbsp;&nbsp;&nbsp;- initWithSettings:</option>
+	
+	<option value="//api/name/keyForPassword:salt:">&nbsp;&nbsp;&nbsp;&nbsp;- keyForPassword:salt:</option>
 	
 	<option value="//api/name/performOperation:fromStream:readCallback:toStream:writeCallback:encryptionKey:IV:footerSize:footer:error:">&nbsp;&nbsp;&nbsp;&nbsp;- performOperation:fromStream:readCallback:toStream:writeCallback:encryptionKey:IV:footerSize:footer:error:</option>
 	
@@ -84,6 +100,8 @@
 	
 	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#task_Key-based stream operations">Key-based stream operations</a></span></li>
 	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#task_Password-based operations">Password-based operations</a></span></li>
+	
 </ul></li>
 
 
@@ -108,9 +126,25 @@
 
 <li role="treeitem" class="children"><span class="disclosure"></span><span class="sectionName"><a href="#instance_methods">Instance Methods</a></span><ul>
 	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/decryptData:password:error:">decryptData:password:error:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/decryptFromStream:toStream:encryptionKey:IV:HMACKey:error:">decryptFromStream:toStream:encryptionKey:IV:HMACKey:error:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/decryptFromStream:toStream:password:error:">decryptFromStream:toStream:password:error:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/decryptFromURL:toURL:append:password:error:">decryptFromURL:toURL:append:password:error:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/encryptData:password:error:">encryptData:password:error:</a></span></li>
+	
 	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/encryptFromStream:toStream:encryptionKey:IV:HMACKey:error:">encryptFromStream:toStream:encryptionKey:IV:HMACKey:error:</a></span></li>
 	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/encryptFromStream:toStream:password:error:">encryptFromStream:toStream:password:error:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/encryptFromURL:toURL:append:password:error:">encryptFromURL:toURL:append:password:error:</a></span></li>
+	
 	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/initWithSettings:">initWithSettings:</a></span></li>
+	
+	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/keyForPassword:salt:">keyForPassword:salt:</a></span></li>
 	
 	<li><span class="nodisclosure"></span><span class="sectionName"><a href="#//api/name/performOperation:fromStream:readCallback:toStream:writeCallback:encryptionKey:IV:footerSize:footer:error:">performOperation:fromStream:readCallback:toStream:writeCallback:encryptionKey:IV:footerSize:footer:error:</a></span></li>
 	
@@ -235,6 +269,84 @@ The HMAC of the ciphertext will be written the the end of the stream.</p></span>
 	</span>
 	
 	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/decryptFromStream:toStream:encryptionKey:IV:HMACKey:error:">&ndash;&nbsp;decryptFromStream:toStream:encryptionKey:IV:HMACKey:error:</a></code>
+		<span class="tooltip"><p>Decrypt from a stream, to a stream, provided a key (not password), IV, and optional HMAC key.
+The HMAC of the ciphertext will be read from the end of the stream if an HMAC key is provided. If there is an HMAC,
+then it must match, or this method will return <code>NO</code>.</p></span>
+	</span>
+	
+	
+</li>
+						</ul>
+						
+						
+						<a title="Password-based operations" name="task_Password-based operations"></a>
+						<h3 class="subsubtitle task-title">Password-based operations</h3>
+
+						<ul class="task-list">
+							<li>
+	<span class="tooltip">
+		<code><a href="#//api/name/encryptFromStream:toStream:password:error:">&ndash;&nbsp;encryptFromStream:toStream:password:error:</a></code>
+		<span class="tooltip"><p>Encrypt from a stream, to a stream, provided a password.
+Automatically generates required salts and IV. Prepends header and appends HMAC.
+Full format is described at <a href="https://github.com/rnapier/RNCryptor/wiki/Data-Format">https://github.com/rnapier/RNCryptor/wiki/Data-Format</a></p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/encryptFromURL:toURL:append:password:error:">&ndash;&nbsp;encryptFromURL:toURL:append:password:error:</a></code>
+		<span class="tooltip"><p>Encrypt from a URL, to a URL, provided a password.
+Automatically generates required salts and IV. Prepends header and appends HMAC.
+Full format is described at <a href="https://github.com/rnapier/RNCryptor/wiki/Data-Format">https://github.com/rnapier/RNCryptor/wiki/Data-Format</a></p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/encryptData:password:error:">&ndash;&nbsp;encryptData:password:error:</a></code>
+		<span class="tooltip"><p>Encrypt data, provided a password.
+Automatically generates required salts and IV. Prepends header and appends HMAC.
+Full format is described at <a href="https://github.com/rnapier/RNCryptor/wiki/Data-Format">https://github.com/rnapier/RNCryptor/wiki/Data-Format</a></p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/decryptFromStream:toStream:password:error:">&ndash;&nbsp;decryptFromStream:toStream:password:error:</a></code>
+		<span class="tooltip"><p>Decrypt from a stream, to a stream, provided a password.
+Stream must be in format described at <a href="https://github.com/rnapier/RNCryptor/wiki/Data-Format,">https://github.com/rnapier/RNCryptor/wiki/Data-Format,</a> with header,
+required salts and IV prepended, and HMAC appended.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/decryptFromURL:toURL:append:password:error:">&ndash;&nbsp;decryptFromURL:toURL:append:password:error:</a></code>
+		<span class="tooltip"><p>Decrypt from a URL, to a URL, provided a password.
+URL contents must be in format described at <a href="https://github.com/rnapier/RNCryptor/wiki/Data-Format,">https://github.com/rnapier/RNCryptor/wiki/Data-Format,</a> with header,
+required salts and IV prepended, and HMAC appended.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/decryptData:password:error:">&ndash;&nbsp;decryptData:password:error:</a></code>
+		<span class="tooltip"><p>Decrypt data, provided a password.
+Data must be in format described at <a href="https://github.com/rnapier/RNCryptor/wiki/Data-Format,">https://github.com/rnapier/RNCryptor/wiki/Data-Format,</a> with header,
+required salts and IV prepended, and HMAC appended.</p></span>
+	</span>
+	
+	
+</li><li>
+	<span class="tooltip">
+		<code><a href="#//api/name/keyForPassword:salt:">&ndash;&nbsp;keyForPassword:salt:</a></code>
+		<span class="tooltip"><p>Generate key given a password and salt using a PBKDF</p></span>
+	</span>
+	
+	
 </li>
 						</ul>
 						
@@ -346,6 +458,376 @@ Appropriate for most uses.</p>
 						<h2 class="subtitle subtitle-methods">Instance Methods</h2>
 						
 						<div class="section-method">
+	<a name="//api/name/decryptData:password:error:" title="decryptData:password:error:"></a>
+	<h3 class="subsubtitle method-title">decryptData:password:error:</h3>
+	
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Decrypt data, provided a password.
+Data must be in format described at <a href="https://github.com/rnapier/RNCryptor/wiki/Data-Format,">https://github.com/rnapier/RNCryptor/wiki/Data-Format,</a> with header,
+required salts and IV prepended, and HMAC appended.</p>
+	</div>		
+	
+	
+	<div class="method-subsection method-declaration"><code>- (NSData *)decryptData:(NSData *)<em>ciphertext</em> password:(NSString *)<em>password</em> error:(NSError **)<em>error</em></code></div>
+	
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>ciphertext</em></dt>
+			<dd><p>Data to decrypt</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>password</em></dt>
+			<dd><p>Password to use for decryption</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>error</em></dt>
+			<dd><p>If there is an error, this will contain the <code>NSError</code> by reference</p></dd>
+		</dl>
+		
+	</div>
+	
+	
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>Decrypted data, or <code>nil</code> if there was an error.</p>
+	</div>
+	
+	
+	
+	
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<p>Decrypt data, provided a password.
+Data must be in format described at <a href="https://github.com/rnapier/RNCryptor/wiki/Data-Format,">https://github.com/rnapier/RNCryptor/wiki/Data-Format,</a> with header,
+required salts and IV prepended, and HMAC appended.</p>
+	</div>
+	
+	
+	
+	
+	
+	
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">RNCryptor.h</code><br />
+	</div>				
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/decryptFromStream:toStream:encryptionKey:IV:HMACKey:error:" title="decryptFromStream:toStream:encryptionKey:IV:HMACKey:error:"></a>
+	<h3 class="subsubtitle method-title">decryptFromStream:toStream:encryptionKey:IV:HMACKey:error:</h3>
+	
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Decrypt from a stream, to a stream, provided a key (not password), IV, and optional HMAC key.
+The HMAC of the ciphertext will be read from the end of the stream if an HMAC key is provided. If there is an HMAC,
+then it must match, or this method will return <code>NO</code>.</p>
+	</div>		
+	
+	
+	<div class="method-subsection method-declaration"><code>- (BOOL)decryptFromStream:(NSInputStream *)<em>fromStream</em> toStream:(NSOutputStream *)<em>toStream</em> encryptionKey:(NSData *)<em>encryptionKey</em> IV:(NSData *)<em>IV</em> HMACKey:(NSData *)<em>HMACKey</em> error:(NSError **)<em>error</em></code></div>
+	
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>fromStream</em></dt>
+			<dd><p>Stream to read. May be opened or unopened.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>toStream</em></dt>
+			<dd><p>Stream to write. May be opened or unopened.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>encryptionKey</em></dt>
+			<dd><p>Encryption key of correct length for algorithm. This is not a password. No hashing or PBKDF will be applied.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>IV</em></dt>
+			<dd><p>Initialization vector of correct length for algorithm. For &ldquo;no IV,&rdquo; you must pass a zero-filled block of the correct length. This is strongly discouraged.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>HMACKey</em></dt>
+			<dd><p>HMAC key, matching the encryption key.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>error</em></dt>
+			<dd><p>If there is an error, this will contain the <code>NSError</code> by reference</p></dd>
+		</dl>
+		
+	</div>
+	
+	
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p><code>YES</code> on success. <code>NO</code> on failure (including HMAC mismatch), and <code>error</code> will contain the error object.</p>
+	</div>
+	
+	
+	
+	
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<p>Decrypt from a stream, to a stream, provided a key (not password), IV, and optional HMAC key.
+The HMAC of the ciphertext will be read from the end of the stream if an HMAC key is provided. If there is an HMAC,
+then it must match, or this method will return <code>NO</code>.</p>
+	</div>
+	
+	
+	
+	
+	
+	
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">RNCryptor.h</code><br />
+	</div>				
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/decryptFromStream:toStream:password:error:" title="decryptFromStream:toStream:password:error:"></a>
+	<h3 class="subsubtitle method-title">decryptFromStream:toStream:password:error:</h3>
+	
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Decrypt from a stream, to a stream, provided a password.
+Stream must be in format described at <a href="https://github.com/rnapier/RNCryptor/wiki/Data-Format,">https://github.com/rnapier/RNCryptor/wiki/Data-Format,</a> with header,
+required salts and IV prepended, and HMAC appended.</p>
+	</div>		
+	
+	
+	<div class="method-subsection method-declaration"><code>- (BOOL)decryptFromStream:(NSInputStream *)<em>fromStream</em> toStream:(NSOutputStream *)<em>toStream</em> password:(NSString *)<em>password</em> error:(NSError **)<em>error</em></code></div>
+	
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>fromStream</em></dt>
+			<dd><p>Stream to read. May be opened or unopened.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>toStream</em></dt>
+			<dd><p>Stream to write. May be opened or unopened.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>password</em></dt>
+			<dd><p>Password to use for decryption</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>error</em></dt>
+			<dd><p>If there is an error, this will contain the <code>NSError</code> by reference</p></dd>
+		</dl>
+		
+	</div>
+	
+	
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p><code>YES</code> on success. <code>NO</code> on failure, and <code>error</code> will contain the error object.</p>
+	</div>
+	
+	
+	
+	
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<p>Decrypt from a stream, to a stream, provided a password.
+Stream must be in format described at <a href="https://github.com/rnapier/RNCryptor/wiki/Data-Format,">https://github.com/rnapier/RNCryptor/wiki/Data-Format,</a> with header,
+required salts and IV prepended, and HMAC appended.</p>
+	</div>
+	
+	
+	
+	
+	
+	
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">RNCryptor.h</code><br />
+	</div>				
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/decryptFromURL:toURL:append:password:error:" title="decryptFromURL:toURL:append:password:error:"></a>
+	<h3 class="subsubtitle method-title">decryptFromURL:toURL:append:password:error:</h3>
+	
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Decrypt from a URL, to a URL, provided a password.
+URL contents must be in format described at <a href="https://github.com/rnapier/RNCryptor/wiki/Data-Format,">https://github.com/rnapier/RNCryptor/wiki/Data-Format,</a> with header,
+required salts and IV prepended, and HMAC appended.</p>
+	</div>		
+	
+	
+	<div class="method-subsection method-declaration"><code>- (BOOL)decryptFromURL:(NSURL *)<em>fromURL</em> toURL:(NSURL *)<em>toURL</em> append:(BOOL)<em>append</em> password:(NSString *)<em>password</em> error:(NSError **)<em>error</em></code></div>
+	
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>fromURL</em></dt>
+			<dd><p>URL to read.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>toURL</em></dt>
+			<dd><p>URL to write.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>append</em></dt>
+			<dd><p>Should output be appended rather than overwritng?</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>password</em></dt>
+			<dd><p>Password to use for decryption</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>error</em></dt>
+			<dd><p>If there is an error, this will contain the <code>NSError</code> by reference</p></dd>
+		</dl>
+		
+	</div>
+	
+	
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p><code>YES</code> on success. <code>NO</code> on failure, and <code>error</code> will contain the error object.</p>
+	</div>
+	
+	
+	
+	
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<p>Decrypt from a URL, to a URL, provided a password.
+URL contents must be in format described at <a href="https://github.com/rnapier/RNCryptor/wiki/Data-Format,">https://github.com/rnapier/RNCryptor/wiki/Data-Format,</a> with header,
+required salts and IV prepended, and HMAC appended.</p>
+	</div>
+	
+	
+	
+	
+	
+	
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">RNCryptor.h</code><br />
+	</div>				
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/encryptData:password:error:" title="encryptData:password:error:"></a>
+	<h3 class="subsubtitle method-title">encryptData:password:error:</h3>
+	
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Encrypt data, provided a password.
+Automatically generates required salts and IV. Prepends header and appends HMAC.
+Full format is described at <a href="https://github.com/rnapier/RNCryptor/wiki/Data-Format">https://github.com/rnapier/RNCryptor/wiki/Data-Format</a></p>
+	</div>		
+	
+	
+	<div class="method-subsection method-declaration"><code>- (NSData *)encryptData:(NSData *)<em>plaintext</em> password:(NSString *)<em>password</em> error:(NSError **)<em>error</em></code></div>
+	
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>plaintext</em></dt>
+			<dd><p>Data to encrypt</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>password</em></dt>
+			<dd><p>Password to use for encryption</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>error</em></dt>
+			<dd><p>If there is an error, this will contain the <code>NSError</code> by reference</p></dd>
+		</dl>
+		
+	</div>
+	
+	
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>Encrypted data, or <code>nil</code> if there was an error.</p>
+	</div>
+	
+	
+	
+	
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<p>Encrypt data, provided a password.
+Automatically generates required salts and IV. Prepends header and appends HMAC.
+Full format is described at <a href="https://github.com/rnapier/RNCryptor/wiki/Data-Format">https://github.com/rnapier/RNCryptor/wiki/Data-Format</a></p>
+	</div>
+	
+	
+	
+	
+	
+	
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">RNCryptor.h</code><br />
+	</div>				
+	
+	
+</div>
+						
+						<div class="section-method">
 	<a name="//api/name/encryptFromStream:toStream:encryptionKey:IV:HMACKey:error:" title="encryptFromStream:toStream:encryptionKey:IV:HMACKey:error:"></a>
 	<h3 class="subsubtitle method-title">encryptFromStream:toStream:encryptionKey:IV:HMACKey:error:</h3>
 	
@@ -385,7 +867,7 @@ The HMAC of the ciphertext will be written the the end of the stream.</p>
 		
 		<dl class="argument-def parameter-def">
 			<dt><em>HMACKey</em></dt>
-			<dd><p>HMAC key. This can be of any length. It is discouraged to make this the same as <code>encryptionKey</code>.</p></dd>
+			<dd><p>HMAC key. This can be of any length. It is discouraged to make this the same as <code>encryptionKey</code>. If HMACKey is <code>nil</code>, no HMAC will be written.</p></dd>
 		</dl>
 		
 		<dl class="argument-def parameter-def">
@@ -397,6 +879,11 @@ The HMAC of the ciphertext will be written the the end of the stream.</p>
 	
 	
 	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p><code>YES</code> on success. <code>NO</code> on failure, and <code>error</code> will contain the error object.</p><p>`</p>
+	</div>
+	
 	
 	
 	
@@ -405,6 +892,157 @@ The HMAC of the ciphertext will be written the the end of the stream.</p>
 		<h4 class="method-subtitle">Discussion</h4>
 		<p>Encrypt from a stream, to a stream, provided a key (not password), IV, and optional HMAC key.
 The HMAC of the ciphertext will be written the the end of the stream.</p>
+	</div>
+	
+	
+	
+	
+	
+	
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">RNCryptor.h</code><br />
+	</div>				
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/encryptFromStream:toStream:password:error:" title="encryptFromStream:toStream:password:error:"></a>
+	<h3 class="subsubtitle method-title">encryptFromStream:toStream:password:error:</h3>
+	
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Encrypt from a stream, to a stream, provided a password.
+Automatically generates required salts and IV. Prepends header and appends HMAC.
+Full format is described at <a href="https://github.com/rnapier/RNCryptor/wiki/Data-Format">https://github.com/rnapier/RNCryptor/wiki/Data-Format</a></p>
+	</div>		
+	
+	
+	<div class="method-subsection method-declaration"><code>- (BOOL)encryptFromStream:(NSInputStream *)<em>fromStream</em> toStream:(NSOutputStream *)<em>toStream</em> password:(NSString *)<em>password</em> error:(NSError **)<em>error</em></code></div>
+	
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>fromStream</em></dt>
+			<dd><p>Stream to read. May be opened or unopened.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>toStream</em></dt>
+			<dd><p>Stream to write. May be opened or unopened.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>password</em></dt>
+			<dd><p>Password to use for encryption</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>error</em></dt>
+			<dd><p>If there is an error, this will contain the <code>NSError</code> by reference</p></dd>
+		</dl>
+		
+	</div>
+	
+	
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p><code>YES</code> on success. <code>NO</code> on failure, and <code>error</code> will contain the error object.</p>
+	</div>
+	
+	
+	
+	
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<p>Encrypt from a stream, to a stream, provided a password.
+Automatically generates required salts and IV. Prepends header and appends HMAC.
+Full format is described at <a href="https://github.com/rnapier/RNCryptor/wiki/Data-Format">https://github.com/rnapier/RNCryptor/wiki/Data-Format</a></p>
+	</div>
+	
+	
+	
+	
+	
+	
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">RNCryptor.h</code><br />
+	</div>				
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/encryptFromURL:toURL:append:password:error:" title="encryptFromURL:toURL:append:password:error:"></a>
+	<h3 class="subsubtitle method-title">encryptFromURL:toURL:append:password:error:</h3>
+	
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Encrypt from a URL, to a URL, provided a password.
+Automatically generates required salts and IV. Prepends header and appends HMAC.
+Full format is described at <a href="https://github.com/rnapier/RNCryptor/wiki/Data-Format">https://github.com/rnapier/RNCryptor/wiki/Data-Format</a></p>
+	</div>		
+	
+	
+	<div class="method-subsection method-declaration"><code>- (BOOL)encryptFromURL:(NSURL *)<em>fromURL</em> toURL:(NSURL *)<em>toURL</em> append:(BOOL)<em>append</em> password:(NSString *)<em>password</em> error:(NSError **)<em>error</em></code></div>
+	
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>fromURL</em></dt>
+			<dd><p>URL to read.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>toURL</em></dt>
+			<dd><p>URL to write.</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>append</em></dt>
+			<dd><p>Should output be appended rather than overwritng?</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>password</em></dt>
+			<dd><p>Password to use for encryption</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>error</em></dt>
+			<dd><p>If there is an error, this will contain the <code>NSError</code> by reference</p></dd>
+		</dl>
+		
+	</div>
+	
+	
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p><code>YES</code> on success. <code>NO</code> on failure, and <code>error</code> will contain the error object.</p>
+	</div>
+	
+	
+	
+	
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<p>Encrypt from a URL, to a URL, provided a password.
+Automatically generates required salts and IV. Prepends header and appends HMAC.
+Full format is described at <a href="https://github.com/rnapier/RNCryptor/wiki/Data-Format">https://github.com/rnapier/RNCryptor/wiki/Data-Format</a></p>
 	</div>
 	
 	
@@ -454,6 +1092,65 @@ The HMAC of the ciphertext will be written the the end of the stream.</p>
 	<div class="method-subsection discussion-section">
 		<h4 class="method-subtitle">Discussion</h4>
 		<p>Create a customiced cryptor</p>
+	</div>
+	
+	
+	
+	
+	
+	
+	
+	<div class="method-subsection declared-in-section">
+		<h4 class="method-subtitle">Declared In</h4>
+		<code class="declared-in-ref">RNCryptor.h</code><br />
+	</div>				
+	
+	
+</div>
+						
+						<div class="section-method">
+	<a name="//api/name/keyForPassword:salt:" title="keyForPassword:salt:"></a>
+	<h3 class="subsubtitle method-title">keyForPassword:salt:</h3>
+	
+	
+	
+	<div class="method-subsection brief-description">
+		<p>Generate key given a password and salt using a PBKDF</p>
+	</div>		
+	
+	
+	<div class="method-subsection method-declaration"><code>- (NSData *)keyForPassword:(NSString *)<em>password</em> salt:(NSData *)<em>salt</em></code></div>
+	
+	
+	<div class="method-subsection arguments-section parameters">
+		<h4 class="method-subtitle parameter-title">Parameters</h4>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>password</em></dt>
+			<dd><p>Password to use for PBKDF</p></dd>
+		</dl>
+		
+		<dl class="argument-def parameter-def">
+			<dt><em>salt</em></dt>
+			<dd><p>Salt for password</p></dd>
+		</dl>
+		
+	</div>
+	
+	
+	
+	<div class="method-subsection return">
+		<h4 class="method-subtitle parameter-title">Return Value</h4>
+		<p>Key</p>
+	</div>
+	
+	
+	
+	
+	
+	<div class="method-subsection discussion-section">
+		<h4 class="method-subtitle">Discussion</h4>
+		<p>Generate key given a password and salt using a PBKDF</p>
 	</div>
 	
 	
