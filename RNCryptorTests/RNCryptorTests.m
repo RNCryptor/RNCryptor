@@ -348,7 +348,7 @@ NSString * const kBadPassword = @"NotThePassword";
 
   NSData *decrypted = [[RNCryptor AES256Cryptor] decryptData:encrypted password:kGoodPassword error:&error];
   STAssertNil(decrypted, @"Decrypt should have failed");
-  STAssertEquals([error code], 1, @"Wrong error code:%d", [error code]);
+  STAssertEquals([error code], kRNCyrptorUnknownHeader, @"Wrong error code:%d", [error code]);
 }
 
 - (void)testSmall

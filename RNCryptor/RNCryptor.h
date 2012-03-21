@@ -32,6 +32,12 @@
 
 extern NSString *const kRNCryptorErrorDomain;
 
+enum {
+  kRNCryptorErrorHMACMismatch = 1,
+  kRNCyrptorUnknownHeader = 2,
+  kRNCryptorCouldNotCreateStream = 3,
+};
+
 typedef void (^RNCryptorReadCallback)(NSData *readData);
 typedef void (^RNCryptorWriteCallback)(NSData *writeData);
 

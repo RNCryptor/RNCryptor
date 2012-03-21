@@ -350,7 +350,9 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
     if (! [computedHMACData isEqualToData:streamHMACData])
     {
       result = NO;
-      *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:1 userInfo:nil]; // FIXME: Better error reports
+      *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:kRNCryptorErrorHMACMismatch
+                               userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"HMAC Mismatch", @"HMAC Mismatch")
+                                                                    forKey:NSLocalizedDescriptionKey]];
     }
   }
 
@@ -376,7 +378,9 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   uint8_t AES128CryptorHeader[2] = {0, 0};
   if (![header isEqualToData:[NSData dataWithBytes:AES128CryptorHeader length:sizeof(AES128CryptorHeader)]])
   {
-    *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:1 userInfo:nil]; // FIXME: error
+    *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:kRNCyrptorUnknownHeader
+                             userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"Unknown header", @"Unknown header")
+                                                                  forKey:NSLocalizedDescriptionKey]];
     return NO;
   }
 
@@ -496,7 +500,9 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   {
     if (error)
     {
-      *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:1 userInfo:nil]; // FIXME: Error
+      *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:kRNCryptorCouldNotCreateStream
+                               userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"Could not create stream", @"Could not create stream")
+                                                                    forKey:NSLocalizedDescriptionKey]];
     }
     return NO;
   }
@@ -507,7 +513,9 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   {
     if (error)
     {
-      *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:1 userInfo:nil]; // FIXME: Error
+      *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:kRNCryptorCouldNotCreateStream
+                                     userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"Could not create stream", @"Could not create stream")
+                                                                          forKey:NSLocalizedDescriptionKey]];
     }
     return NO;
   }
