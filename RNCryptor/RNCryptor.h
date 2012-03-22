@@ -36,6 +36,8 @@ enum {
   kRNCryptorErrorHMACMismatch = 1,
   kRNCyrptorUnknownHeader = 2,
   kRNCryptorCouldNotCreateStream = 3,
+  kRNCryptorCouldNotReadStream = 4,
+  kRNCryptorCouldNotWriteStream = 5,
 };
 
 typedef void (^RNCryptorReadCallback)(NSData *readData);
@@ -77,6 +79,7 @@ typedef void (^RNCryptorWriteCallback)(NSData *writeData);
  * @param settings Immutable settings for cryptor.
  */
 
++ (NSError *)errorWithCode:(int)code localizedDescription:(NSString *)localizedDescription underlyingError:(NSError *)underlyingError;
 - (RNCryptor *)initWithSettings:(RNCryptorSettings *)settings;
 
 
@@ -114,8 +117,9 @@ typedef void (^RNCryptorWriteCallback)(NSData *writeData);
 /// @name Key-based stream operations
 ///---------------------------------------------------------------------------------------
 
-/** Encrypt from a stream, to a stream, provided a key (not password), IV, and optional HMAC key.
-*   The HMAC of the ciphertext will be written the the end of the stream.
+/** Encrypt from a stream, to a stream, provided an encryption key and optional HMAC key.
+*   A random IV will be written to the beginning of the stream. If an HMAC key is provided, the HMAC of the ciphertext
+*   will be written the the end of the stream.
 *
 * @param fromStream Stream to read. May be opened or unopened.
 * @param toStream Stream to write. May be opened or unopened.
@@ -129,11 +133,11 @@ typedef void (^RNCryptorWriteCallback)(NSData *writeData);
 - (BOOL)encryptFromStream:(NSInputStream *)fromStream
                  toStream:(NSOutputStream *)toStream
             encryptionKey:(NSData *)encryptionKey
-                       IV:(NSData *)IV
                   HMACKey:(NSData *)HMACKey
                     error:(NSError **)error;
 
-/** Decrypt from a stream, to a stream, provided a key (not password), IV, and optional HMAC key.
+/** Decrypt from a stream, to a stream, provided an encryption key (not password), and optional HMAC key.
+*   The IV must be at the start of the stream
 *   The HMAC of the ciphertext will be read from the end of the stream if an HMAC key is provided. If there is an HMAC,
 *   then it must match, or this method will return `NO`.
 *
@@ -148,7 +152,6 @@ typedef void (^RNCryptorWriteCallback)(NSData *writeData);
 - (BOOL)decryptFromStream:(NSInputStream *)fromStream
                  toStream:(NSOutputStream *)toStream
             encryptionKey:(NSData *)encryptionKey
-                       IV:(NSData *)IV
                   HMACKey:(NSData *)HMACKey
                     error:(NSError **)error;
 

@@ -47,7 +47,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   {
     if (error)
     {
-      *error = [self streamError];
+      *error = [RNCryptor errorWithCode:kRNCryptorCouldNotReadStream localizedDescription:@"Could not read from stream" underlyingError:[self streamError]];
       return NO;
     }
   }
@@ -74,7 +74,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
     {
       if (error)
       {
-        *error = [self streamError];
+        *error = [RNCryptor errorWithCode:kRNCryptorCouldNotWriteStream localizedDescription:@"Could not write to stream" underlyingError:[self streamError]];
       }
       return NO;
     }
@@ -96,6 +96,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   return self;
 }
 
+
 + (RNCryptor *)AES256Cryptor
 {
   static dispatch_once_t once;
@@ -103,6 +104,22 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
 
   dispatch_once(&once, ^{ AES256Cryptor = [[self alloc] initWithSettings:[RNCryptorSettings AES256Settings]]; });
   return AES256Cryptor;
+}
+
++ (NSError *)errorWithCode:(int)code localizedDescription:(NSString *)localizedDescription underlyingError:(NSError *)underlyingError
+{
+  NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+  if (localizedDescription)
+  {
+    [userInfo setObject:localizedDescription forKey:NSLocalizedDescriptionKey];
+  }
+
+  if (underlyingError)
+  {
+    [userInfo setObject:underlyingError forKey:NSUnderlyingErrorKey];
+  }
+
+  return [NSError errorWithDomain:kRNCryptorErrorDomain code:code userInfo:userInfo];
 }
 
 - (NSData *)randomDataOfLength:(size_t)length
@@ -314,7 +331,6 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
 - (BOOL)decryptFromStream:(NSInputStream *)input
                  toStream:(NSOutputStream *)output
             encryptionKey:(NSData *)encryptionKey
-                       IV:(NSData *)IV
                   HMACKey:(NSData *)HMACKey
                     error:(NSError **)error
 {
@@ -328,6 +344,13 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
     readCallback = ^void(NSData *readData) {
       CCHmacUpdate(&HMACContext, readData.bytes, readData.length);
     };
+  }
+
+  [input open];
+  NSData *IV;
+  if (![input _RNGetData:&IV maxLength:self.settings.blockSize error:error])
+  {
+    return NO;
   }
 
   NSData *streamHMACData;
@@ -363,14 +386,13 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
 {
   NSData *encryptionKeySalt;
   NSData *HMACKeySalt;
-  NSData *IV;
   NSData *header;
 
   [input open];
   if (! [input _RNGetData:&header maxLength:2 error:error] ||
       ! [input _RNGetData:&encryptionKeySalt maxLength:self.settings.saltSize error:error] ||
-      ! [input _RNGetData:&HMACKeySalt maxLength:self.settings.saltSize error:error] ||
-      ! [input _RNGetData:&IV maxLength:self.settings.blockSize error:error])
+      ! [input _RNGetData:&HMACKeySalt maxLength:self.settings.saltSize error:error]
+    )
   {
     return NO;
   }
@@ -387,7 +409,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   NSData *encryptionKey = [self keyForPassword:password salt:encryptionKeySalt];
   NSData *HMACKey = [self keyForPassword:password salt:HMACKeySalt];
 
-  return [self decryptFromStream:input toStream:output encryptionKey:encryptionKey IV:IV HMACKey:HMACKey error:error];
+  return [self decryptFromStream:input toStream:output encryptionKey:encryptionKey HMACKey:HMACKey error:error];
 }
 
 - (BOOL)decryptFromURL:(NSURL *)inURL toURL:(NSURL *)outURL append:(BOOL)append password:(NSString *)password error:(NSError **)error
@@ -427,7 +449,6 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
 - (BOOL)encryptFromStream:(NSInputStream *)input
                  toStream:(NSOutputStream *)output
             encryptionKey:(NSData *)encryptionKey
-                       IV:(NSData *)IV
                   HMACKey:(NSData *)HMACKey
                     error:(NSError **)error
 {
@@ -441,6 +462,13 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
     writeCallback = ^void(NSData *writeData) {
       CCHmacUpdate(&HMACContext, writeData.bytes, writeData.length);
     };
+  }
+
+  [output open];
+  NSData *IV = [self randomDataOfLength:self.settings.blockSize];
+  if (! [output _RNWriteData:IV error:error])
+  {
+    return NO;
   }
 
   BOOL result = [self performOperation:kCCEncrypt
@@ -475,21 +503,18 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   NSData *HMACKeySalt = [self randomDataOfLength:self.settings.saltSize];
   NSData *HMACKey = [self keyForPassword:password salt:HMACKeySalt];
 
-  NSData *IV = [self randomDataOfLength:self.settings.blockSize];
 
   [output open];
   uint8_t header[2] = {0, 0};
   NSData *headerData = [NSData dataWithBytes:header length:sizeof(header)];
   if (! [output _RNWriteData:headerData error:error] ||
       ! [output _RNWriteData:encryptionKeySalt error:error] ||
-      ! [output _RNWriteData:HMACKeySalt error:error] ||
-      ! [output _RNWriteData:IV error:error]
-    )
+      ! [output _RNWriteData:HMACKeySalt error:error])
   {
     return NO;
   }
 
-  return [self encryptFromStream:input toStream:output encryptionKey:encryptionKey IV:IV HMACKey:HMACKey error:error];
+  return [self encryptFromStream:input toStream:output encryptionKey:encryptionKey HMACKey:HMACKey error:error];
 }
 
 - (BOOL)encryptFromURL:(NSURL *)inURL toURL:(NSURL *)outURL append:(BOOL)append password:(NSString *)password error:(NSError **)error
