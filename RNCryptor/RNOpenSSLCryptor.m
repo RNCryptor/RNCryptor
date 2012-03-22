@@ -24,6 +24,18 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
+//For aes-256
+//
+//Hash0 = ''
+//Hash1 = MD5(Hash0 + Password + Salt)
+//Hash2 = MD5(Hash1 + Password + Salt)
+//Hash3 = MD5(Hash2 + Password + Salt)
+//Hash4 = MD5(Hash3 + Password + Salt)
+//...
+//
+//Key = Hash1 + Hash2
+//IV = Hash3 + Hash4
+
 #import "RNOpenSSLCryptor.h"
 
 const NSUInteger kSaltSize = 8;
@@ -91,6 +103,7 @@ NSString * const kSaltedString = @"Salted__";
 
 - (NSData *)keyForPassword:(NSString *)password salt:(NSData *)salt
 {
+  // key = MD5(password + salt)
   unsigned char md[CC_MD5_DIGEST_LENGTH];
   NSMutableData *keyMaterial = [NSMutableData dataWithData:[password dataUsingEncoding:NSUTF8StringEncoding]];
   [keyMaterial appendData:salt];
@@ -101,6 +114,7 @@ NSString * const kSaltedString = @"Salted__";
 
 - (NSData *)IVForKey:(NSData *)key password:(NSString *)password salt:(NSData *)salt
 {
+  // IV = MD5(Key + password + salt)
   unsigned char md[CC_MD5_DIGEST_LENGTH];
   NSMutableData *IVMaterial = [NSMutableData dataWithData:key];
   [IVMaterial appendData:[password dataUsingEncoding:NSUTF8StringEncoding]];
