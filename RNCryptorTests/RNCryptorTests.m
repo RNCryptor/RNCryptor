@@ -111,13 +111,12 @@ NSString * const kBadPassword = @"NotThePassword";
   NSData *data = [cryptor randomDataOfLength:1024];
   NSData *key = [cryptor randomDataOfLength:kCCKeySizeAES128];
   NSData *HMACkey = [cryptor randomDataOfLength:kCCKeySizeAES128];
-  NSData *IV = [cryptor randomDataOfLength:kCCBlockSizeAES128];
 
   NSError *error;
   NSInputStream *encryptInputStream = [NSInputStream inputStreamWithData:data];
   NSOutputStream *encryptOutputStream = [NSOutputStream outputStreamToMemory];
 
-  STAssertTrue([cryptor encryptFromStream:encryptInputStream toStream:encryptOutputStream encryptionKey:key IV:IV HMACKey:HMACkey error:&error],
+  STAssertTrue([cryptor encryptFromStream:encryptInputStream toStream:encryptOutputStream encryptionKey:key HMACKey:HMACkey error:&error],
   @"Encrypt failed:%@", error);
 
   [encryptOutputStream close];
@@ -129,7 +128,7 @@ NSString * const kBadPassword = @"NotThePassword";
   NSInputStream *decryptInputStream = [NSInputStream inputStreamWithData:encryptedData];
   NSOutputStream *decryptOutputStream = [NSOutputStream outputStreamToMemory];
 
-  STAssertTrue([cryptor decryptFromStream:decryptInputStream toStream:decryptOutputStream encryptionKey:key IV:IV HMACKey:HMACkey error:&error],
+  STAssertTrue([cryptor decryptFromStream:decryptInputStream toStream:decryptOutputStream encryptionKey:key HMACKey:HMACkey error:&error],
   @"Decrypt failed:%@", error);
 
   [decryptOutputStream close];
