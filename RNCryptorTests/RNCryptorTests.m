@@ -26,6 +26,7 @@
 
 #import "RNCryptorTests.h"
 #import "RNCryptor.h"
+#import "RNOpenSSLCryptor.h"
 
 NSString * const kGoodPassword = @"Passw0rd!";
 NSString * const kBadPassword = @"NotThePassword";
@@ -434,6 +435,19 @@ NSString * const kBadPassword = @"NotThePassword";
   {
     [self _testURLWithLength:i encryptPassword:kGoodPassword decryptPassword:kBadPassword];
   }
+}
+
+- (void)testOpenSSL
+{
+  NSInputStream *input = [NSInputStream inputStreamWithFileAtPath:@"test.enc"];
+  NSOutputStream *output = [NSOutputStream outputStreamToMemory];
+  NSError *error;
+  STAssertTrue([[[RNOpenSSLCryptor alloc] init] decryptFromStream:input toStream:output password:@"Passw0rd" error:&error], @"Could not decrypt:%@", error);
+
+  NSData *decryptedData = [output propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
+  NSString *decryptedString = [[NSString alloc] initWithData:decryptedData encoding:NSUTF8StringEncoding];
+  NSString *testString = @"Test data\n";
+  STAssertEqualObjects(decryptedString, testString, @"Decrypted data does not match");
 }
 
 @end

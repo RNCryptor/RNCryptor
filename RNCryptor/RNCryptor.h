@@ -267,4 +267,6 @@ typedef void (^RNCryptorWriteCallback)(NSData *writeData);
 @property (nonatomic, readonly) size_t HMACLength;  // CC_SHA256_DIGEST_LENGTH
 
 + (RNCryptorSettings *)AES256Settings;
++ (RNCryptorSettings *)openSSLSettings; // FIXME: Refactor
+
 @end

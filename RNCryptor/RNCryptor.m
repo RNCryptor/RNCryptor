@@ -586,4 +586,26 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   return AES256Settings;
 }
 
++ (RNCryptorSettings *)openSSLSettings
+{
+  static dispatch_once_t once;
+  static RNCryptorSettings *openSSLSettings;
+
+  dispatch_once(&once, ^{
+    openSSLSettings = [[self alloc] init];
+    openSSLSettings->algorithm_ = kCCAlgorithmAES128;
+    openSSLSettings->mode_ = kCCModeCBC;
+    openSSLSettings->modeOptions_ = 0;
+    openSSLSettings->keySize_ = kCCKeySizeAES128; // FIXME: Switch to 256 (need key generation routine)
+    openSSLSettings->blockSize_ = kCCBlockSizeAES128;
+    openSSLSettings->IVSize_ = kCCBlockSizeAES128;
+    openSSLSettings->padding_ = ccPKCS7Padding;
+    openSSLSettings->saltSize_ = 8;
+    openSSLSettings->PBKDFRounds_ = 0;
+    openSSLSettings->HMACAlgorithm_ = 0;
+    openSSLSettings->HMACLength_= 0;
+  });
+  return openSSLSettings;
+}
+
 @end
