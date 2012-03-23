@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d896adf5-dae3-498d-8719-1445fd729a19" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/RNCryptor/RNCryptor.h" afterPath="$PROJECT_DIR$/RNCryptor/RNCryptor.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/RNCryptor/RNCryptor.m" afterPath="$PROJECT_DIR$/RNCryptor/RNCryptor.m" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/RNCryptorTests/RNCryptorTests.m" afterPath="$PROJECT_DIR$/RNCryptorTests/RNCryptorTests.m" />
-    </list>
+    <list default="true" id="d896adf5-dae3-498d-8719-1445fd729a19" name="Default" comment="" />
     <ignored path="RNCryptor.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -30,28 +25,32 @@
       <file leaf-file-name="RNCryptor.h" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/RNCryptor/RNCryptor.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="36" column="25" selection-start="1444" selection-end="1467" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="RNCryptor.m" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/RNCryptor/RNCryptor.m">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="515" column="62" selection-start="17723" selection-end="17723" vertical-scroll-proportion="0.0">
+            <state line="39" column="35" selection-start="1582" selection-end="1582" vertical-scroll-proportion="0.0">
               <folding>
-                <element signature="e#18883#18918#0" expanded="true" />
+                <element signature="e#1207#1240#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="RNCryptorTests.m" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="RNCryptor.m" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/RNCryptor/RNCryptor.m">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="44" column="67" selection-start="1800" selection-end="1800" vertical-scroll-proportion="0.4">
+              <folding>
+                <element signature="e#19626#19661#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="RNCryptorTests.m" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/RNCryptorTests/RNCryptorTests.m">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="250" column="29" selection-start="9583" selection-end="9583" vertical-scroll-proportion="0.4039039">
-              <folding />
+            <state line="130" column="0" selection-start="4999" selection-end="4999" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="e#1210#1236#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -91,9 +90,9 @@
         <option value="$PROJECT_DIR$/RNCryptor/RNDecryptor.m" />
         <option value="$PROJECT_DIR$/RNCryptor/RNEncryptor.m" />
         <option value="$PROJECT_DIR$/RNCryptorTests/RNCryptorTests.h" />
+        <option value="$PROJECT_DIR$/RNCryptorTests/RNCryptorTests.m" />
         <option value="$PROJECT_DIR$/RNCryptor/RNCryptor.h" />
         <option value="$PROJECT_DIR$/RNCryptor/RNCryptor.m" />
-        <option value="$PROJECT_DIR$/RNCryptorTests/RNCryptorTests.m" />
       </list>
     </option>
   </component>
@@ -101,9 +100,10 @@
     <option name="myCanGoOffline" value="true" />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="y" value="22" />
-    <option name="width" value="2560" />
-    <option name="height" value="1337" />
+    <option name="x" value="400" />
+    <option name="y" value="181" />
+    <option name="width" value="1680" />
+    <option name="height" value="947" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
@@ -131,6 +131,16 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="DirectoryView.Xcode">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="RNCryptor" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.XcodeDirectoryView$1$1" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -187,54 +197,20 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="DirectoryView.Xcode">
-        <subPane>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="RNCryptor" />
-              <option name="myItemType" value="com.jetbrains.cidr.projectView.XcodeDirectoryView$1$1" />
-            </PATH_ELEMENT>
-          </PATH>
-        </subPane>
-      </pane>
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="options.splitter.main.proportions" value="0.3" />
-    <property name="options.lastSelected" value="editing.templates" />
     <property name="recentsLimit" value="5" />
+    <property name="options.lastSelected" value="editing.templates" />
     <property name="FullScreen" value="false" />
     <property name="OBJC.PRESERVED_TARGET_SELECTION" value="" />
-    <property name="GoToClass.includeJavaFiles" value="false" />
-    <property name="options.searchVisible" value="true" />
     <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="options.searchVisible" value="true" />
+    <property name="GoToClass.includeJavaFiles" value="false" />
   </component>
-  <component name="RunManager" selected="OCUnit.All in RNCryptorTests">
-    <configuration default="false" name="All in RNCryptorTests" type="OCUnitRunConfiguration" factoryName="OCUnit" temporary="true" SCHEME_NAME="All in RNCryptorTests" PROJECT_NAME="RNCryptor" TARGET_NAME="RNCryptorTests" CONFIG_NAME="Debug" DESTINATION_ID="iphonesimulator_5.1_1" DEBUGGER="LLDB" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" MAKE_ACTIVE="TRUE" WAIT_FOR="FALSE" TEST_CLASS="RNCryptorTests">
-      <envs />
-      <RunnerSettings RunnerId="AppRunner" />
-      <ConfigurationWrapper RunnerId="AppRunner" />
-      <method />
-    </configuration>
-    <configuration default="false" name="-[RNCryptorTests testNearDoubleReadBlocksizeBadPassword]" type="OCUnitRunConfiguration" factoryName="OCUnit" temporary="true" SCHEME_NAME="-[RNCryptorTests testNearDoubleReadBlocksizeBadPassword]" PROJECT_NAME="RNCryptor" TARGET_NAME="RNCryptorTests" CONFIG_NAME="Debug" DESTINATION_ID="iphonesimulator_5.1_1" DEBUGGER="LLDB" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" MAKE_ACTIVE="TRUE" WAIT_FOR="FALSE" TEST_CLASS="RNCryptorTests" TEST_METHOD="testNearDoubleReadBlocksizeBadPassword">
-      <envs />
-      <RunnerSettings RunnerId="AppRunner" />
-      <ConfigurationWrapper RunnerId="AppRunner" />
-      <method />
-    </configuration>
-    <configuration default="false" name="-[RNCryptorTests testURLSmallBadPassword]" type="OCUnitRunConfiguration" factoryName="OCUnit" temporary="true" SCHEME_NAME="-[RNCryptorTests testURLSmallBadPassword]" PROJECT_NAME="RNCryptor" TARGET_NAME="RNCryptorTests" CONFIG_NAME="Debug" DESTINATION_ID="iphonesimulator_5.1_1" DEBUGGER="GDB" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" MAKE_ACTIVE="TRUE" WAIT_FOR="FALSE" TEST_CLASS="RNCryptorTests" TEST_METHOD="testURLSmallBadPassword">
-      <envs />
-      <RunnerSettings RunnerId="AppRunner" />
-      <ConfigurationWrapper RunnerId="AppRunner" />
-      <method />
-    </configuration>
-    <configuration default="false" name="-[RNCryptorTests testURLNearReadBlocksizeBadPassword]" type="OCUnitRunConfiguration" factoryName="OCUnit" temporary="true" SCHEME_NAME="-[RNCryptorTests testURLNearReadBlocksizeBadPassword]" PROJECT_NAME="RNCryptor" TARGET_NAME="RNCryptorTests" CONFIG_NAME="Debug" DESTINATION_ID="iphonesimulator_5.1_1" DEBUGGER="GDB" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" MAKE_ACTIVE="TRUE" WAIT_FOR="FALSE" TEST_CLASS="RNCryptorTests" TEST_METHOD="testURLNearReadBlocksizeBadPassword">
-      <envs />
-      <RunnerSettings RunnerId="AppRunner" />
-      <ConfigurationWrapper RunnerId="AppRunner" />
-      <method />
-    </configuration>
-    <configuration default="false" name="-[RNCryptorTests testURLNearReadBlocksize]" type="OCUnitRunConfiguration" factoryName="OCUnit" temporary="true" SCHEME_NAME="-[RNCryptorTests testURLNearReadBlocksize]" PROJECT_NAME="RNCryptor" TARGET_NAME="RNCryptorTests" CONFIG_NAME="Debug" DESTINATION_ID="iphonesimulator_5.1_1" DEBUGGER="GDB" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" MAKE_ACTIVE="TRUE" WAIT_FOR="FALSE" TEST_CLASS="RNCryptorTests" TEST_METHOD="testURLNearReadBlocksize">
+  <component name="RunManager" selected="OCUnit.RNCryptorTests">
+    <configuration default="false" name="RNCryptor" type="AppleRunConfiguration" factoryName="Application" temporary="true" SCHEME_NAME="RNCryptor" PROJECT_NAME="RNCryptor" TARGET_NAME="RNCryptor" CONFIG_NAME="Debug" DESTINATION_ID="iphonesimulator_5.1_1" DEBUGGER="GDB" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" MAKE_ACTIVE="TRUE" WAIT_FOR="FALSE">
       <envs />
       <RunnerSettings RunnerId="AppRunner" />
       <ConfigurationWrapper RunnerId="AppRunner" />
@@ -254,19 +230,15 @@
         <option name="com.jetbrains.cidr.execution.StopCurrentSessionBeforeRunTaskProvider$StopCurrentSessionBeforeRunTask" enabled="false" />
       </method>
     </configuration>
-    <configuration default="false" name="RNCryptorTests" type="OCUnitRunConfiguration" factoryName="OCUnit" SCHEME_NAME="RNCryptorTests" PROJECT_NAME="RNCryptor" TARGET_NAME="RNCryptorTests" CONFIG_NAME="Debug" DESTINATION_ID="iphonesimulator_5.1_1" DEBUGGER="LLDB" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" MAKE_ACTIVE="TRUE" WAIT_FOR="FALSE">
+    <configuration default="false" name="RNCryptorTests" type="OCUnitRunConfiguration" factoryName="OCUnit" SCHEME_NAME="RNCryptorTests" PROJECT_NAME="RNCryptor" TARGET_NAME="RNCryptorTests" CONFIG_NAME="Debug" DESTINATION_ID="iphonesimulator_5.1_1" DEBUGGER="GDB" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" MAKE_ACTIVE="TRUE" WAIT_FOR="FALSE">
       <envs />
       <RunnerSettings RunnerId="AppRunner" />
       <ConfigurationWrapper RunnerId="AppRunner" />
       <method />
     </configuration>
-    <list size="6">
-      <item index="0" class="java.lang.String" itemvalue="OCUnit.RNCryptorTests" />
-      <item index="1" class="java.lang.String" itemvalue="OCUnit.All in RNCryptorTests" />
-      <item index="2" class="java.lang.String" itemvalue="OCUnit.-[RNCryptorTests testNearDoubleReadBlocksizeBadPassword]" />
-      <item index="3" class="java.lang.String" itemvalue="OCUnit.-[RNCryptorTests testURLSmallBadPassword]" />
-      <item index="4" class="java.lang.String" itemvalue="OCUnit.-[RNCryptorTests testURLNearReadBlocksizeBadPassword]" />
-      <item index="5" class="java.lang.String" itemvalue="OCUnit.-[RNCryptorTests testURLNearReadBlocksize]" />
+    <list size="2">
+      <item index="0" class="java.lang.String" itemvalue="Application.RNCryptor" />
+      <item index="1" class="java.lang.String" itemvalue="OCUnit.RNCryptorTests" />
     </list>
   </component>
   <component name="ShelveChangesManager" show_recycled="false" />
@@ -410,7 +382,11 @@
       <created>1332279514724</created>
       <updated>1332279514724</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="Read/Write IV in stream code rather than only for passwords.">
+      <created>1332427984430</created>
+      <updated>1332427984430</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="TodoView" selected-index="2">
@@ -434,19 +410,19 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="22" width="2560" height="1337" extended-state="0" />
+    <frame x="400" y="181" width="1680" height="947" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32582462" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32473624" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32942554" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32942554" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.10642491" sideWeight="0.42719227" order="1" side_tool="true" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.10642491" sideWeight="0.12469831" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3974256" sideWeight="0.8967284" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.10621605" sideWeight="0.48300117" order="1" side_tool="true" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.10621605" sideWeight="0.06799531" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39742085" sideWeight="0.8967284" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32954547" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.44247788" sideWeight="0.99897385" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.44079718" sideWeight="0.99897385" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -491,7 +467,7 @@
     <option name="CREATE_PATCH_EXPAND_DETAILS_DEFAULT" value="true" />
     <option name="SHOW_FILE_HISTORY_DETAILS" value="true" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixes #19. When reading, make sure to consume a whole buffer (or the rest of the stream) before returning. Block if you have to." />
+    <option name="LAST_COMMIT_MESSAGE" value="Read/Write IV in stream code rather than only for passwords." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="false" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -504,7 +480,6 @@
     <option name="UPDATE_GROUP_BY_CHANGELIST" value="false" />
     <option name="SHOW_FILE_HISTORY_AS_TREE" value="false" />
     <option name="FILE_HISTORY_SPLITTER_PROPORTION" value="0.6" />
-    <MESSAGE value="Fix tests for HMAC decryption" />
     <MESSAGE value="RNCryptorStream" />
     <MESSAGE value="Switch to protocols" />
     <MESSAGE value="Rename streams" />
@@ -529,6 +504,7 @@
     <MESSAGE value="Add header to match spec. Fixes #17" />
     <MESSAGE value="Improve docs" />
     <MESSAGE value="Fixes #19. When reading, make sure to consume a whole buffer (or the rest of the stream) before returning. Block if you have to." />
+    <MESSAGE value="Read/Write IV in stream code rather than only for passwords." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -589,38 +565,40 @@
         <state line="148" column="4" selection-start="6250" selection-end="6250" vertical-scroll-proportion="0.018159807" />
       </provider>
     </entry>
+    <entry file="file:///Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator5.1.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSStream.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="88" column="6" selection-start="3829" selection-end="3829" vertical-scroll-proportion="0.3329223" />
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/RNCryptorTests/RNCryptorTests.h">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file:///Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator5.1.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSStream.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="88" column="6" selection-start="3829" selection-end="3829" vertical-scroll-proportion="0.3329223">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/RNCryptor/RNCryptor.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="36" column="25" selection-start="1444" selection-end="1467" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/RNCryptor/RNCryptor.m">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="515" column="62" selection-start="17723" selection-end="17723" vertical-scroll-proportion="0.0">
+        <state line="39" column="35" selection-start="1582" selection-end="1582" vertical-scroll-proportion="0.0">
           <folding>
-            <element signature="e#18883#18918#0" expanded="true" />
+            <element signature="e#1207#1240#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/RNCryptorTests/RNCryptorTests.m">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="250" column="29" selection-start="9583" selection-end="9583" vertical-scroll-proportion="0.4039039">
-          <folding />
+        <state line="130" column="0" selection-start="4999" selection-end="4999" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="e#1210#1236#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RNCryptor/RNCryptor.m">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="44" column="67" selection-start="1800" selection-end="1800" vertical-scroll-proportion="0.4">
+          <folding>
+            <element signature="e#19626#19661#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

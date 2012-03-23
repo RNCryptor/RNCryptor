@@ -72,7 +72,7 @@ Wherever possible within the above constraints, the best available algorithms ar
 
 * Encrypt-then-MAC. While `RNCryptor` does not exploit all the advantages of this approach (for instance, by design it cannot validate the HMAC prior to decrypting the stream), I still believe the Encrypt-then-MAC approach makes sense. For more discusion, see http://www.daemonology.net/blog/2009-06-24-encrypt-then-mac.html.
 
-* PBKDF2. While bcrypt and scrypt may be more secure than PBKDF2, CommonCryptor only supports PBKDF2. NIST also continues to recommend PBKDF2. http://security.stackexchange.com/questions/4781/do-any-security-experts-recommend-bcrypt-for-password-storage
+* PBKDF2. While bcrypt and scrypt may be more secure than PBKDF2, CommonCryptor only supports PBKDF2. NIST also continues to recommend PBKDF2. http://security.stackexchange.com/questions/4781/do-any-security-experts-recommend-bcrypt-for-password-storage We use 10k rounds of PBKDF2 which represents about 80ms on an iPhone 4.
 
 ## Code simplicity
 
