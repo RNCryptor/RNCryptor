@@ -68,7 +68,7 @@ Wherever possible within the above constraints, the best available algorithms ar
 
 * AES-256. While Bruce Schneier has made some interesting recommendations regarding moving to AES-128 due to certain attacks on AES-256, my current thinking is in line with Colin Percival here: http://www.daemonology.net/blog/2009-07-31-thoughts-on-AES.html. PBKDF2 output is effectively random, which should negate related-keys attacks against the kinds of use cases we're interested in.
 
-* HMAC+SHA1. No surprises here.
+* HMAC+SHA256. No surprises here.
 
 * Encrypt-then-MAC. While `RNCryptor` does not exploit all the advantages of this approach (for instance, by design it cannot validate the HMAC prior to decrypting the stream), I still believe the Encrypt-then-MAC approach makes sense. For more discusion, see http://www.daemonology.net/blog/2009-06-24-encrypt-then-mac.html.
 
