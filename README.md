@@ -86,6 +86,13 @@ Performance is a goal, but not the most important goal. The code must be secure 
 
 Without sacrificing other goals, it is preferable to read the output format of `RNCryptor` on other platforms. It would be nice if the format were easy to read or write in PHP or Java. Similarly, it would be useful if `RNCryptor` could read and write common formats like OpenSSL's `enc` output. While OpenSSL has significant problems in how it implements AES encryption (for instance, it does not iterate its KDF), it is very common and it would be useful if `RNCryptor` could integrate into systems that use it.
 
+# Roadmap
+
+* v1.0 is complete and includes synchronous stream and data support.
+* v1.1 will include the option of OpenSSL compatibility (at the cost of reduced security and removal of integrity checks). This may cause small cahgnes in the API
+* v1.2 will add asynchronous modes. This may cause non-trivials changes in the API.
+
+
 
 # LICENSE
 This code is licensed under the MIT License:
