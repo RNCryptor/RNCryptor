@@ -40,6 +40,8 @@ The same encryption and decryption can be processed from one `NSURL` or `NSStrea
 
 Full API information is available at http://rnapier.github.com/RNCryptor/doc/html/Classes/RNCryptor.html.
 
+Details on the data format are available at https://github.com/rnapier/RNCryptor/wiki/Data-Format.
+
 # Building
 
 Comes packaged as a static library, but the `RNCryptor.h` and `RNCryptor.m` files can be dropped into any project.
@@ -91,7 +93,6 @@ Without sacrificing other goals, it is preferable to read the output format of `
 * v1.0 is complete and includes synchronous stream and data support.
 * v1.1 will include the option of OpenSSL compatibility (at the cost of reduced security and removal of integrity checks). This may cause small cahgnes in the API
 * v1.2 will add asynchronous modes. This may cause non-trivials changes in the API.
-
 
 
 # LICENSE
