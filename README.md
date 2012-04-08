@@ -70,9 +70,18 @@ Wherever possible within the above constraints, the best available algorithms ar
 
 * AES-256. While Bruce Schneier has made some interesting recommendations regarding moving to AES-128 due to certain attacks on AES-256, my current thinking is in line with Colin Percival here: http://www.daemonology.net/blog/2009-07-31-thoughts-on-AES.html. PBKDF2 output is effectively random, which should negate related-keys attacks against the kinds of use cases we're interested in.
 
-* HMAC+SHA256. No surprises here.
+* AES-CTR mode. CBC is the most commonly available, but it requires padding, and anything that requires padding opens itself
+up to the possibility of padding oracle attacks. CTR uses no padding and so padding oracles aren't possible. Moreover, the
+lack of padding makes the ciphertext slightly shorter, and in theory (though I don't believe currently in practice on any CommonCryptor
+platform) AES-CTR can be parallelized.
 
-* Encrypt-then-MAC. While `RNCryptor` does not exploit all the advantages of this approach (for instance, by design it cannot validate the HMAC prior to decrypting the stream), I still believe the Encrypt-then-MAC approach makes sense. For more discusion, see http://www.daemonology.net/blog/2009-06-24-encrypt-then-mac.html.
+* Encrypt-then-MAC. If there were a good authenticated AES mode on iOS (GCM for instance), I would probably use that for
+it's simplicity. Colin Percival makes [good arguments for hand-coding an encrypt-than-MAC](http://www.daemonology.net/blog/2009-06-24-encrypt-then-mac.html) rather than using an authenticated
+AES mode, but in RNCryptor mananging the HMAC actually adds quite a bit of complexity. I'd rather the complexity at a
+more broadly peer-reviewed layer like CommonCryptor than at the RNCryptor layer. But this isn't an option, so I fall back
+to my own Encrypt-than-MAC. 
+
+* HMAC+SHA256. No surprises here.
 
 * PBKDF2. While bcrypt and scrypt may be more secure than PBKDF2, CommonCryptor only supports PBKDF2. NIST also continues to recommend PBKDF2. http://security.stackexchange.com/questions/4781/do-any-security-experts-recommend-bcrypt-for-password-storage We use 10k rounds of PBKDF2 which represents about 80ms on an iPhone 4.
 
@@ -86,12 +95,13 @@ Performance is a goal, but not the most important goal. The code must be secure 
 
 ## Portability
 
-Without sacrificing other goals, it is preferable to read the output format of `RNCryptor` on other platforms. It would be nice if the format were easy to read or write in PHP or Java. Similarly, it would be useful if `RNCryptor` could read and write common formats like OpenSSL's `enc` output. While OpenSSL has significant problems in how it implements AES encryption (for instance, it does not iterate its KDF), it is very common and it would be useful if `RNCryptor` could integrate into systems that use it.
+Without sacrificing other goals, it is preferable to read the output format of `RNCryptor` on other platforms. `RNCryptor` is now
+compatible with OpenSSL aes-256-cbc (using `RNOpenSSLCryptor`). This is intentionally kept as a separate wrapper around
+`RNCryptor` because the OpenSSL format has significant security issues that I don't want to allow into the main code.
 
 # Roadmap
 
-* v1.0 is complete and includes synchronous stream and data support.
-* v1.1 will include the option of OpenSSL compatibility (at the cost of reduced security and removal of integrity checks). This may cause small cahgnes in the API
+* v1.1 is complete and includes synchronous stream and data support, as well as OpenSSL compatibility (aes-256-cbc only).
 * v1.2 will add asynchronous modes. This may cause non-trivials changes in the API.
 
 
