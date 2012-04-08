@@ -24,17 +24,21 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-//For aes-256
+// OpenSSL Format:
 //
-//Hash0 = ''
-//Hash1 = MD5(Hash0 + Password + Salt)
-//Hash2 = MD5(Hash1 + Password + Salt)
-//Hash3 = MD5(Hash2 + Password + Salt)
-//Hash4 = MD5(Hash3 + Password + Salt)
-//...
+// For aes-256
 //
-//Key = Hash1 + Hash2
-//IV = Hash3 + Hash4
+// Hash0 = ''
+// Hash1 = MD5(Hash0 + Password + Salt)
+// Hash2 = MD5(Hash1 + Password + Salt)
+// Hash3 = MD5(Hash2 + Password + Salt)
+// Hash4 = MD5(Hash3 + Password + Salt)
+//
+// Key = Hash1 + Hash2
+// IV = Hash3 + Hash4
+//
+// |Salted___|<salt>|<ciphertext>|
+//
 
 #import "RNOpenSSLCryptor.h"
 
@@ -151,10 +155,9 @@ NSString * const kSaltedString = @"Salted__";
   NSData *encryptionKey = [self keyForPassword:password salt:encryptionKeySalt];
   NSData *IV = [self IVForKey:encryptionKey password:password salt:encryptionKeySalt];
 
-
   RNCryptor *cryptor = [[RNCryptor alloc] initWithSettings:[RNCryptorSettings openSSLSettings]];
 
-  return [cryptor decryptFromStream:fromStream toStream:toStream encryptionKey:encryptionKey IV:IV HMACKey:nil error:error];return NO;
+  return [cryptor performOperation:kCCDecrypt fromStream:fromStream readCallback:nil toStream:toStream writeCallback:nil encryptionKey:encryptionKey IV:IV footerSize:0 footer:nil error:error];
 }
 
 
