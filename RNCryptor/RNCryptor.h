@@ -28,9 +28,37 @@
 #import <CommonCrypto/CommonCryptor.h>
 #import <CommonCrypto/CommonKeyDerivation.h>
 
-@class RNCryptorSettings;
+//@class RNCryptorSettings;
 
 extern NSString *const kRNCryptorErrorDomain;
+
+typedef struct _RNCryptorSettings {
+  CCAlgorithm algorithm;
+  CCMode mode;
+  CCModeOptions modeOptions;
+  size_t keySize;
+  size_t blockSize;
+  size_t IVSize;
+  CCPadding padding;
+  size_t saltSize;
+  uint PBKDFRounds;
+  CCHmacAlgorithm HMACAlgorithm;
+  size_t HMACLength;
+} RNCryptorSettings;
+
+static const RNCryptorSettings kRNCryptorAES256Settings = {
+    .algorithm= kCCAlgorithmAES128,
+    .mode = kCCModeCTR,
+    .modeOptions = kCCModeOptionCTR_LE,
+    .keySize = kCCKeySizeAES256,
+    .blockSize = kCCBlockSizeAES128,
+    .IVSize = kCCBlockSizeAES128,
+    .padding = ccNoPadding,
+    .saltSize = 8,
+    .PBKDFRounds = 10000,
+    .HMACAlgorithm = kCCHmacAlgSHA256,
+    .HMACLength= CC_SHA256_DIGEST_LENGTH,
+};
 
 enum {
   kRNCryptorErrorHMACMismatch = 1,
@@ -61,7 +89,7 @@ typedef void (^RNCryptorWriteCallback)(NSData *writeData);
 
 /** Immutable settings for cryptor.
 */
-@property (nonatomic, readonly) RNCryptorSettings *settings;
+@property (nonatomic, readonly) RNCryptorSettings settings;
 
 ///---------------------------------------------------------------------------------------
 /// @name Creating an RNCryptor
@@ -80,7 +108,7 @@ typedef void (^RNCryptorWriteCallback)(NSData *writeData);
  */
 
 + (NSError *)errorWithCode:(int)code localizedDescription:(NSString *)localizedDescription underlyingError:(NSError *)underlyingError;
-- (RNCryptor *)initWithSettings:(RNCryptorSettings *)settings;
+- (RNCryptor *)initWithSettings:(RNCryptorSettings)settings;
 
 
 ///---------------------------------------------------------------------------------------
@@ -254,20 +282,6 @@ typedef void (^RNCryptorWriteCallback)(NSData *writeData);
 */
 - (NSData *)keyForPassword:(NSString *)password salt:(NSData *)salt;
 
-@end
++ (NSData *)randomDataOfLength:(size_t)length;
 
-@interface RNCryptorSettings : NSObject
-@property (nonatomic, readonly) CCAlgorithm algorithm;  // kCCAlgorithmAES128
-@property (nonatomic, readonly) CCMode mode;            // kCCModeCTR
-@property (nonatomic, readonly) CCModeOptions modeOptions;  // kCCModeOptionCTR_LE
-@property (nonatomic, readonly) size_t keySize;         // kCCKeySizeAES256
-@property (nonatomic, readonly) size_t blockSize;       // kCCBlockSizeAES128
-@property (nonatomic, readonly) size_t IVSize;          // kCCBlockSizeAES128
-@property (nonatomic, readonly) CCPadding padding;      // ccNoPadding
-@property (nonatomic, readonly) size_t saltSize;        // 8
-@property (nonatomic, readonly) uint PBKDFRounds;       // 10000 (~80ms on an iPhone 4)
-@property (nonatomic, readonly) CCHmacAlgorithm HMACAlgorithm;  // kCCHmacAlgSHA256
-@property (nonatomic, readonly) size_t HMACLength;  // CC_SHA256_DIGEST_LENGTH
-
-+ (RNCryptorSettings *)AES256Settings;
 @end

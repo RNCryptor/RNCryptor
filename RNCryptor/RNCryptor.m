@@ -86,7 +86,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
 @implementation RNCryptor
 @synthesize settings = settings_;
 
-- (RNCryptor *)initWithSettings:(RNCryptorSettings *)settings
+- (RNCryptor *)initWithSettings:(RNCryptorSettings)settings
 {
   self = [super init];
   if (self)
@@ -102,7 +102,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   static dispatch_once_t once;
   static RNCryptor *AES256Cryptor = nil;
 
-  dispatch_once(&once, ^{ AES256Cryptor = [[self alloc] initWithSettings:[RNCryptorSettings AES256Settings]]; });
+  dispatch_once(&once, ^{ AES256Cryptor = [[self alloc] initWithSettings:kRNCryptorAES256Settings]; });
   return AES256Cryptor;
 }
 
@@ -122,7 +122,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   return [NSError errorWithDomain:kRNCryptorErrorDomain code:code userInfo:userInfo];
 }
 
-- (NSData *)randomDataOfLength:(size_t)length
++ (NSData *)randomDataOfLength:(size_t)length
 {
   NSMutableData *data = [NSMutableData dataWithLength:length];
 
@@ -465,7 +465,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   }
 
   [output open];
-  NSData *IV = [self randomDataOfLength:self.settings.blockSize];
+  NSData *IV = [[self class] randomDataOfLength:self.settings.blockSize];
   if (! [output _RNWriteData:IV error:error])
   {
     return NO;
@@ -497,10 +497,10 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
 }
 - (BOOL)encryptFromStream:(NSInputStream *)input toStream:(NSOutputStream *)output password:(NSString *)password error:(NSError **)error
 {
-  NSData *encryptionKeySalt = [self randomDataOfLength:self.settings.saltSize];
+  NSData *encryptionKeySalt = [[self class] randomDataOfLength:self.settings.saltSize];
   NSData *encryptionKey = [self keyForPassword:password salt:encryptionKeySalt];
 
-  NSData *HMACKeySalt = [self randomDataOfLength:self.settings.saltSize];
+  NSData *HMACKeySalt = [[self class] randomDataOfLength:self.settings.saltSize];
   NSData *HMACKey = [self keyForPassword:password salt:HMACKeySalt];
 
 
@@ -571,44 +571,6 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   {
     return nil;
   }
-}
-
-@end
-
-@implementation RNCryptorSettings
-@synthesize algorithm = algorithm_;
-@synthesize keySize = keySize_;
-@synthesize blockSize = blockSize_;
-@synthesize IVSize = IVSize_;
-@synthesize saltSize = saltSize_;
-@synthesize PBKDFRounds = PBKDFRounds_;
-@synthesize HMACAlgorithm = HMACAlgorithm_;
-@synthesize HMACLength = HMACLength_;
-@synthesize mode = mode_;
-@synthesize padding = padding_;
-@synthesize modeOptions = modeOptions_;
-
-
-+ (RNCryptorSettings *)AES256Settings
-{
-  static dispatch_once_t once;
-  static RNCryptorSettings *AES256Settings;
-
-  dispatch_once(&once, ^{
-    AES256Settings = [[self alloc] init];
-    AES256Settings->algorithm_ = kCCAlgorithmAES128;
-    AES256Settings->mode_ = kCCModeCTR;
-    AES256Settings->modeOptions_ = kCCModeOptionCTR_LE;
-    AES256Settings->keySize_ = kCCKeySizeAES256;
-    AES256Settings->blockSize_ = kCCBlockSizeAES128;
-    AES256Settings->IVSize_ = kCCBlockSizeAES128;
-    AES256Settings->padding_ = ccNoPadding;
-    AES256Settings->saltSize_ = 8;
-    AES256Settings->PBKDFRounds_ = 10000; // ~80ms on an iPhone 4
-    AES256Settings->HMACAlgorithm_ = kCCHmacAlgSHA256;
-    AES256Settings->HMACLength_= CC_SHA256_DIGEST_LENGTH;
-  });
-  return AES256Settings;
 }
 
 @end
