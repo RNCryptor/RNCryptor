@@ -24,9 +24,13 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-// OpenSSL Format:
+// For aes-128:
 //
-// For aes-256
+// key = MD5(password + salt)
+// IV = MD5(Key + password + salt)
+
+//
+// For aes-256:
 //
 // Hash0 = ''
 // Hash1 = MD5(Hash0 + Password + Salt)
@@ -36,6 +40,9 @@
 //
 // Key = Hash1 + Hash2
 // IV = Hash3 + Hash4
+//
+
+// File Format:
 //
 // |Salted___|<salt>|<ciphertext>|
 //
@@ -105,27 +112,74 @@ NSString * const kSaltedString = @"Salted__";
   return openSSLCryptor;
 }
 
+- (NSData *)hashForHash:(NSData *)hash passwordSalt:(NSData *)passwordSalt
+{
+  unsigned char md[CC_MD5_DIGEST_LENGTH];
+
+  NSMutableData *hashMaterial = [NSMutableData dataWithData:hash];
+  [hashMaterial appendData:passwordSalt];
+  CC_MD5([hashMaterial bytes], [hashMaterial length], md);
+
+  return [NSData dataWithBytes:md length:sizeof(md)];
+}
+
 - (NSData *)keyForPassword:(NSString *)password salt:(NSData *)salt
 {
-  // key = MD5(password + salt)
-  unsigned char md[CC_MD5_DIGEST_LENGTH];
-  NSMutableData *keyMaterial = [NSMutableData dataWithData:[password dataUsingEncoding:NSUTF8StringEncoding]];
-  [keyMaterial appendData:salt];
-  CC_MD5([keyMaterial bytes], [keyMaterial length], md);
-  NSData *key = [NSData dataWithBytes:md length:sizeof(md)];
+  // FIXME: This is all very inefficient; we repeat ourselves in IVForKey:...
+
+  // Hash0 = ''
+  // Hash1 = MD5(Hash0 + Password + Salt)
+  // Hash2 = MD5(Hash1 + Password + Salt)
+  // Hash3 = MD5(Hash2 + Password + Salt)
+  // Hash4 = MD5(Hash3 + Password + Salt)
+  //
+  // Key = Hash1 + Hash2
+  // IV = Hash3 + Hash4
+
+  NSMutableData *passwordSalt = [[password dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
+  [passwordSalt appendData:salt];
+
+  NSData *hash1 = [self hashForHash:nil passwordSalt:passwordSalt];
+  NSData *hash2 = [self hashForHash:hash1 passwordSalt:passwordSalt];
+
+  NSMutableData *key = [hash1 mutableCopy];
+  [key appendData:hash2];
+
   return key;
+
+//  // key = MD5(password + salt)
+//  unsigned char md[CC_MD5_DIGEST_LENGTH];
+//  NSMutableData *keyMaterial = [NSMutableData dataWithData:[password dataUsingEncoding:NSUTF8StringEncoding]];
+//  [keyMaterial appendData:salt];
+//  CC_MD5([keyMaterial bytes], [keyMaterial length], md);
+//  NSData *key = [NSData dataWithBytes:md length:sizeof(md)];
+//  return key;
 }
 
 - (NSData *)IVForKey:(NSData *)key password:(NSString *)password salt:(NSData *)salt
 {
-  // IV = MD5(Key + password + salt)
-  unsigned char md[CC_MD5_DIGEST_LENGTH];
-  NSMutableData *IVMaterial = [NSMutableData dataWithData:key];
-  [IVMaterial appendData:[password dataUsingEncoding:NSUTF8StringEncoding]];
-  [IVMaterial appendData:salt];
-  CC_MD5([IVMaterial bytes], [IVMaterial length], md);
-  NSData *IV= [NSData dataWithBytes:md length:sizeof(md)];
+  NSMutableData *passwordSalt = [[password dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
+  [passwordSalt appendData:salt];
+
+  NSData *hash1 = [self hashForHash:nil passwordSalt:passwordSalt];
+  NSData *hash2 = [self hashForHash:hash1 passwordSalt:passwordSalt];
+  NSData *hash3 = [self hashForHash:hash2 passwordSalt:passwordSalt];
+  NSData *hash4 = [self hashForHash:hash3 passwordSalt:passwordSalt];
+
+  NSMutableData *IV = [hash3 mutableCopy];
+  [IV appendData:hash4];
+
   return IV;
+
+
+//  // IV = MD5(Key + password + salt)
+//  unsigned char md[CC_MD5_DIGEST_LENGTH];
+//  NSMutableData *IVMaterial = [NSMutableData dataWithData:key];
+//  [IVMaterial appendData:[password dataUsingEncoding:NSUTF8StringEncoding]];
+//  [IVMaterial appendData:salt];
+//  CC_MD5([IVMaterial bytes], [IVMaterial length], md);
+//  NSData *IV = [NSData dataWithBytes:md length:sizeof(md)];
+//  return IV;
 }
 
 - (BOOL)decryptFromStream:(NSInputStream *)fromStream toStream:(NSOutputStream *)toStream password:(NSString *)password error:(NSError **)error
@@ -146,7 +200,7 @@ NSString * const kSaltedString = @"Salted__";
     if (error)
     {
       *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:kRNCyrptorUnknownHeader
-                               userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"Could not find salt", @"Unknown header")
+                               userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"Could not find salt", @"Could not find salt")
                                                                     forKey:NSLocalizedDescriptionKey]];
     }
     return NO;
@@ -161,32 +215,24 @@ NSString * const kSaltedString = @"Salted__";
 }
 
 
-//- (BOOL)encryptFromStream:(NSInputStream *)fromStream toStream:(NSOutputStream *)toStream password:(NSString *)password error:(NSError **)error
-//{
-//  NSData *encryptionKeySalt = [self randomDataOfLength:kSaltSize];
-//  NSData *encryptionKey = [self keyForPassword:password salt:encryptionKeySalt];
-//
-//  NSData *HMACKeySalt = [self randomDataOfLength:self.settings.saltSize];
-//  NSData *HMACKey = [self keyForPassword:password salt:HMACKeySalt];
-//
-//  NSData *IV = [self randomDataOfLength:self.settings.blockSize];
-//
-//  [output open];
-//  uint8_t header[2] = {0, 0};
-//  NSData *headerData = [NSData dataWithBytes:header length:sizeof(header)];
-//  if (! [output _RNWriteData:headerData error:error] ||
-//      ! [output _RNWriteData:encryptionKeySalt error:error] ||
-//      ! [output _RNWriteData:HMACKeySalt error:error] ||
-//      ! [output _RNWriteData:IV error:error]
-//    )
-//  {
-//    return NO;
-//  }
-//
-//  return [self encryptFromStream:input toStream:output encryptionKey:encryptionKey IV:IV HMACKey:HMACKey error:error];
-//
-//
-//}
+- (BOOL)encryptFromStream:(NSInputStream *)fromStream toStream:(NSOutputStream *)toStream password:(NSString *)password error:(NSError **)error
+{
+  NSData *encryptionKeySalt = [RNCryptor randomDataOfLength:kSaltSize];
+  NSData *encryptionKey = [self keyForPassword:password salt:encryptionKeySalt];
+  NSData *IV = [self IVForKey:encryptionKey password:password salt:encryptionKeySalt];
+
+  [toStream open];
+  NSData *headerData = [kSaltedString dataUsingEncoding:NSUTF8StringEncoding];
+  if (! [toStream _RNWriteData:headerData error:error] ||
+      ! [toStream _RNWriteData:encryptionKeySalt error:error]
+      )
+  {
+    return NO;
+  }
+
+  RNCryptor *cryptor = [[RNCryptor alloc] initWithSettings:[RNCryptorSettings openSSLSettings]];
+  return [cryptor performOperation:kCCEncrypt fromStream:fromStream readCallback:nil toStream:toStream writeCallback:nil encryptionKey:encryptionKey IV:IV footerSize:0 footer:nil error:error];
+}
 
 
 @end

@@ -30,10 +30,10 @@
 @interface RNOpenSSLCryptor : NSObject
 + (RNOpenSSLCryptor *)openSSLCryptor;
 
-//- (BOOL)encryptFromStream:(NSInputStream *)fromStream
-//                 toStream:(NSOutputStream *)toStream
-//                 password:(NSString *)password
-//                    error:(NSError **)error;
+- (BOOL)encryptFromStream:(NSInputStream *)fromStream
+                 toStream:(NSOutputStream *)toStream
+                 password:(NSString *)password
+                    error:(NSError **)error;
 
 - (BOOL)decryptFromStream:(NSInputStream *)fromStream
                  toStream:(NSOutputStream *)toStream

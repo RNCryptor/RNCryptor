@@ -254,6 +254,8 @@ typedef void (^RNCryptorWriteCallback)(NSData *writeData);
 */
 - (NSData *)keyForPassword:(NSString *)password salt:(NSData *)salt;
 
++ (NSData *)randomDataOfLength:(size_t)length;
+
 @end
 
 @interface RNCryptorSettings : NSObject

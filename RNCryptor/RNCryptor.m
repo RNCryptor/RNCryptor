@@ -122,7 +122,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   return [NSError errorWithDomain:kRNCryptorErrorDomain code:code userInfo:userInfo];
 }
 
-- (NSData *)randomDataOfLength:(size_t)length
++ (NSData *)randomDataOfLength:(size_t)length
 {
   NSMutableData *data = [NSMutableData dataWithLength:length];
 
@@ -465,7 +465,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   }
 
   [output open];
-  NSData *IV = [self randomDataOfLength:self.settings.blockSize];
+  NSData *IV = [[self class] randomDataOfLength:self.settings.blockSize];
   if (! [output _RNWriteData:IV error:error])
   {
     return NO;
@@ -497,10 +497,10 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
 }
 - (BOOL)encryptFromStream:(NSInputStream *)input toStream:(NSOutputStream *)output password:(NSString *)password error:(NSError **)error
 {
-  NSData *encryptionKeySalt = [self randomDataOfLength:self.settings.saltSize];
+  NSData *encryptionKeySalt = [[self class] randomDataOfLength:self.settings.saltSize];
   NSData *encryptionKey = [self keyForPassword:password salt:encryptionKeySalt];
 
-  NSData *HMACKeySalt = [self randomDataOfLength:self.settings.saltSize];
+  NSData *HMACKeySalt = [[self class] randomDataOfLength:self.settings.saltSize];
   NSData *HMACKey = [self keyForPassword:password salt:HMACKeySalt];
 
 
@@ -621,7 +621,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
     openSSLSettings->algorithm_ = kCCAlgorithmAES128;
     openSSLSettings->mode_ = kCCModeCBC;
     openSSLSettings->modeOptions_ = 0;
-    openSSLSettings->keySize_ = kCCKeySizeAES128; // FIXME: Switch to 256 (need key generation routine)
+    openSSLSettings->keySize_ = kCCKeySizeAES256;
     openSSLSettings->blockSize_ = kCCBlockSizeAES128;
     openSSLSettings->IVSize_ = kCCBlockSizeAES128;
     openSSLSettings->padding_ = ccPKCS7Padding;

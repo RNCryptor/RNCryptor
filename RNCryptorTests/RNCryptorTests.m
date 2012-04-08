@@ -31,10 +31,6 @@
 NSString * const kGoodPassword = @"Passw0rd!";
 NSString * const kBadPassword = @"NotThePassword";
 
-@interface RNCryptor (Private)
-- (NSData *)randomDataOfLength:(size_t)length;
-@end
-
 @implementation RNCryptorTests
 
 - (void)setUp
@@ -55,9 +51,9 @@ NSString * const kBadPassword = @"NotThePassword";
 {
   RNCryptor *cryptor = [[RNCryptor alloc] initWithSettings:[RNCryptorSettings AES256Settings]];
 
-  NSData *data = [cryptor randomDataOfLength:1024];
-  NSData *key = [cryptor randomDataOfLength:kCCKeySizeAES128];
-  NSData *IV = [cryptor randomDataOfLength:kCCBlockSizeAES128];
+  NSData *data = [[cryptor class] randomDataOfLength:1024];
+  NSData *key = [[cryptor class] randomDataOfLength:kCCKeySizeAES128];
+  NSData *IV = [[cryptor class] randomDataOfLength:kCCBlockSizeAES128];
 
   NSError *error;
   NSInputStream *encryptInputStream = [NSInputStream inputStreamWithData:data];
@@ -108,9 +104,9 @@ NSString * const kBadPassword = @"NotThePassword";
 {
   RNCryptor *cryptor = [RNCryptor AES256Cryptor];
 
-  NSData *data = [cryptor randomDataOfLength:1024];
-  NSData *key = [cryptor randomDataOfLength:kCCKeySizeAES128];
-  NSData *HMACkey = [cryptor randomDataOfLength:kCCKeySizeAES128];
+  NSData *data = [[cryptor class] randomDataOfLength:1024];
+  NSData *key = [[cryptor class] randomDataOfLength:kCCKeySizeAES128];
+  NSData *HMACkey = [[cryptor class] randomDataOfLength:kCCKeySizeAES128];
 
   NSError *error;
   NSInputStream *encryptInputStream = [NSInputStream inputStreamWithData:data];
@@ -141,7 +137,7 @@ NSString * const kBadPassword = @"NotThePassword";
 {
   RNCryptor *cryptor = [RNCryptor AES256Cryptor];
 
-  NSData *data = [cryptor randomDataOfLength:1024];
+  NSData *data = [[cryptor class] randomDataOfLength:1024];
 
   NSError *error;
 
@@ -173,7 +169,7 @@ NSString * const kBadPassword = @"NotThePassword";
 {
   RNCryptor *cryptor = [RNCryptor AES256Cryptor];
 
-  NSData *data = [cryptor randomDataOfLength:1024];
+  NSData *data = [[cryptor class] randomDataOfLength:1024];
 
   NSError *error;
 
@@ -205,7 +201,7 @@ NSString * const kBadPassword = @"NotThePassword";
 {
   RNCryptor *cryptor = [RNCryptor AES256Cryptor];
 
-  NSData *data = [cryptor randomDataOfLength:length];
+  NSData *data = [[cryptor class] randomDataOfLength:length];
 
   NSError *error;
 
@@ -236,14 +232,14 @@ NSString * const kBadPassword = @"NotThePassword";
 {
   RNCryptor *cryptor = [RNCryptor AES256Cryptor];
 
-  NSData *data = [cryptor randomDataOfLength:1024];
+  NSData *data = [[cryptor class] randomDataOfLength:1024];
 
   NSError *error;
 
   NSData *encryptedData = [cryptor encryptData:data password:kGoodPassword error:&error];
 
   NSMutableData *corruptData = [encryptedData mutableCopy];
-  [corruptData replaceBytesInRange:NSMakeRange(100,100) withBytes:[[cryptor randomDataOfLength:100] bytes]];
+  [corruptData replaceBytesInRange:NSMakeRange(100,100) withBytes:[[[cryptor class]randomDataOfLength:100] bytes]];
 
   NSData *decryptedData = [cryptor decryptData:corruptData password:kGoodPassword error:&error];
 
@@ -275,7 +271,7 @@ NSString * const kBadPassword = @"NotThePassword";
 {
   RNCryptor *cryptor = [RNCryptor AES256Cryptor];
 
-  NSData *data = [cryptor randomDataOfLength:length];
+  NSData *data = [[cryptor class] randomDataOfLength:length];
   NSError *error;
 
   NSURL *plaintextURL = [NSURL fileURLWithPath:[self temporaryFilePath]];
@@ -436,17 +432,42 @@ NSString * const kBadPassword = @"NotThePassword";
   }
 }
 
-- (void)testOpenSSL
+// echo Test data | openssl enc -aes-256-cbc -out test.enc -k Passw0rd
+
+static NSString * const kOpenSSLString = @"Test data\n";
+static NSString * const kOpenSSLPath = @"test.enc";
+static NSString * const kOpenSSLPassword = @"Passw0rd";
+
+- (void)testOpenSSLDecrypt
 {
-  NSInputStream *input = [NSInputStream inputStreamWithFileAtPath:@"test.enc"];
+  NSInputStream *input = [NSInputStream inputStreamWithFileAtPath:kOpenSSLPath];
   NSOutputStream *output = [NSOutputStream outputStreamToMemory];
   NSError *error;
-  STAssertTrue([[[RNOpenSSLCryptor alloc] init] decryptFromStream:input toStream:output password:@"Passw0rd" error:&error], @"Could not decrypt:%@", error);
+  STAssertTrue([[[RNOpenSSLCryptor alloc] init] decryptFromStream:input toStream:output password:kOpenSSLPassword error:&error], @"Could not decrypt:%@", error);
 
   NSData *decryptedData = [output propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
   NSString *decryptedString = [[NSString alloc] initWithData:decryptedData encoding:NSUTF8StringEncoding];
-  NSString *testString = @"Test data\n";
-  STAssertEqualObjects(decryptedString, testString, @"Decrypted data does not match");
+  STAssertEqualObjects(decryptedString, kOpenSSLString, @"Decrypted data does not match");
+}
+
+- (void)testOpenSSLEncrypt
+{
+  NSInputStream *input = [NSInputStream inputStreamWithData:[kOpenSSLString dataUsingEncoding:NSUTF8StringEncoding]];
+  NSOutputStream *output = [NSOutputStream outputStreamToMemory];
+  NSError *error;
+  STAssertTrue([[[RNOpenSSLCryptor alloc] init] encryptFromStream:input toStream:output password:kOpenSSLPassword error:&error], @"Could not decrypt:%@", error);
+
+  NSData *encryptedData = [output propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
+
+  NSString *encryptedFile = [self temporaryFilePath];
+  NSString *decryptedFile = [self temporaryFilePath];
+  [encryptedData writeToFile:encryptedFile atomically:NO];
+
+  NSString *cmd = [NSString stringWithFormat:@"/usr/bin/openssl enc -d -aes-256-cbc -k %@ -in %@ -out %@", kOpenSSLPassword, encryptedFile, decryptedFile];
+  STAssertEquals(system([cmd UTF8String]), 0, @"System calll failed");
+
+  NSString *decryptedString = [NSString stringWithContentsOfFile:decryptedFile encoding:NSUTF8StringEncoding error:&error];
+  STAssertEqualObjects(decryptedString, kOpenSSLString, @"Decryption doesn't match: %@", error);
 }
 
 @end
