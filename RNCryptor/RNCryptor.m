@@ -86,7 +86,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
 @implementation RNCryptor
 @synthesize settings = settings_;
 
-- (RNCryptor *)initWithSettings:(RNCryptorSettings *)settings
+- (RNCryptor *)initWithSettings:(RNCryptorSettings)settings
 {
   self = [super init];
   if (self)
@@ -102,7 +102,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   static dispatch_once_t once;
   static RNCryptor *AES256Cryptor = nil;
 
-  dispatch_once(&once, ^{ AES256Cryptor = [[self alloc] initWithSettings:[RNCryptorSettings AES256Settings]]; });
+  dispatch_once(&once, ^{ AES256Cryptor = [[self alloc] initWithSettings:kRNCryptorAES256Settings]; });
   return AES256Cryptor;
 }
 
@@ -571,66 +571,6 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   {
     return nil;
   }
-}
-
-@end
-
-@implementation RNCryptorSettings
-@synthesize algorithm = algorithm_;
-@synthesize keySize = keySize_;
-@synthesize blockSize = blockSize_;
-@synthesize IVSize = IVSize_;
-@synthesize saltSize = saltSize_;
-@synthesize PBKDFRounds = PBKDFRounds_;
-@synthesize HMACAlgorithm = HMACAlgorithm_;
-@synthesize HMACLength = HMACLength_;
-@synthesize mode = mode_;
-@synthesize padding = padding_;
-@synthesize modeOptions = modeOptions_;
-
-
-+ (RNCryptorSettings *)AES256Settings
-{
-  static dispatch_once_t once;
-  static RNCryptorSettings *AES256Settings;
-
-  dispatch_once(&once, ^{
-    AES256Settings = [[self alloc] init];
-    AES256Settings->algorithm_ = kCCAlgorithmAES128;
-    AES256Settings->mode_ = kCCModeCTR;
-    AES256Settings->modeOptions_ = kCCModeOptionCTR_LE;
-    AES256Settings->keySize_ = kCCKeySizeAES256;
-    AES256Settings->blockSize_ = kCCBlockSizeAES128;
-    AES256Settings->IVSize_ = kCCBlockSizeAES128;
-    AES256Settings->padding_ = ccNoPadding;
-    AES256Settings->saltSize_ = 8;
-    AES256Settings->PBKDFRounds_ = 10000; // ~80ms on an iPhone 4
-    AES256Settings->HMACAlgorithm_ = kCCHmacAlgSHA256;
-    AES256Settings->HMACLength_= CC_SHA256_DIGEST_LENGTH;
-  });
-  return AES256Settings;
-}
-
-+ (RNCryptorSettings *)openSSLSettings
-{
-  static dispatch_once_t once;
-  static RNCryptorSettings *openSSLSettings;
-
-  dispatch_once(&once, ^{
-    openSSLSettings = [[self alloc] init];
-    openSSLSettings->algorithm_ = kCCAlgorithmAES128;
-    openSSLSettings->mode_ = kCCModeCBC;
-    openSSLSettings->modeOptions_ = 0;
-    openSSLSettings->keySize_ = kCCKeySizeAES256;
-    openSSLSettings->blockSize_ = kCCBlockSizeAES128;
-    openSSLSettings->IVSize_ = kCCBlockSizeAES128;
-    openSSLSettings->padding_ = ccPKCS7Padding;
-    openSSLSettings->saltSize_ = 8;
-    openSSLSettings->PBKDFRounds_ = 0;
-    openSSLSettings->HMACAlgorithm_ = 0;
-    openSSLSettings->HMACLength_= 0;
-  });
-  return openSSLSettings;
 }
 
 @end

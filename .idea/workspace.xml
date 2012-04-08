@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d896adf5-dae3-498d-8719-1445fd729a19" name="Default" comment="Working OpenSSL support for AES-256-CBC">
+    <list default="true" id="d896adf5-dae3-498d-8719-1445fd729a19" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/RNCryptor/RNCryptor.h" afterPath="$PROJECT_DIR$/RNCryptor/RNCryptor.h" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/RNCryptor/RNCryptor.m" afterPath="$PROJECT_DIR$/RNCryptor/RNCryptor.m" />
@@ -32,25 +32,27 @@
       <file leaf-file-name="RNCryptorTests.m" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/RNCryptorTests/RNCryptorTests.m">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="465" column="154" selection-start="16621" selection-end="16621" vertical-scroll-proportion="0.0">
-              <folding />
+            <state line="51" column="60" selection-start="1630" selection-end="1630" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="e#1210#1236#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="RNOpenSSLCryptor.m" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="RNOpenSSLCryptor.m" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/RNCryptor/RNOpenSSLCryptor.m">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="158" column="25" selection-start="4609" selection-end="4609" vertical-scroll-proportion="0.33333334">
+            <state line="232" column="60" selection-start="7625" selection-end="7625" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="RNOpenSSLCryptor.h" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="RNOpenSSLCryptor.h" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/RNCryptor/RNOpenSSLCryptor.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="37" column="8" selection-start="1522" selection-end="1522" vertical-scroll-proportion="0.0">
+            <state line="44" column="31" selection-start="1751" selection-end="1751" vertical-scroll-proportion="1.0492846">
               <folding />
             </state>
           </provider>
@@ -59,7 +61,7 @@
       <file leaf-file-name="RNCryptor.m" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/RNCryptor/RNCryptor.m">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="623" column="49" selection-start="21187" selection-end="21187" vertical-scroll-proportion="0.0">
+            <state line="104" column="74" selection-start="3240" selection-end="3240" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -68,7 +70,7 @@
       <file leaf-file-name="RNCryptor.h" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/RNCryptor/RNCryptor.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="256" column="1" selection-start="12750" selection-end="12750" vertical-scroll-proportion="-27.538462">
+            <state line="48" column="31" selection-start="1729" selection-end="1729" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -103,10 +105,10 @@
         <option value="$PROJECT_DIR$/RNCryptor/RNDecryptor.m" />
         <option value="$PROJECT_DIR$/RNCryptor/RNEncryptor.m" />
         <option value="$PROJECT_DIR$/RNCryptorTests/RNCryptorTests.h" />
-        <option value="$PROJECT_DIR$/RNCryptor/RNOpenSSLCryptor.h" />
         <option value="$PROJECT_DIR$/RNCryptor/RNCryptor.h" />
         <option value="$PROJECT_DIR$/RNCryptor/RNCryptor.m" />
         <option value="$PROJECT_DIR$/RNCryptorTests/RNCryptorTests.m" />
+        <option value="$PROJECT_DIR$/RNCryptor/RNOpenSSLCryptor.h" />
         <option value="$PROJECT_DIR$/RNCryptor/RNOpenSSLCryptor.m" />
       </list>
     </option>
@@ -437,7 +439,11 @@
       <created>1333919027431</created>
       <updated>1333919027431</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033" summary="Working OpenSSL support for AES-256-CBC">
+      <created>1333922232079</created>
+      <updated>1333922232079</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="TodoView" selected-index="2">
@@ -462,18 +468,18 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="563" y="22" width="1680" height="1268" extended-state="0" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32453153" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32453153" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32942554" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32942554" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32951117" sideWeight="0.6754685" order="1" side_tool="true" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32951117" sideWeight="0.5587734" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32951117" sideWeight="0.32453153" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3974256" sideWeight="0.8967284" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32954547" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.44122657" sideWeight="0.99897385" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.44122657" sideWeight="0.99897385" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -596,11 +602,6 @@
         <state line="53" column="4" selection-start="1774" selection-end="1774" vertical-scroll-proportion="0.018159807" />
       </provider>
     </entry>
-    <entry file="file:///Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator5.1.sdk/usr/include/CommonCrypto/CommonCryptor.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="148" column="4" selection-start="6250" selection-end="6250" vertical-scroll-proportion="0.018159807" />
-      </provider>
-    </entry>
     <entry file="file:///Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator5.1.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSStream.h">
       <provider selected="true" editor-type-id="text-editor">
         <state line="88" column="6" selection-start="3829" selection-end="3829" vertical-scroll-proportion="0.3329223" />
@@ -616,37 +617,46 @@
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
+    <entry file="file:///Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator5.1.sdk/usr/include/CommonCrypto/CommonCryptor.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="95" column="14" selection-start="4435" selection-end="4441" vertical-scroll-proportion="0.347864">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/RNCryptor/RNCryptor.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="256" column="1" selection-start="12750" selection-end="12750" vertical-scroll-proportion="-27.538462">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/RNCryptor/RNCryptor.m">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="623" column="49" selection-start="21187" selection-end="21187" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/RNCryptor/RNOpenSSLCryptor.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="37" column="8" selection-start="1522" selection-end="1522" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/RNCryptorTests/RNCryptorTests.m">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="465" column="154" selection-start="16621" selection-end="16621" vertical-scroll-proportion="0.0">
+        <state line="48" column="31" selection-start="1729" selection-end="1729" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/RNCryptor/RNOpenSSLCryptor.m">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="158" column="25" selection-start="4609" selection-end="4609" vertical-scroll-proportion="0.33333334">
+        <state line="232" column="60" selection-start="7625" selection-end="7625" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RNCryptorTests/RNCryptorTests.m">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="51" column="60" selection-start="1630" selection-end="1630" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="e#1210#1236#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RNCryptor/RNCryptor.m">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="104" column="74" selection-start="3240" selection-end="3240" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/RNCryptor/RNOpenSSLCryptor.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="44" column="31" selection-start="1751" selection-end="1751" vertical-scroll-proportion="1.0492846">
           <folding />
         </state>
       </provider>

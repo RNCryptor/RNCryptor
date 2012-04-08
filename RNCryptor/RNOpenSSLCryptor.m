@@ -209,7 +209,7 @@ NSString * const kSaltedString = @"Salted__";
   NSData *encryptionKey = [self keyForPassword:password salt:encryptionKeySalt];
   NSData *IV = [self IVForKey:encryptionKey password:password salt:encryptionKeySalt];
 
-  RNCryptor *cryptor = [[RNCryptor alloc] initWithSettings:[RNCryptorSettings openSSLSettings]];
+  RNCryptor *cryptor = [[RNCryptor alloc] initWithSettings:kRNCryptorOpenSSLSettings];
 
   return [cryptor performOperation:kCCDecrypt fromStream:fromStream readCallback:nil toStream:toStream writeCallback:nil encryptionKey:encryptionKey IV:IV footerSize:0 footer:nil error:error];
 }
@@ -230,9 +230,7 @@ NSString * const kSaltedString = @"Salted__";
     return NO;
   }
 
-  RNCryptor *cryptor = [[RNCryptor alloc] initWithSettings:[RNCryptorSettings openSSLSettings]];
+  RNCryptor *cryptor = [[RNCryptor alloc] initWithSettings:kRNCryptorOpenSSLSettings];
   return [cryptor performOperation:kCCEncrypt fromStream:fromStream readCallback:nil toStream:toStream writeCallback:nil encryptionKey:encryptionKey IV:IV footerSize:0 footer:nil error:error];
 }
-
-
 @end

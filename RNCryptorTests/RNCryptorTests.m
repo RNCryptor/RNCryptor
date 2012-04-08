@@ -49,7 +49,7 @@ NSString * const kBadPassword = @"NotThePassword";
 
 - (void)testStream
 {
-  RNCryptor *cryptor = [[RNCryptor alloc] initWithSettings:[RNCryptorSettings AES256Settings]];
+  RNCryptor *cryptor = [[RNCryptor alloc] initWithSettings:kRNCryptorAES256Settings];
 
   NSData *data = [[cryptor class] randomDataOfLength:1024];
   NSData *key = [[cryptor class] randomDataOfLength:kCCKeySizeAES128];

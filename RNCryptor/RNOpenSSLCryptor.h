@@ -41,3 +41,17 @@
                     error:(NSError **)error;
 
 @end
+
+static const RNCryptorSettings kRNCryptorOpenSSLSettings = {
+    .algorithm = kCCAlgorithmAES128,
+    .mode = kCCModeCBC,
+    .modeOptions = 0,
+    .keySize = kCCKeySizeAES256,
+    .blockSize = kCCBlockSizeAES128,
+    .IVSize = kCCBlockSizeAES128,
+    .padding = ccPKCS7Padding,
+    .saltSize = 8,
+    .PBKDFRounds = 0,
+    .HMACAlgorithm = 0,
+    .HMACLength= 0,
+};
