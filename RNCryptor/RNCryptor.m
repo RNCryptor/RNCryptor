@@ -132,19 +132,19 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   return data;
 }
 
-- (NSData *)keyForPassword:(NSString *)password salt:(NSData *)salt
+- (NSData *)keyForPassword:(NSString *)password withSalt:(NSData *)salt andSettings:(RNCryptorKeyDerivationSettings)keySettings
 {
-  NSMutableData *derivedKey = [NSMutableData dataWithLength:self.settings.keySize];
+  NSMutableData *derivedKey = [NSMutableData dataWithLength:keySettings.keySize];
 
-  int result = CCKeyDerivationPBKDF(kCCPBKDF2,            // algorithm
-                                    password.UTF8String,  // password
-                                    password.length,  // passwordLength
-                                    salt.bytes,           // salt
-                                    salt.length,          // saltLen
-                                    kCCPRFHmacAlgSHA1,    // PRF
-                                    self.settings.PBKDFRounds,         // rounds
-                                    derivedKey.mutableBytes, // derivedKey
-                                    derivedKey.length); // derivedKeyLen
+  int result = CCKeyDerivationPBKDF(keySettings.algorithm,              // algorithm
+                                    password.UTF8String,                // password
+                                    password.length,                    // passwordLength
+                                    salt.bytes,                         // salt
+                                    salt.length,                        // saltLen
+                                    keySettings.prf,                    // PRF
+                                    keySettings.rounds,                 // rounds
+                                    derivedKey.mutableBytes,            // derivedKey
+                                    derivedKey.length);                 // derivedKeyLen
 
   // Do not log password here
   NSAssert(result == kCCSuccess, @"Unable to create AES key for password: %d", result);
@@ -231,16 +231,16 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   CCCryptorRef cryptor = NULL;
   CCCryptorStatus cryptorStatus;
   cryptorStatus = CCCryptorCreateWithMode(anOperation,
-                                          self.settings.mode,
-                                          self.settings.algorithm,
-                                          self.settings.padding,
+                                          self.settings.cryptor.mode,
+                                          self.settings.cryptor.algorithm,
+                                          self.settings.cryptor.padding,
                                           anIV.bytes,
                                           anEncryptionKey.bytes,
                                           anEncryptionKey.length,
                                           NULL, // tweak
                                           0, // tweakLength
                                           0, // numRounds (0=default)
-                                          self.settings.modeOptions,
+                                          self.settings.cryptor.modeOptions,
                                           &cryptor);
 
   if (cryptorStatus != kCCSuccess || cryptor == NULL)
@@ -253,7 +253,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
     return NO;
   }
 
-  const NSUInteger bufferSize = NextMultipleOfUnit(MAX(aFooterSize + 1, kSmallestBlockSize), self.settings.blockSize);
+  const NSUInteger bufferSize = NextMultipleOfUnit(MAX(aFooterSize + 1, kSmallestBlockSize), self.settings.cryptor.blockSize);
   NSMutableData *readBuffer = [NSMutableData data];
 
   // Read ahead
@@ -339,7 +339,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
 
   if (HMACKey)
   {
-    CCHmacInit(&HMACContext, kCCHmacAlgSHA1, HMACKey.bytes, HMACKey.length);
+    CCHmacInit(&HMACContext, self.settings.hmacKey.algorithm, HMACKey.bytes, HMACKey.length);
 
     readCallback = ^void(NSData *readData) {
       CCHmacUpdate(&HMACContext, readData.bytes, readData.length);
@@ -348,7 +348,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
 
   [input open];
   NSData *IV;
-  if (![input _RNGetData:&IV maxLength:self.settings.blockSize error:error])
+  if (![input _RNGetData:&IV maxLength:self.settings.cryptor.IVSize error:error])
   {
     return NO;
   }
@@ -361,13 +361,13 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
                            writeCallback:nil
                            encryptionKey:encryptionKey
                                       IV:IV
-                              footerSize:HMACKey ? self.settings.HMACLength : 0
+                              footerSize:HMACKey ? self.settings.hmacKey.keySize : 0
                                   footer:&streamHMACData
                                    error:error];
 
   if (result && HMACKey)
   {
-    NSMutableData *computedHMACData = [NSMutableData dataWithLength:self.settings.HMACLength];
+    NSMutableData *computedHMACData = [NSMutableData dataWithLength:self.settings.hmacKey.keySize];
     CCHmacFinal(&HMACContext, [computedHMACData mutableBytes]);
 
     if (! [computedHMACData isEqualToData:streamHMACData])
@@ -390,8 +390,8 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
 
   [input open];
   if (! [input _RNGetData:&header maxLength:2 error:error] ||
-      ! [input _RNGetData:&encryptionKeySalt maxLength:self.settings.saltSize error:error] ||
-      ! [input _RNGetData:&HMACKeySalt maxLength:self.settings.saltSize error:error]
+      ! [input _RNGetData:&encryptionKeySalt maxLength:self.settings.key.saltSize error:error] ||
+      ! [input _RNGetData:&HMACKeySalt maxLength:self.settings.hmacKey.saltSize error:error]
     )
   {
     return NO;
@@ -406,8 +406,8 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
     return NO;
   }
 
-  NSData *encryptionKey = [self keyForPassword:password salt:encryptionKeySalt];
-  NSData *HMACKey = [self keyForPassword:password salt:HMACKeySalt];
+  NSData *encryptionKey = [self keyForPassword:password withSalt:encryptionKeySalt andSettings:self.settings.key];
+  NSData *HMACKey = [self keyForPassword:password withSalt:HMACKeySalt andSettings:self.settings.hmacKey];
 
   return [self decryptFromStream:input toStream:output encryptionKey:encryptionKey HMACKey:HMACKey error:error];
 }
@@ -457,7 +457,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
 
   if (HMACKey)
   {
-    CCHmacInit(&HMACContext, kCCHmacAlgSHA1, HMACKey.bytes, HMACKey.length);
+    CCHmacInit(&HMACContext, self.settings.cryptor.HMACAlgorithm, HMACKey.bytes, HMACKey.length);
 
     writeCallback = ^void(NSData *writeData) {
       CCHmacUpdate(&HMACContext, writeData.bytes, writeData.length);
@@ -465,7 +465,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   }
 
   [output open];
-  NSData *IV = [[self class] randomDataOfLength:self.settings.blockSize];
+  NSData *IV = [[self class] randomDataOfLength:self.settings.cryptor.IVSize];
   if (! [output _RNWriteData:IV error:error])
   {
     return NO;
@@ -484,7 +484,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
 
   if (HMACKey && result)
   {
-    NSMutableData *HMACData = [NSMutableData dataWithLength:self.settings.HMACLength];
+    NSMutableData *HMACData = [NSMutableData dataWithLength:self.settings.hmacKey.keySize];
     CCHmacFinal(&HMACContext, [HMACData mutableBytes]);
 
     if (! [output _RNWriteData:HMACData error:error])
@@ -497,11 +497,11 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
 }
 - (BOOL)encryptFromStream:(NSInputStream *)input toStream:(NSOutputStream *)output password:(NSString *)password error:(NSError **)error
 {
-  NSData *encryptionKeySalt = [[self class] randomDataOfLength:self.settings.saltSize];
-  NSData *encryptionKey = [self keyForPassword:password salt:encryptionKeySalt];
+  NSData *encryptionKeySalt = [[self class] randomDataOfLength:self.settings.key.saltSize];
+  NSData *encryptionKey = [self keyForPassword:password withSalt:encryptionKeySalt andSettings:self.settings.key];
 
-  NSData *HMACKeySalt = [[self class] randomDataOfLength:self.settings.saltSize];
-  NSData *HMACKey = [self keyForPassword:password salt:HMACKeySalt];
+  NSData *HMACKeySalt = [[self class] randomDataOfLength:self.settings.hmacKey.saltSize];
+  NSData *HMACKey = [self keyForPassword:password withSalt:HMACKeySalt andSettings:self.settings.hmacKey];
 
 
   [output open];
