@@ -32,32 +32,55 @@
 
 extern NSString *const kRNCryptorErrorDomain;
 
+typedef struct _RNCryptorKeyDerivationSettings {
+    size_t keySize;
+    size_t saltSize;
+    CCPBKDFAlgorithm algorithm;
+    CCPseudoRandomAlgorithm prf;
+    uint rounds;
+} RNCryptorKeyDerivationSettings;
+
+typedef struct _RNCryptorCryptorSettings {
+    CCAlgorithm algorithm;
+    CCMode mode;
+    CCModeOptions modeOptions;
+    size_t blockSize;
+    size_t IVSize;
+    CCPadding padding;
+    CCHmacAlgorithm HMACAlgorithm;
+    size_t HMACLength;
+} RNCryptorCryptorSettings;
+
 typedef struct _RNCryptorSettings {
-  CCAlgorithm algorithm;
-  CCMode mode;
-  CCModeOptions modeOptions;
-  size_t keySize;
-  size_t blockSize;
-  size_t IVSize;
-  CCPadding padding;
-  size_t saltSize;
-  uint PBKDFRounds;
-  CCHmacAlgorithm HMACAlgorithm;
-  size_t HMACLength;
+    RNCryptorKeyDerivationSettings key;
+    RNCryptorKeyDerivationSettings hmacKey;
+    RNCryptorCryptorSettings cryptor;
 } RNCryptorSettings;
 
 static const RNCryptorSettings kRNCryptorAES256Settings = {
-    .algorithm= kCCAlgorithmAES128,
-    .mode = kCCModeCTR,
-    .modeOptions = kCCModeOptionCTR_LE,
-    .keySize = kCCKeySizeAES256,
-    .blockSize = kCCBlockSizeAES128,
-    .IVSize = kCCBlockSizeAES128,
-    .padding = ccNoPadding,
-    .saltSize = 8,
-    .PBKDFRounds = 10000,
-    .HMACAlgorithm = kCCHmacAlgSHA256,
-    .HMACLength= CC_SHA256_DIGEST_LENGTH,
+    .cryptor.algorithm = kCCAlgorithmAES128,
+    .cryptor.mode = kCCModeCTR,
+    .cryptor.modeOptions = kCCModeOptionCTR_LE,
+    .cryptor.blockSize = kCCBlockSizeAES128,
+    .cryptor.IVSize = kCCBlockSizeAES128,
+    .cryptor.padding = ccNoPadding,
+    .cryptor.HMACAlgorithm = kCCHmacAlgSHA256,
+    
+    .key = {
+        .keySize = kCCKeySizeAES256,
+        .saltSize = 8,
+        .algorithm = kCCPBKDF2,
+        .prf = kCCPRFHmacAlgSHA1,
+        .rounds = 10000
+    },
+    
+    .hmacKey = {
+        .keySize = CC_SHA256_DIGEST_LENGTH,
+        .saltSize = 8,
+        .algorithm = kCCPBKDF2,
+        .prf = kCCPRFHmacAlgSHA1,
+        .rounds = 10000
+    }
 };
 
 enum {
@@ -278,9 +301,10 @@ typedef void (^RNCryptorWriteCallback)(NSData *writeData);
 *
 * @param password Password to use for PBKDF
 * @param salt Salt for password
+* @param keySettings Settings for the derivation (RNCryptorKeyDerivationSettings)
 * @returns Key
 */
-- (NSData *)keyForPassword:(NSString *)password salt:(NSData *)salt;
+- (NSData *)keyForPassword:(NSString *)password withSalt:(NSData *)salt andSettings:(RNCryptorKeyDerivationSettings)keySettings;
 
 + (NSData *)randomDataOfLength:(size_t)length;
 
