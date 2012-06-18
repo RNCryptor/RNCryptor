@@ -470,4 +470,23 @@ static NSString * const kOpenSSLPassword = @"Passw0rd";
   STAssertEqualObjects(decryptedString, kOpenSSLString, @"Decryption doesn't match: %@", error);
 }
 
+- (void)testURLNegativeInput
+{
+  RNCryptor *cryptor = [RNCryptor AES256Cryptor];
+
+  NSError *error;
+
+  NSURL *plaintextURL = [NSURL fileURLWithPath:@"DoesNotExist"];
+  NSURL *ciphertextURL = [NSURL fileURLWithPath:[self temporaryFilePath]];
+  NSURL *decryptedURL = [NSURL fileURLWithPath:[self temporaryFilePath]];
+
+  // Don't write the data
+
+  STAssertFalse([cryptor encryptFromURL:plaintextURL toURL:ciphertextURL append:NO password:kGoodPassword error:&error], @"Should have failed.");
+
+  [[NSFileManager defaultManager] removeItemAtURL:plaintextURL error:&error];
+  [[NSFileManager defaultManager] removeItemAtURL:ciphertextURL error:&error];
+  [[NSFileManager defaultManager] removeItemAtURL:decryptedURL error:&error];
+}
+
 @end

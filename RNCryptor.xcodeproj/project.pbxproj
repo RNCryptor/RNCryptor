@@ -17,7 +17,7 @@
 		FB75651F1512D7F8007B806B /* RNCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB75651A1512D3E9007B806B /* RNCryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FB7565241512D9BE007B806B /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7565221512D9A8007B806B /* Security.framework */; };
 		FB7565241512D9BE007B806D /* RNOpenSSLCryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B806C /* RNOpenSSLCryptor.m */; };
-		FB7565241512D9BE007B806F /* RNOpenSSLCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B806E /* RNOpenSSLCryptor.h */; };
+		FB7565241512D9BE007B806F /* RNOpenSSLCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B806E /* RNOpenSSLCryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
