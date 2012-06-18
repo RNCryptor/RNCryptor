@@ -229,19 +229,29 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
 {
  // Create the cryptor
   CCCryptorRef cryptor = NULL;
-  CCCryptorStatus cryptorStatus;
-  cryptorStatus = CCCryptorCreateWithMode(anOperation,
-                                          self.settings.cryptor.mode,
-                                          self.settings.cryptor.algorithm,
-                                          self.settings.cryptor.padding,
-                                          anIV.bytes,
-                                          anEncryptionKey.bytes,
-                                          anEncryptionKey.length,
-                                          NULL, // tweak
-                                          0, // tweakLength
-                                          0, // numRounds (0=default)
-                                          self.settings.cryptor.modeOptions,
-                                          &cryptor);
+  CCCryptorStatus
+      cryptorStatus = CCCryptorCreate(anOperation, // op
+                                      self.settings.cryptor.algorithm, // alg
+                                      self.settings.cryptor.padding, // options
+                                      anEncryptionKey.bytes, // key
+                                      anEncryptionKey.length, // keyLength
+                                      anIV.bytes, // iv
+                                      &cryptor // cryptoRef
+  );
+  /* iOS 5+
+cryptorStatus = CCCryptorCreateWithMode(anOperation,
+  self.settings.cryptor.mode,
+  self.settings.cryptor.algorithm,
+  self.settings.cryptor.padding,
+  anIV.bytes,
+  anEncryptionKey.bytes,
+  anEncryptionKey.length,
+  NULL, // tweak
+  0, // tweakLength
+  0, // numRounds (0=default)
+  self.settings.cryptor.modeOptions,
+  &cryptor);
+  */
 
   if (cryptorStatus != kCCSuccess || cryptor == NULL)
   {

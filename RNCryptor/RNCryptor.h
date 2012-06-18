@@ -28,8 +28,6 @@
 #import <CommonCrypto/CommonCryptor.h>
 #import <CommonCrypto/CommonKeyDerivation.h>
 
-//@class RNCryptorSettings;
-
 extern NSString *const kRNCryptorErrorDomain;
 
 typedef struct _RNCryptorKeyDerivationSettings {
@@ -42,8 +40,8 @@ typedef struct _RNCryptorKeyDerivationSettings {
 
 typedef struct _RNCryptorCryptorSettings {
     CCAlgorithm algorithm;
-    CCMode mode;
-    CCModeOptions modeOptions;
+/*    CCMode mode; */
+/*    CCModeOptions modeOptions; */ /* iOS 5+ */
     size_t blockSize;
     size_t IVSize;
     CCPadding padding;
@@ -59,11 +57,10 @@ typedef struct _RNCryptorSettings {
 
 static const RNCryptorSettings kRNCryptorAES256Settings = {
     .cryptor.algorithm = kCCAlgorithmAES128,
-    .cryptor.mode = kCCModeCTR,
-    .cryptor.modeOptions = kCCModeOptionCTR_LE,
+/*    .cryptor.mode = kCCModeCBC, */ /* iOS 5+ */
     .cryptor.blockSize = kCCBlockSizeAES128,
     .cryptor.IVSize = kCCBlockSizeAES128,
-    .cryptor.padding = ccNoPadding,
+    .cryptor.padding = ccPKCS7Padding,
     .cryptor.HMACAlgorithm = kCCHmacAlgSHA256,
     
     .key = {

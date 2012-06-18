@@ -44,8 +44,7 @@
 
 static const RNCryptorSettings kRNCryptorOpenSSLSettings = {
     .cryptor.algorithm = kCCAlgorithmAES128,
-    .cryptor.mode = kCCModeCBC,
-    .cryptor.modeOptions = 0,
+    /* .cryptor.mode = kCCModeCBC, */ /* iOS 5+ */
     .cryptor.blockSize = kCCBlockSizeAES128,
     .cryptor.IVSize = kCCBlockSizeAES128,
     .cryptor.padding = ccPKCS7Padding,
