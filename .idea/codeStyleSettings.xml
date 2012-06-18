@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectCodeStyleSettingsManager">
+    <option name="PER_PROJECT_SETTINGS">
+      <value>
+        <Objective-C-extensions>
+          <option name="GENERATE_INSTANCE_VARIABLES_FOR_PROPERTIES" value="ASK" />
+          <option name="REFACTOR_PROPERTIES_AND_IVARS" value="ASK" />
+          <option name="REFACTOR_COMPATIBILITY_ALIASES_AND_CLASSES" value="ASK" />
+          <option name="RELEASE_STYLE" value="IVAR" />
+          <option name="PROPERTY_ACCESS" value="DEFAULT" />
+          <option name="PROPERTY_SEMANTICS" value="DEFAULT" />
+          <file>
+            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="Import" />
+            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="Macro" />
+            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="Typedef" />
+            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="Struct" />
+            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="Enum" />
+            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="ClassPredef" />
+            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="Constant" />
+            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="Global" />
+            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="FunctionPredecl" />
+            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="Function" />
+            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="Class" />
+          </file>
+          <class>
+            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="Property" />
+            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="Synthesize" />
+            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="InitMethod" />
+            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="StaticMethod" />
+            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="InstanceMethod" />
+            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="DeallocMethod" />
+          </class>
+        </Objective-C-extensions>
+        <XML>
+          <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
+        </XML>
+      </value>
+    </option>
+  </component>
+</project>
+
