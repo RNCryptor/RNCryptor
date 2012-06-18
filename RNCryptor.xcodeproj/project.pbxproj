@@ -36,7 +36,6 @@
 		FB7564F71512D3C4007B806B /* RNCryptor-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RNCryptor-Prefix.pch"; sourceTree = "<group>"; };
 		FB7565001512D3C4007B806B /* RNCryptorTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RNCryptorTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB7565011512D3C4007B806B /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
-		FB7565031512D3C4007B806B /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		FB75650B1512D3C4007B806B /* RNCryptorTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "RNCryptorTests-Info.plist"; sourceTree = "<group>"; };
 		FB75650D1512D3C4007B806B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		FB75650F1512D3C4007B806B /* RNCryptorTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNCryptorTests.h; sourceTree = "<group>"; };
@@ -74,7 +73,6 @@
 		FB7564E51512D3C4007B806B = {
 			isa = PBXGroup;
 			children = (
-				FB7565221512D9A8007B806B /* Security.framework */,
 				FB7564F51512D3C4007B806B /* RNCryptor */,
 				FB7565091512D3C4007B806B /* RNCryptorTests */,
 				FB7564F21512D3C4007B806B /* Frameworks */,
@@ -94,9 +92,9 @@
 		FB7564F21512D3C4007B806B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FB7565221512D9A8007B806B /* Security.framework */,
 				FB7564F31512D3C4007B806B /* Foundation.framework */,
 				FB7565011512D3C4007B806B /* SenTestingKit.framework */,
-				FB7565031512D3C4007B806B /* UIKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -290,7 +288,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = (
+					"$(ARCHS_STANDARD_32_BIT)",
+					armv6,
+				);
 				CLANG_ENABLE_OBJC_ARC = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -314,7 +315,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = (
+					"$(ARCHS_STANDARD_32_BIT)",
+					armv6,
+				);
 				CLANG_ENABLE_OBJC_ARC = YES;
 				COPY_PHASE_STRIP = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
