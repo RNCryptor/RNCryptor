@@ -30,29 +30,32 @@
 
 extern NSString *const kRNCryptorErrorDomain;
 
-typedef struct _RNCryptorKeyDerivationSettings {
-    size_t keySize;
-    size_t saltSize;
-    CCPBKDFAlgorithm algorithm;
-    CCPseudoRandomAlgorithm prf;
-    uint rounds;
+typedef struct _RNCryptorKeyDerivationSettings
+{
+  size_t keySize;
+  size_t saltSize;
+  CCPBKDFAlgorithm algorithm;
+  CCPseudoRandomAlgorithm prf;
+  uint rounds;
 } RNCryptorKeyDerivationSettings;
 
-typedef struct _RNCryptorCryptorSettings {
-    CCAlgorithm algorithm;
+typedef struct _RNCryptorCryptorSettings
+{
+  CCAlgorithm algorithm;
 /*    CCMode mode; */
 /*    CCModeOptions modeOptions; */ /* iOS 5+ */
-    size_t blockSize;
-    size_t IVSize;
-    CCPadding padding;
-    CCHmacAlgorithm HMACAlgorithm;
-    size_t HMACLength;
+  size_t blockSize;
+  size_t IVSize;
+  CCPadding padding;
+  CCHmacAlgorithm HMACAlgorithm;
+  size_t HMACLength;
 } RNCryptorCryptorSettings;
 
-typedef struct _RNCryptorSettings {
-    RNCryptorKeyDerivationSettings key;
-    RNCryptorKeyDerivationSettings hmacKey;
-    RNCryptorCryptorSettings cryptor;
+typedef struct _RNCryptorSettings
+{
+  RNCryptorKeyDerivationSettings key;
+  RNCryptorKeyDerivationSettings hmacKey;
+  RNCryptorCryptorSettings cryptor;
 } RNCryptorSettings;
 
 static const RNCryptorSettings kRNCryptorAES256Settings = {
@@ -62,7 +65,7 @@ static const RNCryptorSettings kRNCryptorAES256Settings = {
     .cryptor.IVSize = kCCBlockSizeAES128,
     .cryptor.padding = ccPKCS7Padding,
     .cryptor.HMACAlgorithm = kCCHmacAlgSHA256,
-    
+
     .key = {
         .keySize = kCCKeySizeAES256,
         .saltSize = 8,
@@ -70,7 +73,7 @@ static const RNCryptorSettings kRNCryptorAES256Settings = {
         .prf = kCCPRFHmacAlgSHA1,
         .rounds = 10000
     },
-    
+
     .hmacKey = {
         .keySize = CC_SHA256_DIGEST_LENGTH,
         .saltSize = 8,
@@ -80,9 +83,10 @@ static const RNCryptorSettings kRNCryptorAES256Settings = {
     }
 };
 
-enum {
+enum
+{
   kRNCryptorErrorHMACMismatch = 1,
-  kRNCyrptorUnknownHeader = 2,
+  kRNCryptorUnknownHeader = 2,
   kRNCryptorCouldNotCreateStream = 3,
   kRNCryptorCouldNotReadStream = 4,
   kRNCryptorCouldNotWriteStream = 5,
@@ -117,13 +121,13 @@ typedef void (^RNCryptorWriteCallback)(NSData *writeData);
 
 /** Shared AES-256 encryptor
  *
- * AES-CTR cryptor with 256-bit key. 8-byte salt. HMAC+SHA256 of ciphertext appended (Encrypt-then-MAC).
+ * AES-CBC cryptor with 256-bit key. 8-byte salt. HMAC+SHA256 of ciphertext appended (Encrypt-then-MAC).
  * Appropriate for most uses.
  *
  */
 + (RNCryptor *)AES256Cryptor;
 
-/** Create a customiced cryptor
+/** Create a customised cryptor
  * @param settings Immutable settings for cryptor.
  */
 

@@ -30,8 +30,7 @@ NSUInteger kSmallestBlockSize = 1024;
 
 NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
 
-static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
-{
+static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit) {
   return ((size + unit - 1) / unit) * unit;
 }
 
@@ -43,10 +42,8 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
 - (BOOL)_RNGetData:(NSData **)data maxLength:(NSUInteger)maxLength error:(NSError **)error
 {
   NSMutableData *buffer = [NSMutableData dataWithLength:maxLength];
-  if ([self read:buffer.mutableBytes maxLength:maxLength] < 0)
-  {
-    if (error)
-    {
+  if ([self read:buffer.mutableBytes maxLength:maxLength] < 0) {
+    if (error) {
       *error = [RNCryptor errorWithCode:kRNCryptorCouldNotReadStream localizedDescription:@"Could not read from stream" underlyingError:[self streamError]];
       return NO;
     }
@@ -66,14 +63,11 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
 {
   // Writing 0 bytes will close the output stream.
   // This is an undocumented side-effect. radar://9930518
-  if (data.length > 0)
-  {
+  if (data.length > 0) {
     NSInteger bytesWritten = [self write:data.bytes
                                maxLength:data.length];
-    if (bytesWritten != data.length)
-    {
-      if (error)
-      {
+    if (bytesWritten != data.length) {
+      if (error) {
         *error = [RNCryptor errorWithCode:kRNCryptorCouldNotWriteStream localizedDescription:@"Could not write to stream" underlyingError:[self streamError]];
       }
       return NO;
@@ -89,8 +83,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
 - (RNCryptor *)initWithSettings:(RNCryptorSettings)settings
 {
   self = [super init];
-  if (self)
-  {
+  if (self) {
     settings_ = settings;
   }
   return self;
@@ -102,20 +95,18 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   static dispatch_once_t once;
   static RNCryptor *AES256Cryptor = nil;
 
-  dispatch_once(&once, ^{ AES256Cryptor = [[self alloc] initWithSettings:kRNCryptorAES256Settings]; });
+  dispatch_once(&once, ^{AES256Cryptor = [[self alloc] initWithSettings:kRNCryptorAES256Settings];});
   return AES256Cryptor;
 }
 
 + (NSError *)errorWithCode:(int)code localizedDescription:(NSString *)localizedDescription underlyingError:(NSError *)underlyingError
 {
   NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
-  if (localizedDescription)
-  {
+  if (localizedDescription) {
     [userInfo setObject:localizedDescription forKey:NSLocalizedDescriptionKey];
   }
 
-  if (underlyingError)
-  {
+  if (underlyingError) {
     [userInfo setObject:underlyingError forKey:NSUnderlyingErrorKey];
   }
 
@@ -153,38 +144,32 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
 }
 
 - (BOOL)processResult:(CCCryptorStatus)cryptorStatus
-                data:(NSMutableData *)outData
+                 data:(NSMutableData *)outData
                length:(size_t)length
              callback:(RNCryptorWriteCallback)writeCallback
                output:(NSOutputStream *)output
                 error:(NSError **)error
 {
-  if (cryptorStatus != kCCSuccess)
-  {
-    if (error)
-    {
+  if (cryptorStatus != kCCSuccess) {
+    if (error) {
       *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:cryptorStatus userInfo:nil];
     }
     return NO;
   }
 
-  if (length > 0)
-  {
+  if (length > 0) {
     [outData setLength:length];
 
     [output open];
     NSInteger bytesWritten = [output write:outData.bytes maxLength:outData.length];
-    if (bytesWritten != outData.length)
-    {
-      if (error)
-      {
+    if (bytesWritten != outData.length) {
+      if (error) {
         *error = [output streamError];
       }
       return NO;
     }
 
-    if (writeCallback)
-    {
+    if (writeCallback) {
       writeCallback(outData);
     }
   }
@@ -199,16 +184,13 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
   NSUInteger availableLength = maxLength;
   [stream open];
 
-  while (availableLength > 0 && [stream streamStatus] != NSStreamStatusAtEnd && [stream streamStatus] != NSStreamStatusError)
-  {
+  while (availableLength > 0 && [stream streamStatus] != NSStreamStatusAtEnd && [stream streamStatus] != NSStreamStatusError) {
     NSInteger readLength = [stream read:readPtr maxLength:availableLength];
-    if (readLength >= 0)
-    {
+    if (readLength >= 0) {
       readPtr += readLength;
       availableLength -= readLength;
     }
-    else
-    {
+    else {
       return nil;
     }
   }
@@ -223,11 +205,11 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit)
            writeCallback:(RNCryptorWriteCallback)aWriteCallback
            encryptionKey:(NSData *)anEncryptionKey
                       IV:(NSData *)anIV
-             footerSize:(NSUInteger)aFooterSize
-                 footer:(NSData **)aFooter
+              footerSize:(NSUInteger)aFooterSize
+                  footer:(NSData **)aFooter
                    error:(NSError **)anError
 {
- // Create the cryptor
+  // Create the cryptor
   CCCryptorRef cryptor = NULL;
   CCCryptorStatus
       cryptorStatus = CCCryptorCreate(anOperation, // op
@@ -253,10 +235,8 @@ cryptorStatus = CCCryptorCreateWithMode(anOperation,
   &cryptor);
   */
 
-  if (cryptorStatus != kCCSuccess || cryptor == NULL)
-  {
-    if (anError)
-    {
+  if (cryptorStatus != kCCSuccess || cryptor == NULL) {
+    if (anError) {
       *anError = [NSError errorWithDomain:kRNCryptorErrorDomain code:cryptorStatus userInfo:nil];
     }
     NSAssert(NO, @"Could not create cryptor: %d", cryptorStatus);
@@ -272,39 +252,33 @@ cryptorStatus = CCCryptorCreateWithMode(anOperation,
   NSMutableData *outData = [NSMutableData data];
   BOOL stop = NO;
   size_t dataOutMoved;
-  while (!stop)
-  {
+  while (!stop) {
     // Error
-    if ([aFromStream streamStatus] == NSStreamStatusError)
-    {
+    if ([aFromStream streamStatus] == NSStreamStatusError) {
       *anError = [aFromStream streamError];
       CCCryptorRelease(cryptor);
       return NO;
     }
 
     // Not at end (read-ahead has a full block). Read another block.
-    if ([aFromStream streamStatus] != NSStreamStatusAtEnd)
-    {
+    if ([aFromStream streamStatus] != NSStreamStatusAtEnd) {
       readBuffer = readAheadBuffer;
       readAheadBuffer = [self readStream:aFromStream length:bufferSize];
     }
 
     // At end now?
-    if ([aFromStream streamStatus] == NSStreamStatusAtEnd)
-    {
+    if ([aFromStream streamStatus] == NSStreamStatusAtEnd) {
       // Put everything together
       [readBuffer appendData:readAheadBuffer];
       readAheadBuffer = nil;
       stop = YES;
-      if (aFooter && aFooterSize > 0)
-      {
+      if (aFooter && aFooterSize > 0) {
         *aFooter = [readBuffer subdataWithRange:NSMakeRange([readBuffer length] - aFooterSize, aFooterSize)];
         [readBuffer setLength:[readBuffer length] - aFooterSize];
       }
     }
 
-    if (aReadCallback)
-    {
+    if (aReadCallback) {
       aReadCallback(readBuffer);
     }
     [outData setLength:CCCryptorGetOutputLength(cryptor, [readBuffer length], true)];
@@ -314,8 +288,7 @@ cryptorStatus = CCCryptorCreateWithMode(anOperation,
                                     outData.mutableBytes,      // dataOut
                                     outData.length, // dataOutAvailable
                                     &dataOutMoved);   // dataOutMoved
-    if (![self processResult:cryptorStatus data:outData length:dataOutMoved callback:aWriteCallback output:aToStream error:anError])
-    {
+    if (![self processResult:cryptorStatus data:outData length:dataOutMoved callback:aWriteCallback output:aToStream error:anError]) {
       CCCryptorRelease(cryptor);
       return NO;
     }
@@ -323,19 +296,18 @@ cryptorStatus = CCCryptorCreateWithMode(anOperation,
 
   [outData setLength:CCCryptorGetOutputLength(cryptor, bufferSize, true)];
 
-   // Write the final block
-   cryptorStatus = CCCryptorFinal(cryptor,        // cryptor
-                                  outData.mutableBytes,       // dataOut
-                                  outData.length,  // dataOutAvailable
-                                  &dataOutMoved);    // dataOutMoved
-  if (![self processResult:cryptorStatus data:outData length:dataOutMoved callback:aWriteCallback output:aToStream error:anError])
-   {
-     CCCryptorRelease(cryptor);
-     return NO;
-   }
+  // Write the final block
+  cryptorStatus = CCCryptorFinal(cryptor,        // cryptor
+                                 outData.mutableBytes,       // dataOut
+                                 outData.length,  // dataOutAvailable
+                                 &dataOutMoved);    // dataOutMoved
+  if (![self processResult:cryptorStatus data:outData length:dataOutMoved callback:aWriteCallback output:aToStream error:anError]) {
+    CCCryptorRelease(cryptor);
+    return NO;
+  }
 
-   CCCryptorRelease(cryptor);
-   return YES;
+  CCCryptorRelease(cryptor);
+  return YES;
 }
 
 - (BOOL)decryptFromStream:(NSInputStream *)input
@@ -347,8 +319,7 @@ cryptorStatus = CCCryptorCreateWithMode(anOperation,
   RNCryptorWriteCallback readCallback = nil;
   __block CCHmacContext HMACContext;
 
-  if (HMACKey)
-  {
+  if (HMACKey) {
     CCHmacInit(&HMACContext, self.settings.hmacKey.algorithm, HMACKey.bytes, HMACKey.length);
 
     readCallback = ^void(NSData *readData) {
@@ -358,34 +329,29 @@ cryptorStatus = CCCryptorCreateWithMode(anOperation,
 
   [input open];
   NSData *IV;
-  if (![input _RNGetData:&IV maxLength:self.settings.cryptor.IVSize error:error])
-  {
+  if (![input _RNGetData:&IV maxLength:self.settings.cryptor.IVSize error:error]) {
     return NO;
   }
 
   NSData *streamHMACData;
   BOOL result = [self performOperation:kCCDecrypt
-                              fromStream:input
-                            readCallback:readCallback
-                                toStream:output
-                           writeCallback:nil
-                           encryptionKey:encryptionKey
-                                      IV:IV
-                              footerSize:HMACKey ? self.settings.hmacKey.keySize : 0
-                                  footer:&streamHMACData
-                                   error:error];
+                            fromStream:input
+                          readCallback:readCallback
+                              toStream:output
+                         writeCallback:nil encryptionKey:encryptionKey
+                                    IV:IV
+                            footerSize:HMACKey ? self.settings.hmacKey.keySize : 0
+                                footer:&streamHMACData
+                                 error:error];
 
-  if (result && HMACKey)
-  {
+  if (result && HMACKey) {
     NSMutableData *computedHMACData = [NSMutableData dataWithLength:self.settings.hmacKey.keySize];
     CCHmacFinal(&HMACContext, [computedHMACData mutableBytes]);
 
-    if (! [computedHMACData isEqualToData:streamHMACData])
-    {
+    if (![computedHMACData isEqualToData:streamHMACData]) {
       result = NO;
       *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:kRNCryptorErrorHMACMismatch
-                               userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"HMAC Mismatch", @"HMAC Mismatch")
-                                                                    forKey:NSLocalizedDescriptionKey]];
+                               userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"HMAC Mismatch", @"HMAC Mismatch") forKey:NSLocalizedDescriptionKey]];
     }
   }
 
@@ -399,20 +365,17 @@ cryptorStatus = CCCryptorCreateWithMode(anOperation,
   NSData *header;
 
   [input open];
-  if (! [input _RNGetData:&header maxLength:2 error:error] ||
-      ! [input _RNGetData:&encryptionKeySalt maxLength:self.settings.key.saltSize error:error] ||
-      ! [input _RNGetData:&HMACKeySalt maxLength:self.settings.hmacKey.saltSize error:error]
-    )
-  {
+  if (![input _RNGetData:&header maxLength:2 error:error] ||
+      ![input _RNGetData:&encryptionKeySalt maxLength:self.settings.key.saltSize error:error] ||
+      ![input _RNGetData:&HMACKeySalt maxLength:self.settings.hmacKey.saltSize error:error]
+      ) {
     return NO;
   }
 
   uint8_t AES128CryptorHeader[2] = {0, 0};
-  if (![header isEqualToData:[NSData dataWithBytes:AES128CryptorHeader length:sizeof(AES128CryptorHeader)]])
-  {
-    *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:kRNCyrptorUnknownHeader
-                             userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"Unknown header", @"Unknown header")
-                                                                  forKey:NSLocalizedDescriptionKey]];
+  if (![header isEqualToData:[NSData dataWithBytes:AES128CryptorHeader length:sizeof(AES128CryptorHeader)]]) {
+    *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:kRNCryptorUnknownHeader
+                             userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"Unknown header", @"Unknown header") forKey:NSLocalizedDescriptionKey]];
     return NO;
   }
 
@@ -446,12 +409,10 @@ cryptorStatus = CCCryptorCreateWithMode(anOperation,
   [decryptOutputStream close];
   [decryptInputStream close];
 
-  if (result)
-  {
+  if (result) {
     return [decryptOutputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
   }
-  else
-  {
+  else {
     return nil;
   }
 }
@@ -465,8 +426,7 @@ cryptorStatus = CCCryptorCreateWithMode(anOperation,
   RNCryptorWriteCallback writeCallback = nil;
   __block CCHmacContext HMACContext;
 
-  if (HMACKey)
-  {
+  if (HMACKey) {
     CCHmacInit(&HMACContext, self.settings.cryptor.HMACAlgorithm, HMACKey.bytes, HMACKey.length);
 
     writeCallback = ^void(NSData *writeData) {
@@ -476,35 +436,31 @@ cryptorStatus = CCCryptorCreateWithMode(anOperation,
 
   [output open];
   NSData *IV = [[self class] randomDataOfLength:self.settings.cryptor.IVSize];
-  if (! [output _RNWriteData:IV error:error])
-  {
+  if (![output _RNWriteData:IV error:error]) {
     return NO;
   }
 
   BOOL result = [self performOperation:kCCEncrypt
-                              fromStream:input
-                            readCallback:nil
-                                toStream:output
-                           writeCallback:writeCallback
-                           encryptionKey:encryptionKey
-                                      IV:IV
-                              footerSize:0
-                                  footer:nil
-                                   error:error];
+                            fromStream:input
+                          readCallback:nil toStream:output
+                         writeCallback:writeCallback
+                         encryptionKey:encryptionKey
+                                    IV:IV
+                            footerSize:0
+                                footer:nil error:error];
 
-  if (HMACKey && result)
-  {
+  if (HMACKey && result) {
     NSMutableData *HMACData = [NSMutableData dataWithLength:self.settings.hmacKey.keySize];
     CCHmacFinal(&HMACContext, [HMACData mutableBytes]);
 
-    if (! [output _RNWriteData:HMACData error:error])
-    {
+    if (![output _RNWriteData:HMACData error:error]) {
       return NO;
     }
   }
 
   return result;
 }
+
 - (BOOL)encryptFromStream:(NSInputStream *)input toStream:(NSOutputStream *)output password:(NSString *)password error:(NSError **)error
 {
   NSData *encryptionKeySalt = [[self class] randomDataOfLength:self.settings.key.saltSize];
@@ -517,10 +473,9 @@ cryptorStatus = CCCryptorCreateWithMode(anOperation,
   [output open];
   uint8_t header[2] = {0, 0};
   NSData *headerData = [NSData dataWithBytes:header length:sizeof(header)];
-  if (! [output _RNWriteData:headerData error:error] ||
-      ! [output _RNWriteData:encryptionKeySalt error:error] ||
-      ! [output _RNWriteData:HMACKeySalt error:error])
-  {
+  if (![output _RNWriteData:headerData error:error] ||
+      ![output _RNWriteData:encryptionKeySalt error:error] ||
+      ![output _RNWriteData:HMACKeySalt error:error]) {
     return NO;
   }
 
@@ -531,26 +486,20 @@ cryptorStatus = CCCryptorCreateWithMode(anOperation,
 {
   NSInputStream *encryptInputStream = [NSInputStream inputStreamWithURL:inURL];
   [encryptInputStream open];
-  if (!encryptInputStream)
-  {
-    if (error)
-    {
+  if (!encryptInputStream) {
+    if (error) {
       *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:kRNCryptorCouldNotCreateStream
-                               userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"Could not create stream", @"Could not create stream")
-                                                                    forKey:NSLocalizedDescriptionKey]];
+                               userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"Could not create stream", @"Could not create stream") forKey:NSLocalizedDescriptionKey]];
     }
     return NO;
   }
 
   NSOutputStream *encryptOutputStream = [NSOutputStream outputStreamWithURL:outURL append:append];
   [encryptOutputStream open];
-  if (!encryptOutputStream)
-  {
-    if (error)
-    {
+  if (!encryptOutputStream) {
+    if (error) {
       *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:kRNCryptorCouldNotCreateStream
-                                     userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"Could not create stream", @"Could not create stream")
-                                                                          forKey:NSLocalizedDescriptionKey]];
+                               userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"Could not create stream", @"Could not create stream") forKey:NSLocalizedDescriptionKey]];
     }
     return NO;
   }
@@ -573,12 +522,10 @@ cryptorStatus = CCCryptorCreateWithMode(anOperation,
   [encryptOutputStream close];
   [encryptInputStream close];
 
-  if (result)
-  {
+  if (result) {
     return [encryptOutputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
   }
-  else
-  {
+  else {
     return nil;
   }
 }

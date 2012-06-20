@@ -50,7 +50,7 @@
 #import "RNOpenSSLCryptor.h"
 
 const NSUInteger kSaltSize = 8;
-NSString * const kSaltedString = @"Salted__";
+NSString *const kSaltedString = @"Salted__";
 
 @interface NSInputStream (RNCryptor)
 - (BOOL)_RNGetData:(NSData **)data maxLength:(NSUInteger)maxLength error:(NSError **)error;
@@ -60,10 +60,8 @@ NSString * const kSaltedString = @"Salted__";
 - (BOOL)_RNGetData:(NSData **)data maxLength:(NSUInteger)maxLength error:(NSError **)error
 {
   NSMutableData *buffer = [NSMutableData dataWithLength:maxLength];
-  if ([self read:buffer.mutableBytes maxLength:maxLength] < 0)
-  {
-    if (error)
-    {
+  if ([self read:buffer.mutableBytes maxLength:maxLength] < 0) {
+    if (error) {
       *error = [self streamError];
       return NO;
     }
@@ -83,14 +81,11 @@ NSString * const kSaltedString = @"Salted__";
 {
   // Writing 0 bytes will close the output stream.
   // This is an undocumented side-effect. radar://9930518
-  if (data.length > 0)
-  {
+  if (data.length > 0) {
     NSInteger bytesWritten = [self write:data.bytes
                                maxLength:data.length];
-    if (bytesWritten != data.length)
-    {
-      if (error)
-      {
+    if (bytesWritten != data.length) {
+      if (error) {
         *error = [self streamError];
       }
       return NO;
@@ -99,6 +94,7 @@ NSString * const kSaltedString = @"Salted__";
   return YES;
 }
 @end
+
 @interface RNOpenSSLCryptor ()
 @end
 
@@ -108,7 +104,7 @@ NSString * const kSaltedString = @"Salted__";
   static dispatch_once_t once;
   static id openSSLCryptor = nil;
 
-  dispatch_once(&once, ^{ openSSLCryptor = [[self alloc] init]; });
+  dispatch_once(&once, ^{openSSLCryptor = [[self alloc] init];});
   return openSSLCryptor;
 }
 
@@ -189,19 +185,15 @@ NSString * const kSaltedString = @"Salted__";
 
   [fromStream open];
 
-  if (! [fromStream _RNGetData:&salted maxLength:[kSaltedString length] error:error] ||
-      ! [fromStream _RNGetData:&encryptionKeySalt maxLength:kSaltSize error:error])
-  {
+  if (![fromStream _RNGetData:&salted maxLength:[kSaltedString length] error:error] ||
+      ![fromStream _RNGetData:&encryptionKeySalt maxLength:kSaltSize error:error]) {
     return NO;
   }
 
-  if (! [[[NSString alloc] initWithData:salted encoding:NSUTF8StringEncoding] isEqualToString:kSaltedString])
-  {
-    if (error)
-    {
-      *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:kRNCyrptorUnknownHeader
-                               userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"Could not find salt", @"Could not find salt")
-                                                                    forKey:NSLocalizedDescriptionKey]];
+  if (![[[NSString alloc] initWithData:salted encoding:NSUTF8StringEncoding] isEqualToString:kSaltedString]) {
+    if (error) {
+      *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:kRNCryptorUnknownHeader
+                               userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"Could not find salt", @"Could not find salt") forKey:NSLocalizedDescriptionKey]];
     }
     return NO;
   }
@@ -223,10 +215,9 @@ NSString * const kSaltedString = @"Salted__";
 
   [toStream open];
   NSData *headerData = [kSaltedString dataUsingEncoding:NSUTF8StringEncoding];
-  if (! [toStream _RNWriteData:headerData error:error] ||
-      ! [toStream _RNWriteData:encryptionKeySalt error:error]
-      )
-  {
+  if (![toStream _RNWriteData:headerData error:error] ||
+      ![toStream _RNWriteData:encryptionKeySalt error:error]
+      ) {
     return NO;
   }
 
