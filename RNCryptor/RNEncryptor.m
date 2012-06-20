@@ -30,7 +30,6 @@
 @interface RNEncryptor ()
 @property (nonatomic, readonly) NSMutableData *outData;
 @property (nonatomic, readwrite, assign) CCCryptorRef cryptor;
-@property (nonatomic, readwrite, assign) CCHmacContext HMACContext;
 @property (nonatomic, readonly) NSUInteger HMACLength;
 @property (nonatomic, readwrite, copy) RNCryptorHandler handler;
 @property (nonatomic, readwrite, copy) RNCryptorCompletion completion;
@@ -39,12 +38,14 @@
 @end
 
 @implementation RNEncryptor
+{
+  CCHmacContext _HMACContext;
+}
 @synthesize cryptor = _cryptor;
 @synthesize outData = __outData;
 @synthesize handler = _handler;
 @synthesize completion = _completion;
 @synthesize queue = _queue;
-@synthesize HMACContext = _HMACContext;
 @synthesize HMACLength = __HMACLength;
 @synthesize buffer = __buffer;
 
