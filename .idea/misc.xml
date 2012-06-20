@@ -4,5 +4,8 @@
     <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>
   </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="iphonesimulator5.1" project-jdk-type="com.jetbrains.cidr.frameworks.AppleSdkType" />
+  <component name="SvnBranchConfigurationManager">
+    <option name="mySupportsUserInfoFilter" value="true" />
+  </component>
 </project>
 

@@ -441,7 +441,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit) {
                                 footer:nil error:error];
 
   if (HMACKey && result) {
-    NSMutableData *HMACData = [NSMutableData dataWithLength:self.settings.HMACKeySettings.keySize];
+    NSMutableData *HMACData = [NSMutableData dataWithLength:self.settings.HMACLength];
     CCHmacFinal(&HMACContext, [HMACData mutableBytes]);
 
     if (![output _RNWriteData:HMACData error:error]) {

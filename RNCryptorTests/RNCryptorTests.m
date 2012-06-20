@@ -27,6 +27,7 @@
 #import "RNCryptorTests.h"
 #import "RNCryptor.h"
 #import "RNOpenSSLCryptor.h"
+#import "RNEncryptor.h"
 
 NSString *const kGoodPassword = @"Passw0rd!";
 NSString *const kBadPassword = @"NotThePassword";
@@ -473,6 +474,30 @@ static NSString *const kOpenSSLPassword = @"Passw0rd";
   [[NSFileManager defaultManager] removeItemAtURL:plaintextURL error:&error];
   [[NSFileManager defaultManager] removeItemAtURL:ciphertextURL error:&error];
   [[NSFileManager defaultManager] removeItemAtURL:decryptedURL error:&error];
+}
+
+- (void)testAsync
+{
+  NSString *plaintext = @"test";
+  NSData *plaintextData = [plaintext dataUsingEncoding:NSUTF8StringEncoding];
+  __block NSData *encryptedData;
+  RNEncryptor *encryptor = [[RNEncryptor alloc] initWithSettings:kRNCryptorAES256Settings
+                                                        password:kGoodPassword
+                                                         handler:nil completion:^(NSData *data, NSError *error) {
+        STAssertNil(error, @"Encryption error:%@", error);
+        encryptedData = data;
+      }];
+
+  [encryptor addData:plaintextData];
+  [encryptor finish];
+
+  STAssertNotNil(encryptedData, @"Data did not encrypt.");
+
+  RNCryptor *cryptor = [RNCryptor AES256Cryptor];
+  NSError *error;
+  NSData *decryptedData = [cryptor decryptData:encryptedData password:kGoodPassword error:&error];
+  STAssertNil(error, @"Error decrypting:%@", error);
+  STAssertEqualObjects(decryptedData, plaintextData, @"Incorrect decryption.");
 }
 
 @end
