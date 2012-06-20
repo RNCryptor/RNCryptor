@@ -34,51 +34,47 @@ typedef struct _RNCryptorKeyDerivationSettings
 {
   size_t keySize;
   size_t saltSize;
-  CCPBKDFAlgorithm algorithm;
-  CCPseudoRandomAlgorithm prf;
+  CCPBKDFAlgorithm PBKDFAlgorithm;
+  CCPseudoRandomAlgorithm PRF;
   uint rounds;
 } RNCryptorKeyDerivationSettings;
 
-typedef struct _RNCryptorCryptorSettings
+typedef struct _RNCryptorSettings
 {
   CCAlgorithm algorithm;
-/*    CCMode mode; */
-/*    CCModeOptions modeOptions; */ /* iOS 5+ */
+  CCMode mode;
+  CCModeOptions modeOptions;
   size_t blockSize;
   size_t IVSize;
   CCPadding padding;
   CCHmacAlgorithm HMACAlgorithm;
   size_t HMACLength;
-} RNCryptorCryptorSettings;
-
-typedef struct _RNCryptorSettings
-{
-  RNCryptorKeyDerivationSettings key;
-  RNCryptorKeyDerivationSettings hmacKey;
-  RNCryptorCryptorSettings cryptor;
+  RNCryptorKeyDerivationSettings keySettings;
+  RNCryptorKeyDerivationSettings HMACKeySettings;
 } RNCryptorSettings;
 
 static const RNCryptorSettings kRNCryptorAES256Settings = {
-    .cryptor.algorithm = kCCAlgorithmAES128,
-/*    .cryptor.mode = kCCModeCBC, */ /* iOS 5+ */
-    .cryptor.blockSize = kCCBlockSizeAES128,
-    .cryptor.IVSize = kCCBlockSizeAES128,
-    .cryptor.padding = ccPKCS7Padding,
-    .cryptor.HMACAlgorithm = kCCHmacAlgSHA256,
+    .algorithm = kCCAlgorithmAES128,
+    .mode = kCCModeCBC,
+    .blockSize = kCCBlockSizeAES128,
+    .IVSize = kCCBlockSizeAES128,
+    .padding = ccPKCS7Padding,
+    .HMACAlgorithm = kCCHmacAlgSHA256,
+    .HMACLength = CC_SHA256_DIGEST_LENGTH,
 
-    .key = {
+    .keySettings = {
         .keySize = kCCKeySizeAES256,
         .saltSize = 8,
-        .algorithm = kCCPBKDF2,
-        .prf = kCCPRFHmacAlgSHA1,
+        .PBKDFAlgorithm = kCCPBKDF2,
+        .PRF = kCCPRFHmacAlgSHA1,
         .rounds = 10000
     },
 
-    .hmacKey = {
-        .keySize = CC_SHA256_DIGEST_LENGTH,
+    .HMACKeySettings = {
+        .keySize = kCCKeySizeAES256,
         .saltSize = 8,
-        .algorithm = kCCPBKDF2,
-        .prf = kCCPRFHmacAlgSHA1,
+        .PBKDFAlgorithm = kCCPBKDF2,
+        .PRF = kCCPRFHmacAlgSHA1,
         .rounds = 10000
     }
 };

@@ -43,25 +43,16 @@
 @end
 
 static const RNCryptorSettings kRNCryptorOpenSSLSettings = {
-    .cryptor.algorithm = kCCAlgorithmAES128,
-    /* .cryptor.mode = kCCModeCBC, */ /* iOS 5+ */
-    .cryptor.blockSize = kCCBlockSizeAES128,
-    .cryptor.IVSize = kCCBlockSizeAES128,
-    .cryptor.padding = ccPKCS7Padding,
-    
-    .key = {
+    .algorithm = kCCAlgorithmAES128,
+    .mode = kCCModeCBC,
+    .blockSize = kCCBlockSizeAES128,
+    .IVSize = kCCBlockSizeAES128,
+    .padding = ccPKCS7Padding,
+
+    .keySettings = {
         .keySize = kCCKeySizeAES256,
         .saltSize = 8,
-        .algorithm = kCCKeySizeAES256,
-        .rounds = 0,
-        .prf = kCCPRFHmacAlgSHA1
+        .rounds = 1,
+        .PRF = kCCPRFHmacAlgSHA1
     },
-    
-    .hmacKey = {
-        .keySize = 0,
-        .saltSize = 8,
-        .algorithm = 0,
-        .rounds = 0,
-        .prf = kCCPRFHmacAlgSHA1
-    }
 };

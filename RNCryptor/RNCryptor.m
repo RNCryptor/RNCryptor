@@ -127,12 +127,12 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit) {
 {
   NSMutableData *derivedKey = [NSMutableData dataWithLength:keySettings.keySize];
 
-  int result = CCKeyDerivationPBKDF(keySettings.algorithm,              // algorithm
+  int result = CCKeyDerivationPBKDF(keySettings.PBKDFAlgorithm,              // algorithm
                                     password.UTF8String,                // password
                                     password.length,                    // passwordLength
                                     salt.bytes,                         // salt
                                     salt.length,                        // saltLen
-                                    keySettings.prf,                    // PRF
+                                    keySettings.PRF,                    // PRF
                                     keySettings.rounds,                 // rounds
                                     derivedKey.mutableBytes,            // derivedKey
                                     derivedKey.length);                 // derivedKeyLen
@@ -212,28 +212,19 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit) {
   // Create the cryptor
   CCCryptorRef cryptor = NULL;
   CCCryptorStatus
-      cryptorStatus = CCCryptorCreate(anOperation, // op
-                                      self.settings.cryptor.algorithm, // alg
-                                      self.settings.cryptor.padding, // options
-                                      anEncryptionKey.bytes, // key
-                                      anEncryptionKey.length, // keyLength
-                                      anIV.bytes, // iv
-                                      &cryptor // cryptoRef
-  );
-  /* iOS 5+
-cryptorStatus = CCCryptorCreateWithMode(anOperation,
-  self.settings.cryptor.mode,
-  self.settings.cryptor.algorithm,
-  self.settings.cryptor.padding,
-  anIV.bytes,
-  anEncryptionKey.bytes,
-  anEncryptionKey.length,
-  NULL, // tweak
-  0, // tweakLength
-  0, // numRounds (0=default)
-  self.settings.cryptor.modeOptions,
-  &cryptor);
-  */
+      cryptorStatus = CCCryptorCreateWithMode(anOperation,
+                                              self.settings.mode,
+                                              self.settings.algorithm,
+                                              self.settings.padding,
+                                              anIV.bytes,
+                                              anEncryptionKey.bytes,
+                                              anEncryptionKey.length,
+      NULL, // tweak
+                                              0, // tweakLength
+                                              0, // numRounds (0=default)
+                                              self.settings.modeOptions,
+                                              &cryptor);
+
 
   if (cryptorStatus != kCCSuccess || cryptor == NULL) {
     if (anError) {
@@ -243,7 +234,7 @@ cryptorStatus = CCCryptorCreateWithMode(anOperation,
     return NO;
   }
 
-  const NSUInteger bufferSize = NextMultipleOfUnit(MAX(aFooterSize + 1, kSmallestBlockSize), self.settings.cryptor.blockSize);
+  const NSUInteger bufferSize = NextMultipleOfUnit(MAX(aFooterSize + 1, kSmallestBlockSize), self.settings.blockSize);
   NSMutableData *readBuffer = [NSMutableData data];
 
   // Read ahead
@@ -320,7 +311,7 @@ cryptorStatus = CCCryptorCreateWithMode(anOperation,
   __block CCHmacContext HMACContext;
 
   if (HMACKey) {
-    CCHmacInit(&HMACContext, self.settings.hmacKey.algorithm, HMACKey.bytes, HMACKey.length);
+    CCHmacInit(&HMACContext, self.settings.HMACAlgorithm, HMACKey.bytes, HMACKey.length);
 
     readCallback = ^void(NSData *readData) {
       CCHmacUpdate(&HMACContext, readData.bytes, readData.length);
@@ -329,7 +320,7 @@ cryptorStatus = CCCryptorCreateWithMode(anOperation,
 
   [input open];
   NSData *IV;
-  if (![input _RNGetData:&IV maxLength:self.settings.cryptor.IVSize error:error]) {
+  if (![input _RNGetData:&IV maxLength:self.settings.IVSize error:error]) {
     return NO;
   }
 
@@ -340,12 +331,12 @@ cryptorStatus = CCCryptorCreateWithMode(anOperation,
                               toStream:output
                          writeCallback:nil encryptionKey:encryptionKey
                                     IV:IV
-                            footerSize:HMACKey ? self.settings.hmacKey.keySize : 0
+                            footerSize:HMACKey ? self.settings.HMACLength : 0
                                 footer:&streamHMACData
                                  error:error];
 
   if (result && HMACKey) {
-    NSMutableData *computedHMACData = [NSMutableData dataWithLength:self.settings.hmacKey.keySize];
+    NSMutableData *computedHMACData = [NSMutableData dataWithLength:self.settings.HMACLength];
     CCHmacFinal(&HMACContext, [computedHMACData mutableBytes]);
 
     if (![computedHMACData isEqualToData:streamHMACData]) {
@@ -366,8 +357,8 @@ cryptorStatus = CCCryptorCreateWithMode(anOperation,
 
   [input open];
   if (![input _RNGetData:&header maxLength:2 error:error] ||
-      ![input _RNGetData:&encryptionKeySalt maxLength:self.settings.key.saltSize error:error] ||
-      ![input _RNGetData:&HMACKeySalt maxLength:self.settings.hmacKey.saltSize error:error]
+      ![input _RNGetData:&encryptionKeySalt maxLength:self.settings.keySettings.saltSize error:error] ||
+      ![input _RNGetData:&HMACKeySalt maxLength:self.settings.HMACKeySettings.saltSize error:error]
       ) {
     return NO;
   }
@@ -379,8 +370,8 @@ cryptorStatus = CCCryptorCreateWithMode(anOperation,
     return NO;
   }
 
-  NSData *encryptionKey = [self keyForPassword:password withSalt:encryptionKeySalt andSettings:self.settings.key];
-  NSData *HMACKey = [self keyForPassword:password withSalt:HMACKeySalt andSettings:self.settings.hmacKey];
+  NSData *encryptionKey = [self keyForPassword:password withSalt:encryptionKeySalt andSettings:self.settings.keySettings];
+  NSData *HMACKey = [self keyForPassword:password withSalt:HMACKeySalt andSettings:self.settings.HMACKeySettings];
 
   return [self decryptFromStream:input toStream:output encryptionKey:encryptionKey HMACKey:HMACKey error:error];
 }
@@ -427,7 +418,7 @@ cryptorStatus = CCCryptorCreateWithMode(anOperation,
   __block CCHmacContext HMACContext;
 
   if (HMACKey) {
-    CCHmacInit(&HMACContext, self.settings.cryptor.HMACAlgorithm, HMACKey.bytes, HMACKey.length);
+    CCHmacInit(&HMACContext, self.settings.HMACAlgorithm, HMACKey.bytes, HMACKey.length);
 
     writeCallback = ^void(NSData *writeData) {
       CCHmacUpdate(&HMACContext, writeData.bytes, writeData.length);
@@ -435,7 +426,7 @@ cryptorStatus = CCCryptorCreateWithMode(anOperation,
   }
 
   [output open];
-  NSData *IV = [[self class] randomDataOfLength:self.settings.cryptor.IVSize];
+  NSData *IV = [[self class] randomDataOfLength:self.settings.IVSize];
   if (![output _RNWriteData:IV error:error]) {
     return NO;
   }
@@ -450,7 +441,7 @@ cryptorStatus = CCCryptorCreateWithMode(anOperation,
                                 footer:nil error:error];
 
   if (HMACKey && result) {
-    NSMutableData *HMACData = [NSMutableData dataWithLength:self.settings.hmacKey.keySize];
+    NSMutableData *HMACData = [NSMutableData dataWithLength:self.settings.HMACKeySettings.keySize];
     CCHmacFinal(&HMACContext, [HMACData mutableBytes]);
 
     if (![output _RNWriteData:HMACData error:error]) {
@@ -463,11 +454,11 @@ cryptorStatus = CCCryptorCreateWithMode(anOperation,
 
 - (BOOL)encryptFromStream:(NSInputStream *)input toStream:(NSOutputStream *)output password:(NSString *)password error:(NSError **)error
 {
-  NSData *encryptionKeySalt = [[self class] randomDataOfLength:self.settings.key.saltSize];
-  NSData *encryptionKey = [self keyForPassword:password withSalt:encryptionKeySalt andSettings:self.settings.key];
+  NSData *encryptionKeySalt = [[self class] randomDataOfLength:self.settings.keySettings.saltSize];
+  NSData *encryptionKey = [self keyForPassword:password withSalt:encryptionKeySalt andSettings:self.settings.keySettings];
 
-  NSData *HMACKeySalt = [[self class] randomDataOfLength:self.settings.hmacKey.saltSize];
-  NSData *HMACKey = [self keyForPassword:password withSalt:HMACKeySalt andSettings:self.settings.hmacKey];
+  NSData *HMACKeySalt = [[self class] randomDataOfLength:self.settings.HMACKeySettings.saltSize];
+  NSData *HMACKey = [self keyForPassword:password withSalt:HMACKeySalt andSettings:self.settings.HMACKeySettings];
 
 
   [output open];
