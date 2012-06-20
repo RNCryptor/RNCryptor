@@ -480,24 +480,21 @@ static NSString *const kOpenSSLPassword = @"Passw0rd";
 {
   NSString *plaintext = @"test";
   NSData *plaintextData = [plaintext dataUsingEncoding:NSUTF8StringEncoding];
-  __block NSData *encryptedData;
   RNEncryptor *encryptor = [[RNEncryptor alloc] initWithSettings:kRNCryptorAES256Settings
                                                         password:kGoodPassword
                                                          handler:nil completion:^(NSData *data, NSError *error) {
         STAssertNil(error, @"Encryption error:%@", error);
-        encryptedData = data;
+        STAssertNotNil(data, @"Data did not encrypt.");
+
+        RNCryptor *cryptor = [RNCryptor AES256Cryptor];
+        NSError *decryptionError;
+        NSData *decryptedData = [cryptor decryptData:data password:kGoodPassword error:&decryptionError];
+        STAssertNil(decryptionError, @"Error decrypting:%@", decryptionError);
+        STAssertEqualObjects(decryptedData, plaintextData, @"Incorrect decryption.");
       }];
 
   [encryptor addData:plaintextData];
   [encryptor finish];
-
-  STAssertNotNil(encryptedData, @"Data did not encrypt.");
-
-  RNCryptor *cryptor = [RNCryptor AES256Cryptor];
-  NSError *error;
-  NSData *decryptedData = [cryptor decryptData:encryptedData password:kGoodPassword error:&error];
-  STAssertNil(error, @"Error decrypting:%@", error);
-  STAssertEqualObjects(decryptedData, plaintextData, @"Incorrect decryption.");
 }
 
 @end

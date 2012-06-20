@@ -129,73 +129,79 @@
   _handler = nil;
   _completion = nil;
 
-  if (_queue) {
-    dispatch_release(_queue);
-    _queue = NULL;
-  }
-
   __buffer = nil;
 }
 
 - (void)dealloc
 {
   [self cleanup];
+  if (_queue) {
+    dispatch_release(_queue);
+    _queue = NULL;
+  }
 }
 
 - (void)addData:(NSData *)data
 {
   NSAssert(self.cryptor != NULL, @"Cryptor has be completed");
 
-  NSMutableData *buffer = self.buffer;
-  [buffer setLength:CCCryptorGetOutputLength(self.cryptor, [data length], true)]; // We'll reuse the buffer in -finish
+  dispatch_async(self.queue, ^{
+    NSMutableData *buffer = self.buffer;
+    [buffer setLength:CCCryptorGetOutputLength(self.cryptor, [data length], true)]; // We'll reuse the buffer in -finish
 
-  size_t dataOutMoved;
-  CCCryptorStatus
-      cryptorStatus = CCCryptorUpdate(self.cryptor,       // cryptor
-                                      data.bytes,      // dataIn
-                                      data.length,     // dataInLength (verified > 0 above)
-                                      buffer.mutableBytes,      // dataOut
-                                      buffer.length, // dataOutAvailable
-                                      &dataOutMoved);   // dataOutMoved
+    size_t dataOutMoved;
+    CCCryptorStatus
+        cryptorStatus = CCCryptorUpdate(self.cryptor,       // cryptor
+                                        data.bytes,      // dataIn
+                                        data.length,     // dataInLength (verified > 0 above)
+                                        buffer.mutableBytes,      // dataOut
+                                        buffer.length, // dataOutAvailable
+                                        &dataOutMoved);   // dataOutMoved
 
-  if (cryptorStatus != kCCSuccess) {
-    [self cleanupAndNotifyWithStatus:cryptorStatus];
-    return;
-  }
+    if (cryptorStatus != kCCSuccess) {
+      [self cleanupAndNotifyWithStatus:cryptorStatus];
+      return;
+    }
 
-  CCHmacUpdate(&_HMACContext, buffer.bytes, dataOutMoved);
+    CCHmacUpdate(&_HMACContext, buffer.bytes, dataOutMoved);
 
-  [self.outData appendData:[self.buffer subdataWithRange:NSMakeRange(0, dataOutMoved)]];
+    [self.outData appendData:[self.buffer subdataWithRange:NSMakeRange(0, dataOutMoved)]];
 
-  if (self.handler) {
-    self.handler(self.outData);
-    [self.outData setLength:0];
-  }
+    if (self.handler) {
+      dispatch_sync(dispatch_get_main_queue(), ^{
+        self.handler(self.outData);
+      });
+      [self.outData setLength:0];
+    }
+  });
 }
 
 - (void)finish
 {
   NSAssert(self.cryptor != NULL, @"Cryptor has be completed");
 
-  NSMutableData *buffer = self.buffer;
+  dispatch_async(self.queue, ^{
 
-  size_t dataOutMoved;
-  CCCryptorStatus
-      cryptorStatus = CCCryptorFinal(self.cryptor,        // cryptor
-                                     buffer.mutableBytes,       // dataOut
-                                     buffer.length,  // dataOutAvailable
-                                     &dataOutMoved);    // dataOutMoved
-  [buffer setLength:dataOutMoved];
-  [self.outData appendData:buffer];
+    NSMutableData *buffer = self.buffer;
 
-  CCHmacUpdate(&_HMACContext, buffer.bytes, dataOutMoved);
+    size_t dataOutMoved;
+    CCCryptorStatus
+        cryptorStatus = CCCryptorFinal(self.cryptor,        // cryptor
+                                       buffer.mutableBytes,       // dataOut
+                                       buffer.length,  // dataOutAvailable
+                                       &dataOutMoved);    // dataOutMoved
+    [buffer setLength:dataOutMoved];
+    [self.outData appendData:buffer];
 
-  NSMutableData *HMACData = [NSMutableData dataWithLength:self.HMACLength];
-  CCHmacFinal(&_HMACContext, [HMACData mutableBytes]);
+    CCHmacUpdate(&_HMACContext, buffer.bytes, dataOutMoved);
 
-  [self.outData appendData:HMACData];
+    NSMutableData *HMACData = [NSMutableData dataWithLength:self.HMACLength];
+    CCHmacFinal(&_HMACContext, [HMACData mutableBytes]);
 
-  [self cleanupAndNotifyWithStatus:cryptorStatus];
+    [self.outData appendData:HMACData];
+
+    [self cleanupAndNotifyWithStatus:cryptorStatus];
+  });
 }
 
 - (void)cleanupAndNotifyWithStatus:(CCCryptorStatus)cryptorStatus
@@ -205,7 +211,9 @@
     if (cryptorStatus != kCCSuccess) {
       error = [NSError errorWithDomain:kRNCryptorErrorDomain code:cryptorStatus userInfo:nil];
     }
-    self.completion(self.outData, error);
+    dispatch_sync(dispatch_get_main_queue(), ^{
+      self.completion(self.outData, error);
+    });
   }
 
   [self cleanup];
