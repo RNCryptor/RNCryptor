@@ -497,4 +497,27 @@ static NSString *const kOpenSSLPassword = @"Passw0rd";
   [encryptor finish];
 }
 
+- (void)testSync
+{
+  NSString *plaintext = @"test";
+  NSData *plaintextData = [plaintext dataUsingEncoding:NSUTF8StringEncoding];
+  NSError *error;
+
+  NSData *encrypted = [RNEncryptor encryptWithSettings:kRNCryptorAES256Settings
+                                              password:kGoodPassword
+                                                  data:plaintextData
+                                                 error:&error];
+
+  STAssertNil(error, @"Encryption error:%@", error);
+  STAssertNotNil(encrypted, @"Data did not encrypt.");
+
+  RNCryptor *cryptor = [RNCryptor AES256Cryptor];
+  NSError *decryptionError;
+  NSData *decryptedData = [cryptor decryptData:encrypted password:kGoodPassword error:&decryptionError];
+  STAssertNil(decryptionError, @"Error decrypting:%@", decryptionError);
+  STAssertEqualObjects(decryptedData, plaintextData, @"Incorrect decryption.");
+
+
+}
+
 @end

@@ -48,7 +48,37 @@
 @synthesize queue = _queue;
 @synthesize HMACLength = __HMACLength;
 @synthesize buffer = __buffer;
+@synthesize responseQueue = _responseQueue;
 
++ (NSData *)encryptWithSettings:(RNCryptorSettings)theSettings password:(NSString *)aPassword data:(NSData *)thePlaintext error:(NSError **)anError
+{
+  dispatch_semaphore_t sem = dispatch_semaphore_create(0);
+
+  __block NSData *encryptedData;
+  __block NSError *returnedError;
+  RNEncryptor *cryptor = [[self alloc] initWithSettings:theSettings
+                                               password:aPassword
+                                                handler:nil completion:^(NSData *d, NSError *e) {
+        encryptedData = d;
+        returnedError = e;
+        dispatch_semaphore_signal(sem);
+      }];
+  dispatch_queue_t queue = dispatch_queue_create("net.robnapier.RNEncryptor.response", DISPATCH_QUEUE_SERIAL);
+  cryptor.responseQueue = queue;
+  [cryptor addData:thePlaintext];
+  [cryptor finish];
+
+  dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
+
+  if (anError) {
+    *anError = returnedError;
+  }
+
+  dispatch_release(sem);
+  dispatch_release(queue);
+
+  return encryptedData;
+}
 
 - (RNEncryptor *)initWithSettings:(RNCryptorSettings)theSettings encryptionKey:(NSData *)anEncryptionKey HMACKey:(NSData *)anHMACKey handler:(RNCryptorHandler)aHandler completion:(RNCryptorCompletion)aCompletion
 {
@@ -84,8 +114,11 @@
 
     _handler = [aHandler copy];
     _completion = [aCompletion copy];
-    _queue = dispatch_queue_create("net.robnapier.rncryptor", DISPATCH_QUEUE_SERIAL);
+    _queue = dispatch_queue_create("net.robnapier.RNEncryptor", DISPATCH_QUEUE_SERIAL);
     __buffer = [NSMutableData data];
+
+    _responseQueue = dispatch_get_current_queue();
+    dispatch_retain(_responseQueue);
   }
 
   return self;
@@ -131,6 +164,11 @@
   _completion = nil;
 
   __buffer = nil;
+
+  if (_responseQueue) {
+    dispatch_release(_responseQueue);
+    _responseQueue = NULL;
+  }
 }
 
 - (void)dealloc
@@ -140,6 +178,19 @@
     dispatch_release(_queue);
     _queue = NULL;
   }
+}
+
+- (void)setResponseQueue:(dispatch_queue_t)aResponseQueue
+{
+  if (aResponseQueue) {
+    dispatch_retain(aResponseQueue);
+  }
+
+  if (_responseQueue) {
+    dispatch_release(_responseQueue);
+  }
+
+  _responseQueue = aResponseQueue;
 }
 
 - (void)addData:(NSData *)data
@@ -169,7 +220,7 @@
     [self.outData appendData:[self.buffer subdataWithRange:NSMakeRange(0, dataOutMoved)]];
 
     if (self.handler) {
-      dispatch_sync(dispatch_get_main_queue(), ^{
+      dispatch_sync(self.responseQueue, ^{
         self.handler(self.outData);
       });
       [self.outData setLength:0];
@@ -212,11 +263,10 @@
     if (cryptorStatus != kCCSuccess) {
       error = [NSError errorWithDomain:kRNCryptorErrorDomain code:cryptorStatus userInfo:nil];
     }
-    dispatch_sync(dispatch_get_main_queue(), ^{
+    dispatch_sync(self.responseQueue, ^{
       self.completion(self.outData, error);
     });
   }
-
   [self cleanup];
 }
 

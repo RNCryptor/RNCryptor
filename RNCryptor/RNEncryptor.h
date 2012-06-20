@@ -29,6 +29,8 @@
 
 
 @interface RNEncryptor : RNCryptorAsync
+@property (nonatomic, readwrite) dispatch_queue_t responseQueue;
+
 - (RNEncryptor *)initWithSettings:(RNCryptorSettings)settings
                     encryptionKey:(NSData *)encryptionKey
                           HMACKey:(NSData *)HMACKey
@@ -42,5 +44,7 @@
 
 - (void)addData:(NSData *)data;
 - (void)finish;
+
++ (NSData *)encryptWithSettings:(RNCryptorSettings)settings password:(NSString *)password data:(NSData *)data error:(NSError **)error;
 
 @end
