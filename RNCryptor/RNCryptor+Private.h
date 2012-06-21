@@ -35,6 +35,7 @@
 @property (nonatomic, readonly) NSMutableData *outData;
 @property (nonatomic, readonly) RNCryptorHandler handler;
 @property (nonatomic, readonly) RNCryptorCompletion completion;
+@property (nonatomic, readwrite, assign) NSUInteger HMACLength;
 
 - (id)initWithHandler:(RNCryptorHandler)handler completion:(RNCryptorCompletion)completion;
 - (void)cleanup;

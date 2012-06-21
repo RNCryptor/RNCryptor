@@ -34,6 +34,7 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
 @synthesize engine = _engine;
 @synthesize outData = __outData;
 @synthesize queue = _queue;
+@synthesize HMACLength = __HMACLength;
 
 + (NSData *)keyForPassword:(NSString *)password withSalt:(NSData *)salt andSettings:(RNCryptorKeyDerivationSettings)keySettings
 {

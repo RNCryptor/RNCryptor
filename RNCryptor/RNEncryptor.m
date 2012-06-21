@@ -29,15 +29,10 @@
 #import "RNEncryptor.h"
 #import "RNCryptorEngine.h"
 
-@interface RNEncryptor ()
-@property (nonatomic, readonly) NSUInteger HMACLength;
-@end
-
 @implementation RNEncryptor
 {
   CCHmacContext _HMACContext;
 }
-@synthesize HMACLength = __HMACLength;
 
 + (NSData *)encryptData:(NSData *)thePlaintext withSettings:(RNCryptorSettings)theSettings password:(NSString *)aPassword error:(NSError **)anError
 {
@@ -78,7 +73,7 @@
 
     if (anHMACKey) {
       CCHmacInit(&_HMACContext, theSettings.HMACAlgorithm, anHMACKey.bytes, anHMACKey.length);
-      __HMACLength = theSettings.HMACLength;
+      self.HMACLength = theSettings.HMACLength;
     }
 
     NSError *error;
