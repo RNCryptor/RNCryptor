@@ -25,11 +25,13 @@
 ////
 //
 #import "RNCryptor.h"
+#import "RNCryptor+Private.h"
 
 NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
 
 @implementation RNCryptor
 @synthesize responseQueue = _responseQueue;
+@synthesize engine = _engine;
 
 + (NSData *)keyForPassword:(NSString *)password withSalt:(NSData *)salt andSettings:(RNCryptorKeyDerivationSettings)keySettings
 {
@@ -69,6 +71,7 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
     _responseQueue = dispatch_get_current_queue();
     dispatch_retain(_responseQueue);
   }
+  return self;
 }
 
 - (void)dealloc

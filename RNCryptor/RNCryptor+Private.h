@@ -27,5 +27,8 @@
 #import <Foundation/Foundation.h>
 #import "RNCryptor.h"
 
-@interface RNCryptor (Private)
+@class RNCryptorEngine;
+
+@interface RNCryptor ()
+@property (nonatomic, readwrite, strong) RNCryptorEngine *engine;
 @end

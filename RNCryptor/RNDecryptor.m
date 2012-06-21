@@ -25,6 +25,7 @@
 //
 
 
+#import "RNCryptor+Private.h"
 #import "RNDecryptor.h"
 #import "RNCryptorEngine.h"
 
@@ -90,7 +91,6 @@ static const NSUInteger kPreambleSize = 2;
 @synthesize HMACLength = _HMACLength;
 @synthesize encryptionKey = _encryptionKey;
 @synthesize HMACKey = _HMACKey;
-@synthesize engine = _engine;
 
 + (NSData *)decryptData:(NSData *)theCipherText withPassword:(NSString *)aPassword error:(NSError **)anError
 {

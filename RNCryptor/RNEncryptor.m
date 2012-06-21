@@ -25,11 +25,11 @@
 //
 
 
+#import "RNCryptor+Private.h"
 #import "RNEncryptor.h"
 #import "RNCryptorEngine.h"
 
 @interface RNEncryptor ()
-@property (nonatomic, readonly) RNCryptorEngine *engine;
 @property (nonatomic, readonly) NSMutableData *outData;
 @property (nonatomic, readonly) NSUInteger HMACLength;
 @property (nonatomic, readwrite, copy) RNCryptorHandler handler;
@@ -46,8 +46,6 @@
 @synthesize completion = _completion;
 @synthesize queue = _queue;
 @synthesize HMACLength = __HMACLength;
-@synthesize engine = __engine;
-
 
 + (NSData *)encryptData:(NSData *)thePlaintext withSettings:(RNCryptorSettings)theSettings password:(NSString *)aPassword error:(NSError **)anError
 {
@@ -96,12 +94,12 @@
     _queue = dispatch_queue_create("net.robnapier.RNEncryptor", DISPATCH_QUEUE_SERIAL);
 
     NSError *error;
-    __engine = [[RNCryptorEngine alloc] initWithOperation:kCCEncrypt
-                                                 settings:theSettings
-                                                      key:anEncryptionKey
-                                                       IV:IV
-                                                    error:&error];
-    if (!__engine) {
+    self.engine = [[RNCryptorEngine alloc] initWithOperation:kCCEncrypt
+                                                    settings:theSettings
+                                                         key:anEncryptionKey
+                                                          IV:IV
+                                                       error:&error];
+    if (!self.engine) {
       [self cleanupAndNotifyWithError:error];
       self = nil;
       return nil;
@@ -144,8 +142,6 @@
   __outData = nil;
   _handler = nil;
   _completion = nil;
-
-  __engine = nil;
 }
 
 - (void)dealloc
