@@ -68,13 +68,11 @@ static const NSUInteger kPreambleSize = 2;
 @end
 
 @interface RNDecryptor ()
-@property (nonatomic, readwrite, strong) RNCryptorEngine *engine;
 @property (nonatomic, readwrite, strong) NSMutableData *inData;
 @property (nonatomic, readonly) NSMutableData *outData;
 @property (nonatomic, readwrite, assign) NSUInteger HMACLength;
 @property (nonatomic, readwrite, copy) RNCryptorHandler handler;
 @property (nonatomic, readwrite, copy) RNCryptorCompletion completion;
-@property (nonatomic, readwrite, assign) dispatch_queue_t queue;
 @property (nonatomic, readwrite, copy) NSData *encryptionKey;
 @property (nonatomic, readwrite, copy) NSData *HMACKey;
 @property (nonatomic, readwrite, copy) NSString *password;
@@ -87,7 +85,6 @@ static const NSUInteger kPreambleSize = 2;
 @synthesize outData = __outData;
 @synthesize handler = _handler;
 @synthesize completion = _completion;
-@synthesize queue = _queue;
 @synthesize HMACLength = _HMACLength;
 @synthesize encryptionKey = _encryptionKey;
 @synthesize HMACKey = _HMACKey;
@@ -130,7 +127,6 @@ static const NSUInteger kPreambleSize = 2;
     _handler = [aHandler copy];
     _completion = [aCompletion copy];
 
-    _queue = dispatch_queue_create("net.robnapier.RNDecryptor", DISPATCH_QUEUE_SERIAL);
     _inData = [NSMutableData data];
     __outData = [NSMutableData data];
   }
@@ -156,18 +152,9 @@ static const NSUInteger kPreambleSize = 2;
   _inData = nil;
   _handler = nil;
   _completion = nil;
+  [super cleanup];
 
 }
-
-- (void)dealloc
-{
-  [self cleanup];
-  if (_queue) {
-    dispatch_release(_queue);
-    _queue = NULL;
-  }
-}
-
 
 - (void)decryptData:(NSData *)data
 {

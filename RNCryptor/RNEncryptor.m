@@ -34,7 +34,6 @@
 @property (nonatomic, readonly) NSUInteger HMACLength;
 @property (nonatomic, readwrite, copy) RNCryptorHandler handler;
 @property (nonatomic, readwrite, copy) RNCryptorCompletion completion;
-@property (nonatomic, readwrite, assign) dispatch_queue_t queue;
 @end
 
 @implementation RNEncryptor
@@ -44,7 +43,6 @@
 @synthesize outData = __outData;
 @synthesize handler = _handler;
 @synthesize completion = _completion;
-@synthesize queue = _queue;
 @synthesize HMACLength = __HMACLength;
 
 + (NSData *)encryptData:(NSData *)thePlaintext withSettings:(RNCryptorSettings)theSettings password:(NSString *)aPassword error:(NSError **)anError
@@ -91,7 +89,6 @@
 
     _handler = [aHandler copy];
     _completion = [aCompletion copy];
-    _queue = dispatch_queue_create("net.robnapier.RNEncryptor", DISPATCH_QUEUE_SERIAL);
 
     NSError *error;
     self.engine = [[RNCryptorEngine alloc] initWithOperation:kCCEncrypt
@@ -142,15 +139,7 @@
   __outData = nil;
   _handler = nil;
   _completion = nil;
-}
-
-- (void)dealloc
-{
-  [self cleanup];
-  if (_queue) {
-    dispatch_release(_queue);
-    _queue = NULL;
-  }
+  [super cleanup];
 }
 
 - (void)addData:(NSData *)data
