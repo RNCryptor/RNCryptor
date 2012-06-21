@@ -46,7 +46,6 @@
 @synthesize completion = _completion;
 @synthesize queue = _queue;
 @synthesize HMACLength = __HMACLength;
-@synthesize responseQueue = _responseQueue;
 @synthesize engine = __engine;
 
 
@@ -95,9 +94,6 @@
     _handler = [aHandler copy];
     _completion = [aCompletion copy];
     _queue = dispatch_queue_create("net.robnapier.RNEncryptor", DISPATCH_QUEUE_SERIAL);
-
-    _responseQueue = dispatch_get_current_queue();
-    dispatch_retain(_responseQueue);
 
     NSError *error;
     __engine = [[RNCryptorEngine alloc] initWithOperation:kCCEncrypt
@@ -149,11 +145,6 @@
   _handler = nil;
   _completion = nil;
 
-  if (_responseQueue) {
-    dispatch_release(_responseQueue);
-    _responseQueue = NULL;
-  }
-
   __engine = nil;
 }
 
@@ -164,19 +155,6 @@
     dispatch_release(_queue);
     _queue = NULL;
   }
-}
-
-- (void)setResponseQueue:(dispatch_queue_t)aResponseQueue
-{
-  if (aResponseQueue) {
-    dispatch_retain(aResponseQueue);
-  }
-
-  if (_responseQueue) {
-    dispatch_release(_responseQueue);
-  }
-
-  _responseQueue = aResponseQueue;
 }
 
 - (void)addData:(NSData *)data

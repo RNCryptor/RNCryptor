@@ -103,6 +103,8 @@ typedef void (^RNCryptorCompletion)(NSData *, NSError *);
 
 @interface RNCryptor : NSObject
 
+@property (nonatomic, readwrite) dispatch_queue_t responseQueue;
+
 /** Generate key given a password and salt using a PBKDF
 *
 * @param password Password to use for PBKDF

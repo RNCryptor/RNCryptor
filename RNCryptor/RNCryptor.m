@@ -29,6 +29,7 @@
 NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
 
 @implementation RNCryptor
+@synthesize responseQueue = _responseQueue;
 
 + (NSData *)keyForPassword:(NSString *)password withSalt:(NSData *)salt andSettings:(RNCryptorKeyDerivationSettings)keySettings
 {
@@ -59,6 +60,36 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
   NSAssert(result == 0, @"Unable to generate random bytes: %d", errno);
 
   return data;
+}
+
+- (id)init
+{
+  self = [super init];
+  if (self) {
+    _responseQueue = dispatch_get_current_queue();
+    dispatch_retain(_responseQueue);
+  }
+}
+
+- (void)dealloc
+{
+  if (_responseQueue) {
+    dispatch_release(_responseQueue);
+    _responseQueue = NULL;
+  }
+}
+
+- (void)setResponseQueue:(dispatch_queue_t)aResponseQueue
+{
+  if (aResponseQueue) {
+    dispatch_retain(aResponseQueue);
+  }
+
+  if (_responseQueue) {
+    dispatch_release(_responseQueue);
+  }
+
+  _responseQueue = aResponseQueue;
 }
 
 @end

@@ -28,8 +28,6 @@
 #import "RNCryptor.h"
 
 @interface RNEncryptor : RNCryptor
-@property (nonatomic, readwrite) dispatch_queue_t responseQueue;
-
 - (RNEncryptor *)initWithSettings:(RNCryptorSettings)settings
                     encryptionKey:(NSData *)encryptionKey
                           HMACKey:(NSData *)HMACKey

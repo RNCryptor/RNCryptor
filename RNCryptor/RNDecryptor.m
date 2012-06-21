@@ -88,7 +88,6 @@ static const NSUInteger kPreambleSize = 2;
 @synthesize completion = _completion;
 @synthesize queue = _queue;
 @synthesize HMACLength = _HMACLength;
-@synthesize responseQueue = _responseQueue;
 @synthesize encryptionKey = _encryptionKey;
 @synthesize HMACKey = _HMACKey;
 @synthesize engine = _engine;
@@ -134,8 +133,6 @@ static const NSUInteger kPreambleSize = 2;
     _queue = dispatch_queue_create("net.robnapier.RNDecryptor", DISPATCH_QUEUE_SERIAL);
     _inData = [NSMutableData data];
     __outData = [NSMutableData data];
-    _responseQueue = dispatch_get_current_queue();
-    dispatch_retain(_responseQueue);
   }
 
   return self;
@@ -160,10 +157,6 @@ static const NSUInteger kPreambleSize = 2;
   _handler = nil;
   _completion = nil;
 
-  if (_responseQueue) {
-    dispatch_release(_responseQueue);
-    _responseQueue = NULL;
-  }
 }
 
 - (void)dealloc
@@ -175,18 +168,6 @@ static const NSUInteger kPreambleSize = 2;
   }
 }
 
-- (void)setResponseQueue:(dispatch_queue_t)aResponseQueue
-{
-  if (aResponseQueue) {
-    dispatch_retain(aResponseQueue);
-  }
-
-  if (_responseQueue) {
-    dispatch_release(_responseQueue);
-  }
-
-  _responseQueue = aResponseQueue;
-}
 
 - (void)decryptData:(NSData *)data
 {

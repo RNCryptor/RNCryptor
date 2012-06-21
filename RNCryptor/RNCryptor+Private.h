@@ -1,5 +1,5 @@
 //
-//  RNDecryptor
+//  RNCryptor(Private)
 //
 //  Copyright (c) 2012 Rob Napier
 //
@@ -27,21 +27,5 @@
 #import <Foundation/Foundation.h>
 #import "RNCryptor.h"
 
-
-@interface RNDecryptor : RNCryptor
-
-- (RNDecryptor *)initWithEncryptionKey:(NSData *)encryptionKey
-                               HMACKey:(NSData *)HMACKey
-                               handler:(RNCryptorHandler)handler
-                            completion:(RNCryptorCompletion)completion;
-
-- (RNDecryptor *)initWithPassword:(NSString *)password
-                          handler:(RNCryptorHandler)handler
-                       completion:(RNCryptorCompletion)completion;
-
-- (void)addData:(NSData *)data;
-- (void)finish;
-
-+ (NSData *)decryptData:(NSData *)data withPassword:(NSString *)password error:(NSError **)error;
-
+@interface RNCryptor (Private)
 @end
