@@ -1,5 +1,5 @@
 //
-//  RNEncryptor
+//  RNDecryptor
 //
 //  Copyright (c) 2012 Rob Napier
 //
@@ -26,6 +26,7 @@
 
 
 #import "RNDecryptor.h"
+#import "RNCryptorEngine.h"
 
 static const uint8_t kCurrentFileVersion = 0; // FIXME: Move to superclass
 static const NSUInteger kPreambleSize = 2;
@@ -66,14 +67,13 @@ static const NSUInteger kPreambleSize = 2;
 @end
 
 @interface RNDecryptor ()
+@property (nonatomic, readwrite, strong) RNCryptorEngine *engine;
 @property (nonatomic, readwrite, strong) NSMutableData *inData;
 @property (nonatomic, readonly) NSMutableData *outData;
-@property (nonatomic, readwrite, assign) CCCryptorRef cryptor;
 @property (nonatomic, readwrite, assign) NSUInteger HMACLength;
 @property (nonatomic, readwrite, copy) RNCryptorHandler handler;
 @property (nonatomic, readwrite, copy) RNCryptorCompletion completion;
 @property (nonatomic, readwrite, assign) dispatch_queue_t queue;
-@property (nonatomic, readonly) NSMutableData *buffer;
 @property (nonatomic, readwrite, copy) NSData *encryptionKey;
 @property (nonatomic, readwrite, copy) NSData *HMACKey;
 @property (nonatomic, readwrite, copy) NSString *password;
@@ -83,16 +83,15 @@ static const NSUInteger kPreambleSize = 2;
 {
   CCHmacContext _HMACContext;
 }
-@synthesize cryptor = _cryptor;
 @synthesize outData = __outData;
 @synthesize handler = _handler;
 @synthesize completion = _completion;
 @synthesize queue = _queue;
 @synthesize HMACLength = _HMACLength;
-@synthesize buffer = __buffer;
 @synthesize responseQueue = _responseQueue;
 @synthesize encryptionKey = _encryptionKey;
 @synthesize HMACKey = _HMACKey;
+@synthesize engine = _engine;
 
 + (NSData *)decryptData:(NSData *)theCipherText withPassword:(NSString *)aPassword error:(NSError **)anError
 {
@@ -133,7 +132,6 @@ static const NSUInteger kPreambleSize = 2;
     _completion = [aCompletion copy];
 
     _queue = dispatch_queue_create("net.robnapier.RNDecryptor", DISPATCH_QUEUE_SERIAL);
-    __buffer = [NSMutableData data];
     _inData = [NSMutableData data];
     __outData = [NSMutableData data];
     _responseQueue = dispatch_get_current_queue();
@@ -157,17 +155,10 @@ static const NSUInteger kPreambleSize = 2;
 
 - (void)cleanup
 {
-  if (_cryptor) {
-    CCCryptorRelease(_cryptor);
-    _cryptor = NULL;
-  }
-
   __outData = nil;
   _inData = nil;
   _handler = nil;
   _completion = nil;
-
-  __buffer = nil;
 
   if (_responseQueue) {
     dispatch_release(_responseQueue);
@@ -200,26 +191,17 @@ static const NSUInteger kPreambleSize = 2;
 - (void)decryptData:(NSData *)data
 {
   dispatch_async(self.queue, ^{
-    NSMutableData *buffer = self.buffer;
-    [buffer setLength:CCCryptorGetOutputLength(self.cryptor, [data length], true)]; // We'll reuse the buffer in -finish
-
     CCHmacUpdate(&_HMACContext, data.bytes, data.length);
 
-    size_t dataOutMoved;
-    CCCryptorStatus
-        cryptorStatus = CCCryptorUpdate(self.cryptor,       // cryptor
-                                        data.bytes,      // dataIn
-                                        data.length,     // dataInLength (verified > 0 above)
-                                        buffer.mutableBytes,      // dataOut
-                                        buffer.length, // dataOutAvailable
-                                        &dataOutMoved);   // dataOutMoved
+    NSError *error;
+    NSData *decryptedData = [self.engine addData:data error:&error];
 
-    if (cryptorStatus != kCCSuccess) {
-      [self cleanupAndNotifyWithStatus:cryptorStatus];
+    if (!decryptedData) {
+      [self cleanupAndNotifyWithError:error];
       return;
     }
 
-    [self.outData appendData:[buffer subdataWithRange:NSMakeRange(0, dataOutMoved)]];
+    [self.outData appendData:decryptedData];
 
     if (self.handler) {
       dispatch_sync(self.responseQueue, ^{
@@ -233,10 +215,10 @@ static const NSUInteger kPreambleSize = 2;
 - (void)addData:(NSData *)theData
 {
   [self.inData appendData:theData];
-  if (!self.cryptor) {
+  if (!self.engine) {
     [self parseHeaderFromData:self.inData];
   }
-  if (self.cryptor) {
+  if (self.engine) {
     NSUInteger HMACLength = self.HMACLength;
     if (self.inData.length > HMACLength) {
       NSData *data = [self.inData _RNDataRemovedToIndex:self.inData.length - HMACLength];
@@ -316,24 +298,10 @@ static const NSUInteger kPreambleSize = 2;
     return;
   }
 
-  CCCryptorStatus
-      cryptorStatus = CCCryptorCreateWithMode(kCCDecrypt,
-                                              settings.mode,
-                                              settings.algorithm,
-                                              settings.padding,
-                                              IV.bytes,
-                                              self.encryptionKey.bytes,
-                                              self.encryptionKey.length,
-      NULL, // tweak
-                                              0, // tweakLength
-                                              0, // numRounds (0=default)
-                                              settings.modeOptions,
-                                              &_cryptor);
-
+  self.engine = [[RNCryptorEngine alloc] initWithOperation:kCCDecrypt settings:settings key:self.encryptionKey IV:IV error:&error];
   self.encryptionKey = nil; // Don't need this anymore
-
-  if (cryptorStatus != kCCSuccess || _cryptor == NULL) {
-    [self cleanupAndNotifyWithStatus:cryptorStatus];
+  if (!self.engine) {
+    [self cleanupAndNotifyWithError:error];
     return;
   }
 
@@ -347,25 +315,17 @@ static const NSUInteger kPreambleSize = 2;
 
 - (void)finish
 {
-  NSAssert(self.cryptor != NULL, @"Cryptor has be completed");
+  NSAssert(self.engine != NULL, @"Cryptor has be completed");
 
   dispatch_async(self.queue, ^{
-    NSMutableData *buffer = self.buffer;
+    NSError *error;
+    NSData *decryptedData = [self.engine finishWithError:&error];
 
-    size_t dataOutMoved;
-    CCCryptorStatus
-        cryptorStatus = CCCryptorFinal(self.cryptor,        // cryptor
-                                       buffer.mutableBytes,       // dataOut
-                                       buffer.length,  // dataOutAvailable
-                                       &dataOutMoved);    // dataOutMoved
-
-    if (cryptorStatus != kCCSuccess) {
-      [self cleanupAndNotifyWithStatus:cryptorStatus];
+    if (!decryptedData) {
+      [self cleanupAndNotifyWithError:error];
       return;
     }
-
-    [buffer setLength:dataOutMoved];
-    [self.outData appendData:buffer];
+    [self.outData appendData:decryptedData];
 
     NSMutableData *HMACData = [NSMutableData dataWithLength:self.HMACLength];
     CCHmacFinal(&_HMACContext, [HMACData mutableBytes]);
@@ -380,11 +340,6 @@ static const NSUInteger kPreambleSize = 2;
 
     [self cleanupAndNotifyWithError:nil];
   });
-}
-
-- (void)cleanupAndNotifyWithStatus:(CCCryptorStatus)status
-{
-  [self cleanupAndNotifyWithError:[NSError errorWithDomain:kRNCryptorErrorDomain code:status userInfo:nil]];
 }
 
 - (void)cleanupAndNotifyWithError:(NSError *)error

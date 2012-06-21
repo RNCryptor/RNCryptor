@@ -37,7 +37,7 @@
 @synthesize buffer = __buffer;
 
 
-- (RNCryptorEngine *)initWithOperation:(CCOperation)operation settings:(RNCryptorSettings)settings key:(NSData *)key IV:(NSData *)IV;
+- (RNCryptorEngine *)initWithOperation:(CCOperation)operation settings:(RNCryptorSettings)settings key:(NSData *)key IV:(NSData *)IV error:(NSError **)error
 {
   self = [super init];
   if (self) {
@@ -55,8 +55,10 @@
                                                 settings.modeOptions,
                                                 &__cryptor);
     if (cryptorStatus != kCCSuccess || __cryptor == NULL) {
+      if (error) {
+        *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:cryptorStatus userInfo:nil];
+      }
       self = nil;
-      NSAssert(NO, @"Could not create cryptor: %d", cryptorStatus);
       return nil;
     }
 

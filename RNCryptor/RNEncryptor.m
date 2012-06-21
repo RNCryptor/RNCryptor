@@ -87,15 +87,6 @@
     NSData *IV = [[self class] randomDataOfLength:theSettings.IVSize];
     __outData = [IV mutableCopy];
 
-    __engine = [[RNCryptorEngine alloc] initWithOperation:kCCEncrypt
-                                                 settings:theSettings
-                                                      key:anEncryptionKey
-                                                       IV:IV];
-    if (!__engine) {
-      self = nil;
-      return nil;
-    }
-
     if (anHMACKey) {
       CCHmacInit(&_HMACContext, theSettings.HMACAlgorithm, anHMACKey.bytes, anHMACKey.length);
       __HMACLength = theSettings.HMACLength;
@@ -107,6 +98,18 @@
 
     _responseQueue = dispatch_get_current_queue();
     dispatch_retain(_responseQueue);
+
+    NSError *error;
+    __engine = [[RNCryptorEngine alloc] initWithOperation:kCCEncrypt
+                                                 settings:theSettings
+                                                      key:anEncryptionKey
+                                                       IV:IV
+                                                    error:&error];
+    if (!__engine) {
+      [self cleanupAndNotifyWithError:error];
+      self = nil;
+      return nil;
+    }
   }
 
   return self;
