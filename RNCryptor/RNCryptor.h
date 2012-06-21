@@ -81,7 +81,7 @@ static const RNCryptorSettings kRNCryptorAES256Settings = {
 
 enum
 {
-  kRNCryptorErrorHMACMismatch = 1,
+  kRNCryptorHMACMismatch = 1,
   kRNCryptorUnknownHeader = 2,
   kRNCryptorCouldNotCreateStream = 3,
   kRNCryptorCouldNotReadStream = 4,

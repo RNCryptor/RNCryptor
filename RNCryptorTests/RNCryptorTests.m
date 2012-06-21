@@ -28,6 +28,7 @@
 #import "RNCryptor.h"
 #import "RNOpenSSLCryptor.h"
 #import "RNEncryptor.h"
+#import "RNDecryptor.h"
 
 NSString *const kGoodPassword = @"Passw0rd!";
 NSString *const kBadPassword = @"NotThePassword";
@@ -476,26 +477,34 @@ static NSString *const kOpenSSLPassword = @"Passw0rd";
   [[NSFileManager defaultManager] removeItemAtURL:decryptedURL error:&error];
 }
 
-- (void)testAsync
-{
-  NSString *plaintext = @"test";
-  NSData *plaintextData = [plaintext dataUsingEncoding:NSUTF8StringEncoding];
-  RNEncryptor *encryptor = [[RNEncryptor alloc] initWithSettings:kRNCryptorAES256Settings
-                                                        password:kGoodPassword
-                                                         handler:nil completion:^(NSData *data, NSError *error) {
-        STAssertNil(error, @"Encryption error:%@", error);
-        STAssertNotNil(data, @"Data did not encrypt.");
-
-        RNCryptor *cryptor = [RNCryptor AES256Cryptor];
-        NSError *decryptionError;
-        NSData *decryptedData = [cryptor decryptData:data password:kGoodPassword error:&decryptionError];
-        STAssertNil(decryptionError, @"Error decrypting:%@", decryptionError);
-        STAssertEqualObjects(decryptedData, plaintextData, @"Incorrect decryption.");
-      }];
-
-  [encryptor addData:plaintextData];
-  [encryptor finish];
-}
+//- (void)testAsync
+//{
+//  __block dispatch_semaphore_t sem = dispatch_semaphore_create(0);
+//  __block NSData *encryptedData;
+//  __block NSError *encryptionError;
+//  NSString *plaintext = @"test";
+//  NSData *plaintextData = [plaintext dataUsingEncoding:NSUTF8StringEncoding];
+//  RNEncryptor *encryptor = [[RNEncryptor alloc] initWithSettings:kRNCryptorAES256Settings
+//                                                        password:kGoodPassword
+//                                                         handler:nil completion:^(NSData *data, NSError *error) {
+//        STAssertNil(error, @"Encryption error:%@", error);
+//        STAssertNotNil(data, @"Data did not encrypt.");
+//        encryptedData = data;
+//        encryptionError = error;
+//        dispatch_semaphore_signal(sem);
+//      }];
+//
+//  [encryptor addData:plaintextData];
+//  [encryptor finish];
+//  dispatch_semaphore_wait(sem, dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC));
+//
+//  NSError *decryptionError;
+//  NSData *decryptedData = [RNDecryptor decryptData:encryptedData withPassword:kGoodPassword error:&decryptionError];
+//
+//  STAssertNil(decryptionError, @"Error decrypting:%@", decryptionError);
+//  STAssertEqualObjects(decryptedData, plaintextData, @"Incorrect decryption.");
+//  NSLog(@"plaintext=%@ decryptedText=%@", plaintext, [[NSString alloc] initWithData:decryptedData encoding:NSUTF8StringEncoding]);
+//}
 
 - (void)testSync
 {
@@ -503,21 +512,18 @@ static NSString *const kOpenSSLPassword = @"Passw0rd";
   NSData *plaintextData = [plaintext dataUsingEncoding:NSUTF8StringEncoding];
   NSError *error;
 
-  NSData *encrypted = [RNEncryptor encryptWithSettings:kRNCryptorAES256Settings
-                                              password:kGoodPassword
-                                                  data:plaintextData
-                                                 error:&error];
+  NSData *encryptedData = [RNEncryptor encryptData:plaintextData
+                                      withSettings:kRNCryptorAES256Settings
+                                          password:kGoodPassword
+                                             error:&error];
 
   STAssertNil(error, @"Encryption error:%@", error);
-  STAssertNotNil(encrypted, @"Data did not encrypt.");
+  STAssertNotNil(encryptedData, @"Data did not encrypt.");
 
-  RNCryptor *cryptor = [RNCryptor AES256Cryptor];
   NSError *decryptionError;
-  NSData *decryptedData = [cryptor decryptData:encrypted password:kGoodPassword error:&decryptionError];
+  NSData *decryptedData = [RNDecryptor decryptData:encryptedData withPassword:kGoodPassword error:&decryptionError];
   STAssertNil(decryptionError, @"Error decrypting:%@", decryptionError);
   STAssertEqualObjects(decryptedData, plaintextData, @"Incorrect decryption.");
-
-
 }
 
 @end

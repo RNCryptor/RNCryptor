@@ -341,7 +341,7 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit) {
 
     if (![computedHMACData isEqualToData:streamHMACData]) {
       result = NO;
-      *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:kRNCryptorErrorHMACMismatch
+      *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:kRNCryptorHMACMismatch
                                userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"HMAC Mismatch", @"HMAC Mismatch") forKey:NSLocalizedDescriptionKey]];
     }
   }

@@ -1,5 +1,5 @@
 //
-//  RNEncryptor
+//  RNDecryptor
 //
 //  Copyright (c) 2012 Rob Napier
 //
@@ -28,23 +28,21 @@
 #import "RNCryptorAsync.h"
 
 
-@interface RNEncryptor : RNCryptorAsync
+@interface RNDecryptor : RNCryptorAsync
 @property (nonatomic, readwrite) dispatch_queue_t responseQueue;
 
-- (RNEncryptor *)initWithSettings:(RNCryptorSettings)settings
-                    encryptionKey:(NSData *)encryptionKey
-                          HMACKey:(NSData *)HMACKey
-                          handler:(RNCryptorHandler)handler
-                       completion:(RNCryptorCompletion)completion;
+- (RNDecryptor *)initWithEncryptionKey:(NSData *)encryptionKey
+                               HMACKey:(NSData *)HMACKey
+                               handler:(RNCryptorHandler)handler
+                            completion:(RNCryptorCompletion)completion;
 
-- (RNEncryptor *)initWithSettings:(RNCryptorSettings)settings
-                         password:(NSString *)password
+- (RNDecryptor *)initWithPassword:(NSString *)password
                           handler:(RNCryptorHandler)handler
                        completion:(RNCryptorCompletion)completion;
 
 - (void)addData:(NSData *)data;
 - (void)finish;
 
-+ (NSData *)encryptData:(NSData *)data withSettings:(RNCryptorSettings)settings password:(NSString *)password error:(NSError **)error;
++ (NSData *)decryptData:(NSData *)data withPassword:(NSString *)password error:(NSError **)error;
 
 @end

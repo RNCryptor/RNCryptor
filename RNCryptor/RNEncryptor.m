@@ -50,7 +50,7 @@
 @synthesize buffer = __buffer;
 @synthesize responseQueue = _responseQueue;
 
-+ (NSData *)encryptWithSettings:(RNCryptorSettings)theSettings password:(NSString *)aPassword data:(NSData *)thePlaintext error:(NSError **)anError
++ (NSData *)encryptData:(NSData *)thePlaintext withSettings:(RNCryptorSettings)theSettings password:(NSString *)aPassword error:(NSError **)anError
 {
   dispatch_semaphore_t sem = dispatch_semaphore_create(0);
 

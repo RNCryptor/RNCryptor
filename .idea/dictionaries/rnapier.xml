@@ -3,6 +3,7 @@
     <words>
       <w>async</w>
       <w>cryptor</w>
+      <w>decryptor</w>
       <w>encryptor</w>
       <w>hmac</w>
       <w>rncryptor</w>
