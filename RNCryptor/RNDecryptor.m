@@ -42,7 +42,7 @@ static const NSUInteger kPreambleSize = 2;
   NSMutableData *buffer = [NSMutableData dataWithLength:maxLength];
   if ([self read:buffer.mutableBytes maxLength:maxLength] < 0) {
     if (error) {
-      *error = [RNCryptor errorWithCode:kRNCryptorCouldNotReadStream localizedDescription:@"Could not read from stream" underlyingError:[self streamError]];
+      *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:kRNCryptorCouldNotCreateStream userInfo:nil];
       return NO;
     }
   }

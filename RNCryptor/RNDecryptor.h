@@ -25,10 +25,10 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "RNCryptorAsync.h"
+#import "RNCryptor.h"
 
 
-@interface RNDecryptor : RNCryptorAsync
+@interface RNDecryptor : RNCryptor
 @property (nonatomic, readwrite) dispatch_queue_t responseQueue;
 
 - (RNDecryptor *)initWithEncryptionKey:(NSData *)encryptionKey
