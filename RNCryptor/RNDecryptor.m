@@ -81,14 +81,18 @@ static const NSUInteger kPreambleSize = 2;
 
   dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
 
-  if (anError) {
-    *anError = returnedError;
-  }
-
   dispatch_release(sem);
   dispatch_release(queue);
 
-  return decryptedData;
+  if (returnedError) {
+    if (anError) {
+      *anError = returnedError;
+    }
+    return nil;
+  }
+  else {
+    return decryptedData;
+  }
 }
 
 - (RNDecryptor *)initWithEncryptionKey:(NSData *)anEncryptionKey HMACKey:(NSData *)anHMACKey handler:(RNCryptorHandler)aHandler completion:(RNCryptorCompletion)aCompletion
