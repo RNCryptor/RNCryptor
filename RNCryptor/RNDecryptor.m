@@ -70,8 +70,6 @@ static const NSUInteger kPreambleSize = 2;
 @interface RNDecryptor ()
 @property (nonatomic, readwrite, strong) NSMutableData *inData;
 @property (nonatomic, readwrite, assign) NSUInteger HMACLength;
-@property (nonatomic, readwrite, copy) RNCryptorHandler handler;
-@property (nonatomic, readwrite, copy) RNCryptorCompletion completion;
 @property (nonatomic, readwrite, copy) NSData *encryptionKey;
 @property (nonatomic, readwrite, copy) NSData *HMACKey;
 @property (nonatomic, readwrite, copy) NSString *password;
@@ -81,8 +79,6 @@ static const NSUInteger kPreambleSize = 2;
 {
   CCHmacContext _HMACContext;
 }
-@synthesize handler = _handler;
-@synthesize completion = _completion;
 @synthesize HMACLength = _HMACLength;
 @synthesize encryptionKey = _encryptionKey;
 @synthesize HMACKey = _HMACKey;
@@ -118,12 +114,10 @@ static const NSUInteger kPreambleSize = 2;
 
 - (RNDecryptor *)initWithEncryptionKey:(NSData *)anEncryptionKey HMACKey:(NSData *)anHMACKey handler:(RNCryptorHandler)aHandler completion:(RNCryptorCompletion)aCompletion
 {
-  self = [super init];
+  self = [super initWithHandler:aHandler completion:aCompletion];
   if (self) {
     _encryptionKey = [anEncryptionKey copy];
     _HMACKey = [anHMACKey copy];
-    _handler = [aHandler copy];
-    _completion = [aCompletion copy];
 
     _inData = [NSMutableData data];
   }
@@ -141,15 +135,6 @@ static const NSUInteger kPreambleSize = 2;
     _password = aPassword;
   }
   return self;
-}
-
-- (void)cleanup
-{
-  _inData = nil;
-  _handler = nil;
-  _completion = nil;
-  [super cleanup];
-
 }
 
 - (void)decryptData:(NSData *)data

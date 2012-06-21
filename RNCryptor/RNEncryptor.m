@@ -31,16 +31,12 @@
 
 @interface RNEncryptor ()
 @property (nonatomic, readonly) NSUInteger HMACLength;
-@property (nonatomic, readwrite, copy) RNCryptorHandler handler;
-@property (nonatomic, readwrite, copy) RNCryptorCompletion completion;
 @end
 
 @implementation RNEncryptor
 {
   CCHmacContext _HMACContext;
 }
-@synthesize handler = _handler;
-@synthesize completion = _completion;
 @synthesize HMACLength = __HMACLength;
 
 + (NSData *)encryptData:(NSData *)thePlaintext withSettings:(RNCryptorSettings)theSettings password:(NSString *)aPassword error:(NSError **)anError
@@ -75,7 +71,7 @@
 
 - (RNEncryptor *)initWithSettings:(RNCryptorSettings)theSettings encryptionKey:(NSData *)anEncryptionKey HMACKey:(NSData *)anHMACKey handler:(RNCryptorHandler)aHandler completion:(RNCryptorCompletion)aCompletion
 {
-  self = [super init];
+  self = [super initWithHandler:aHandler completion:aCompletion];
   if (self) {
     NSData *IV = [[self class] randomDataOfLength:theSettings.IVSize];
     [self.outData setData:IV];
@@ -84,9 +80,6 @@
       CCHmacInit(&_HMACContext, theSettings.HMACAlgorithm, anHMACKey.bytes, anHMACKey.length);
       __HMACLength = theSettings.HMACLength;
     }
-
-    _handler = [aHandler copy];
-    _completion = [aCompletion copy];
 
     NSError *error;
     self.engine = [[RNCryptorEngine alloc] initWithOperation:kCCEncrypt
@@ -130,13 +123,6 @@
     [self.outData setData:headerData];
   }
   return self;
-}
-
-- (void)cleanup
-{
-  _handler = nil;
-  _completion = nil;
-  [super cleanup];
 }
 
 - (void)addData:(NSData *)data

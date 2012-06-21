@@ -66,7 +66,7 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
   return data;
 }
 
-- (id)init
+- (id)initWithHandler:(RNCryptorHandler)handler completion:(RNCryptorCompletion)completion;
 {
   self = [super init];
   if (self) {
@@ -76,6 +76,9 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
     NSString *queueName = [@"net.robnapier." stringByAppendingString:NSStringFromClass([self class])];
     _queue = dispatch_queue_create([queueName UTF8String], DISPATCH_QUEUE_SERIAL);
     __outData = [NSMutableData data];
+
+    _handler = [handler copy];
+    _completion = [completion copy];
   }
   return self;
 }
@@ -97,6 +100,8 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
     dispatch_release(_queue);
     _queue = NULL;
   }
+  _handler = nil;
+  _completion = nil;
 }
 
 - (void)setResponseQueue:(dispatch_queue_t)aResponseQueue

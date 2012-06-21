@@ -33,5 +33,9 @@
 @property (nonatomic, readwrite, strong) RNCryptorEngine *engine;
 @property (nonatomic, readwrite, assign) dispatch_queue_t queue;
 @property (nonatomic, readonly) NSMutableData *outData;
+@property (nonatomic, readonly) RNCryptorHandler handler;
+@property (nonatomic, readonly) RNCryptorCompletion completion;
+
+- (id)initWithHandler:(RNCryptorHandler)handler completion:(RNCryptorCompletion)completion;
 - (void)cleanup;
 @end
