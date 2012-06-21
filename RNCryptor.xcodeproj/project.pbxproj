@@ -25,6 +25,8 @@
 		FB7565241512D9BE007B8077 /* RNEncryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8076 /* RNEncryptor.h */; };
 		FB7565241512D9BE007B8079 /* RNDecryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8078 /* RNDecryptor.m */; };
 		FB7565241512D9BE007B807B /* RNDecryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B807A /* RNDecryptor.h */; };
+		FB7565241512D9BE007B807D /* RNCryptorEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B807C /* RNCryptorEngine.m */; };
+		FB7565241512D9BE007B807F /* RNCryptorEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B807E /* RNCryptorEngine.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,6 +61,8 @@
 		FB7565241512D9BE007B8076 /* RNEncryptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNEncryptor.h; sourceTree = "<group>"; };
 		FB7565241512D9BE007B8078 /* RNDecryptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNDecryptor.m; sourceTree = "<group>"; };
 		FB7565241512D9BE007B807A /* RNDecryptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNDecryptor.h; sourceTree = "<group>"; };
+		FB7565241512D9BE007B807C /* RNCryptorEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCryptorEngine.m; sourceTree = "<group>"; };
+		FB7565241512D9BE007B807E /* RNCryptorEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCryptorEngine.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,6 +120,8 @@
 		FB7564F51512D3C4007B806B /* RNCryptor */ = {
 			isa = PBXGroup;
 			children = (
+				FB7565241512D9BE007B807E /* RNCryptorEngine.h */,
+				FB7565241512D9BE007B807C /* RNCryptorEngine.m */,
 				FB7565241512D9BE007B807A /* RNDecryptor.h */,
 				FB7565241512D9BE007B8078 /* RNDecryptor.m */,
 				FB7565241512D9BE007B8076 /* RNEncryptor.h */,
@@ -171,6 +177,7 @@
 				FB7565241512D9BE007B8073 /* RNCryptorAsync.h in Headers */,
 				FB7565241512D9BE007B8077 /* RNEncryptor.h in Headers */,
 				FB7565241512D9BE007B807B /* RNDecryptor.h in Headers */,
+				FB7565241512D9BE007B807F /* RNCryptorEngine.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -279,6 +286,7 @@
 				FB7565241512D9BE007B8071 /* RNCryptorAsync.m in Sources */,
 				FB7565241512D9BE007B8075 /* RNEncryptor.m in Sources */,
 				FB7565241512D9BE007B8079 /* RNDecryptor.m in Sources */,
+				FB7565241512D9BE007B807D /* RNCryptorEngine.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

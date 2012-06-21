@@ -26,29 +26,29 @@
 
 
 #import "RNEncryptor.h"
+#import "RNCryptorEngine.h"
 
 @interface RNEncryptor ()
+@property (nonatomic, readonly) RNCryptorEngine *engine;
 @property (nonatomic, readonly) NSMutableData *outData;
-@property (nonatomic, readwrite, assign) CCCryptorRef cryptor;
 @property (nonatomic, readonly) NSUInteger HMACLength;
 @property (nonatomic, readwrite, copy) RNCryptorHandler handler;
 @property (nonatomic, readwrite, copy) RNCryptorCompletion completion;
 @property (nonatomic, readwrite, assign) dispatch_queue_t queue;
-@property (nonatomic, readonly, strong) NSMutableData *buffer;
 @end
 
 @implementation RNEncryptor
 {
   CCHmacContext _HMACContext;
 }
-@synthesize cryptor = _cryptor;
 @synthesize outData = __outData;
 @synthesize handler = _handler;
 @synthesize completion = _completion;
 @synthesize queue = _queue;
 @synthesize HMACLength = __HMACLength;
-@synthesize buffer = __buffer;
 @synthesize responseQueue = _responseQueue;
+@synthesize engine = __engine;
+
 
 + (NSData *)encryptData:(NSData *)thePlaintext withSettings:(RNCryptorSettings)theSettings password:(NSString *)aPassword error:(NSError **)anError
 {
@@ -87,23 +87,12 @@
     NSData *IV = [[self class] randomDataOfLength:theSettings.IVSize];
     __outData = [IV mutableCopy];
 
-    CCCryptorStatus
-        cryptorStatus = CCCryptorCreateWithMode(kCCEncrypt,
-                                                theSettings.mode,
-                                                theSettings.algorithm,
-                                                theSettings.padding,
-                                                IV.bytes,
-                                                anEncryptionKey.bytes,
-                                                anEncryptionKey.length,
-        NULL, // tweak
-                                                0, // tweakLength
-                                                0, // numRounds (0=default)
-                                                theSettings.modeOptions,
-                                                &_cryptor);
-
-    if (cryptorStatus != kCCSuccess || _cryptor == NULL) {
+    __engine = [[RNCryptorEngine alloc] initWithOperation:kCCEncrypt
+                                                 settings:theSettings
+                                                      key:anEncryptionKey
+                                                       IV:IV];
+    if (!__engine) {
       self = nil;
-      NSAssert(NO, @"Could not create cryptor: %d", cryptorStatus);
       return nil;
     }
 
@@ -115,7 +104,6 @@
     _handler = [aHandler copy];
     _completion = [aCompletion copy];
     _queue = dispatch_queue_create("net.robnapier.RNEncryptor", DISPATCH_QUEUE_SERIAL);
-    __buffer = [NSMutableData data];
 
     _responseQueue = dispatch_get_current_queue();
     dispatch_retain(_responseQueue);
@@ -154,21 +142,16 @@
 
 - (void)cleanup
 {
-  if (_cryptor) {
-    CCCryptorRelease(_cryptor);
-    _cryptor = NULL;
-  }
-
   __outData = nil;
   _handler = nil;
   _completion = nil;
-
-  __buffer = nil;
 
   if (_responseQueue) {
     dispatch_release(_responseQueue);
     _responseQueue = NULL;
   }
+
+  __engine = nil;
 }
 
 - (void)dealloc
@@ -195,29 +178,17 @@
 
 - (void)addData:(NSData *)data
 {
-  NSAssert(self.cryptor != NULL, @"Cryptor has be completed");
+  NSAssert(self.engine != NULL, @"Cryptor has be completed");
 
   dispatch_async(self.queue, ^{
-    NSMutableData *buffer = self.buffer;
-    [buffer setLength:CCCryptorGetOutputLength(self.cryptor, [data length], true)]; // We'll reuse the buffer in -finish
-
-    size_t dataOutMoved;
-    CCCryptorStatus
-        cryptorStatus = CCCryptorUpdate(self.cryptor,       // cryptor
-                                        data.bytes,      // dataIn
-                                        data.length,     // dataInLength (verified > 0 above)
-                                        buffer.mutableBytes,      // dataOut
-                                        buffer.length, // dataOutAvailable
-                                        &dataOutMoved);   // dataOutMoved
-
-    if (cryptorStatus != kCCSuccess) {
-      [self cleanupAndNotifyWithStatus:cryptorStatus];
-      return;
+    NSError *error;
+    NSData *encryptedData = [self.engine addData:data error:&error];
+    if (!encryptedData) {
+      [self cleanupAndNotifyWithError:error];
     }
+    CCHmacUpdate(&_HMACContext, encryptedData.bytes, encryptedData.length);
 
-    CCHmacUpdate(&_HMACContext, buffer.bytes, dataOutMoved);
-
-    [self.outData appendData:[self.buffer subdataWithRange:NSMakeRange(0, dataOutMoved)]];
+    [self.outData appendData:encryptedData];
 
     if (self.handler) {
       dispatch_sync(self.responseQueue, ^{
@@ -230,39 +201,25 @@
 
 - (void)finish
 {
-  NSAssert(self.cryptor != NULL, @"Cryptor has be completed");
+  NSAssert(self.engine != NULL, @"Cryptor has be completed");
 
   dispatch_async(self.queue, ^{
-
-    NSMutableData *buffer = self.buffer;
-
-    size_t dataOutMoved;
-    CCCryptorStatus
-        cryptorStatus = CCCryptorFinal(self.cryptor,        // cryptor
-                                       buffer.mutableBytes,       // dataOut
-                                       buffer.length,  // dataOutAvailable
-                                       &dataOutMoved);    // dataOutMoved
-    [buffer setLength:dataOutMoved];
-    [self.outData appendData:buffer];
-
-    CCHmacUpdate(&_HMACContext, buffer.bytes, dataOutMoved);
-
+    NSError *error;
+    NSData *encryptedData = [self.engine finishWithError:&error];
+    [self.outData appendData:encryptedData];
+    CCHmacUpdate(&_HMACContext, encryptedData.bytes, encryptedData.length);
     NSMutableData *HMACData = [NSMutableData dataWithLength:self.HMACLength];
     CCHmacFinal(&_HMACContext, [HMACData mutableBytes]);
 
     [self.outData appendData:HMACData];
 
-    [self cleanupAndNotifyWithStatus:cryptorStatus];
+    [self cleanupAndNotifyWithError:error];
   });
 }
 
-- (void)cleanupAndNotifyWithStatus:(CCCryptorStatus)cryptorStatus
+- (void)cleanupAndNotifyWithError:(NSError *)error
 {
   if (self.completion) {
-    NSError *error = nil;
-    if (cryptorStatus != kCCSuccess) {
-      error = [NSError errorWithDomain:kRNCryptorErrorDomain code:cryptorStatus userInfo:nil];
-    }
     dispatch_sync(self.responseQueue, ^{
       self.completion(self.outData, error);
     });
