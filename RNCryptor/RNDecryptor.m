@@ -31,33 +31,13 @@
 
 static const NSUInteger kPreambleSize = 2;
 
-// TODO: Refactor; we don't really need a stream here. We could just work on the data? Or build a NSData reader?
-@interface NSInputStream (RNCryptor)
-- (BOOL)_RNGetData:(NSData **)data maxLength:(NSUInteger)maxLength error:(NSError **)error;
-@end
-
-@implementation NSInputStream (RNCryptor)
-- (BOOL)_RNGetData:(NSData **)data maxLength:(NSUInteger)maxLength error:(NSError **)error
-{
-  NSMutableData *buffer = [NSMutableData dataWithLength:maxLength];
-  if ([self read:buffer.mutableBytes maxLength:maxLength] < 0) {
-    if (error) {
-      *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:kRNCryptorCouldNotCreateStream userInfo:nil];
-      return NO;
-    }
-  }
-
-  *data = buffer;
-  return YES;
-}
-@end
-
 @interface NSMutableData (RNCryptor)
-- (NSData *)_RNDataRemovedToIndex:(NSUInteger)index;
+- (NSData *)_RNConsumeToIndex:(NSUInteger)index;
 @end
 
+// TODO: This is a slightly expensive solution, but it's convenient. May want to create a "walkable" data object
 @implementation NSMutableData (RNCryptor)
-- (NSData *)_RNDataRemovedToIndex:(NSUInteger)index
+- (NSData *)_RNConsumeToIndex:(NSUInteger)index
 {
   NSData *removed = [self subdataWithRange:NSMakeRange(0, index)];
   [self replaceBytesInRange:NSMakeRange(0, self.length - index) withBytes:([self mutableBytes] + index)];
@@ -77,8 +57,10 @@ static const NSUInteger kPreambleSize = 2;
 {
   CCHmacContext _HMACContext;
 }
+@synthesize inData = _inData;
 @synthesize encryptionKey = _encryptionKey;
 @synthesize HMACKey = _HMACKey;
+@synthesize password = _password;
 
 + (NSData *)decryptData:(NSData *)theCipherText withPassword:(NSString *)aPassword error:(NSError **)anError
 {
@@ -162,12 +144,12 @@ static const NSUInteger kPreambleSize = 2;
 {
   [self.inData appendData:theData];
   if (!self.engine) {
-    [self parseHeaderFromData:self.inData];
+    [self consumeHeaderFromData:self.inData];
   }
   if (self.engine) {
     NSUInteger HMACLength = self.HMACLength;
     if (self.inData.length > HMACLength) {
-      NSData *data = [self.inData _RNDataRemovedToIndex:self.inData.length - HMACLength];
+      NSData *data = [self.inData _RNConsumeToIndex:self.inData.length - HMACLength];
       [self decryptData:data];
     }
   }
@@ -194,7 +176,7 @@ static const NSUInteger kPreambleSize = 2;
   return NO;
 }
 
-- (void)parseHeaderFromData:(NSMutableData *)data
+- (void)consumeHeaderFromData:(NSMutableData *)data
 {
   if (data.length < kPreambleSize) {
     return;
@@ -213,24 +195,14 @@ static const NSUInteger kPreambleSize = 2;
     return;
   }
 
-  NSData *header = [data _RNDataRemovedToIndex:headerSize];
-  header = [header subdataWithRange:NSMakeRange(kPreambleSize, headerSize - kPreambleSize)]; // Don't need the preamble anymore
+  [data _RNConsumeToIndex:kPreambleSize]; // Throw away the preamble
 
-  NSInputStream *input = [[NSInputStream alloc] initWithData:header];
-  [input open];
   NSError *error;
   if (self.password) {
     NSAssert(!self.encryptionKey && !self.HMACKey, @"Both password and the key (%d) or HMACKey (%d) are set.", self.encryptionKey != nil, self.HMACKey != nil);
 
-    NSData *encryptionKeySalt;
-    NSData *HMACKeySalt;
-
-    if (![input _RNGetData:&encryptionKeySalt maxLength:settings.keySettings.saltSize error:&error] ||
-        ![input _RNGetData:&HMACKeySalt maxLength:settings.HMACKeySettings.saltSize error:&error]
-        ) {
-      [self cleanupAndNotifyWithError:error];
-      return;
-    }
+    NSData *encryptionKeySalt = [data _RNConsumeToIndex:settings.keySettings.saltSize];
+    NSData *HMACKeySalt = [data _RNConsumeToIndex:settings.HMACKeySettings.saltSize];
 
     self.encryptionKey = [[self class] keyForPassword:self.password withSalt:encryptionKeySalt andSettings:settings.keySettings];
     self.HMACKey = [[self class] keyForPassword:self.password withSalt:HMACKeySalt andSettings:settings.HMACKeySettings];
@@ -238,11 +210,7 @@ static const NSUInteger kPreambleSize = 2;
     self.password = nil;  // Don't need this anymore.
   }
 
-  NSData *IV;
-  if (![input _RNGetData:&IV maxLength:settings.IVSize error:&error]) {
-    [self cleanupAndNotifyWithError:error];
-    return;
-  }
+  NSData *IV = [data _RNConsumeToIndex:settings.IVSize];
 
   self.engine = [[RNCryptorEngine alloc] initWithOperation:kCCDecrypt settings:settings key:self.encryptionKey IV:IV error:&error];
   self.encryptionKey = nil; // Don't need this anymore
@@ -256,7 +224,6 @@ static const NSUInteger kPreambleSize = 2;
     self.HMACLength = settings.HMACLength;
     self.HMACKey = nil; // Don't need this anymore
   }
-  [input close];
 }
 
 - (void)finish
