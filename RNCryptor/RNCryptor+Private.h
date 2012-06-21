@@ -32,5 +32,6 @@
 @interface RNCryptor ()
 @property (nonatomic, readwrite, strong) RNCryptorEngine *engine;
 @property (nonatomic, readwrite, assign) dispatch_queue_t queue;
+@property (nonatomic, readonly) NSMutableData *outData;
 - (void)cleanup;
 @end

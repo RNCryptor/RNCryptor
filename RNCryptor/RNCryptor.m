@@ -32,6 +32,7 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
 @implementation RNCryptor
 @synthesize responseQueue = _responseQueue;
 @synthesize engine = _engine;
+@synthesize outData = __outData;
 @synthesize queue = _queue;
 
 + (NSData *)keyForPassword:(NSString *)password withSalt:(NSData *)salt andSettings:(RNCryptorKeyDerivationSettings)keySettings
@@ -74,7 +75,7 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
 
     NSString *queueName = [@"net.robnapier." stringByAppendingString:NSStringFromClass([self class])];
     _queue = dispatch_queue_create([queueName UTF8String], DISPATCH_QUEUE_SERIAL);
-
+    __outData = [NSMutableData data];
   }
   return self;
 }
@@ -91,7 +92,7 @@ NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
 - (void)cleanup
 {
   _engine = nil;
-
+  __outData = nil;
   if (_queue) {
     dispatch_release(_queue);
     _queue = NULL;

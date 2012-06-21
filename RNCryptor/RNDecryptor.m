@@ -69,7 +69,6 @@ static const NSUInteger kPreambleSize = 2;
 
 @interface RNDecryptor ()
 @property (nonatomic, readwrite, strong) NSMutableData *inData;
-@property (nonatomic, readonly) NSMutableData *outData;
 @property (nonatomic, readwrite, assign) NSUInteger HMACLength;
 @property (nonatomic, readwrite, copy) RNCryptorHandler handler;
 @property (nonatomic, readwrite, copy) RNCryptorCompletion completion;
@@ -82,7 +81,6 @@ static const NSUInteger kPreambleSize = 2;
 {
   CCHmacContext _HMACContext;
 }
-@synthesize outData = __outData;
 @synthesize handler = _handler;
 @synthesize completion = _completion;
 @synthesize HMACLength = _HMACLength;
@@ -128,7 +126,6 @@ static const NSUInteger kPreambleSize = 2;
     _completion = [aCompletion copy];
 
     _inData = [NSMutableData data];
-    __outData = [NSMutableData data];
   }
 
   return self;
@@ -148,7 +145,6 @@ static const NSUInteger kPreambleSize = 2;
 
 - (void)cleanup
 {
-  __outData = nil;
   _inData = nil;
   _handler = nil;
   _completion = nil;

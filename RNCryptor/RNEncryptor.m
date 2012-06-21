@@ -30,7 +30,6 @@
 #import "RNCryptorEngine.h"
 
 @interface RNEncryptor ()
-@property (nonatomic, readonly) NSMutableData *outData;
 @property (nonatomic, readonly) NSUInteger HMACLength;
 @property (nonatomic, readwrite, copy) RNCryptorHandler handler;
 @property (nonatomic, readwrite, copy) RNCryptorCompletion completion;
@@ -40,7 +39,6 @@
 {
   CCHmacContext _HMACContext;
 }
-@synthesize outData = __outData;
 @synthesize handler = _handler;
 @synthesize completion = _completion;
 @synthesize HMACLength = __HMACLength;
@@ -80,7 +78,7 @@
   self = [super init];
   if (self) {
     NSData *IV = [[self class] randomDataOfLength:theSettings.IVSize];
-    __outData = [IV mutableCopy];
+    [self.outData setData:IV];
 
     if (anHMACKey) {
       CCHmacInit(&_HMACContext, theSettings.HMACAlgorithm, anHMACKey.bytes, anHMACKey.length);
@@ -128,15 +126,14 @@
                      completion:aCompletion];
   if (self) {
     // Prepend our header
-    [headerData appendData:__outData];
-    __outData = headerData;
+    [headerData appendData:self.outData];
+    [self.outData setData:headerData];
   }
   return self;
 }
 
 - (void)cleanup
 {
-  __outData = nil;
   _handler = nil;
   _completion = nil;
   [super cleanup];
