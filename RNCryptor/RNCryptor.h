@@ -91,9 +91,35 @@ enum
 typedef void (^RNCryptorHandler)(NSData *);
 typedef void (^RNCryptorCompletion)(NSData *, NSError *);
 
+///** Encryptor/Decryptor for iOS
+//
+//  Provides an easy-to-use, Objective-C interface to the AES functionality of CommonCrypto. Simplifies correct handling of
+//  password stretching (PBKDF2), salting, and IV. For more information on these terms, see "Properly encrypting with AES
+//  with CommonCrypto," and iOS 5 Programming Pushing the Limits, Chapter 11. Also includes automatic HMAC handling to integrity-check messages.
+//
+//  RNCryptor is abstract. Use RNEncryptor to encrypt or RNDecryptor to decrypt
+// */
+//
+
 @interface RNCryptor : NSObject
+
+/** Generate key given a password and salt using a PBKDF
+*
+* @param password Password to use for PBKDF
+* @param salt Salt for password
+* @param keySettings Settings for the derivation (RNCryptorKeyDerivationSettings)
+* @returns Key
+* @throws if settings are illegal
+*/
 + (NSData *)keyForPassword:(NSString *)password withSalt:(NSData *)salt andSettings:(RNCryptorKeyDerivationSettings)keySettings;
+
+/** Generate random data
+*
+* @param length Length of data to generate
+* @returns random data
+*/
 + (NSData *)randomDataOfLength:(size_t)length;
+
 @end
 
 
@@ -101,16 +127,6 @@ typedef void (^RNCryptorCompletion)(NSData *, NSError *);
 
 //typedef void (^RNCryptorReadCallback)(NSData *readData);
 //typedef void (^RNCryptorWriteCallback)(NSData *writeData);
-//
-///** Encryptor/Decryptor for iOS
-//
-//  Provides an easy-to-use, Objective-C interface to the AES functionality of CommonCrypto. Simplifies correct handling of
-//  password stretching (PBKDF2), salting, and IV. For more information on these terms, see "Properly encrypting with AES
-//  with CommonCrypto," and iOS 5 Programming Pushing the Limits, Chapter 11. Also includes automatic HMAC handling to integrity-check messages.
-//
-//  RNCryptor is immutable, stateless and thread-safe. A given cryptor object may be used simultaneously on multiple threads,
-//  and can be reused to encrypt or decrypt an arbitrary number of independent messages.
-// */
 //
 //@interface RNCryptor : NSObject
 //

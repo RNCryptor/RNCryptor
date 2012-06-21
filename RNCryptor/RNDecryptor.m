@@ -274,7 +274,7 @@ static const NSUInteger kPreambleSize = 2;
   [input open];
   NSError *error;
   if (self.password) {
-    NSAssert(!self.encryptionKey && !self.HMACKey, @"Both password and the key (%d) or HMACKey (%d) are set. This should never happen.", self.encryptionKey != nil, self.HMACKey != nil);
+    NSAssert(!self.encryptionKey && !self.HMACKey, @"Both password and the key (%d) or HMACKey (%d) are set.", self.encryptionKey != nil, self.HMACKey != nil);
 
     NSData *encryptionKeySalt;
     NSData *HMACKeySalt;
