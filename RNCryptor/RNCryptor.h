@@ -29,6 +29,7 @@
 #import <CommonCrypto/CommonKeyDerivation.h>
 
 extern NSString *const kRNCryptorErrorDomain;
+extern const uint8_t kRNCryptorFileVersion;
 
 typedef struct _RNCryptorKeyDerivationSettings
 {

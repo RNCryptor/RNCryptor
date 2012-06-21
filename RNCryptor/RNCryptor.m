@@ -28,6 +28,7 @@
 #import "RNCryptor+Private.h"
 
 NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
+const uint8_t kRNCryptorFileVersion = 0;
 
 @implementation RNCryptor
 @synthesize responseQueue = _responseQueue;

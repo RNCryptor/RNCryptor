@@ -29,7 +29,6 @@
 #import "RNDecryptor.h"
 #import "RNCryptorEngine.h"
 
-static const uint8_t kCurrentFileVersion = 0; // FIXME: Move to superclass
 static const NSUInteger kPreambleSize = 2;
 
 // TODO: Refactor; we don't really need a stream here. We could just work on the data? Or build a NSData reader?
@@ -187,7 +186,7 @@ static const NSUInteger kPreambleSize = 2;
 - (BOOL)getSettings:(RNCryptorSettings *)settings forPreamble:(NSData *)preamble
 {
   const uint8_t *bytes = [preamble bytes];
-  if (bytes[0] == kCurrentFileVersion && bytes[1] == 0) { // Version 0, no options
+  if (bytes[0] == kRNCryptorFileVersion && bytes[1] == 0) { // Version 0, no options
     *settings = kRNCryptorAES256Settings;
     return YES;
   }
