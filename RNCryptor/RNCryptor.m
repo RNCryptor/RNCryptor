@@ -36,6 +36,8 @@ const uint8_t kRNCryptorFileVersion = 0;
 @synthesize outData = __outData;
 @synthesize queue = _queue;
 @synthesize HMACLength = __HMACLength;
+@synthesize error = _error;
+@synthesize finished = _finished;
 
 + (NSData *)keyForPassword:(NSString *)password withSalt:(NSData *)salt andSettings:(RNCryptorKeyDerivationSettings)keySettings
 {
@@ -68,8 +70,9 @@ const uint8_t kRNCryptorFileVersion = 0;
   return data;
 }
 
-- (id)initWithHandler:(RNCryptorHandler)handler completion:(RNCryptorCompletion)completion;
+- (id)initWithHandler:(RNCryptorHandler)handler
 {
+  NSParameterAssert(handler);
   self = [super init];
   if (self) {
     _responseQueue = dispatch_get_current_queue();
@@ -80,30 +83,21 @@ const uint8_t kRNCryptorFileVersion = 0;
     __outData = [NSMutableData data];
 
     _handler = [handler copy];
-    _completion = [completion copy];
   }
   return self;
 }
 
 - (void)dealloc
 {
-  [self cleanup];
   if (_responseQueue) {
     dispatch_release(_responseQueue);
     _responseQueue = NULL;
   }
-}
 
-- (void)cleanup
-{
-  _engine = nil;
-  __outData = nil;
   if (_queue) {
     dispatch_release(_queue);
     _queue = NULL;
   }
-  _handler = nil;
-  _completion = nil;
 }
 
 - (void)setResponseQueue:(dispatch_queue_t)aResponseQueue

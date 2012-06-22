@@ -38,15 +38,17 @@
 {
   dispatch_semaphore_t sem = dispatch_semaphore_create(0);
 
-  __block NSData *encryptedData;
+  NSMutableData *encryptedData = [NSMutableData data];
   __block NSError *returnedError;
   RNEncryptor *cryptor = [[self alloc] initWithSettings:theSettings
                                                password:aPassword
-                                                handler:nil completion:^(NSData *d, NSError *e) {
-        encryptedData = d;
-        returnedError = e;
-        dispatch_semaphore_signal(sem);
-      }];
+                                                handler:^(RNCryptor *c, NSData *d) {
+                                                  [encryptedData appendData:d];
+                                                  if (c.isFinished) {
+                                                    returnedError = c.error;
+                                                    dispatch_semaphore_signal(sem);
+                                                  }
+                                                }];
   dispatch_queue_t queue = dispatch_queue_create("net.robnapier.RNEncryptor.response", DISPATCH_QUEUE_SERIAL);
   cryptor.responseQueue = queue;
   [cryptor addData:thePlaintext];
@@ -64,9 +66,9 @@
   return encryptedData;
 }
 
-- (RNEncryptor *)initWithSettings:(RNCryptorSettings)theSettings encryptionKey:(NSData *)anEncryptionKey HMACKey:(NSData *)anHMACKey handler:(RNCryptorHandler)aHandler completion:(RNCryptorCompletion)aCompletion
+- (RNEncryptor *)initWithSettings:(RNCryptorSettings)theSettings encryptionKey:(NSData *)anEncryptionKey HMACKey:(NSData *)anHMACKey handler:(RNCryptorHandler)aHandler
 {
-  self = [super initWithHandler:aHandler completion:aCompletion];
+  self = [super initWithHandler:aHandler];
   if (self) {
     NSData *IV = [[self class] randomDataOfLength:theSettings.IVSize];
     [self.outData setData:IV];
@@ -92,7 +94,7 @@
   return self;
 }
 
-- (RNEncryptor *)initWithSettings:(RNCryptorSettings)theSettings password:(NSString *)aPassword handler:(RNCryptorHandler)aHandler completion:(RNCryptorCompletion)aCompletion
+- (RNEncryptor *)initWithSettings:(RNCryptorSettings)theSettings password:(NSString *)aPassword handler:(RNCryptorHandler)aHandler
 {
   NSParameterAssert(aPassword != nil);
 
@@ -110,8 +112,7 @@
   self = [self initWithSettings:theSettings
                   encryptionKey:encryptionKey
                         HMACKey:HMACKey
-                        handler:aHandler
-                     completion:aCompletion];
+                        handler:aHandler];
   if (self) {
     // Prepend our header
     [headerData appendData:self.outData];
@@ -122,7 +123,9 @@
 
 - (void)addData:(NSData *)data
 {
-  NSAssert(self.engine != NULL, @"Cryptor has be completed");
+  if (self.isFinished) {
+    return;
+  }
 
   dispatch_async(self.queue, ^{
     NSError *error;
@@ -134,18 +137,18 @@
 
     [self.outData appendData:encryptedData];
 
-    if (self.handler) {
-      dispatch_sync(self.responseQueue, ^{
-        self.handler(self.outData);
-      });
-      [self.outData setLength:0];
-    }
+    dispatch_sync(self.responseQueue, ^{
+      self.handler(self, self.outData);
+    });
+    [self.outData setLength:0];
   });
 }
 
 - (void)finish
 {
-  NSAssert(self.engine != NULL, @"Cryptor has be completed");
+  if (self.isFinished) {
+    return;
+  }
 
   dispatch_async(self.queue, ^{
     NSError *error;
@@ -163,12 +166,11 @@
 
 - (void)cleanupAndNotifyWithError:(NSError *)error
 {
-  if (self.completion) {
-    dispatch_sync(self.responseQueue, ^{
-      self.completion(self.outData, error);
-    });
-  }
-  [self cleanup];
+  self.error = error;
+  self.finished = YES;
+  dispatch_sync(self.responseQueue, ^{
+    self.handler(self, self.outData);
+  });
 }
 
 @end

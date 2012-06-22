@@ -33,10 +33,10 @@
 @property (nonatomic, readwrite, strong) RNCryptorEngine *engine;
 @property (nonatomic, readwrite, assign) dispatch_queue_t queue;
 @property (nonatomic, readonly) NSMutableData *outData;
-@property (nonatomic, readonly) RNCryptorHandler handler;
-@property (nonatomic, readonly) RNCryptorCompletion completion;
+@property (nonatomic, readwrite, copy) RNCryptorHandler handler;
 @property (nonatomic, readwrite, assign) NSUInteger HMACLength;
+@property (nonatomic, readwrite, strong) NSError *error;
+@property (nonatomic, readwrite, assign, getter=isFinished) BOOL finished;
 
-- (id)initWithHandler:(RNCryptorHandler)handler completion:(RNCryptorCompletion)completion;
-- (void)cleanup;
+- (id)initWithHandler:(RNCryptorHandler)handler;
 @end

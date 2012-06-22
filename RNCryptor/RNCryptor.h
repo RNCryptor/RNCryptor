@@ -84,13 +84,11 @@ enum
 {
   kRNCryptorHMACMismatch = 1,
   kRNCryptorUnknownHeader = 2,
-  kRNCryptorCouldNotCreateStream = 3,
-  kRNCryptorCouldNotReadStream = 4,
-  kRNCryptorCouldNotWriteStream = 5,
 };
 
-typedef void (^RNCryptorHandler)(NSData *);
-typedef void (^RNCryptorCompletion)(NSData *, NSError *);
+@class RNCryptor;
+
+typedef void (^RNCryptorHandler)(RNCryptor *cryptor, NSData *data);
 
 ///** Encryptor/Decryptor for iOS
 //
@@ -105,6 +103,8 @@ typedef void (^RNCryptorCompletion)(NSData *, NSError *);
 @interface RNCryptor : NSObject
 
 @property (nonatomic, readwrite) dispatch_queue_t responseQueue;
+@property (nonatomic, readonly, strong) NSError *error;
+@property (nonatomic, readonly, getter=isFinished) BOOL finished;
 
 /** Generate key given a password and salt using a PBKDF
 *

@@ -32,12 +32,10 @@
 
 - (RNDecryptor *)initWithEncryptionKey:(NSData *)encryptionKey
                                HMACKey:(NSData *)HMACKey
-                               handler:(RNCryptorHandler)handler
-                            completion:(RNCryptorCompletion)completion;
+                               handler:(RNCryptorHandler)handler;
 
 - (RNDecryptor *)initWithPassword:(NSString *)password
-                          handler:(RNCryptorHandler)handler
-                       completion:(RNCryptorCompletion)completion;
+                          handler:(RNCryptorHandler)handler;
 
 - (void)addData:(NSData *)data;
 - (void)finish;
