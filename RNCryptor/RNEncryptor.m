@@ -46,35 +46,21 @@
 
 + (NSData *)encryptData:(NSData *)thePlaintext withSettings:(RNCryptorSettings)theSettings password:(NSString *)aPassword error:(NSError **)anError
 {
-  dispatch_semaphore_t sem = dispatch_semaphore_create(0);
-
-  NSMutableData *encryptedData = [NSMutableData data];
-  __block NSError *returnedError;
   RNEncryptor *cryptor = [[self alloc] initWithSettings:theSettings
                                                password:aPassword
-                                                handler:^(RNCryptor *c, NSData *d) {
-                                                  [encryptedData appendData:d];
-                                                  if (c.isFinished) {
-                                                    returnedError = c.error;
-                                                    dispatch_semaphore_signal(sem);
-                                                  }
-                                                }];
-  dispatch_queue_t queue = dispatch_queue_create("net.robnapier.RNEncryptor.response", DISPATCH_QUEUE_SERIAL);
-  cryptor.responseQueue = queue;
-  [cryptor addData:thePlaintext];
-  [cryptor finish];
-
-  dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
-
-  if (anError) {
-    *anError = returnedError;
-  }
-
-  dispatch_release(sem);
-  dispatch_release(queue);
-
-  return encryptedData;
+                                                handler:^(RNCryptor *c, NSData *d) {}];
+  return [self synchronousResultForCryptor:cryptor data:thePlaintext error:anError];
 }
+
++ (NSData *)encryptData:(NSData *)thePlaintext withSettings:(RNCryptorSettings)theSettings encryptionKey:(NSData *)anEncryptionKey HMACKey:(NSData *)anHMACKey error:(NSError **)anError
+{
+  RNEncryptor *cryptor = [[self alloc] initWithSettings:theSettings
+                                          encryptionKey:anEncryptionKey
+                                                HMACKey:anHMACKey
+                                                handler:^(RNCryptor *c, NSData *d) {}];
+  return [self synchronousResultForCryptor:cryptor data:thePlaintext error:anError];
+}
+
 
 - (RNEncryptor *)initWithSettings:(RNCryptorSettings)theSettings encryptionKey:(NSData *)anEncryptionKey HMACKey:(NSData *)anHMACKey handler:(RNCryptorHandler)aHandler
 {

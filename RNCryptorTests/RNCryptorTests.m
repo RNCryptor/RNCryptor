@@ -219,6 +219,28 @@ NSString *const kBadPassword = @"NotThePassword";
   STAssertEqualObjects(decryptedData, data, @"Incorrect decryption.");
 }
 
+- (void)testKey
+{
+  NSData *data = [RNCryptor randomDataOfLength:1024];
+  NSData *encryptionKey = [RNCryptor randomDataOfLength:kRNCryptorAES256Settings.keySettings.keySize];
+  NSData *HMACKey = [RNCryptor randomDataOfLength:kRNCryptorAES256Settings.HMACKeySettings.keySize];
+  NSError *error;
+
+  NSData *encryptedData = [RNEncryptor encryptData:data
+                                      withSettings:kRNCryptorAES256Settings
+                                     encryptionKey:encryptionKey
+                                           HMACKey:HMACKey
+                                             error:&error];
+
+  STAssertNil(error, @"Encryption error:%@", error);
+  STAssertNotNil(encryptedData, @"Data did not encrypt.");
+
+  NSError *decryptionError;
+  NSData *decryptedData = [RNDecryptor decryptData:encryptedData withEncryptionKey:encryptionKey HMACKey:HMACKey error:&decryptionError];
+  STAssertNil(decryptionError, @"Error decrypting:%@", decryptionError);
+  STAssertEqualObjects(decryptedData, data, @"Incorrect decryption.");
+}
+
 //
 //- (void)_testDataOfLength:(NSUInteger)length encryptPassword:(NSString *)encryptPassword decryptPassword:(NSString *)decryptPassword
 //{

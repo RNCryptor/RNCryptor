@@ -107,10 +107,13 @@ typedef void (^RNCryptorHandler)(RNCryptor *cryptor, NSData *data);
 //
 
 @interface RNCryptor : NSObject
-
-@property (nonatomic, readwrite) dispatch_queue_t responseQueue;
 @property (nonatomic, readonly, strong) NSError *error;
 @property (nonatomic, readonly, getter=isFinished) BOOL finished;
+@property (nonatomic, readonly, copy) RNCryptorHandler handler;
+@property (nonatomic, readwrite) dispatch_queue_t responseQueue;
+
+- (void)addData:(NSData *)data;
+- (void)finish;
 
 /** Generate key given a password and salt using a PBKDF
 *
@@ -130,8 +133,6 @@ typedef void (^RNCryptorHandler)(RNCryptor *cryptor, NSData *data);
 + (NSData *)randomDataOfLength:(size_t)length;
 
 @end
-
-
 
 
 //typedef void (^RNCryptorReadCallback)(NSData *readData);

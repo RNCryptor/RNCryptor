@@ -37,9 +37,7 @@
                          password:(NSString *)password
                           handler:(RNCryptorHandler)handler;
 
-- (void)addData:(NSData *)data;
-- (void)finish;
-
 + (NSData *)encryptData:(NSData *)data withSettings:(RNCryptorSettings)settings password:(NSString *)password error:(NSError **)error;
++ (NSData *)encryptData:(NSData *)data withSettings:(RNCryptorSettings)settings encryptionKey:(NSData *)encryptionKey HMACKey:(NSData *)HMACKey error:(NSError **)error;
 
 @end

@@ -40,6 +40,45 @@ const uint8_t kRNCryptorFileVersion = 1;
 @synthesize finished = _finished;
 @synthesize options = _options;
 
++ (NSData *)synchronousResultForCryptor:(RNCryptor *)cryptor data:(NSData *)inData error:(NSError **)anError
+{
+  dispatch_semaphore_t sem = dispatch_semaphore_create(0);
+
+  NSMutableData *data = [NSMutableData data];
+  __block NSError *returnedError;
+
+  RNCryptorHandler handler = ^(RNCryptor *c, NSData *d) {
+    [data appendData:d];
+    if (c.isFinished) {
+      returnedError = c.error;
+      dispatch_semaphore_signal(sem);
+    }
+  };
+
+  cryptor.handler = handler;
+
+  dispatch_queue_t queue = dispatch_queue_create("net.robnapier.RNEncryptor.response", DISPATCH_QUEUE_SERIAL);
+  cryptor.responseQueue = queue;
+  [cryptor addData:inData];
+  [cryptor finish];
+
+
+  dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
+
+  dispatch_release(sem);
+  dispatch_release(queue);
+
+  if (returnedError) {
+    if (anError) {
+      *anError = returnedError;
+    }
+    return nil;
+  }
+  else {
+    return data;
+  }
+}
+
 
 + (NSData *)keyForPassword:(NSString *)password withSalt:(NSData *)salt andSettings:(RNCryptorKeyDerivationSettings)keySettings
 {
@@ -114,5 +153,16 @@ const uint8_t kRNCryptorFileVersion = 1;
 
   _responseQueue = aResponseQueue;
 }
+
+- (void)addData:(NSData *)data
+{
+
+}
+
+- (void)finish
+{
+
+}
+
 
 @end

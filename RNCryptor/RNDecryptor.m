@@ -64,37 +64,18 @@ static const NSUInteger kPreambleSize = 2;
 
 + (NSData *)decryptData:(NSData *)theCipherText withPassword:(NSString *)aPassword error:(NSError **)anError
 {
-  dispatch_semaphore_t sem = dispatch_semaphore_create(0);
-
-  NSMutableData *decryptedData = [NSMutableData data];
-  __block NSError *returnedError;
   RNDecryptor *cryptor = [[self alloc] initWithPassword:aPassword
-                                                handler:^(RNCryptor *c, NSData *d) {
-                                                  [decryptedData appendData:d];
-                                                  if (c.isFinished) {
-                                                    returnedError = c.error;
-                                                    dispatch_semaphore_signal(sem);
-                                                  }
-                                                }];
-  dispatch_queue_t queue = dispatch_queue_create("net.robnapier.RNDecryptor.response", DISPATCH_QUEUE_SERIAL);
-  cryptor.responseQueue = queue;
-  [cryptor addData:theCipherText];
-  [cryptor finish];
+                                                handler:^(RNCryptor *c, NSData *d) {}];
+  return [self synchronousResultForCryptor:cryptor data:theCipherText error:anError];
+}
 
-  dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
++ (NSData *)decryptData:(NSData *)theCipherText withEncryptionKey:(NSData *)encryptionKey HMACKey:(NSData *)HMACKey error:(NSError **)anError;
+{
+  RNDecryptor *cryptor = [[self alloc] initWithEncryptionKey:encryptionKey
+                                                     HMACKey:HMACKey
+                                                     handler:^(RNCryptor *c, NSData *d) {}];
+  return [self synchronousResultForCryptor:cryptor data:theCipherText error:anError];
 
-  dispatch_release(sem);
-  dispatch_release(queue);
-
-  if (returnedError) {
-    if (anError) {
-      *anError = returnedError;
-    }
-    return nil;
-  }
-  else {
-    return decryptedData;
-  }
 }
 
 - (RNDecryptor *)initWithEncryptionKey:(NSData *)anEncryptionKey HMACKey:(NSData *)anHMACKey handler:(RNCryptorHandler)aHandler
@@ -161,16 +142,6 @@ static const NSUInteger kPreambleSize = 2;
     }
   }
 }
-
-//- (NSUInteger)headerSizeForSettings:(RNCryptorSettings)settings
-//{
-//  if (self.password) {
-//    return kPreambleSize + settings.keySettings.saltSize + settings.HMACKeySettings.saltSize + settings.IVSize;
-//  }
-//  else {
-//    return settings.IVSize;
-//  }
-//}
 
 - (BOOL)getSettings:(RNCryptorSettings *)settings forPreamble:(NSData *)preamble
 {

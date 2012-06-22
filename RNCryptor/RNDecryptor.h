@@ -37,9 +37,7 @@
 - (RNDecryptor *)initWithPassword:(NSString *)password
                           handler:(RNCryptorHandler)handler;
 
-- (void)addData:(NSData *)data;
-- (void)finish;
-
 + (NSData *)decryptData:(NSData *)data withPassword:(NSString *)password error:(NSError **)error;
++ (NSData *)decryptData:(NSData *)data withEncryptionKey:(NSData *)encryptionKey HMACKey:(NSData *)HMACKey error:(NSError **)error;
 
 @end
