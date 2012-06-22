@@ -80,6 +80,12 @@ static const RNCryptorSettings kRNCryptorAES256Settings = {
     }
 };
 
+enum _RNCryptorOptions
+{
+  kRNCryptorOptionHasPassword = 1 << 0,
+};
+typedef uint8_t RNCryptorOptions;
+
 enum
 {
   kRNCryptorHMACMismatch = 1,

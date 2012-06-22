@@ -162,21 +162,24 @@ static const NSUInteger kPreambleSize = 2;
   }
 }
 
-- (NSUInteger)headerSizeForSettings:(RNCryptorSettings)settings
-{
-  if (self.password) {
-    return kPreambleSize + settings.keySettings.saltSize + settings.HMACKeySettings.saltSize + settings.IVSize;
-  }
-  else {
-    return settings.IVSize;
-  }
-}
+//- (NSUInteger)headerSizeForSettings:(RNCryptorSettings)settings
+//{
+//  if (self.password) {
+//    return kPreambleSize + settings.keySettings.saltSize + settings.HMACKeySettings.saltSize + settings.IVSize;
+//  }
+//  else {
+//    return settings.IVSize;
+//  }
+//}
 
 - (BOOL)getSettings:(RNCryptorSettings *)settings forPreamble:(NSData *)preamble
 {
   const uint8_t *bytes = [preamble bytes];
-  if (bytes[0] == kRNCryptorFileVersion && bytes[1] == 0) { // Version 0, no options
+  if (bytes[0] == kRNCryptorFileVersion) {
     *settings = kRNCryptorAES256Settings;
+
+    self.options = bytes[1];
+
     return YES;
   }
 
@@ -197,7 +200,11 @@ static const NSUInteger kPreambleSize = 2;
                                                                                          forKey:NSLocalizedDescriptionKey]]];
   }
 
-  NSUInteger headerSize = [self headerSizeForSettings:settings];
+  NSUInteger headerSize = kPreambleSize + settings.IVSize;
+  if (self.options & kRNCryptorOptionHasPassword) {
+    headerSize += settings.keySettings.saltSize + settings.HMACKeySettings.saltSize;
+  }
+
   if (data.length < headerSize) {
     return;
   }

@@ -28,7 +28,7 @@
 #import "RNCryptor+Private.h"
 
 NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
-const uint8_t kRNCryptorFileVersion = 0;
+const uint8_t kRNCryptorFileVersion = 1;
 
 @implementation RNCryptor
 @synthesize responseQueue = _responseQueue;
@@ -38,6 +38,8 @@ const uint8_t kRNCryptorFileVersion = 0;
 @synthesize HMACLength = __HMACLength;
 @synthesize error = _error;
 @synthesize finished = _finished;
+@synthesize options = _options;
+
 
 + (NSData *)keyForPassword:(NSString *)password withSalt:(NSData *)salt andSettings:(RNCryptorKeyDerivationSettings)keySettings
 {

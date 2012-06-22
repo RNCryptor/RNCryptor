@@ -98,7 +98,7 @@ NSString *const kBadPassword = @"NotThePassword";
 
   NSURLRequest *request = [NSURLRequest requestWithURL:testURL];
   NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
-  NSLog(@"Started connection", connection);
+  NSLog(@"Started connection:%@", connection);
 
   self.isTestRunning = YES;
   __block NSMutableData *encryptedData = [NSMutableData data];
@@ -178,7 +178,7 @@ NSString *const kBadPassword = @"NotThePassword";
   NSError *error;
   NSMutableData *encrypted = [[RNEncryptor encryptData:data withSettings:kRNCryptorAES256Settings password:kGoodPassword error:&error] mutableCopy];
 
-  uint8_t firstByte = 1;
+  uint8_t firstByte = 99;
   [encrypted replaceBytesInRange:NSMakeRange(0, 1) withBytes:&firstByte];
 
   NSData *decrypted = [RNDecryptor decryptData:encrypted withPassword:kGoodPassword error:&error];

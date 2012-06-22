@@ -29,10 +29,20 @@
 #import "RNEncryptor.h"
 #import "RNCryptorEngine.h"
 
+@interface RNEncryptor ()
+@property (nonatomic, readwrite, strong) NSData *encryptionSalt;
+@property (nonatomic, readwrite, strong) NSData *HMACSalt;
+@property (nonatomic, readwrite, strong) NSData *IV;
+@property (nonatomic, readwrite, assign) BOOL haveWrittenHeader;
+@end
+
 @implementation RNEncryptor
 {
   CCHmacContext _HMACContext;
 }
+@synthesize encryptionSalt = _encryptionSalt;
+@synthesize HMACSalt = _HMACSalt;
+@synthesize IV = _IV;
 
 + (NSData *)encryptData:(NSData *)thePlaintext withSettings:(RNCryptorSettings)theSettings password:(NSString *)aPassword error:(NSError **)anError
 {
@@ -70,8 +80,7 @@
 {
   self = [super initWithHandler:aHandler];
   if (self) {
-    NSData *IV = [[self class] randomDataOfLength:theSettings.IVSize];
-    [self.outData setData:IV];
+    self.IV = [[self class] randomDataOfLength:theSettings.IVSize];
 
     if (anHMACKey) {
       CCHmacInit(&_HMACContext, theSettings.HMACAlgorithm, anHMACKey.bytes, anHMACKey.length);
@@ -82,7 +91,7 @@
     self.engine = [[RNCryptorEngine alloc] initWithOperation:kCCEncrypt
                                                     settings:theSettings
                                                          key:anEncryptionKey
-                                                          IV:IV
+                                                          IV:self.IV
                                                        error:&error];
     if (!self.engine) {
       [self cleanupAndNotifyWithError:error];
@@ -98,27 +107,34 @@
 {
   NSParameterAssert(aPassword != nil);
 
-  NSData *encryptionKeySalt = [[self class] randomDataOfLength:theSettings.keySettings.saltSize];
-  NSData *encryptionKey = [[self class] keyForPassword:aPassword withSalt:encryptionKeySalt andSettings:theSettings.keySettings];
+  NSData *encryptionSalt = [[self class] randomDataOfLength:theSettings.keySettings.saltSize];
+  NSData *encryptionKey = [[self class] keyForPassword:aPassword withSalt:encryptionSalt andSettings:theSettings.keySettings];
 
-  NSData *HMACKeySalt = [[self class] randomDataOfLength:theSettings.HMACKeySettings.saltSize];
-  NSData *HMACKey = [[self class] keyForPassword:aPassword withSalt:HMACKeySalt andSettings:theSettings.HMACKeySettings];
-
-  uint8_t header[2] = {0, 0};
-  NSMutableData *headerData = [NSMutableData dataWithBytes:header length:sizeof(header)];
-  [headerData appendData:encryptionKeySalt];
-  [headerData appendData:HMACKeySalt];
+  NSData *HMACSalt = [[self class] randomDataOfLength:theSettings.HMACKeySettings.saltSize];
+  NSData *HMACKey = [[self class] keyForPassword:aPassword withSalt:HMACSalt andSettings:theSettings.HMACKeySettings];
 
   self = [self initWithSettings:theSettings
                   encryptionKey:encryptionKey
                         HMACKey:HMACKey
                         handler:aHandler];
   if (self) {
-    // Prepend our header
-    [headerData appendData:self.outData];
-    [self.outData setData:headerData];
+    self.options |= kRNCryptorOptionHasPassword;
+    self.encryptionSalt = encryptionSalt;
+    self.HMACSalt = HMACSalt;
   }
   return self;
+}
+
+- (NSData *)header
+{
+  uint8_t header[2] = {kRNCryptorFileVersion, self.options};
+  NSMutableData *headerData = [NSMutableData dataWithBytes:header length:sizeof(header)];
+  if (self.options & kRNCryptorOptionHasPassword) {
+    [headerData appendData:self.encryptionSalt];
+    [headerData appendData:self.HMACSalt];
+  }
+  [headerData appendData:self.IV];
+  return headerData;
 }
 
 - (void)addData:(NSData *)data
@@ -128,6 +144,11 @@
   }
 
   dispatch_async(self.queue, ^{
+    if (!self.haveWrittenHeader) {
+      [self.outData setData:[self header]];
+      self.haveWrittenHeader = YES;
+    }
+
     NSError *error;
     NSData *encryptedData = [self.engine addData:data error:&error];
     if (!encryptedData) {

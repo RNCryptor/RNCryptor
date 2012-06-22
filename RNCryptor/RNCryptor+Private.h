@@ -37,6 +37,7 @@
 @property (nonatomic, readwrite, assign) NSUInteger HMACLength;
 @property (nonatomic, readwrite, strong) NSError *error;
 @property (nonatomic, readwrite, assign, getter=isFinished) BOOL finished;
+@property (nonatomic, readwrite, assign) RNCryptorOptions options;
 
 - (id)initWithHandler:(RNCryptorHandler)handler;
 @end
