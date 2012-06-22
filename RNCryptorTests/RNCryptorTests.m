@@ -97,7 +97,8 @@ NSString *const kBadPassword = @"NotThePassword";
   STAssertNotNil(plaintext, @"Couldn't download: %@", downloadError);
 
   NSURLRequest *request = [NSURLRequest requestWithURL:testURL];
-  [[NSURLConnection alloc] initWithRequest:request delegate:self];
+  NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+  NSLog(@"Started connection", connection);
 
   self.isTestRunning = YES;
   __block NSMutableData *encryptedData = [NSMutableData data];
@@ -193,6 +194,29 @@ NSString *const kBadPassword = @"NotThePassword";
 
   NSRange found = [encrypted rangeOfData:data options:0 range:NSMakeRange(0, encrypted.length)];
   STAssertEquals(found.location, (NSUInteger)NSNotFound, @"Data is not encrypted");
+}
+
+- (void)testBackground
+{
+  NSData *data = [RNCryptor randomDataOfLength:1024];
+
+  __block NSError *error;
+  __block NSData *encryptedData;
+
+  dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
+    encryptedData = [RNEncryptor encryptData:data
+                                withSettings:kRNCryptorAES256Settings
+                                    password:kGoodPassword
+                                       error:&error];
+  });
+
+  STAssertNil(error, @"Encryption error:%@", error);
+  STAssertNotNil(encryptedData, @"Data did not encrypt.");
+
+  NSError *decryptionError;
+  NSData *decryptedData = [RNDecryptor decryptData:encryptedData withPassword:kGoodPassword error:&decryptionError];
+  STAssertNil(decryptionError, @"Error decrypting:%@", decryptionError);
+  STAssertEqualObjects(decryptedData, data, @"Incorrect decryption.");
 }
 
 //
@@ -308,20 +332,6 @@ NSString *const kBadPassword = @"NotThePassword";
 //
 //  NSRange found = [encrypted rangeOfData:data options:0 range:NSMakeRange(0, encrypted.length)];
 //  STAssertEquals(found.location, (NSUInteger)NSNotFound, @"Data is not encrypted");
-//}
-//
-//- (void)testBadHeader
-//{
-//  NSData *data = [@"Data" dataUsingEncoding:NSUTF8StringEncoding];
-//  NSError *error;
-//  NSMutableData *encrypted = [[[RNCryptor AES256Cryptor] encryptData:data password:kGoodPassword error:&error] mutableCopy];
-//
-//  uint8_t firstByte = 1;
-//  [encrypted replaceBytesInRange:NSMakeRange(0, 1) withBytes:&firstByte];
-//
-//  NSData *decrypted = [[RNCryptor AES256Cryptor] decryptData:encrypted password:kGoodPassword error:&error];
-//  STAssertNil(decrypted, @"Decrypt should have failed");
-//  STAssertEquals([error code], kRNCryptorUnknownHeader, @"Wrong error code:%d", [error code]);
 //}
 //
 //- (void)testSmall
