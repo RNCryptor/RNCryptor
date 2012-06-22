@@ -25,7 +25,6 @@
 //
 
 #import "RNCryptorTests.h"
-#import "RNCryptor.h"
 #import "RNEncryptor.h"
 #import "RNDecryptor.h"
 
@@ -186,6 +185,15 @@ NSString *const kBadPassword = @"NotThePassword";
   STAssertEquals([error code], kRNCryptorUnknownHeader, @"Wrong error code:%d", [error code]);
 }
 
+- (void)testActuallyEncrypting
+{
+  NSData *data = [@"Data" dataUsingEncoding:NSUTF8StringEncoding];
+  NSError *error;
+  NSData *encrypted = [RNEncryptor encryptData:data withSettings:kRNCryptorAES256Settings password:kGoodPassword error:&error];
+
+  NSRange found = [encrypted rangeOfData:data options:0 range:NSMakeRange(0, encrypted.length)];
+  STAssertEquals(found.location, (NSUInteger)NSNotFound, @"Data is not encrypted");
+}
 
 //
 //- (void)_testDataOfLength:(NSUInteger)length encryptPassword:(NSString *)encryptPassword decryptPassword:(NSString *)decryptPassword
