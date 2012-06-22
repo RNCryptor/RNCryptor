@@ -232,7 +232,8 @@ static const NSUInteger kPreambleSize = 2;
 
 - (void)finish
 {
-  NSAssert(self.engine != NULL, @"Cryptor has be completed");
+  // FIXME: Deal correctly with 0-length data
+//  NSAssert(self.engine != NULL, @"Cryptor has be completed");
 
   dispatch_async(self.queue, ^{
     NSError *error;
