@@ -23,6 +23,17 @@
 ////  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 ////  DEALINGS IN THE SOFTWARE.
 ////
+
+#import "RNOpenSSLDecryptor.h"
+#import "RNOpenSSLEncryptor.h"
+
+
+extern NSString *const kRNCryptorOpenSSLSaltedString;
+
+NSData *RNOpenSSLCryptorGetKey(NSString *password, NSData *salt, RNCryptorKeyDerivationSettings keySettings);
+NSData *RNOpenSSLCryptorGetIV(NSData *key, NSString *password, NSData *salt, RNCryptorSettings settings);
+
+
 //
 //#import "RNCryptor.h"
 //

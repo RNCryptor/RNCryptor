@@ -49,15 +49,15 @@
 #import "RNOpenSSLEncryptor.h"
 #import "RNCryptor+Private.h"
 #import "RNCryptorEngine.h"
-
-const NSUInteger kSaltSize = 8;
-NSString *const kSaltedString = @"Salted__";
+#import "RNOpenSSLCryptor.h"
 
 @interface RNOpenSSLEncryptor ()
 @property (nonatomic, readwrite, strong) NSData *encryptionSalt;
 @end
 
 @implementation RNOpenSSLEncryptor
+@synthesize encryptionSalt = _encryptionSalt;
+
 
 - (RNEncryptor *)initWithSettings:(RNCryptorSettings)settings encryptionKey:(NSData *)encryptionKey HMACKey:(NSData *)HMACKey handler:(RNCryptorHandler)handler
 {
@@ -91,12 +91,12 @@ NSString *const kSaltedString = @"Salted__";
   NSParameterAssert(aPassword != nil);
 
   NSData *encryptionSalt = [[self class] randomDataOfLength:theSettings.keySettings.saltSize];
-  NSData *encryptionKey = [[self class] keyForPassword:aPassword withSalt:encryptionSalt andSettings:theSettings.keySettings];
+  NSData *encryptionKey = RNOpenSSLCryptorGetKey(aPassword, encryptionSalt, theSettings.keySettings);
 
   self = [self initWithSettings:theSettings
                   encryptionKey:encryptionKey
-                             IV:[[self class] IVForKey:encryptionKey password:aPassword salt:encryptionSalt]
-      handler:aHandler];
+                             IV:RNOpenSSLCryptorGetIV(encryptionKey, aPassword, encryptionSalt, theSettings)
+                        handler:aHandler];
   if (self) {
     self.options |= kRNCryptorOptionHasPassword;
     self.encryptionSalt = encryptionSalt;
@@ -104,61 +104,9 @@ NSString *const kSaltedString = @"Salted__";
   return self;
 }
 
-+ (NSData *)hashForHash:(NSData *)hash passwordSalt:(NSData *)passwordSalt
-{
-  unsigned char md[CC_MD5_DIGEST_LENGTH];
-
-  NSMutableData *hashMaterial = [NSMutableData dataWithData:hash];
-  [hashMaterial appendData:passwordSalt];
-  CC_MD5([hashMaterial bytes], [hashMaterial length], md);
-
-  return [NSData dataWithBytes:md length:sizeof(md)];
-}
-
-+ (NSData *)keyForPassword:(NSString *)password withSalt:(NSData *)salt andSettings:(RNCryptorKeyDerivationSettings)keySettings
-{
-  // FIXME: This is all very inefficient; we repeat ourselves in IVForKey:...
-
-  // Hash0 = ''
-  // Hash1 = MD5(Hash0 + Password + Salt)
-  // Hash2 = MD5(Hash1 + Password + Salt)
-  // Hash3 = MD5(Hash2 + Password + Salt)
-  // Hash4 = MD5(Hash3 + Password + Salt)
-  //
-  // Key = Hash1 + Hash2
-  // IV = Hash3 + Hash4
-
-  NSMutableData *passwordSalt = [[password dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
-  [passwordSalt appendData:salt];
-
-  NSData *hash1 = [self hashForHash:nil passwordSalt:passwordSalt];
-  NSData *hash2 = [self hashForHash:hash1 passwordSalt:passwordSalt];
-
-  NSMutableData *key = [hash1 mutableCopy];
-  [key appendData:hash2];
-
-  return key;
-}
-
-+ (NSData *)IVForKey:(NSData *)key password:(NSString *)password salt:(NSData *)salt
-{
-  NSMutableData *passwordSalt = [[password dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
-  [passwordSalt appendData:salt];
-
-  NSData *hash1 = [self hashForHash:nil passwordSalt:passwordSalt];
-  NSData *hash2 = [self hashForHash:hash1 passwordSalt:passwordSalt];
-  NSData *hash3 = [self hashForHash:hash2 passwordSalt:passwordSalt];
-  NSData *hash4 = [self hashForHash:hash3 passwordSalt:passwordSalt];
-
-  NSMutableData *IV = [hash3 mutableCopy];
-  [IV appendData:hash4];
-
-  return IV;
-}
-
 - (NSData *)header
 {
-  NSMutableData *headerData = [[kSaltedString dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
+  NSMutableData *headerData = [[kRNCryptorOpenSSLSaltedString dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
   [headerData appendData:self.encryptionSalt];
   return headerData;
 }

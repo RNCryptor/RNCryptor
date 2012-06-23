@@ -23,31 +23,89 @@
 ////  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 ////  DEALINGS IN THE SOFTWARE.
 ////
+
+
+// For aes-128:
 //
-//// For aes-128:
-////
-//// key = MD5(password + salt)
-//// IV = MD5(Key + password + salt)
+// key = MD5(password + salt)
+// IV = MD5(Key + password + salt)
+
 //
-////
-//// For aes-256:
-////
-//// Hash0 = ''
-//// Hash1 = MD5(Hash0 + Password + Salt)
-//// Hash2 = MD5(Hash1 + Password + Salt)
-//// Hash3 = MD5(Hash2 + Password + Salt)
-//// Hash4 = MD5(Hash3 + Password + Salt)
-////
-//// Key = Hash1 + Hash2
-//// IV = Hash3 + Hash4
-////
+// For aes-256:
 //
-//// File Format:
-////
-//// |Salted___|<salt>|<ciphertext>|
-////
+// Hash0 = ''
+// Hash1 = MD5(Hash0 + Password + Salt)
+// Hash2 = MD5(Hash1 + Password + Salt)
+// Hash3 = MD5(Hash2 + Password + Salt)
+// Hash4 = MD5(Hash3 + Password + Salt)
 //
-//#import "RNOpenSSLCryptor.h"
+// Key = Hash1 + Hash2
+// IV = Hash3 + Hash4
+//
+
+// File Format:
+//
+// |Salted___|<salt>|<ciphertext>|
+//
+
+#import "RNOpenSSLCryptor.h"
+
+NSString *const kRNCryptorOpenSSLSaltedString = @"Salted__";
+
+static NSData *GetHashForHash(NSData *hash, NSData *passwordSalt) {
+  unsigned char md[CC_MD5_DIGEST_LENGTH];
+
+  NSMutableData *hashMaterial = [NSMutableData dataWithData:hash];
+  [hashMaterial appendData:passwordSalt];
+  CC_MD5([hashMaterial bytes], [hashMaterial length], md);
+
+  return [NSData dataWithBytes:md length:sizeof(md)];
+}
+
+
+NSData *RNOpenSSLCryptorGetKey(NSString *password, NSData *salt, RNCryptorKeyDerivationSettings keySettings) {
+  // FIXME: This is all very inefficient; we repeat ourselves in IVForKey:...
+
+  // Hash0 = ''
+  // Hash1 = MD5(Hash0 + Password + Salt)
+  // Hash2 = MD5(Hash1 + Password + Salt)
+  // Hash3 = MD5(Hash2 + Password + Salt)
+  // Hash4 = MD5(Hash3 + Password + Salt)
+  //
+  // Key = Hash1 + Hash2
+  // IV = Hash3 + Hash4
+
+  NSMutableData *passwordSalt = [[password dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
+  [passwordSalt appendData:salt];
+
+  NSData *hash1 = GetHashForHash(nil, passwordSalt);
+  NSData *hash2 = GetHashForHash(hash1, passwordSalt);
+
+  NSMutableData *key = [hash1 mutableCopy];
+  [key appendData:hash2];
+
+  return key;
+}
+
+NSData *RNOpenSSLCryptorGetIV(NSData *key, NSString *password, NSData *salt, RNCryptorSettings settings) {
+  NSCAssert(settings.keySettings.keySize == kCCKeySizeAES256, @"OpenSSL uses a different mechanism for AES128. Implement if needed. key is needed for AES128");
+
+  NSMutableData *passwordSalt = [[password dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
+  [passwordSalt appendData:salt];
+
+  NSData *hash1 = GetHashForHash(nil, passwordSalt);
+  NSData *hash2 = GetHashForHash(hash1, passwordSalt);
+  NSData *hash3 = GetHashForHash(hash2, passwordSalt);
+  NSData *hash4 = GetHashForHash(hash3, passwordSalt);
+
+  NSMutableData *IV = [hash3 mutableCopy];
+  [IV appendData:hash4];
+
+  return IV;
+}
+
+
+
 //
 //const NSUInteger kSaltSize = 8;
 //NSString *const kSaltedString = @"Salted__";

@@ -43,6 +43,8 @@
 @synthesize encryptionSalt = _encryptionSalt;
 @synthesize HMACSalt = _HMACSalt;
 @synthesize IV = _IV;
+@synthesize haveWrittenHeader = _haveWrittenHeader;
+
 
 + (NSData *)encryptData:(NSData *)thePlaintext withSettings:(RNCryptorSettings)theSettings password:(NSString *)aPassword error:(NSError **)anError
 {
@@ -93,10 +95,10 @@
   NSParameterAssert(aPassword != nil);
 
   NSData *encryptionSalt = [[self class] randomDataOfLength:theSettings.keySettings.saltSize];
-  NSData *encryptionKey = [[self class] keyForPassword:aPassword withSalt:encryptionSalt andSettings:theSettings.keySettings];
+  NSData *encryptionKey = [[self class] keyForPassword:aPassword salt:encryptionSalt settings:theSettings.keySettings];
 
   NSData *HMACSalt = [[self class] randomDataOfLength:theSettings.HMACKeySettings.saltSize];
-  NSData *HMACKey = [[self class] keyForPassword:aPassword withSalt:HMACSalt andSettings:theSettings.HMACKeySettings];
+  NSData *HMACKey = [[self class] keyForPassword:aPassword salt:HMACSalt settings:theSettings.HMACKeySettings];
 
   self = [self initWithSettings:theSettings
                   encryptionKey:encryptionKey

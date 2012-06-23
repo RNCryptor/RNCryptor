@@ -39,6 +39,7 @@ const uint8_t kRNCryptorFileVersion = 1;
 @synthesize error = _error;
 @synthesize finished = _finished;
 @synthesize options = _options;
+@synthesize handler = _handler;
 
 + (NSData *)synchronousResultForCryptor:(RNCryptor *)cryptor data:(NSData *)inData error:(NSError **)anError
 {
@@ -80,7 +81,7 @@ const uint8_t kRNCryptorFileVersion = 1;
 }
 
 
-+ (NSData *)keyForPassword:(NSString *)password withSalt:(NSData *)salt andSettings:(RNCryptorKeyDerivationSettings)keySettings
++ (NSData *)keyForPassword:(NSString *)password salt:(NSData *)salt settings:(RNCryptorKeyDerivationSettings)keySettings
 {
   NSMutableData *derivedKey = [NSMutableData dataWithLength:keySettings.keySize];
 

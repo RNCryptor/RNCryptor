@@ -105,7 +105,9 @@ static const NSUInteger kPreambleSize = 2;
 - (void)decryptData:(NSData *)data
 {
   dispatch_async(self.queue, ^{
-    CCHmacUpdate(&_HMACContext, data.bytes, data.length);
+    if (self.hasHMAC) {
+      CCHmacUpdate(&_HMACContext, data.bytes, data.length);
+    }
 
     NSError *error;
     NSData *decryptedData = [self.engine addData:data error:&error];
@@ -189,8 +191,8 @@ static const NSUInteger kPreambleSize = 2;
     NSData *encryptionKeySalt = [data _RNConsumeToIndex:settings.keySettings.saltSize];
     NSData *HMACKeySalt = [data _RNConsumeToIndex:settings.HMACKeySettings.saltSize];
 
-    self.encryptionKey = [[self class] keyForPassword:self.password withSalt:encryptionKeySalt andSettings:settings.keySettings];
-    self.HMACKey = [[self class] keyForPassword:self.password withSalt:HMACKeySalt andSettings:settings.HMACKeySettings];
+    self.encryptionKey = [[self class] keyForPassword:self.password salt:encryptionKeySalt settings:settings.keySettings];
+    self.HMACKey = [[self class] keyForPassword:self.password salt:HMACKeySalt settings:settings.HMACKeySettings];
 
     self.password = nil;  // Don't need this anymore.
   }
@@ -227,15 +229,17 @@ static const NSUInteger kPreambleSize = 2;
     }
     [self.outData appendData:decryptedData];
 
-    NSMutableData *HMACData = [NSMutableData dataWithLength:self.HMACLength];
-    CCHmacFinal(&_HMACContext, [HMACData mutableBytes]);
+    if (self.hasHMAC) {
+      NSMutableData *HMACData = [NSMutableData dataWithLength:self.HMACLength];
+      CCHmacFinal(&_HMACContext, [HMACData mutableBytes]);
 
-    if (![HMACData isEqualToData:self.inData]) {
-      [self cleanupAndNotifyWithError:[NSError errorWithDomain:kRNCryptorErrorDomain
-                                                          code:kRNCryptorHMACMismatch
-                                                      userInfo:[NSDictionary dictionaryWithObject:@"HMAC Mismatch" /* DNL */
-                                                                                           forKey:NSLocalizedDescriptionKey]]];
-      return;
+      if (![HMACData isEqualToData:self.inData]) {
+        [self cleanupAndNotifyWithError:[NSError errorWithDomain:kRNCryptorErrorDomain
+                                                            code:kRNCryptorHMACMismatch
+                                                        userInfo:[NSDictionary dictionaryWithObject:@"HMAC Mismatch" /* DNL */
+                                                                                             forKey:NSLocalizedDescriptionKey]]];
+        return;
+      }
     }
 
     [self cleanupAndNotifyWithError:nil];

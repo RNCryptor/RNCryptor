@@ -42,18 +42,13 @@
   self = [super init];
   if (self) {
     CCCryptorStatus
-        cryptorStatus = CCCryptorCreateWithMode(operation,
-                                                settings.mode,
-                                                settings.algorithm,
-                                                settings.padding,
-                                                IV.bytes,
-                                                key.bytes,
-                                                key.length,
-        NULL, // tweak
-                                                0, // tweakLength
-                                                0, // numRounds (0=default)
-                                                settings.modeOptions,
-                                                &__cryptor);
+        cryptorStatus = CCCryptorCreate(operation,
+                                        settings.algorithm,
+                                        settings.options,
+                                        key.bytes,
+                                        key.length,
+                                        IV.bytes,
+                                        &__cryptor);
     if (cryptorStatus != kCCSuccess || __cryptor == NULL) {
       if (error) {
         *error = [NSError errorWithDomain:kRNCryptorErrorDomain code:cryptorStatus userInfo:nil];

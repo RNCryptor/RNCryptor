@@ -32,12 +32,15 @@
 NSString *const kGoodPassword = @"Passw0rd!";
 NSString *const kBadPassword = @"NotThePassword";
 
-@interface RNCryptorTests () <NSURLConnectionDataDelegate>
+@interface RNCryptorTests () // <NSURLConnectionDataDelegate>
 @property (nonatomic, readwrite, assign) BOOL isTestRunning;
 @property (nonatomic, readwrite, strong) RNEncryptor *encryptor;
 @end
 
 @implementation RNCryptorTests
+@synthesize encryptor = _encryptor;
+@synthesize isTestRunning = _isTestRunning;
+
 
 - (void)setUp
 {
@@ -166,11 +169,10 @@ NSString *const kBadPassword = @"NotThePassword";
   NSMutableData *corruptData = [encryptedData mutableCopy];
   [corruptData replaceBytesInRange:NSMakeRange(100, 100) withBytes:[[RNCryptor randomDataOfLength:100] bytes]];
 
-
   NSError *decryptionError;
-  NSData *decryptedData = [RNDecryptor decryptData:encryptedData withPassword:kBadPassword error:&decryptionError];
+  NSData *decryptedData = [RNDecryptor decryptData:corruptData withPassword:kGoodPassword error:&decryptionError];
   STAssertNil(decryptedData, @"Decryption should be nil: %@", decryptedData);
-  STAssertEquals([decryptionError code], kRNCryptorHMACMismatch, @"Should have received kRNCryptorHMACMismatch");
+  STAssertEquals([decryptionError code], (NSInteger)kRNCryptorHMACMismatch, @"Should have received kRNCryptorHMACMismatch");
 }
 
 - (void)testBadHeader
@@ -184,7 +186,7 @@ NSString *const kBadPassword = @"NotThePassword";
 
   NSData *decrypted = [RNDecryptor decryptData:encrypted withPassword:kGoodPassword error:&error];
   STAssertNil(decrypted, @"Decrypt should have failed");
-  STAssertEquals([error code], kRNCryptorUnknownHeader, @"Wrong error code:%d", [error code]);
+  STAssertEquals([error code], (NSInteger)kRNCryptorUnknownHeader, @"Wrong error code:%d", [error code]);
 }
 
 - (void)testActuallyEncrypting
@@ -250,8 +252,6 @@ static NSString *const kOpenSSLPassword = @"Passw0rd";
 
 - (void)testOpenSSLEncrypt
 {
-  NSInputStream *input = [NSInputStream inputStreamWithData:[kOpenSSLString dataUsingEncoding:NSUTF8StringEncoding]];
-  NSOutputStream *output = [NSOutputStream outputStreamToMemory];
   NSError *error;
 
   NSData *encryptedData = [RNOpenSSLEncryptor encryptData:[kOpenSSLString dataUsingEncoding:NSUTF8StringEncoding]
