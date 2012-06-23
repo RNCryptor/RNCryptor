@@ -25,6 +25,7 @@
 //
 
 #import "RNCryptor.h"
+#import <Security/SecRandom.h>
 
 NSUInteger kSmallestBlockSize = 1024;
 
@@ -212,19 +213,13 @@ static NSUInteger NextMultipleOfUnit(NSUInteger size, NSUInteger unit) {
   // Create the cryptor
   CCCryptorRef cryptor = NULL;
   CCCryptorStatus
-      cryptorStatus = CCCryptorCreateWithMode(anOperation,
-                                              self.settings.mode,
-                                              self.settings.algorithm,
-                                              self.settings.padding,
-                                              anIV.bytes,
-                                              anEncryptionKey.bytes,
-                                              anEncryptionKey.length,
-      NULL, // tweak
-                                              0, // tweakLength
-                                              0, // numRounds (0=default)
-                                              self.settings.modeOptions,
-                                              &cryptor);
-
+  cryptorStatus = CCCryptorCreate(anOperation,
+                                  self.settings.algorithm,
+                                  self.settings.options,
+                                  anEncryptionKey.bytes,
+                                  anEncryptionKey.length,
+                                  anIV.bytes,
+                                  &cryptor);
 
   if (cryptorStatus != kCCSuccess || cryptor == NULL) {
     if (anError) {

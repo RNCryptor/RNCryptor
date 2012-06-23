@@ -44,10 +44,9 @@
 
 static const RNCryptorSettings kRNCryptorOpenSSLSettings = {
     .algorithm = kCCAlgorithmAES128,
-    .mode = kCCModeCBC,
     .blockSize = kCCBlockSizeAES128,
     .IVSize = kCCBlockSizeAES128,
-    .padding = ccPKCS7Padding,
+    .options = kCCOptionPKCS7Padding,
 
     .keySettings = {
         .keySize = kCCKeySizeAES256,

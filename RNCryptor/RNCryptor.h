@@ -42,11 +42,9 @@ typedef struct _RNCryptorKeyDerivationSettings
 typedef struct _RNCryptorSettings
 {
   CCAlgorithm algorithm;
-  CCMode mode;
-  CCModeOptions modeOptions;
   size_t blockSize;
   size_t IVSize;
-  CCPadding padding;
+  CCOptions options;
   CCHmacAlgorithm HMACAlgorithm;
   size_t HMACLength;
   RNCryptorKeyDerivationSettings keySettings;
@@ -55,10 +53,9 @@ typedef struct _RNCryptorSettings
 
 static const RNCryptorSettings kRNCryptorAES256Settings = {
     .algorithm = kCCAlgorithmAES128,
-    .mode = kCCModeCBC,
     .blockSize = kCCBlockSizeAES128,
     .IVSize = kCCBlockSizeAES128,
-    .padding = ccPKCS7Padding,
+    .options = kCCOptionPKCS7Padding,
     .HMACAlgorithm = kCCHmacAlgSHA256,
     .HMACLength = CC_SHA256_DIGEST_LENGTH,
 

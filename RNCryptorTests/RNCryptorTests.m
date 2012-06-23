@@ -242,7 +242,7 @@ NSString *const kBadPassword = @"NotThePassword";
   NSData *decryptedData = [cryptor decryptData:corruptData password:kGoodPassword error:&error];
 
   STAssertNil(decryptedData, @"Data should not have decrypted");
-  STAssertEquals([error code], 1, @"Should have received error 1");
+  STAssertEquals([error code], (NSInteger)1, @"Should have received error 1");
 }
 
 - (NSString *)temporaryFilePath
@@ -335,12 +335,12 @@ NSString *const kBadPassword = @"NotThePassword";
   NSError *error;
   NSMutableData *encrypted = [[[RNCryptor AES256Cryptor] encryptData:data password:kGoodPassword error:&error] mutableCopy];
 
-  uint8_t firstByte = 1;
+  uint8_t firstByte = 99;
   [encrypted replaceBytesInRange:NSMakeRange(0, 1) withBytes:&firstByte];
 
   NSData *decrypted = [[RNCryptor AES256Cryptor] decryptData:encrypted password:kGoodPassword error:&error];
   STAssertNil(decrypted, @"Decrypt should have failed");
-  STAssertEquals([error code], kRNCryptorUnknownHeader, @"Wrong error code:%d", [error code]);
+  STAssertEquals([error code], (NSInteger)kRNCryptorUnknownHeader, @"Wrong error code:%d", [error code]);
 }
 
 - (void)testSmall
