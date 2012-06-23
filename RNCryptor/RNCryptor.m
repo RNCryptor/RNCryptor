@@ -164,5 +164,20 @@ const uint8_t kRNCryptorFileVersion = 1;
 
 }
 
+- (void)cleanupAndNotifyWithError:(NSError *)error
+{
+  self.error = error;
+  self.finished = YES;
+  dispatch_sync(self.responseQueue, ^{
+    self.handler(self, self.outData);
+  });
+  self.handler = nil;
+}
+
+- (BOOL)hasHMAC
+{
+  return self.HMACLength > 0;
+}
+
 
 @end

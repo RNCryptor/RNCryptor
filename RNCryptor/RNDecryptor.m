@@ -242,14 +242,4 @@ static const NSUInteger kPreambleSize = 2;
   });
 }
 
-- (void)cleanupAndNotifyWithError:(NSError *)error
-{
-  self.error = error;
-  self.finished = YES;
-  dispatch_sync(self.responseQueue, ^{
-    self.handler(self, self.outData);
-  });
-  self.handler = nil;
-}
-
 @end

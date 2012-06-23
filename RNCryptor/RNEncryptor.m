@@ -61,7 +61,6 @@
   return [self synchronousResultForCryptor:cryptor data:thePlaintext error:anError];
 }
 
-
 - (RNEncryptor *)initWithSettings:(RNCryptorSettings)theSettings encryptionKey:(NSData *)anEncryptionKey HMACKey:(NSData *)anHMACKey handler:(RNCryptorHandler)aHandler
 {
   self = [super initWithHandler:aHandler];
@@ -140,7 +139,9 @@
     if (!encryptedData) {
       [self cleanupAndNotifyWithError:error];
     }
-    CCHmacUpdate(&_HMACContext, encryptedData.bytes, encryptedData.length);
+    if (self.hasHMAC) {
+      CCHmacUpdate(&_HMACContext, encryptedData.bytes, encryptedData.length);
+    }
 
     [self.outData appendData:encryptedData];
 
@@ -161,22 +162,13 @@
     NSError *error;
     NSData *encryptedData = [self.engine finishWithError:&error];
     [self.outData appendData:encryptedData];
-    CCHmacUpdate(&_HMACContext, encryptedData.bytes, encryptedData.length);
-    NSMutableData *HMACData = [NSMutableData dataWithLength:self.HMACLength];
-    CCHmacFinal(&_HMACContext, [HMACData mutableBytes]);
-
-    [self.outData appendData:HMACData];
-
+    if (self.hasHMAC) {
+      CCHmacUpdate(&_HMACContext, encryptedData.bytes, encryptedData.length);
+      NSMutableData *HMACData = [NSMutableData dataWithLength:self.HMACLength];
+      CCHmacFinal(&_HMACContext, [HMACData mutableBytes]);
+      [self.outData appendData:HMACData];
+    }
     [self cleanupAndNotifyWithError:error];
-  });
-}
-
-- (void)cleanupAndNotifyWithError:(NSError *)error
-{
-  self.error = error;
-  self.finished = YES;
-  dispatch_sync(self.responseQueue, ^{
-    self.handler(self, self.outData);
   });
 }
 

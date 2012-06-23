@@ -1,5 +1,5 @@
 //
-//  RNCryptor(Private)
+//  RNOpenSSLEncryptor
 //
 //  Copyright (c) 2012 Rob Napier
 //
@@ -25,22 +25,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "RNCryptor.h"
+#import "RNEncryptor.h"
 
-@class RNCryptorEngine;
-
-@interface RNCryptor ()
-@property (nonatomic, readwrite, strong) RNCryptorEngine *engine;
-@property (nonatomic, readwrite, assign) dispatch_queue_t queue;
-@property (nonatomic, readonly) NSMutableData *outData;
-@property (nonatomic, readwrite, copy) RNCryptorHandler handler;
-@property (nonatomic, readwrite, assign) NSUInteger HMACLength;
-@property (nonatomic, readwrite, strong) NSError *error;
-@property (nonatomic, readwrite, assign, getter=isFinished) BOOL finished;
-@property (nonatomic, readwrite, assign) RNCryptorOptions options;
-
-- (id)initWithHandler:(RNCryptorHandler)handler;
-+ (NSData *)synchronousResultForCryptor:(RNCryptor *)cryptor data:(NSData *)inData error:(NSError **)anError;
-- (void)cleanupAndNotifyWithError:(NSError *)error;
-- (BOOL)hasHMAC;
+@interface RNOpenSSLEncryptor : RNEncryptor
+- (RNEncryptor *)initWithSettings:(RNCryptorSettings)theSettings encryptionKey:(NSData *)anEncryptionKey IV:(NSData *)anIV handler:(RNCryptorHandler)aHandler;
 @end

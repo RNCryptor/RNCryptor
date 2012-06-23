@@ -27,6 +27,7 @@
 #import "RNCryptorTests.h"
 #import "RNEncryptor.h"
 #import "RNDecryptor.h"
+#import "RNOpenSSLEncryptor.h"
 
 NSString *const kGoodPassword = @"Passw0rd!";
 NSString *const kBadPassword = @"NotThePassword";
@@ -241,6 +242,34 @@ NSString *const kBadPassword = @"NotThePassword";
   STAssertEqualObjects(decryptedData, data, @"Incorrect decryption.");
 }
 
+// echo Test data | openssl enc -aes-256-cbc -out test.enc -k Passw0rd
+
+static NSString *const kOpenSSLString = @"Test data\n";
+static NSString *const kOpenSSLPath = @"test.enc";
+static NSString *const kOpenSSLPassword = @"Passw0rd";
+
+- (void)testOpenSSLEncrypt
+{
+  NSInputStream *input = [NSInputStream inputStreamWithData:[kOpenSSLString dataUsingEncoding:NSUTF8StringEncoding]];
+  NSOutputStream *output = [NSOutputStream outputStreamToMemory];
+  NSError *error;
+
+  NSData *encryptedData = [RNOpenSSLEncryptor encryptData:[kOpenSSLString dataUsingEncoding:NSUTF8StringEncoding]
+      withSettings:kRNCryptorAES256Settings
+          password:kOpenSSLPassword
+             error:&error];
+
+  NSString *encryptedFile = [self temporaryFilePath];
+  NSString *decryptedFile = [self temporaryFilePath];
+  [encryptedData writeToFile:encryptedFile atomically:NO];
+
+  NSString *cmd = [NSString stringWithFormat:@"/usr/bin/openssl enc -d -aes-256-cbc -k %@ -in %@ -out %@", kOpenSSLPassword, encryptedFile, decryptedFile];
+  STAssertEquals(system([cmd UTF8String]), 0, @"System call failed");
+
+  NSString *decryptedString = [NSString stringWithContentsOfFile:decryptedFile encoding:NSUTF8StringEncoding error:&error];
+  STAssertEqualObjects(decryptedString, kOpenSSLString, @"Decryption doesn't match: %@", error);
+}
+
 //
 //- (void)_testDataOfLength:(NSUInteger)length encryptPassword:(NSString *)encryptPassword decryptPassword:(NSString *)decryptPassword
 //{
@@ -272,25 +301,7 @@ NSString *const kBadPassword = @"NotThePassword";
 //}
 
 //
-//- (NSString *)temporaryFilePath
-//{
-//  // Thanks to Matt Gallagher
-//  NSString *tempFileTemplate = [NSTemporaryDirectory() stringByAppendingPathComponent:@"RNCryptorTest.XXXXXX"];
-//  const char *tempFileTemplateCString = [tempFileTemplate fileSystemRepresentation];
-//  char *tempFileNameCString = (char *)malloc(strlen(tempFileTemplateCString) + 1);
-//  strcpy(tempFileNameCString, tempFileTemplateCString);
-//  int fileDescriptor = mkstemp(tempFileNameCString);
-//
-//  NSAssert(fileDescriptor >= 0, @"Failed to create temporary file");
-//
-//  NSString *tempFileName =
-//      [[NSFileManager defaultManager]
-//          stringWithFileSystemRepresentation:tempFileNameCString
-//                                      length:strlen(tempFileNameCString)];
-//
-//  free(tempFileNameCString);
-//  return tempFileName;
-//}
+
 //
 //- (void)_testURLWithLength:(NSUInteger)length encryptPassword:(NSString *)encryptPassword decryptPassword:(NSString *)decryptPassword
 //{
@@ -431,11 +442,6 @@ NSString *const kBadPassword = @"NotThePassword";
 //  }
 //}
 //
-//// echo Test data | openssl enc -aes-256-cbc -out test.enc -k Passw0rd
-//
-//static NSString *const kOpenSSLString = @"Test data\n";
-//static NSString *const kOpenSSLPath = @"test.enc";
-//static NSString *const kOpenSSLPassword = @"Passw0rd";
 //
 //- (void)testOpenSSLDecrypt
 //{
@@ -487,5 +493,25 @@ NSString *const kBadPassword = @"NotThePassword";
 //  [[NSFileManager defaultManager] removeItemAtURL:ciphertextURL error:&error];
 //  [[NSFileManager defaultManager] removeItemAtURL:decryptedURL error:&error];
 //}
+
+- (NSString *)temporaryFilePath
+{
+  // Thanks to Matt Gallagher
+  NSString *tempFileTemplate = [NSTemporaryDirectory() stringByAppendingPathComponent:@"RNCryptorTest.XXXXXX"];
+  const char *tempFileTemplateCString = [tempFileTemplate fileSystemRepresentation];
+  char *tempFileNameCString = (char *)malloc(strlen(tempFileTemplateCString) + 1);
+  strcpy(tempFileNameCString, tempFileTemplateCString);
+  int fileDescriptor = mkstemp(tempFileNameCString);
+
+  NSAssert(fileDescriptor >= 0, @"Failed to create temporary file");
+
+  NSString *tempFileName =
+      [[NSFileManager defaultManager]
+          stringWithFileSystemRepresentation:tempFileNameCString
+                                      length:strlen(tempFileNameCString)];
+
+  free(tempFileNameCString);
+  return tempFileName;
+}
 
 @end
