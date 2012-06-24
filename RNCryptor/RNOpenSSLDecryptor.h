@@ -28,4 +28,16 @@
 #import "RNDecryptor.h"
 
 @interface RNOpenSSLDecryptor : RNDecryptor
+- (RNDecryptor *)initWithSettings:(RNCryptorSettings)settings
+                         password:(NSString *)password
+                          handler:(RNCryptorHandler)handler;
+
+- (RNDecryptor *)initWithSettings:(RNCryptorSettings)theSettings
+                    encryptionKey:(NSData *)anEncryptionKey
+                               IV:(NSData *)anIV
+                          handler:(RNCryptorHandler)aHandler;
+
++ (NSData *)decryptData:(NSData *)data withSettings:(RNCryptorSettings)settings password:(NSString *)password error:(NSError **)error;
++ (NSData *)decryptData:(NSData *)data withSettings:(RNCryptorSettings)settings encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV error:(NSError **)error;
+
 @end

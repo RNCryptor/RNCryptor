@@ -30,6 +30,18 @@
 NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
 const uint8_t kRNCryptorFileVersion = 1;
 
+// TODO: This is a slightly expensive solution, but it's convenient. May want to create a "walkable" data object
+@implementation NSMutableData (RNCryptor)
+- (NSData *)_RNConsumeToIndex:(NSUInteger)index
+{
+  NSData *removed = [self subdataWithRange:NSMakeRange(0, index)];
+  [self replaceBytesInRange:NSMakeRange(0, self.length - index) withBytes:([self mutableBytes] + index)];
+  [self setLength:self.length - index];
+  return removed;
+}
+@end
+
+
 @implementation RNCryptor
 @synthesize responseQueue = _responseQueue;
 @synthesize engine = _engine;
@@ -169,10 +181,12 @@ const uint8_t kRNCryptorFileVersion = 1;
 {
   self.error = error;
   self.finished = YES;
-  dispatch_sync(self.responseQueue, ^{
-    self.handler(self, self.outData);
-  });
-  self.handler = nil;
+  if (self.handler) {
+    dispatch_sync(self.responseQueue, ^{
+      self.handler(self, self.outData);
+    });
+    self.handler = nil;
+  }
 }
 
 - (BOOL)hasHMAC

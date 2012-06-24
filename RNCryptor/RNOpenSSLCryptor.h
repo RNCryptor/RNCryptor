@@ -31,7 +31,7 @@
 extern NSString *const kRNCryptorOpenSSLSaltedString;
 
 NSData *RNOpenSSLCryptorGetKey(NSString *password, NSData *salt, RNCryptorKeyDerivationSettings keySettings);
-NSData *RNOpenSSLCryptorGetIV(NSData *key, NSString *password, NSData *salt, RNCryptorSettings settings);
+NSData *RNOpenSSLCryptorGetIV(NSData *key, NSString *password, NSData *salt, RNCryptorKeyDerivationSettings keySettings);
 
 
 //

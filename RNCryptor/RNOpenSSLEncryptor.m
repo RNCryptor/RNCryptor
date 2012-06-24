@@ -92,10 +92,10 @@
 
   NSData *encryptionSalt = [[self class] randomDataOfLength:theSettings.keySettings.saltSize];
   NSData *encryptionKey = RNOpenSSLCryptorGetKey(aPassword, encryptionSalt, theSettings.keySettings);
-
+  NSData *IV = RNOpenSSLCryptorGetIV(encryptionKey, aPassword, encryptionSalt, theSettings.keySettings);
   self = [self initWithSettings:theSettings
                   encryptionKey:encryptionKey
-                             IV:RNOpenSSLCryptorGetIV(encryptionKey, aPassword, encryptionSalt, theSettings)
+                             IV:IV
                         handler:aHandler];
   if (self) {
     self.options |= kRNCryptorOptionHasPassword;

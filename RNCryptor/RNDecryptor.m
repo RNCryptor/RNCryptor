@@ -31,23 +31,8 @@
 
 static const NSUInteger kPreambleSize = 2;
 
-@interface NSMutableData (RNCryptor)
-- (NSData *)_RNConsumeToIndex:(NSUInteger)index;
-@end
-
-// TODO: This is a slightly expensive solution, but it's convenient. May want to create a "walkable" data object
-@implementation NSMutableData (RNCryptor)
-- (NSData *)_RNConsumeToIndex:(NSUInteger)index
-{
-  NSData *removed = [self subdataWithRange:NSMakeRange(0, index)];
-  [self replaceBytesInRange:NSMakeRange(0, self.length - index) withBytes:([self mutableBytes] + index)];
-  [self setLength:self.length - index];
-  return removed;
-}
-@end
-
 @interface RNDecryptor ()
-@property (nonatomic, readwrite, strong) NSMutableData *inData;
+@property (nonatomic, readonly, strong) NSMutableData *inData;
 @property (nonatomic, readwrite, copy) NSData *encryptionKey;
 @property (nonatomic, readwrite, copy) NSData *HMACKey;
 @property (nonatomic, readwrite, copy) NSString *password;
@@ -56,8 +41,8 @@ static const NSUInteger kPreambleSize = 2;
 @implementation RNDecryptor
 {
   CCHmacContext _HMACContext;
+  NSMutableData *__inData;
 }
-@synthesize inData = _inData;
 @synthesize encryptionKey = _encryptionKey;
 @synthesize HMACKey = _HMACKey;
 @synthesize password = _password;
@@ -84,8 +69,6 @@ static const NSUInteger kPreambleSize = 2;
   if (self) {
     _encryptionKey = [anEncryptionKey copy];
     _HMACKey = [anHMACKey copy];
-
-    _inData = [NSMutableData data];
   }
 
   return self;
@@ -100,6 +83,14 @@ static const NSUInteger kPreambleSize = 2;
     _password = aPassword;
   }
   return self;
+}
+
+- (NSMutableData *)inData
+{
+  if (!__inData) {
+    __inData = [NSMutableData data];
+  }
+  return __inData;
 }
 
 - (void)decryptData:(NSData *)data
@@ -185,7 +176,7 @@ static const NSUInteger kPreambleSize = 2;
   [data _RNConsumeToIndex:kPreambleSize]; // Throw away the preamble
 
   NSError *error;
-  if (self.password) {
+  if (self.options & kRNCryptorOptionHasPassword) {
     NSAssert(!self.encryptionKey && !self.HMACKey, @"Both password and the key (%d) or HMACKey (%d) are set.", self.encryptionKey != nil, self.HMACKey != nil);
 
     NSData *encryptionKeySalt = [data _RNConsumeToIndex:settings.keySettings.saltSize];

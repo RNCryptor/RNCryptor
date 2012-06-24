@@ -44,3 +44,7 @@
 - (void)cleanupAndNotifyWithError:(NSError *)error;
 - (BOOL)hasHMAC;
 @end
+
+@interface NSMutableData (RNCryptor)
+- (NSData *)_RNConsumeToIndex:(NSUInteger)index;
+@end

@@ -28,6 +28,7 @@
 #import "RNEncryptor.h"
 #import "RNDecryptor.h"
 #import "RNOpenSSLEncryptor.h"
+#import "RNOpenSSLDecryptor.h"
 
 NSString *const kGoodPassword = @"Passw0rd!";
 NSString *const kBadPassword = @"NotThePassword";
@@ -258,6 +259,8 @@ static NSString *const kOpenSSLPassword = @"Passw0rd";
       withSettings:kRNCryptorAES256Settings
           password:kOpenSSLPassword
              error:&error];
+  STAssertNotNil(encryptedData, @"Did not encrypt");
+  STAssertNil(error, @"Error:%@", error);
 
   NSString *encryptedFile = [self temporaryFilePath];
   NSString *decryptedFile = [self temporaryFilePath];
@@ -268,6 +271,22 @@ static NSString *const kOpenSSLPassword = @"Passw0rd";
 
   NSString *decryptedString = [NSString stringWithContentsOfFile:decryptedFile encoding:NSUTF8StringEncoding error:&error];
   STAssertEqualObjects(decryptedString, kOpenSSLString, @"Decryption doesn't match: %@", error);
+}
+
+- (void)testOpenSSLDecrypt
+{
+  NSData *encryptedData = [NSData dataWithContentsOfFile:kOpenSSLPath];
+
+  NSError *error;
+  NSData *decryptedData = [RNOpenSSLDecryptor decryptData:encryptedData
+                                             withSettings:kRNCryptorAES256Settings
+                                                 password:kOpenSSLPassword
+                                                    error:&error];
+  STAssertNotNil(decryptedData, @"Did not decrypt");
+  STAssertNil(error, @"Error:%@", error);
+
+  NSString *decryptedString = [[NSString alloc] initWithData:decryptedData encoding:NSUTF8StringEncoding];
+  STAssertEqualObjects(decryptedString, kOpenSSLString, @"Decrypted data does not match");
 }
 
 //
@@ -443,37 +462,7 @@ static NSString *const kOpenSSLPassword = @"Passw0rd";
 //}
 //
 //
-//- (void)testOpenSSLDecrypt
-//{
-//  NSInputStream *input = [NSInputStream inputStreamWithFileAtPath:kOpenSSLPath];
-//  NSOutputStream *output = [NSOutputStream outputStreamToMemory];
-//  NSError *error;
-//  STAssertTrue([[[RNOpenSSLCryptor alloc] init] decryptFromStream:input toStream:output password:kOpenSSLPassword error:&error], @"Could not decrypt:%@", error);
-//
-//  NSData *decryptedData = [output propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
-//  NSString *decryptedString = [[NSString alloc] initWithData:decryptedData encoding:NSUTF8StringEncoding];
-//  STAssertEqualObjects(decryptedString, kOpenSSLString, @"Decrypted data does not match");
-//}
-//
-//- (void)testOpenSSLEncrypt
-//{
-//  NSInputStream *input = [NSInputStream inputStreamWithData:[kOpenSSLString dataUsingEncoding:NSUTF8StringEncoding]];
-//  NSOutputStream *output = [NSOutputStream outputStreamToMemory];
-//  NSError *error;
-//  STAssertTrue([[[RNOpenSSLCryptor alloc] init] encryptFromStream:input toStream:output password:kOpenSSLPassword error:&error], @"Could not decrypt:%@", error);
-//
-//  NSData *encryptedData = [output propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
-//
-//  NSString *encryptedFile = [self temporaryFilePath];
-//  NSString *decryptedFile = [self temporaryFilePath];
-//  [encryptedData writeToFile:encryptedFile atomically:NO];
-//
-//  NSString *cmd = [NSString stringWithFormat:@"/usr/bin/openssl enc -d -aes-256-cbc -k %@ -in %@ -out %@", kOpenSSLPassword, encryptedFile, decryptedFile];
-//  STAssertEquals(system([cmd UTF8String]), 0, @"System calll failed");
-//
-//  NSString *decryptedString = [NSString stringWithContentsOfFile:decryptedFile encoding:NSUTF8StringEncoding error:&error];
-//  STAssertEqualObjects(decryptedString, kOpenSSLString, @"Decryption doesn't match: %@", error);
-//}
+
 //
 //- (void)testURLNegativeInput
 //{

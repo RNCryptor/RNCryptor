@@ -87,8 +87,8 @@ NSData *RNOpenSSLCryptorGetKey(NSString *password, NSData *salt, RNCryptorKeyDer
   return key;
 }
 
-NSData *RNOpenSSLCryptorGetIV(NSData *key, NSString *password, NSData *salt, RNCryptorSettings settings) {
-  NSCAssert(settings.keySettings.keySize == kCCKeySizeAES256, @"OpenSSL uses a different mechanism for AES128. Implement if needed. key is needed for AES128");
+NSData *RNOpenSSLCryptorGetIV(NSData *key, NSString *password, NSData *salt, RNCryptorKeyDerivationSettings keySettings) {
+  NSCAssert(keySettings.keySize == kCCKeySizeAES256, @"OpenSSL uses a different mechanism for AES128. Implement if needed. key is needed for AES128");
 
   NSMutableData *passwordSalt = [[password dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
   [passwordSalt appendData:salt];
