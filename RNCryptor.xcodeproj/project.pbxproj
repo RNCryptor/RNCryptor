@@ -69,6 +69,7 @@
 		FB7565241512D9BE007B808C /* RNOpenSSLEncryptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNOpenSSLEncryptor.h; sourceTree = "<group>"; };
 		FB7565241512D9BE007B808E /* RNOpenSSLDecryptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNOpenSSLDecryptor.h; sourceTree = "<group>"; };
 		FB7565241512D9BE007B8090 /* RNOpenSSLDecryptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNOpenSSLDecryptor.m; sourceTree = "<group>"; };
+		FB7565241512D9BE007B8092 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = file.md; name = README.md; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,6 +98,7 @@
 		FB7564E51512D3C4007B806B = {
 			isa = PBXGroup;
 			children = (
+				FB7565241512D9BE007B8092 /* README.md */,
 				FB7564F51512D3C4007B806B /* RNCryptor */,
 				FB7565091512D3C4007B806B /* RNCryptorTests */,
 				FB7564F21512D3C4007B806B /* Frameworks */,
@@ -126,6 +128,8 @@
 		FB7564F51512D3C4007B806B /* RNCryptor */ = {
 			isa = PBXGroup;
 			children = (
+				FB7565241512D9BE007B8090 /* RNOpenSSLDecryptor.m */,
+				FB7565241512D9BE007B808E /* RNOpenSSLDecryptor.h */,
 				FB7565241512D9BE007B808C /* RNOpenSSLEncryptor.h */,
 				FB7565241512D9BE007B808A /* RNOpenSSLEncryptor.m */,
 				FB7565241512D9BE007B8084 /* RNCryptor+Private.h */,
@@ -147,8 +151,6 @@
 		FB7564F61512D3C4007B806B /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				FB7565241512D9BE007B8090 /* RNOpenSSLDecryptor.m */,
-				FB7565241512D9BE007B808E /* RNOpenSSLDecryptor.h */,
 				FB7564F71512D3C4007B806B /* RNCryptor-Prefix.pch */,
 			);
 			name = "Supporting Files";

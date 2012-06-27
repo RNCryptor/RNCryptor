@@ -7,34 +7,77 @@ password stretching (PBKDF2), salting, and IV. For more information on these ter
 with CommonCrypto,"](http://robnapier.net/blog/aes-commoncrypto-564) and [iOS 5 Programming Pushing the Limits](http://iosptl.com), Chapter 11.
 Also includes automatic HMAC handling to integrity-check messages.
 
-`RNCryptor` is immutable, stateless and thread-safe. A given cryptor object may be used simultaneously on multiple
-threads, and can be reused to encrypt or decrypt an arbitrary number of independent messages.
+`RNCryptor` is an abstract class. Concrete subclasses include:
 
-# Use
+* `RNEncryptor`, `RNDecryptor` : Writer and reader for the [RNCryptor data format](https://github.com/rnapier/RNCryptor/wiki/Data-Format).
+* `RNOpenSSLEncryptor`, `RNOpenSSLDecryptor` : Writer and reader for the OpenSSL format. This format is not recommended due to its weak
+security settings, but is available for compatibility.
+
+# Synchronous use
 
 The most common in-memory use case is as follows:
 
     NSData *data = [@"Data" dataUsingEncoding:NSUTF8StringEncoding];
     NSError *error;
-    NSData *encrypted = [[RNCryptor AES256Cryptor] encryptData:data password:@"password" error:&error];
+  NSData *encryptedData = [RNEncryptor encryptData:data
+                                      withSettings:kRNCryptorAES256Settings
+                                          password:aPassword
+                                             error:&error];
 
-This generates an `NSData` including an encryption salt, an HMAC salt, an IV, the ciphertext, and an HMAC. To decrypt this bundle:
+This generates an `NSData` including a header, encryption salt, HMAC salt, IV, ciphertext, and HMAC. To decrypt this bundle:
 
-    NSData *decrypted = [[RNCryptor AES256Cryptor] decryptData:encrypted password:@"password" error:&error];
+    NSData *decryptedData = [RNDecryptor decryptData:encryptedData
+                                        withPassword:aPassword
+                                               error:&error];
 
-The same encryption and decryption can be processed from one `NSURL` or `NSStream` to another to minimize memory usage:
+Note that `RNDecryptor` does not require settings. These are read from the header.
 
-    BOOL result = [[RNCryptor AES256Cryptor] encryptFromURL:plaintextURL
-              									      toURL:ciphertextURL 
-												     append:NO 
-												   password:password 
-												      error:&error];
+# Asynchronous use
 
-    BOOL result = [[RNCryptor AES256Cryptor] decryptFromURL:ciphertextURL
-              									      toURL:plaintextURL
-												     append:NO 
-												   password:password 
-												      error:&error];
+`RNCryptor` suports asynchronous use, specifically designed to work with `NSURLConnection`.
+This is also useful for cases where the encrypted or decrypted data will not comfortably fit in memory.
+If the data will comfortably fit in memory, ansynchronous operation is best acheived using `dispatch_async()`.
+
+To operate in asynchronous mode, you create an `RNEncryptor` or `RNDecryptor`, providing it a handler. This handler will be
+called as data is encrypted or decrypted. As data becomes available, call `addData:`. When you reach the end of the data
+call `finish`.
+
+    - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
+    {
+      [self.cryptor addData:data];
+    }
+
+    - (void)connectionDidFinishLoading:(NSURLConnection *)connection
+    {
+      [self.cryptor finish];
+    }
+
+    // Other connection delegates
+
+    - (void)decryptionDidFinish {
+      if (self.cryptor.error) {
+        // An error occurred. You cannot trust encryptedData at this point
+      }
+      else {
+        // self.encryptedData is complete. Use it as you like
+      }
+      self.encryptedData = nil;
+      self.cryptor = nil;
+      self.connection = nil;
+    }
+
+    - (void)decryptRequest:(NSURLRequest *)request
+    {
+      self.connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+      self.cryptor = [[RNDecryptor alloc] initWithPassword:self.password
+                                                   handler:^(RNCryptor *cryptor, NSData *data) {
+                                                       [self.decryptedData appendData:data];
+                                                       if (cryptor.isFinished) {
+                                                         [self decryptionDidFinish];
+                                                       }
+                                                     }];
+    }
+
 
 # API Documentation
 
@@ -44,11 +87,11 @@ Details on the data format are available at https://github.com/rnapier/RNCryptor
 
 # Building
 
-Comes packaged as a static library, but the `RNCryptor.h` and `RNCryptor.m` files can be dropped into any project.
+Comes packaged as a static library, but the source files can be dropped into any project. The OpenSSL files are not required.
 
 Requires `Security.framework`.
 
-NOTE: Mac support should be possible, but requires replacing `SecCopyRandomBytes()` and switching from AES-CTR to AES-CBC (at least in 10.7).
+Supports 10.7+ and iOS 5+. For more information on backporting, read and comment on Issue #22.
 
 # Design considerations
 
@@ -70,10 +113,9 @@ Wherever possible within the above constraints, the best available algorithms ar
 
 * AES-256. While Bruce Schneier has made some interesting recommendations regarding moving to AES-128 due to certain attacks on AES-256, my current thinking is in line with Colin Percival here: http://www.daemonology.net/blog/2009-07-31-thoughts-on-AES.html. PBKDF2 output is effectively random, which should negate related-keys attacks against the kinds of use cases we're interested in.
 
-* AES-CTR mode. CBC is the most commonly available, but it requires padding, and anything that requires padding opens itself
-up to the possibility of padding oracle attacks. CTR uses no padding and so padding oracles aren't possible. Moreover, the
-lack of padding makes the ciphertext slightly shorter, and in theory (though I don't believe currently in practice on any CommonCryptor
-platform) AES-CTR can be parallelized.
+* AES-CBC mode. This was a somewhat complex decision, but the ubiquity of CBC outweighs other considerations here. There are no
+major problems with CBC mode, and nonce-based modes like CTR have other trade-offs. See http://robnapier.net/blog/mode-rncryptor-767 for
+more details on this decision.
 
 * Encrypt-then-MAC. If there were a good authenticated AES mode on iOS (GCM for instance), I would probably use that for
 it's simplicity. Colin Percival makes [good arguments for hand-coding an encrypt-than-MAC](http://www.daemonology.net/blog/2009-06-24-encrypt-then-mac.html) rather than using an authenticated
@@ -95,14 +137,12 @@ Performance is a goal, but not the most important goal. The code must be secure 
 
 ## Portability
 
-Without sacrificing other goals, it is preferable to read the output format of `RNCryptor` on other platforms. `RNCryptor` is now
-compatible with OpenSSL aes-256-cbc (using `RNOpenSSLCryptor`). This is intentionally kept as a separate wrapper around
-`RNCryptor` because the OpenSSL format has significant security issues that I don't want to allow into the main code.
+Without sacrificing other goals, it is preferable to read the output format of `RNCryptor` on other platforms.
 
 # Roadmap
 
-* v1.1 is complete and includes synchronous stream and data support, as well as OpenSSL compatibility (aes-256-cbc only).
-* v1.2 will add asynchronous modes. This may cause non-trivials changes in the API.
+* v2.0 adds asynchronous modes.
+* v2.1 backports `RNCryptor` to older versions of Mac OS X (and possibly iOS).
 
 
 # LICENSE
