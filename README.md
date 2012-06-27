@@ -70,13 +70,12 @@ Wherever possible within the above constraints, the best available algorithms ar
 
 * AES-256. While Bruce Schneier has made some interesting recommendations regarding moving to AES-128 due to certain attacks on AES-256, my current thinking is in line with Colin Percival here: http://www.daemonology.net/blog/2009-07-31-thoughts-on-AES.html. PBKDF2 output is effectively random, which should negate related-keys attacks against the kinds of use cases we're interested in.
 
-* AES-CTR mode. CBC is the most commonly available, but it requires padding, and anything that requires padding opens itself
-up to the possibility of padding oracle attacks. CTR uses no padding and so padding oracles aren't possible. Moreover, the
-lack of padding makes the ciphertext slightly shorter, and in theory (though I don't believe currently in practice on any CommonCryptor
-platform) AES-CTR can be parallelized.
+* AES-CBC mode. This was a somewhat complex decision, but the ubiquity of CBC outweighs other considerations here. There are no
+major problems with CBC mode, and nonce-based modes like CTR have other trade-offs. See http://robnapier.net/blog/mode-rncryptor-767 for
+more details on this decision.
 
 * Encrypt-then-MAC. If there were a good authenticated AES mode on iOS (GCM for instance), I would probably use that for
-it's simplicity. Colin Percival makes [good arguments for hand-coding an encrypt-than-MAC](http://www.daemonology.net/blog/2009-06-24-encrypt-then-mac.html) rather than using an authenticated
+its simplicity. Colin Percival makes [good arguments for hand-coding an encrypt-than-MAC](http://www.daemonology.net/blog/2009-06-24-encrypt-then-mac.html) rather than using an authenticated
 AES mode, but in RNCryptor mananging the HMAC actually adds quite a bit of complexity. I'd rather the complexity at a
 more broadly peer-reviewed layer like CommonCryptor than at the RNCryptor layer. But this isn't an option, so I fall back
 to my own Encrypt-than-MAC. 
