@@ -19,7 +19,7 @@ The most common in-memory use case is as follows:
 
     NSData *data = [@"Data" dataUsingEncoding:NSUTF8StringEncoding];
     NSError *error;
-  NSData *encryptedData = [RNEncryptor encryptData:data
+    NSData *encryptedData = [RNEncryptor encryptData:data
                                       withSettings:kRNCryptorAES256Settings
                                           password:aPassword
                                              error:&error];
