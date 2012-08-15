@@ -24,27 +24,27 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-//// For aes-128:
-////
-//// key = MD5(password + salt)
-//// IV = MD5(Key + password + salt)
+// For aes-128:
 //
-////
-//// For aes-256:
-////
-//// Hash0 = ''
-//// Hash1 = MD5(Hash0 + Password + Salt)
-//// Hash2 = MD5(Hash1 + Password + Salt)
-//// Hash3 = MD5(Hash2 + Password + Salt)
-//// Hash4 = MD5(Hash3 + Password + Salt)
-////
-//// Key = Hash1 + Hash2
-//// IV = Hash3 + Hash4
-////
+// key = MD5(password + salt)
+// IV = MD5(Key + password + salt)
+
 //
-//// File Format:
-////
-//// |Salted___|<salt>|<ciphertext>|
+// For aes-256:
+//
+// Hash0 = ''
+// Hash1 = MD5(Hash0 + Password + Salt)
+// Hash2 = MD5(Hash1 + Password + Salt)
+// Hash3 = MD5(Hash2 + Password + Salt)
+// Hash4 = MD5(Hash3 + Password + Salt)
+//
+// Key = Hash1 + Hash2
+// IV = Hash3 + Hash4
+//
+
+// File Format:
+//
+// |Salted___|<salt>|<ciphertext>|
 
 #import "RNOpenSSLEncryptor.h"
 #import "RNCryptor+Private.h"

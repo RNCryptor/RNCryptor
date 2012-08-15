@@ -5,11 +5,7 @@
       <value>
         <Objective-C-extensions>
           <option name="GENERATE_INSTANCE_VARIABLES_FOR_PROPERTIES" value="ASK" />
-          <option name="REFACTOR_PROPERTIES_AND_IVARS" value="ASK" />
-          <option name="REFACTOR_COMPATIBILITY_ALIASES_AND_CLASSES" value="ASK" />
           <option name="RELEASE_STYLE" value="IVAR" />
-          <option name="PROPERTY_ACCESS" value="DEFAULT" />
-          <option name="PROPERTY_SEMANTICS" value="DEFAULT" />
           <file>
             <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="Import" />
             <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="Macro" />
