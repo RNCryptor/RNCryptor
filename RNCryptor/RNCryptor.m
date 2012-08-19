@@ -26,6 +26,7 @@
 //
 #import "RNCryptor.h"
 #import "RNCryptor+Private.h"
+#import <Security/SecRandom.h>
 
 NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
 const uint8_t kRNCryptorFileVersion = 1;
@@ -118,7 +119,7 @@ const uint8_t kRNCryptorFileVersion = 1;
 {
   NSMutableData *data = [NSMutableData dataWithLength:length];
 
-  int result = SecRandomCopyBytes(kSecRandomDefault, length, data.mutableBytes);
+  int result = SecRandomCopyBytes(NULL, length, data.mutableBytes);
   NSAssert(result == 0, @"Unable to generate random bytes: %d", errno);
 
   return data;
