@@ -192,7 +192,6 @@ const uint8_t kRNCryptorFileVersion = 1;
 
 - (void)cleanupAndNotifyWithError:(NSError *)error
 {
-    //this next line is the one that explodes
   self.error = error;
   self.finished = YES;
   if (self.handler) {
