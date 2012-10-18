@@ -31,7 +31,11 @@
 
 @interface RNCryptor ()
 @property (nonatomic, readwrite, strong) RNCryptorEngine *engine;
+#if OS_OBJECT_USE_OBJC
+@property (nonatomic, readwrite, strong) dispatch_queue_t queue;
+#else
 @property (nonatomic, readwrite, assign) dispatch_queue_t queue;
+#endif
 @property (nonatomic, readonly) NSMutableData *outData;
 @property (nonatomic, readwrite, copy) RNCryptorHandler handler;
 @property (nonatomic, readwrite, assign) NSUInteger HMACLength;
