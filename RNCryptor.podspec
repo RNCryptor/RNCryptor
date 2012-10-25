@@ -21,6 +21,7 @@ LIC
   s.source_files = 'RNCryptor/*.{h,m}'
   s.public_header_files = 'RNCryptor/*.h'
   s.requires_arc = true
+  s.ios.frameworks = 'Security'
 # OS X building is broken in 2.0.
   s.platform = :ios, '5.0'
 # Comment the above and uncomment below to support OS X and iOS.
