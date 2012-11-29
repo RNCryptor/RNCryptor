@@ -60,7 +60,7 @@ NSString *const kBadPassword = @"NotThePassword";
 - (void)testSimple
 {
   NSData *data = [RNCryptor randomDataOfLength:1024];
-  NSError *error;
+  NSError *error = nil;
 
   NSData *encryptedData = [RNEncryptor encryptData:data
                                       withSettings:kRNCryptorAES256Settings
@@ -70,7 +70,7 @@ NSString *const kBadPassword = @"NotThePassword";
   STAssertNil(error, @"Encryption error:%@", error);
   STAssertNotNil(encryptedData, @"Data did not encrypt.");
 
-  NSError *decryptionError;
+  NSError *decryptionError = nil;
   NSData *decryptedData = [RNDecryptor decryptData:encryptedData withPassword:kGoodPassword error:&decryptionError];
   STAssertNil(decryptionError, @"Error decrypting:%@", decryptionError);
   STAssertEqualObjects(decryptedData, data, @"Incorrect decryption.");
@@ -97,7 +97,7 @@ NSString *const kBadPassword = @"NotThePassword";
 - (void)testAsync
 {
   NSURL *testURL = [NSURL URLWithString:@"http://robnapier.net/favicon.ico"];
-  NSError *downloadError;
+  NSError *downloadError = nil;
   NSData *plaintext = [NSData dataWithContentsOfURL:testURL options:0 error:&downloadError];
   STAssertNotNil(plaintext, @"Couldn't download: %@", downloadError);
 
@@ -107,7 +107,7 @@ NSString *const kBadPassword = @"NotThePassword";
 
   self.isTestRunning = YES;
   __block NSMutableData *encryptedData = [NSMutableData data];
-  __block NSError *encryptionError;
+  __block NSError *encryptionError = nil;
   self.encryptor = [[RNEncryptor alloc] initWithSettings:kRNCryptorAES256Settings
                                                 password:kGoodPassword
                                                  handler:^(RNCryptor *cryptor, NSData *data) {
@@ -129,7 +129,7 @@ NSString *const kBadPassword = @"NotThePassword";
   STAssertNil(encryptionError, @"Encrypt error: %@", encryptionError);
   STAssertTrue([encryptedData length] > 0, @"Failed to encrypt.");
 
-  NSError *decryptionError;
+  NSError *decryptionError = nil;
   NSData *decryptedData = [RNDecryptor decryptData:encryptedData withPassword:kGoodPassword error:&decryptionError];
   STAssertNil(decryptionError, @"decryption error:%@", decryptionError);
   STAssertEqualObjects(plaintext, decryptedData, @"Bad decryption");
@@ -138,7 +138,7 @@ NSString *const kBadPassword = @"NotThePassword";
 - (void)testSimpleFail
 {
   NSData *data = [RNCryptor randomDataOfLength:1024];
-  NSError *error;
+  NSError *error = nil;
 
   NSData *encryptedData = [RNEncryptor encryptData:data
                                       withSettings:kRNCryptorAES256Settings
@@ -148,7 +148,7 @@ NSString *const kBadPassword = @"NotThePassword";
   STAssertNil(error, @"Encryption error:%@", error);
   STAssertNotNil(encryptedData, @"Data did not encrypt.");
 
-  NSError *decryptionError;
+  NSError *decryptionError = nil;
   NSData *decryptedData = [RNDecryptor decryptData:encryptedData withPassword:kBadPassword error:&decryptionError];
   STAssertNotNil(decryptionError, @"Should have received error decrypting:%@", decryptionError);
   STAssertNil(decryptedData, @"Decryption should be nil: %@", decryptedData);
@@ -157,7 +157,7 @@ NSString *const kBadPassword = @"NotThePassword";
 - (void)testCorruption
 {
   NSData *data = [RNCryptor randomDataOfLength:1024];
-  NSError *error;
+  NSError *error = nil;
 
   NSData *encryptedData = [RNEncryptor encryptData:data
                                       withSettings:kRNCryptorAES256Settings
@@ -170,7 +170,7 @@ NSString *const kBadPassword = @"NotThePassword";
   NSMutableData *corruptData = [encryptedData mutableCopy];
   [corruptData replaceBytesInRange:NSMakeRange(100, 100) withBytes:[[RNCryptor randomDataOfLength:100] bytes]];
 
-  NSError *decryptionError;
+  NSError *decryptionError = nil;
   NSData *decryptedData = [RNDecryptor decryptData:corruptData withPassword:kGoodPassword error:&decryptionError];
   STAssertNil(decryptedData, @"Decryption should be nil: %@", decryptedData);
   STAssertEquals([decryptionError code], (NSInteger)kRNCryptorHMACMismatch, @"Should have received kRNCryptorHMACMismatch");
@@ -179,7 +179,7 @@ NSString *const kBadPassword = @"NotThePassword";
 - (void)testBadHeader
 {
   NSData *data = [@"Data" dataUsingEncoding:NSUTF8StringEncoding];
-  NSError *error;
+  NSError *error = nil;
   NSMutableData *encrypted = [[RNEncryptor encryptData:data withSettings:kRNCryptorAES256Settings password:kGoodPassword error:&error] mutableCopy];
 
   uint8_t firstByte = 99;
@@ -193,7 +193,7 @@ NSString *const kBadPassword = @"NotThePassword";
 - (void)testActuallyEncrypting
 {
   NSData *data = [@"Data" dataUsingEncoding:NSUTF8StringEncoding];
-  NSError *error;
+  NSError *error = nil;
   NSData *encrypted = [RNEncryptor encryptData:data withSettings:kRNCryptorAES256Settings password:kGoodPassword error:&error];
 
   NSRange found = [encrypted rangeOfData:data options:0 range:NSMakeRange(0, encrypted.length)];
@@ -204,8 +204,8 @@ NSString *const kBadPassword = @"NotThePassword";
 {
   NSData *data = [RNCryptor randomDataOfLength:1024];
 
-  __block NSError *error;
-  __block NSData *encryptedData;
+  __block NSError *error = nil;
+  __block NSData *encryptedData = nil;
 
   dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
     encryptedData = [RNEncryptor encryptData:data
@@ -217,7 +217,7 @@ NSString *const kBadPassword = @"NotThePassword";
   STAssertNil(error, @"Encryption error:%@", error);
   STAssertNotNil(encryptedData, @"Data did not encrypt.");
 
-  NSError *decryptionError;
+  NSError *decryptionError = nil;
   NSData *decryptedData = [RNDecryptor decryptData:encryptedData withPassword:kGoodPassword error:&decryptionError];
   STAssertNil(decryptionError, @"Error decrypting:%@", decryptionError);
   STAssertEqualObjects(decryptedData, data, @"Incorrect decryption.");
@@ -228,7 +228,7 @@ NSString *const kBadPassword = @"NotThePassword";
   NSData *data = [RNCryptor randomDataOfLength:1024];
   NSData *encryptionKey = [RNCryptor randomDataOfLength:kRNCryptorAES256Settings.keySettings.keySize];
   NSData *HMACKey = [RNCryptor randomDataOfLength:kRNCryptorAES256Settings.HMACKeySettings.keySize];
-  NSError *error;
+  NSError *error = nil;
 
   NSData *encryptedData = [RNEncryptor encryptData:data
                                       withSettings:kRNCryptorAES256Settings
@@ -239,7 +239,7 @@ NSString *const kBadPassword = @"NotThePassword";
   STAssertNil(error, @"Encryption error:%@", error);
   STAssertNotNil(encryptedData, @"Data did not encrypt.");
 
-  NSError *decryptionError;
+  NSError *decryptionError = nil;
   NSData *decryptedData = [RNDecryptor decryptData:encryptedData withEncryptionKey:encryptionKey HMACKey:HMACKey error:&decryptionError];
   STAssertNil(decryptionError, @"Error decrypting:%@", decryptionError);
   STAssertEqualObjects(decryptedData, data, @"Incorrect decryption.");
@@ -253,7 +253,7 @@ static NSString *const kOpenSSLPassword = @"Passw0rd";
 
 - (void)testOpenSSLEncrypt
 {
-  NSError *error;
+  NSError *error = nil;
 
   NSData *encryptedData = [RNOpenSSLEncryptor encryptData:[kOpenSSLString dataUsingEncoding:NSUTF8StringEncoding]
       withSettings:kRNCryptorAES256Settings
@@ -277,7 +277,7 @@ static NSString *const kOpenSSLPassword = @"Passw0rd";
 {
   NSData *encryptedData = [NSData dataWithContentsOfFile:kOpenSSLPath];
 
-  NSError *error;
+  NSError *error = nil;
   NSData *decryptedData = [RNOpenSSLDecryptor decryptData:encryptedData
                                              withSettings:kRNCryptorAES256Settings
                                                  password:kOpenSSLPassword

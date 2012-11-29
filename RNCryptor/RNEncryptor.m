@@ -74,7 +74,7 @@
       self.HMACLength = theSettings.HMACLength;
     }
 
-    NSError *error;
+    NSError *error = nil;
     self.engine = [[RNCryptorEngine alloc] initWithOperation:kCCEncrypt
                                                     settings:theSettings
                                                          key:anEncryptionKey
@@ -136,7 +136,7 @@
       self.haveWrittenHeader = YES;
     }
 
-    NSError *error;
+    NSError *error = nil;
     NSData *encryptedData = [self.engine addData:data error:&error];
     if (!encryptedData) {
       [self cleanupAndNotifyWithError:error];
@@ -161,7 +161,7 @@
   }
 
   dispatch_async(self.queue, ^{
-    NSError *error;
+    NSError *error = nil;
     NSData *encryptedData = [self.engine finishWithError:&error];
     [self.outData appendData:encryptedData];
     if (self.hasHMAC) {
