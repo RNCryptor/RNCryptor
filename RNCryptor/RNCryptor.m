@@ -79,9 +79,11 @@ const uint8_t kRNCryptorFileVersion = 1;
 
   dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
 
+#if !OS_OBJECT_USE_OBJC
   dispatch_release(sem);
   dispatch_release(queue);
-
+#endif
+    
   if (returnedError) {
     if (anError) {
       *anError = returnedError;
@@ -131,8 +133,11 @@ const uint8_t kRNCryptorFileVersion = 1;
   self = [super init];
   if (self) {
     _responseQueue = dispatch_get_current_queue();
+    
+#if !OS_OBJECT_USE_OBJC
     dispatch_retain(_responseQueue);
-
+#endif
+      
     NSString *queueName = [@"net.robnapier." stringByAppendingString:NSStringFromClass([self class])];
     _queue = dispatch_queue_create([queueName UTF8String], DISPATCH_QUEUE_SERIAL);
     __outData = [NSMutableData data];
@@ -145,12 +150,16 @@ const uint8_t kRNCryptorFileVersion = 1;
 - (void)dealloc
 {
   if (_responseQueue) {
+#if !OS_OBJECT_USE_OBJC
     dispatch_release(_responseQueue);
+#endif
     _responseQueue = NULL;
   }
 
   if (_queue) {
+#if !OS_OBJECT_USE_OBJC
     dispatch_release(_queue);
+#endif
     _queue = NULL;
   }
 }
@@ -158,11 +167,15 @@ const uint8_t kRNCryptorFileVersion = 1;
 - (void)setResponseQueue:(dispatch_queue_t)aResponseQueue
 {
   if (aResponseQueue) {
+#if !OS_OBJECT_USE_OBJC
     dispatch_retain(aResponseQueue);
+#endif
   }
 
   if (_responseQueue) {
+#if !OS_OBJECT_USE_OBJC
     dispatch_release(_responseQueue);
+#endif
   }
 
   _responseQueue = aResponseQueue;
