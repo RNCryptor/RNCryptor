@@ -57,7 +57,7 @@ static NSData *GetHashForHash(NSData *hash, NSData *passwordSalt) {
 
   NSMutableData *hashMaterial = [NSMutableData dataWithData:hash];
   [hashMaterial appendData:passwordSalt];
-  CC_MD5([hashMaterial bytes], [hashMaterial length], md);
+  CC_MD5([hashMaterial bytes], (CC_LONG)[hashMaterial length], md);
 
   return [NSData dataWithBytes:md length:sizeof(md)];
 }
