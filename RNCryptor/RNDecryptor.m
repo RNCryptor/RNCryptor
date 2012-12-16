@@ -100,7 +100,7 @@ static const NSUInteger kPreambleSize = 2;
       CCHmacUpdate(&_HMACContext, data.bytes, data.length);
     }
 
-    NSError *error;
+    NSError *error = nil;
     NSData *decryptedData = [self.engine addData:data error:&error];
 
     if (!decryptedData) {
@@ -175,7 +175,7 @@ static const NSUInteger kPreambleSize = 2;
 
   [data _RNConsumeToIndex:kPreambleSize]; // Throw away the preamble
 
-  NSError *error;
+  NSError *error = nil;
   if (self.options & kRNCryptorOptionHasPassword) {
     NSAssert(!self.encryptionKey && !self.HMACKey, @"Both password and the key (%d) or HMACKey (%d) are set.", self.encryptionKey != nil, self.HMACKey != nil);
 
@@ -211,7 +211,7 @@ static const NSUInteger kPreambleSize = 2;
   }
 
   dispatch_async(self.queue, ^{
-    NSError *error;
+    NSError *error = nil;
     NSData *decryptedData = [self.engine finishWithError:&error];
 
     if (!decryptedData) {

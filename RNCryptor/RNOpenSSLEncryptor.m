@@ -69,7 +69,7 @@
 {
   self = [super initWithHandler:aHandler];
   if (self) {
-    NSError *error;
+    NSError *error = nil;
     self.engine = [[RNCryptorEngine alloc] initWithOperation:kCCEncrypt
                                                     settings:theSettings
                                                          key:anEncryptionKey
