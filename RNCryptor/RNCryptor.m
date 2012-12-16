@@ -59,7 +59,7 @@ const uint8_t kRNCryptorFileVersion = 1;
   dispatch_semaphore_t sem = dispatch_semaphore_create(0);
 
   NSMutableData *data = [NSMutableData data];
-  __block NSError *returnedError;
+  __block NSError *returnedError = nil;
 
   RNCryptorHandler handler = ^(RNCryptor *c, NSData *d) {
     [data appendData:d];

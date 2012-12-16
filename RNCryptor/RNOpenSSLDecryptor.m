@@ -64,7 +64,7 @@
 
   self = [super initWithHandler:aHandler];
   if (self) {
-    NSError *error;
+    NSError *error = nil;
     self.engine = [[RNCryptorEngine alloc] initWithOperation:kCCDecrypt
                                                     settings:theSettings
                                                          key:anEncryptionKey
@@ -142,7 +142,7 @@
   NSData *salt = [data _RNConsumeToIndex:settings.keySettings.saltSize];
   NSData *key = RNOpenSSLCryptorGetKey(self.password, salt, settings.keySettings);
   NSData *IV = RNOpenSSLCryptorGetIV(key, self.password, salt, settings.keySettings);
-  NSError *error;
+  NSError *error = nil;
 
   self.engine = [[RNCryptorEngine alloc] initWithOperation:kCCDecrypt
                                                   settings:settings
