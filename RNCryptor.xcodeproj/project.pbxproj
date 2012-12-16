@@ -42,6 +42,7 @@
 		FB7565241512D9BE007B8091 /* RNOpenSSLDecryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8090 /* RNOpenSSLDecryptor.m */; };
 		FBF7D58E167E5031004B6F0F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7564F31512D3C4007B806B /* Foundation.framework */; };
 		FBF7D591167E5032004B6F0F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FBF7D590167E5032004B6F0F /* main.m */; };
+		FBF7D5A9167E515D004B6F0F /* RNCryptor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB13427A15E0FC2300456914 /* RNCryptor.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -141,6 +142,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FBF7D5A9167E515D004B6F0F /* RNCryptor.framework in Frameworks */,
 				FBF7D58E167E5031004B6F0F /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -761,6 +763,7 @@
 				FBF7D598167E5032004B6F0F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
