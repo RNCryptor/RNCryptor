@@ -109,9 +109,6 @@ NSData *RNOpenSSLCryptorGetIV(NSData *key, NSString *password, NSData *salt, RNC
         //
         // key = MD5(password + salt)
         // IV = MD5(Key + password + salt)
-        unsigned char md[CC_MD5_DIGEST_LENGTH];
-        CC_MD5([passwordSalt bytes], (CC_LONG)[passwordSalt length], md);
-        NSData *key = [NSData dataWithBytes:md length:sizeof(md)];
         IV = [GetHashForHash(key, passwordSalt) mutableCopy];
         
     } else {
@@ -128,9 +125,7 @@ NSData *RNOpenSSLCryptorGetIV(NSData *key, NSString *password, NSData *salt, RNC
         // Key = Hash1 + Hash2
         // IV = Hash3 + Hash4
         
-        NSData *hash1 = GetHashForHash(nil, passwordSalt);
-        NSData *hash2 = GetHashForHash(hash1, passwordSalt);
-        NSData *hash3 = GetHashForHash(hash2, passwordSalt);
+        NSData *hash3 = GetHashForHash(key, passwordSalt);
         NSData *hash4 = GetHashForHash(hash3, passwordSalt);
         
        IV = [hash3 mutableCopy];
