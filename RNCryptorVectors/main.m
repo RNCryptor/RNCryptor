@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "RNEncryptor.h"
+#import "RNDecryptor.h"
 #import "RNCryptorEngine.h"
 
 void Encrypt(NSString *string, NSString *password, NSData *encryptionSalt, NSData *HMACSalt, NSData *IV)
@@ -71,6 +72,13 @@ int main(int argc, const char * argv[])
                                                error:&error];
 
     [encryptedData writeToFile:@"/tmp/RNCryptor.enc" atomically:NO];
+
+    NSData *v1Data = [NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"RNCryptorV1.enc" ofType:nil]];
+
+    NSData *decryptedData = [RNDecryptor decryptData:v1Data withPassword:password error:&error];
+    NSLog(@"decryptedData:%@", [[NSString alloc] initWithData:decryptedData encoding:NSUTF8StringEncoding]);
+    NSLog(@"error:%@", error);
+
   }
   return 0;
 }

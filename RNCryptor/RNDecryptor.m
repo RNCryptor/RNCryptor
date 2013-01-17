@@ -36,7 +36,7 @@ static const NSUInteger kPreambleSize = 2;
 @property (nonatomic, readwrite, copy) NSData *encryptionKey;
 @property (nonatomic, readwrite, copy) NSData *HMACKey;
 @property (nonatomic, readwrite, copy) NSString *password;
-@property (nonatomic, readwrite, assign) BOOL *hasV1HMAC;
+@property (nonatomic, readwrite, assign) BOOL hasV1HMAC;
 
 @end
 
