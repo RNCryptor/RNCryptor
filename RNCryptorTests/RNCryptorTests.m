@@ -275,7 +275,7 @@ static NSString *const kOpenSSLPassword = @"Passw0rd";
 
 - (void)testOpenSSLDecrypt
 {
-  NSData *encryptedData = [NSData dataWithContentsOfFile:kOpenSSLPath];
+  NSData *encryptedData = [NSData dataWithContentsOfFile:[[NSBundle bundleForClass:[self class]] pathForResource:kOpenSSLPath ofType:nil]];
 
   NSError *error = nil;
   NSData *decryptedData = [RNOpenSSLDecryptor decryptData:encryptedData

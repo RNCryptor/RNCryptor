@@ -63,6 +63,14 @@ int main(int argc, const char * argv[])
     string = @"This is a longer test vector intended to be longer than one block.";
     
     Encrypt(string, password, encryptionSalt, HMACSalt, IV);
+
+    NSError *error;
+    NSData *encryptedData = [RNEncryptor encryptData:[string dataUsingEncoding:NSUTF8StringEncoding]
+                                        withSettings:kRNCryptorAES256Settings
+                                       password:password
+                                               error:&error];
+
+    [encryptedData writeToFile:@"/tmp/RNCryptor.enc" atomically:NO];
   }
   return 0;
 }

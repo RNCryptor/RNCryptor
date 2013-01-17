@@ -132,7 +132,11 @@
 
   dispatch_async(self.queue, ^{
     if (!self.haveWrittenHeader) {
-      [self.outData setData:[self header]];
+      NSData *header = [self header];
+      [self.outData setData:header];
+      if (self.hasHMAC) {
+        CCHmacUpdate(&_HMACContext, [header bytes], [header length]);
+      }
       self.haveWrittenHeader = YES;
     }
 
