@@ -83,7 +83,7 @@ const uint8_t kRNCryptorFileVersion = 1;
   dispatch_release(sem);
   dispatch_release(queue);
 #endif
-    
+
   if (returnedError) {
     if (anError) {
       *anError = returnedError;
@@ -132,12 +132,13 @@ const uint8_t kRNCryptorFileVersion = 1;
   NSParameterAssert(handler);
   self = [super init];
   if (self) {
-    _responseQueue = dispatch_get_current_queue();
-    
+      NSString *responseQueueName = [@"net.robnapier.response." stringByAppendingString:NSStringFromClass([self class])];
+      _responseQueue = dispatch_queue_create([responseQueueName UTF8String], NULL);
+
 #if !OS_OBJECT_USE_OBJC
     dispatch_retain(_responseQueue);
 #endif
-      
+
     NSString *queueName = [@"net.robnapier." stringByAppendingString:NSStringFromClass([self class])];
     _queue = dispatch_queue_create([queueName UTF8String], DISPATCH_QUEUE_SERIAL);
     __outData = [NSMutableData data];
