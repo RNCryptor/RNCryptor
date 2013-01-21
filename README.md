@@ -4,7 +4,7 @@ Encryptor/Decryptor for iOS
  
 Provides an easy-to-use, Objective-C interface to the AES functionality of CommonCrypto. Simplifies correct handling of
 password stretching (PBKDF2), salting, and IV. For more information on these terms, see ["Properly encrypting with AES
-with CommonCrypto,"](http://robnapier.net/blog/aes-commoncrypto-564) and [iOS 5 Programming Pushing the Limits](http://iosptl.com), Chapter 11.
+with CommonCrypto,"](http://robnapier.net/blog/aes-commoncrypto-564) and [iOS 6 Programming Pushing the Limits](http://iosptl.com), Chapter 15.
 Also includes automatic HMAC handling to integrity-check messages.
 
 `RNCryptor` is an abstract class. Concrete subclasses include:
@@ -93,6 +93,8 @@ Requires `Security.framework`.
 
 Supports 10.7+ and iOS 5+. For more information on backporting, read and comment on Issue #22.
 
+The current file format is v2. To read v1 files (see Issue #44), you need to set the compile-time macro `RNCRYPTOR_ALLOW_V1_BAD_HMAC`. It is not possible to write v1 files anymore.
+
 # Design considerations
 
 `RNCryptor` has several design goals, in order of importance:
@@ -141,6 +143,7 @@ Without sacrificing other goals, it is preferable to read the output format of `
 
 # Roadmap
 
+* v2.1 Switches to file format v2 to deal with Issue #44.
 * v2.0 adds asynchronous modes.
 * v2.1 backports `RNCryptor` to older versions of Mac OS X (and possibly iOS).
 
