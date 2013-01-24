@@ -6,6 +6,7 @@
 
   /* kRNCryptorAES256Settings */
   $algorithm = MCRYPT_RIJNDAEL_128;
+  $key_size = 32;
   $mode = MCRYPT_MODE_CBC;
   $salt_size = 8;
   $pbkdf2_iterations = 10000;
@@ -13,7 +14,6 @@
   $hmac_algorithm = 'sha256';
   $version = chr(2);
   $options = chr(1);  /* We're using a password */
-
 
   /* Other settings */
   $random_source = MCRYPT_DEV_RANDOM; /* use MCRYPT_RAND on Windows */
@@ -23,15 +23,14 @@
 
   /* Create the IV and determine the keysize length */
   $iv = mcrypt_create_iv(mcrypt_enc_get_iv_size($td), $random_source);
-  $ks = mcrypt_enc_get_key_size($td);
 
   /* Create the salts */
   $key_salt = mcrypt_create_iv($salt_size, $random_source);
   $hmac_salt = mcrypt_create_iv($salt_size, $random_source);
 
   /* Create key */
-  $key = hash_pbkdf2($pbkdf2_prf, $password, $key_salt, $pbkdf2_iterations, $ks, true);
-  $hmac_key = hash_pbkdf2($pbkdf2_prf, $password, $hmac_salt, $pbkdf2_iterations, $ks, true);
+  $key = hash_pbkdf2($pbkdf2_prf, $password, $key_salt, $pbkdf2_iterations, $key_size, true);
+  $hmac_key = hash_pbkdf2($pbkdf2_prf, $password, $hmac_salt, $pbkdf2_iterations, $key_size, true);
 
   /* Pad data */
   $block_size = mcrypt_enc_get_block_size($td);

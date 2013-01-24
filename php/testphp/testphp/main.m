@@ -16,7 +16,7 @@ int main(int argc, const char * argv[])
   @autoreleasepool {
     NSError *decryptionError = nil;
     // Output of encrypt.php
-    NSData *fromPHPData = [@"AgENx4deAFlngMaLY8aNzvhr5AlIjLdttyWnqszfohkpz/Q13gXsEUYmjNMXaBhg3AQnrKXuEnZbhL9Rtcb0ja/YUV21OKsCC3eb70CCeBvEjsCB/nPKCHJBp5tVmoyR8i/SI1FYrCLJmVqGAxJQbsa7X4YzC1Dan3+tG/mQ5VQE7LAgrwlVQNvNYL22DRocECU9XGdo9SSS8L6hYtVmACbe" base64DecodedData];
+    NSData *fromPHPData = [@"AgF12bfxXb0lpR5tJAWTNb9jRUyyhTS5A8GBu5M1qhwA7CV0NMqHYTsyEsDjSccQiohU+FV9wk+VzGDrRmEpoK6PnVKTmsmJpnlqftxOv9BXlkmHIiEBCXzTprhzv4lWQ2MiEKkx+zda9B4WEoBuMTPxdLwnAxek9baTgv9mDH64oPmhZZWtlG3s9gSEaA1Cu2uYScDOin3+T1sEOdVAbnJG" base64DecodedData];
 
     NSData *fromPHPDecryptedData = [RNDecryptor decryptData:fromPHPData withPassword:@"myPassword" error:&decryptionError];
 
