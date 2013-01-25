@@ -5,17 +5,17 @@
 //
 //  This code is licensed under the MIT License:
 //
-//  Permission is hereby granted, free of charge, to any person obtaining a 
+//  Permission is hereby granted, free of charge, to any person obtaining a
 //  copy of this software and associated documentation files (the "Software"),
 //  to deal in the Software without restriction, including without limitation
 //  the rights to use, copy, modify, merge, publish, distribute, sublicense,
 //  and/or sell copies of the Software, and to permit persons to whom the
 //  Software is furnished to do so, subject to the following conditions:
-//  
+//
 //  The above copyright notice and this permission notice shall be included in
 //  all copies or substantial portions of the Software.
 //
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 //  FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
 //  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -55,6 +55,76 @@ NSString *const kBadPassword = @"NotThePassword";
   // Tear-down code here.
 
   [super tearDown];
+}
+
+- (void) testAsyncDecrypt {
+    size_t dataLength = 29808;
+
+    NSData * data = [RNCryptor randomDataOfLength:dataLength];
+
+    NSError *error = nil;
+    NSData *encryptedData = [RNEncryptor encryptData:data
+                                        withSettings:kRNCryptorAES256Settings
+                                            password:kGoodPassword
+                                               error:&error];
+
+    STAssertNil(error, @"Encryption error:%@", error);
+    STAssertNotNil(encryptedData, @"Data did not encrypt.");
+
+    __block NSUInteger totalBytesToRead = data.length;
+    __block NSUInteger totalBytesRead = 0;
+
+    __block NSOutputStream *outputStream = [[NSOutputStream alloc] initToMemory];
+    __block NSError *decryptionError = nil;
+    [outputStream open];
+
+    self.isTestRunning = YES;
+
+    RNDecryptor *decryptor = [[RNDecryptor alloc] initWithPassword:kGoodPassword handler:^(RNCryptor *cryptor, NSData *data) {
+        totalBytesRead += data.length;
+        [outputStream write:data.bytes maxLength:data.length];
+        if (cryptor.isFinished) {
+            self.isTestRunning = NO;
+            //close the outputStream
+            [outputStream close];
+            decryptionError = cryptor.error;
+
+        }
+    }];
+
+    NSInputStream *inputStream = [NSInputStream inputStreamWithData:encryptedData];
+    [inputStream open];
+    while (self.isTestRunning) {
+        if (!inputStream.hasBytesAvailable) {
+            break;
+        } else {
+            uint8_t buf[1024];
+            NSUInteger bytesRead = [inputStream read:buf maxLength:1024];
+            NSData *data = [NSData dataWithBytes:buf length:bytesRead];
+            [decryptor addData:data];
+        }
+    }
+
+    [decryptor finish];
+
+    [inputStream close];
+
+    //Give the test enough time to finish
+    NSDate *timeout = [NSDate dateWithTimeIntervalSinceNow:5];
+    do {
+        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
+                                 beforeDate:timeout];
+    } while (self.isTestRunning);
+
+    STAssertFalse(self.isTestRunning, @"Test timed out.");
+    STAssertNil(decryptionError, @"Decrypt error: %@", decryptionError);
+
+    //Retrieve the decrypted data
+    NSData *decryptedData = [outputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
+    STAssertTrue([decryptedData length] > 0, @"Failed to decrypt.");
+
+    STAssertEqualObjects(decryptedData, data, @"Incorrect decryption.");
+
 }
 
 - (void)testSimple
