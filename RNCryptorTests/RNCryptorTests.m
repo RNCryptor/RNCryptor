@@ -71,7 +71,6 @@ NSString *const kBadPassword = @"NotThePassword";
     STAssertNil(error, @"Encryption error:%@", error);
     STAssertNotNil(encryptedData, @"Data did not encrypt.");
 
-    __block NSUInteger totalBytesToRead = data.length;
     __block NSUInteger totalBytesRead = 0;
 
     __block NSOutputStream *outputStream = [[NSOutputStream alloc] initToMemory];
