@@ -66,41 +66,71 @@ static NSData *GetHashForHash(NSData *hash, NSData *passwordSalt) {
 NSData *RNOpenSSLCryptorGetKey(NSString *password, NSData *salt, RNCryptorKeyDerivationSettings keySettings) {
   // FIXME: This is all very inefficient; we repeat ourselves in IVForKey:...
 
-  // Hash0 = ''
-  // Hash1 = MD5(Hash0 + Password + Salt)
-  // Hash2 = MD5(Hash1 + Password + Salt)
-  // Hash3 = MD5(Hash2 + Password + Salt)
-  // Hash4 = MD5(Hash3 + Password + Salt)
-  //
-  // Key = Hash1 + Hash2
-  // IV = Hash3 + Hash4
-
-  NSMutableData *passwordSalt = [[password dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
-  [passwordSalt appendData:salt];
-
-  NSData *hash1 = GetHashForHash(nil, passwordSalt);
-  NSData *hash2 = GetHashForHash(hash1, passwordSalt);
-
-  NSMutableData *key = [hash1 mutableCopy];
-  [key appendData:hash2];
-
+    NSMutableData *key;
+    NSMutableData *passwordSalt = [[password dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
+    [passwordSalt appendData:salt];
+    
+    if (keySettings.keySize != kCCKeySizeAES256) {
+        // For aes-128:
+        //
+        // key = MD5(password + salt)
+        // IV = MD5(Key + password + salt)
+        unsigned char md[CC_MD5_DIGEST_LENGTH];
+        CC_MD5([passwordSalt bytes], (CC_LONG)[passwordSalt length], md);
+        key = [NSData dataWithBytes:md length:sizeof(md)];
+        
+    } else {
+        // Hash0 = ''
+        // Hash1 = MD5(Hash0 + Password + Salt)
+        // Hash2 = MD5(Hash1 + Password + Salt)
+        // Hash3 = MD5(Hash2 + Password + Salt)
+        // Hash4 = MD5(Hash3 + Password + Salt)
+        //
+        // Key = Hash1 + Hash2
+        // IV = Hash3 + Hash4
+        
+        NSData *hash1 = GetHashForHash(nil, passwordSalt);
+        NSData *hash2 = GetHashForHash(hash1, passwordSalt);
+        
+        key = [hash1 mutableCopy];
+        [key appendData:hash2];
+    }
   return key;
 }
 
 NSData *RNOpenSSLCryptorGetIV(NSData *key, NSString *password, NSData *salt, RNCryptorKeyDerivationSettings keySettings) {
-  NSCAssert(keySettings.keySize == kCCKeySizeAES256, @"OpenSSL uses a different mechanism for AES128. Implement if needed. key is needed for AES128");
-
-  NSMutableData *passwordSalt = [[password dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
-  [passwordSalt appendData:salt];
-
-  NSData *hash1 = GetHashForHash(nil, passwordSalt);
-  NSData *hash2 = GetHashForHash(hash1, passwordSalt);
-  NSData *hash3 = GetHashForHash(hash2, passwordSalt);
-  NSData *hash4 = GetHashForHash(hash3, passwordSalt);
-
-  NSMutableData *IV = [hash3 mutableCopy];
-  [IV appendData:hash4];
-
+    
+    NSMutableData *IV;
+    NSMutableData *passwordSalt = [[password dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
+    [passwordSalt appendData:salt];
+    
+    if (keySettings.keySize != kCCKeySizeAES256) {
+        // For aes-128:
+        //
+        // key = MD5(password + salt)
+        // IV = MD5(Key + password + salt)
+        IV = [GetHashForHash(key, passwordSalt) mutableCopy];
+        
+    } else {
+        
+        //
+        // For aes-256:
+        //
+        // Hash0 = ''
+        // Hash1 = MD5(Hash0 + Password + Salt)
+        // Hash2 = MD5(Hash1 + Password + Salt)
+        // Hash3 = MD5(Hash2 + Password + Salt)
+        // Hash4 = MD5(Hash3 + Password + Salt)
+        //
+        // Key = Hash1 + Hash2
+        // IV = Hash3 + Hash4
+        
+        NSData *hash3 = GetHashForHash(key, passwordSalt);
+        NSData *hash4 = GetHashForHash(hash3, passwordSalt);
+        
+       IV = [hash3 mutableCopy];
+        [IV appendData:hash4];
+    }
   return IV;
 }
 

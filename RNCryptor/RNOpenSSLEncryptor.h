@@ -28,5 +28,6 @@
 #import "RNEncryptor.h"
 
 @interface RNOpenSSLEncryptor : RNEncryptor
++ (NSData *)encryptData:(NSData *)data withSettings:(RNCryptorSettings)settings encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV error:(NSError **)error;
 - (RNEncryptor *)initWithSettings:(RNCryptorSettings)theSettings encryptionKey:(NSData *)anEncryptionKey IV:(NSData *)anIV handler:(RNCryptorHandler)aHandler;
 @end
