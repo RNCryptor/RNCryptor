@@ -58,6 +58,11 @@
 @implementation RNOpenSSLEncryptor
 @synthesize encryptionSalt = _encryptionSalt;
 
++ (NSData *)encryptData:(NSData *)data withSettings:(RNCryptorSettings)settings encryptionKey:(NSData *)encryptionKey IV:(NSData *)IV error:(NSError **)error
+{
+    RNEncryptor *cryptor = [[self alloc] initWithSettings:settings encryptionKey:encryptionKey IV:IV handler:^(RNCryptor *c, NSData *d) {}];
+    return [self synchronousResultForCryptor:cryptor data:data error:error];
+}
 
 - (RNEncryptor *)initWithSettings:(RNCryptorSettings)settings encryptionKey:(NSData *)encryptionKey HMACKey:(NSData *)HMACKey handler:(RNCryptorHandler)handler
 {
@@ -106,8 +111,11 @@
 
 - (NSData *)header
 {
-  NSMutableData *headerData = [[kRNCryptorOpenSSLSaltedString dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
-  [headerData appendData:self.encryptionSalt];
+    NSMutableData *headerData = [NSMutableData data];
+    if (kRNCryptorOptionHasPassword == (self.options & kRNCryptorOptionHasPassword)) {
+        [headerData appendData:[kRNCryptorOpenSSLSaltedString dataUsingEncoding:NSUTF8StringEncoding]];
+        [headerData appendData:self.encryptionSalt];
+    }
   return headerData;
 }
 
