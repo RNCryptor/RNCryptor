@@ -167,7 +167,7 @@ static const NSUInteger kPreambleSize = 2;
     return;
   }
 
-  RNCryptorSettings settings;
+  RNCryptorSettings settings = {};
   if (![self getSettings:&settings forPreamble:[data subdataWithRange:NSMakeRange(0, kPreambleSize)]]) {
     [self cleanupAndNotifyWithError:[NSError errorWithDomain:kRNCryptorErrorDomain
                                                         code:kRNCryptorUnknownHeader

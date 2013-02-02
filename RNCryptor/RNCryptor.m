@@ -81,7 +81,9 @@ const uint8_t kRNCryptorFileVersion = 2;
 
 #if !OS_OBJECT_USE_OBJC
   dispatch_release(sem);
-  dispatch_release(queue);
+  if (queue) {
+    dispatch_release(queue);
+  }
 #endif
 
   if (returnedError) {

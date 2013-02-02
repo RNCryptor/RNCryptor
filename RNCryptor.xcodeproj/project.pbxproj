@@ -393,7 +393,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = RN;
-				LastUpgradeCheck = 0430;
+				LastUpgradeCheck = 0460;
 				ORGANIZATIONNAME = "Rob Napier";
 			};
 			buildConfigurationList = FB7564EA1512D3C4007B806B /* Build configuration list for PBXProject "RNCryptor" */;
@@ -549,7 +549,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = RNCryptor;
-				SDKROOT = macosx10.7;
+				SDKROOT = macosx;
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Debug;
@@ -576,7 +576,7 @@
 				INFOPLIST_FILE = "RNCryptor OS X/RNCryptor OS X-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = RNCryptor;
-				SDKROOT = macosx10.7;
+				SDKROOT = macosx;
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Release;
