@@ -39,8 +39,6 @@ NSString *const kBadPassword = @"NotThePassword";
 @end
 
 @implementation RNCryptorTests
-@synthesize encryptor = _encryptor;
-@synthesize isTestRunning = _isTestRunning;
 
 
 - (void)setUp
@@ -60,10 +58,10 @@ NSString *const kBadPassword = @"NotThePassword";
 - (void) testAsyncDecrypt {
   size_t dataLength = 29808;
 
-  NSData * data = [RNCryptor randomDataOfLength:dataLength];
+  NSData * plaintext = [RNCryptor randomDataOfLength:dataLength];
 
   NSError *error = nil;
-  NSData *encryptedData = [RNEncryptor encryptData:data
+  NSData *encryptedData = [RNEncryptor encryptData:plaintext
                                       withSettings:kRNCryptorAES256Settings
                                           password:kGoodPassword
                                              error:&error];
@@ -71,58 +69,62 @@ NSString *const kBadPassword = @"NotThePassword";
   STAssertNil(error, @"Encryption error:%@", error);
   STAssertNotNil(encryptedData, @"Data did not encrypt.");
 
-  __block NSUInteger totalBytesRead = 0;
+  NSInputStream *inputStream = [NSInputStream inputStreamWithData:encryptedData];
+  [inputStream open];
 
   __block NSOutputStream *outputStream = [[NSOutputStream alloc] initToMemory];
   __block NSError *decryptionError = nil;
   [outputStream open];
 
-  self.isTestRunning = YES;
+  __block dispatch_semaphore_t sem = dispatch_semaphore_create(0);
 
-  RNDecryptor *decryptor = [[RNDecryptor alloc] initWithPassword:kGoodPassword handler:^(RNCryptor *cryptor, NSData *data) {
-    totalBytesRead += data.length;
+  int blockSize = 1024;
+
+  __block RNDecryptor *decryptor;
+  __block NSMutableData *buffer = [NSMutableData dataWithLength:blockSize];
+
+  dispatch_block_t readStreamBlock = ^{
+    [buffer setLength:blockSize];
+    NSInteger bytesRead = [inputStream read:[buffer mutableBytes] maxLength:blockSize];
+    if (bytesRead < 0) {
+      STFail(@"Error reading block:%@", inputStream.streamError);
+      [inputStream close];
+      dispatch_semaphore_signal(sem);
+    }
+    else if (bytesRead == 0) {
+      [inputStream close];
+      [decryptor finish];
+    }
+    else {
+      [buffer setLength:bytesRead];
+      [decryptor addData:buffer];
+      NSLog(@"Sent %ld bytes to decryptor", (unsigned long)bytesRead);
+    }
+  };
+
+  decryptor = [[RNDecryptor alloc] initWithPassword:kGoodPassword handler:^(RNCryptor *cryptor, NSData *data) {
+    NSLog(@"Received %d bytes", data.length);
     [outputStream write:data.bytes maxLength:data.length];
     if (cryptor.isFinished) {
-      self.isTestRunning = NO;
-      //close the outputStream
       [outputStream close];
-      decryptionError = cryptor.error;
-
+      dispatch_semaphore_signal(sem);
     }
-  }];
+    else {
+      readStreamBlock();
+    }  }];
 
-  NSInputStream *inputStream = [NSInputStream inputStreamWithData:encryptedData];
-  [inputStream open];
-  while (self.isTestRunning) {
-    if (!inputStream.hasBytesAvailable) {
-      break;
-    } else {
-      uint8_t buf[1024];
-      NSUInteger bytesRead = [inputStream read:buf maxLength:1024];
-      NSData *data = [NSData dataWithBytes:buf length:bytesRead];
-      [decryptor addData:data];
-    }
-  }
+  readStreamBlock();
 
-  [decryptor finish];
+  long timedout = dispatch_semaphore_wait(sem, dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC));
 
-  [inputStream close];
-
-  //Give the test enough time to finish
-  NSDate *timeout = [NSDate dateWithTimeIntervalSinceNow:5];
-  do {
-    [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
-                             beforeDate:timeout];
-  } while (self.isTestRunning);
-
-  STAssertFalse(self.isTestRunning, @"Test timed out.");
+  STAssertFalse(timedout, @"Test timed out.");
   STAssertNil(decryptionError, @"Decrypt error: %@", decryptionError);
 
   //Retrieve the decrypted data
   NSData *decryptedData = [outputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
   STAssertTrue([decryptedData length] > 0, @"Failed to decrypt.");
 
-  STAssertEqualObjects(decryptedData, data, @"Incorrect decryption.");
+  STAssertEqualObjects(decryptedData, plaintext, @"Incorrect decryption.");
 
 }
 
@@ -361,51 +363,69 @@ static NSString *const kOpenSSLPassword = @"Passw0rd";
 - (void)testOpenSSLDecryptStream {
   NSString *filePath = [[NSBundle bundleForClass:[self class]] pathForResource:kOpenSSLPath ofType:nil];
 
+  NSInputStream *inputStream = [NSInputStream inputStreamWithFileAtPath:filePath];
+  [inputStream open];
+
   __block NSOutputStream *outputStream = [[NSOutputStream alloc] initToMemory];
   __block NSError *decryptionError = nil;
   [outputStream open];
 
-  __block NSUInteger totalBytesRead = 0;
-
   __block dispatch_semaphore_t sem = dispatch_semaphore_create(0);
 
+  size_t blockSize = 1024;
 
-  RNOpenSSLDecryptor *decryptor = [[RNOpenSSLDecryptor alloc] initWithSettings:kRNCryptorAES256Settings
-                                                                      password:kOpenSSLPassword
-                                                                       handler:^(RNCryptor *cryptor, NSData *data)
-                                   {
-                                     totalBytesRead += data.length;
-                                     [outputStream write:data.bytes maxLength:data.length];
-                                     if (cryptor.isFinished)
-                                     {
-                                       //close the outputStream
-                                       [outputStream close];
-                                       decryptionError = cryptor.error;
-                                       dispatch_semaphore_signal(sem);
-                                     }
-                                   }];
+  __block RNDecryptor *decryptor;
+  __block NSMutableData *buffer = [NSMutableData dataWithLength:blockSize];
 
-  size_t BUFFER_SIZE = 1024;
 
-  NSInputStream *inputStream = [NSInputStream inputStreamWithFileAtPath:filePath];
-  [inputStream open];
-  Byte buffer[BUFFER_SIZE];
-  while ([inputStream hasBytesAvailable])
-  {
-    int bytesRead = [inputStream read:buffer maxLength:BUFFER_SIZE];
-    NSData *data = [NSData dataWithBytes:buffer length:bytesRead];
-    [decryptor addData:data];
-  }
-  [decryptor finish];
-  [inputStream close];
+  dispatch_block_t readStreamBlock = ^{
+    [buffer setLength:blockSize];
+    NSInteger bytesRead = [inputStream read:[buffer mutableBytes] maxLength:blockSize];
+    if (bytesRead < 0) {
+      STFail(@"Error reading block:%@", inputStream.streamError);
+      [inputStream close];
+      dispatch_semaphore_signal(sem);
+    }
+    else if (bytesRead == 0) {
+      [inputStream close];
+      [decryptor finish];
+    }
+    else {
+      [buffer setLength:bytesRead];
+      [decryptor addData:buffer];
+      NSLog(@"Sent %ld bytes to decryptor", (unsigned long)bytesRead);
+    }
+  };
 
-  dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
+  decryptor = [[RNOpenSSLDecryptor alloc] initWithSettings:kRNCryptorAES256Settings
+                                                  password:kOpenSSLPassword
+                                                   handler:^(RNCryptor *cryptor, NSData *data) {
+                                                     NSLog(@"Received %d bytes", data.length);
+                                                     if (data.length > 0) {
+                                                       [outputStream write:data.bytes maxLength:data.length];
+                                                     }
+                                                     if (cryptor.isFinished) {
+                                                       [outputStream close];
+                                                       dispatch_semaphore_signal(sem);
+                                                     }
+                                                     else {
+                                                       readStreamBlock();
+                                                     }
+                                                   }];
 
+  readStreamBlock();
+
+  long timedout = dispatch_semaphore_wait(sem, dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC));
+
+  STAssertFalse(timedout, @"Test timed out.");
+  STAssertNil(decryptionError, @"Decrypt error: %@", decryptionError);
+
+  //Retrieve the decrypted data
   NSData *decryptedData = [outputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
+  STAssertTrue([decryptedData length] > 0, @"Failed to decrypt.");
 
   NSString *decryptedString = [[NSString alloc] initWithData:decryptedData encoding:NSUTF8StringEncoding];
   STAssertEqualObjects(decryptedString, kOpenSSLString, @"Decrypted data does not match");
-
 }
 
 //
