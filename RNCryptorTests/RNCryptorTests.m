@@ -58,71 +58,71 @@ NSString *const kBadPassword = @"NotThePassword";
 }
 
 - (void) testAsyncDecrypt {
-    size_t dataLength = 29808;
+  size_t dataLength = 29808;
 
-    NSData * data = [RNCryptor randomDataOfLength:dataLength];
+  NSData * data = [RNCryptor randomDataOfLength:dataLength];
 
-    NSError *error = nil;
-    NSData *encryptedData = [RNEncryptor encryptData:data
-                                        withSettings:kRNCryptorAES256Settings
-                                            password:kGoodPassword
-                                               error:&error];
+  NSError *error = nil;
+  NSData *encryptedData = [RNEncryptor encryptData:data
+                                      withSettings:kRNCryptorAES256Settings
+                                          password:kGoodPassword
+                                             error:&error];
 
-    STAssertNil(error, @"Encryption error:%@", error);
-    STAssertNotNil(encryptedData, @"Data did not encrypt.");
+  STAssertNil(error, @"Encryption error:%@", error);
+  STAssertNotNil(encryptedData, @"Data did not encrypt.");
 
-    __block NSUInteger totalBytesRead = 0;
+  __block NSUInteger totalBytesRead = 0;
 
-    __block NSOutputStream *outputStream = [[NSOutputStream alloc] initToMemory];
-    __block NSError *decryptionError = nil;
-    [outputStream open];
+  __block NSOutputStream *outputStream = [[NSOutputStream alloc] initToMemory];
+  __block NSError *decryptionError = nil;
+  [outputStream open];
 
-    self.isTestRunning = YES;
+  self.isTestRunning = YES;
 
-    RNDecryptor *decryptor = [[RNDecryptor alloc] initWithPassword:kGoodPassword handler:^(RNCryptor *cryptor, NSData *data) {
-        totalBytesRead += data.length;
-        [outputStream write:data.bytes maxLength:data.length];
-        if (cryptor.isFinished) {
-            self.isTestRunning = NO;
-            //close the outputStream
-            [outputStream close];
-            decryptionError = cryptor.error;
+  RNDecryptor *decryptor = [[RNDecryptor alloc] initWithPassword:kGoodPassword handler:^(RNCryptor *cryptor, NSData *data) {
+    totalBytesRead += data.length;
+    [outputStream write:data.bytes maxLength:data.length];
+    if (cryptor.isFinished) {
+      self.isTestRunning = NO;
+      //close the outputStream
+      [outputStream close];
+      decryptionError = cryptor.error;
 
-        }
-    }];
-
-    NSInputStream *inputStream = [NSInputStream inputStreamWithData:encryptedData];
-    [inputStream open];
-    while (self.isTestRunning) {
-        if (!inputStream.hasBytesAvailable) {
-            break;
-        } else {
-            uint8_t buf[1024];
-            NSUInteger bytesRead = [inputStream read:buf maxLength:1024];
-            NSData *data = [NSData dataWithBytes:buf length:bytesRead];
-            [decryptor addData:data];
-        }
     }
+  }];
 
-    [decryptor finish];
+  NSInputStream *inputStream = [NSInputStream inputStreamWithData:encryptedData];
+  [inputStream open];
+  while (self.isTestRunning) {
+    if (!inputStream.hasBytesAvailable) {
+      break;
+    } else {
+      uint8_t buf[1024];
+      NSUInteger bytesRead = [inputStream read:buf maxLength:1024];
+      NSData *data = [NSData dataWithBytes:buf length:bytesRead];
+      [decryptor addData:data];
+    }
+  }
 
-    [inputStream close];
+  [decryptor finish];
 
-    //Give the test enough time to finish
-    NSDate *timeout = [NSDate dateWithTimeIntervalSinceNow:5];
-    do {
-        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
-                                 beforeDate:timeout];
-    } while (self.isTestRunning);
+  [inputStream close];
 
-    STAssertFalse(self.isTestRunning, @"Test timed out.");
-    STAssertNil(decryptionError, @"Decrypt error: %@", decryptionError);
+  //Give the test enough time to finish
+  NSDate *timeout = [NSDate dateWithTimeIntervalSinceNow:5];
+  do {
+    [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
+                             beforeDate:timeout];
+  } while (self.isTestRunning);
 
-    //Retrieve the decrypted data
-    NSData *decryptedData = [outputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
-    STAssertTrue([decryptedData length] > 0, @"Failed to decrypt.");
+  STAssertFalse(self.isTestRunning, @"Test timed out.");
+  STAssertNil(decryptionError, @"Decrypt error: %@", decryptionError);
 
-    STAssertEqualObjects(decryptedData, data, @"Incorrect decryption.");
+  //Retrieve the decrypted data
+  NSData *decryptedData = [outputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
+  STAssertTrue([decryptedData length] > 0, @"Failed to decrypt.");
+
+  STAssertEqualObjects(decryptedData, data, @"Incorrect decryption.");
 
 }
 
@@ -325,9 +325,9 @@ static NSString *const kOpenSSLPassword = @"Passw0rd";
   NSError *error = nil;
 
   NSData *encryptedData = [RNOpenSSLEncryptor encryptData:[kOpenSSLString dataUsingEncoding:NSUTF8StringEncoding]
-      withSettings:kRNCryptorAES256Settings
-          password:kOpenSSLPassword
-             error:&error];
+                                             withSettings:kRNCryptorAES256Settings
+                                                 password:kOpenSSLPassword
+                                                    error:&error];
   STAssertNotNil(encryptedData, @"Did not encrypt");
   STAssertNil(error, @"Error:%@", error);
 
@@ -356,6 +356,56 @@ static NSString *const kOpenSSLPassword = @"Passw0rd";
 
   NSString *decryptedString = [[NSString alloc] initWithData:decryptedData encoding:NSUTF8StringEncoding];
   STAssertEqualObjects(decryptedString, kOpenSSLString, @"Decrypted data does not match");
+}
+
+- (void)testOpenSSLDecryptStream {
+  NSString *filePath = [[NSBundle bundleForClass:[self class]] pathForResource:kOpenSSLPath ofType:nil];
+
+  __block NSOutputStream *outputStream = [[NSOutputStream alloc] initToMemory];
+  __block NSError *decryptionError = nil;
+  [outputStream open];
+
+  __block NSUInteger totalBytesRead = 0;
+
+  __block dispatch_semaphore_t sem = dispatch_semaphore_create(0);
+
+
+  RNOpenSSLDecryptor *decryptor = [[RNOpenSSLDecryptor alloc] initWithSettings:kRNCryptorAES256Settings
+                                                                      password:kOpenSSLPassword
+                                                                       handler:^(RNCryptor *cryptor, NSData *data)
+                                   {
+                                     totalBytesRead += data.length;
+                                     [outputStream write:data.bytes maxLength:data.length];
+                                     if (cryptor.isFinished)
+                                     {
+                                       //close the outputStream
+                                       [outputStream close];
+                                       decryptionError = cryptor.error;
+                                       dispatch_semaphore_signal(sem);
+                                     }
+                                   }];
+
+  size_t BUFFER_SIZE = 1024;
+
+  NSInputStream *inputStream = [NSInputStream inputStreamWithFileAtPath:filePath];
+  [inputStream open];
+  Byte buffer[BUFFER_SIZE];
+  while ([inputStream hasBytesAvailable])
+  {
+    int bytesRead = [inputStream read:buffer maxLength:BUFFER_SIZE];
+    NSData *data = [NSData dataWithBytes:buffer length:bytesRead];
+    [decryptor addData:data];
+  }
+  [decryptor finish];
+  [inputStream close];
+
+  dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
+
+  NSData *decryptedData = [outputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
+
+  NSString *decryptedString = [[NSString alloc] initWithData:decryptedData encoding:NSUTF8StringEncoding];
+  STAssertEqualObjects(decryptedString, kOpenSSLString, @"Decrypted data does not match");
+
 }
 
 //
@@ -564,9 +614,9 @@ static NSString *const kOpenSSLPassword = @"Passw0rd";
   NSAssert(fileDescriptor >= 0, @"Failed to create temporary file");
 
   NSString *tempFileName =
-      [[NSFileManager defaultManager]
-          stringWithFileSystemRepresentation:tempFileNameCString
-                                      length:strlen(tempFileNameCString)];
+  [[NSFileManager defaultManager]
+   stringWithFileSystemRepresentation:tempFileNameCString
+   length:strlen(tempFileNameCString)];
 
   free(tempFileNameCString);
   return tempFileName;
