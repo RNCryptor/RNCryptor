@@ -78,6 +78,63 @@ call `finish`.
                                                      }];
     }
 
+## Async and Streams
+
+When performing async operations on streams, the data can come very quickly (particularly if you're reading from a local
+file). If you use RNCryptor in a naïve way, you'll queue a work blocks faster than the engine can process them and your
+memory usage will spike. This is particularly true if there's only one core, such as on an iPad 1. The solution is to
+only dispatch new work blocks as the previous work blocks complete.
+
+    // Make sure that this number is larger than the header + 1 block.
+    // 33+16 bytes = 49 bytes. So it shouldn't be a problem.
+    int blockSize = 32 * 1024;
+
+    NSInputStream *cryptedStream = [NSInputStream inputStreamWithFileAtPath:@"C++ Spec.pdf"];
+    NSOutputStream *decryptedStream = [NSOutputStream outputStreamToFileAtPath:@"/tmp/C++.crypt" append:NO];
+
+    [cryptedStream open];
+    [decryptedStream open];
+
+    // We don't need to keep making new NSData objects. We can just use one repeatedly.
+    __block NSMutableData *data = [NSMutableData dataWithLength:blockSize];
+    __block RNEncryptor *decryptor = nil;
+
+    dispatch_block_t readStreamBlock = ^{
+      [data setLength:blockSize];
+      NSInteger bytesRead = [cryptedStream read:[data mutableBytes] maxLength:blockSize];
+      if (bytesRead < 0) {
+        // Throw an error
+      }
+      else if (bytesRead == 0) {
+        [decryptor finish];
+      }
+      else {
+        [data setLength:bytesRead];
+        [decryptor addData:data];
+        NSLog(@"Sent %ld bytes to decryptor", (unsigned long)bytesRead);
+      }
+    };
+
+    decryptor = [[RNEncryptor alloc] initWithSettings:kRNCryptorAES256Settings
+                                              password:@"blah"
+                                              handler:^(RNCryptor *cryptor, NSData *data) {
+                                                NSLog(@"Decryptor recevied %ld bytes", (unsigned long)data.length);
+                                                [decryptedStream write:data.bytes maxLength:data.length];
+                                                if (cryptor.isFinished) {
+                                                  [decryptedStream close];
+                                                  // call my delegate that I'm finished with decrypting
+                                                }
+                                                else {
+                                                  // Might want to put this in a dispatch_async(), but I don't think you need it.
+                                                  readStreamBlock();
+                                                }
+                                              }];
+
+    // Read the first block to kick things off    
+    readStreamBlock();
+
+I'll eventually get this into the API to simplify things. See [Cyrille's SO question](http://stackoverflow.com/a/14586231/97337)
+for more discussion. Pull requests welcome.
 
 # API Documentation
 
