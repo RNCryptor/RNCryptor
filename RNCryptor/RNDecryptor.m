@@ -173,6 +173,7 @@ static const NSUInteger kPreambleSize = 2;
                                                         code:kRNCryptorUnknownHeader
                                                     userInfo:[NSDictionary dictionaryWithObject:@"Unknown header" /* DNL */
                                                                                          forKey:NSLocalizedDescriptionKey]]];
+    return;
   }
 
   NSUInteger headerSize = kPreambleSize + settings.IVSize;
