@@ -17,6 +17,84 @@ define('SALT_SIZE', 12);
 define('HMAC_SIZE', 44);
 $gPassword = "myPassword";
 
+
+/*
+ *
+ *  Based on https://github.com/rnapier/RNCryptor
+ *  
+ *  Argument: $b64_data - this is base64encoded data following the data format below.
+ *
+ *  Data Format see https://github.com/rnapier/RNCryptor/wiki/Data-Format for details.
+ * 
+ *  version (1 byte): Data format version. Currently 2.
+ *  options (1 byte): bit 0 - uses password
+ *  encryptionSalt (8 bytes): iff option includes "uses password"
+ *  HMACSalt (8 bytes): iff options includes "uses password"
+ *  IV (16 bytes)
+ *  ciphertext (variable) -- Encrypted with CTR mode in v1.x, CBC mode in 2.0.
+ *  HMAC (32 bytes)
+ *
+ *  Returns: Decrypted data.
+ *
+ */
+function decrypt_data($b64_data) {
+    global $gPassword;
+
+    // kRNCryptorAES256Settings 
+    $algorithm = MCRYPT_RIJNDAEL_128;
+    $key_size = 32;
+    $mode = MCRYPT_MODE_CBC;
+    $pbkdf2_iterations = 10000;
+    $pbkdf2_prf = 'sha1';
+    $hmac_algorithm = 'sha256';
+
+    // back to binary              
+    $bin_data = base64_decode($b64_data);
+    // extract salt
+    $salt = substr($bin_data, 2, 8);
+    // extract HMAC salt
+    $hmac_salt = substr($bin_data, 10, 8);
+    // extract IV
+    $iv = substr($bin_data, 18, 16);
+    // extract data
+    $data = substr($bin_data, 34, strlen($bin_data) - 34 - 32);
+    $dataWithoutHMAC = chr(2).chr(1).$salt.$hmac_salt.$iv.$data;
+    // extract HMAC
+    $hmac = substr($bin_data, strlen($bin_data) - 32);
+    // make HMAC key
+    $hmac_key = hash_pbkdf2($pbkdf2_prf, $gPassword, $hmac_salt, $pbkdf2_iterations, $key_size, true);
+    // make HMAC hash
+    $hmac_hash = hash_hmac($hmac_algorithm, $dataWithoutHMAC , $hmac_key, true);
+    // check if HMAC hash matches HMAC  
+    if($hmac_hash != $hmac) {
+        echo "HMAC mismatch".$nl.$nl.$nl;
+        return false;
+    }
+    // make data key
+    $key = hash_pbkdf2($pbkdf2_prf, $gPassword, $salt, $pbkdf2_iterations, $key_size, true);
+
+    // decrypt
+    $cypher = mcrypt_module_open(MCRYPT_RIJNDAEL_128, '', MCRYPT_MODE_CBC, '');
+    // initialize encryption handle
+    if (mcrypt_generic_init($cypher, $key, $iv) != -1) {
+            // decrypt
+            $decrypted = mdecrypt_generic($cypher, $data);
+
+            // http://www.php.net/manual/en/function.mdecrypt-generic.php
+            // We found that sometimes the resulting padding is not null characters "\0" but rather one of several control characters.
+            // If you know your data is not supposed to have any trailing control characters "as we did" you can strip them like so.
+            $decrypted = preg_replace( "/\p{Cc}*$/u", "", $decrypted );
+
+            // clean up
+            mcrypt_generic_deinit($cypher);
+            mcrypt_module_close($cypher);
+
+            return trim($decrypted);
+    }
+    return false;
+}
+                                                                                                                                                                                                                          
+
 /*
 	// Corresponding iOS encrypt codes example.
 	// Use the CPCryptController from https://github.com/iosptl/ios6ptl/blob/master/ch15/CryptPic/CryptPic/RNCryptManager.m
@@ -49,7 +127,7 @@ $gPassword = "myPassword";
 	}
 */
 
-function decrypt_data($data) {
+function CPCryptController_decrypt_data($data) {
   global $gPassword;
 
   /* kRNCryptorAES256Settings */
