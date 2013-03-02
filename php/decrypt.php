@@ -36,6 +36,23 @@ $gPassword = "myPassword";
  *
  *  Returns: Decrypted data.
  *
+ *  // Corresponding iOS encrypt codes example.
+ *  NSData *encryptedData = [RNEncryptor encryptData:srcData
+ *                                      withSettings:kRNCryptorAES256Settings
+ *                                          password:@"password"
+ *                                             error:&error];
+ *       
+ *  NSString *encryptedDataBase64Final = [encryptedData base64EncodedString];
+ *
+ *  //If no error we send the post, voila!
+ *  if (!error) {  
+ *           NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+ *           // Post enctypted
+ *           [params setObject:encryptedDataBase64Final forKey:@"JSONEncryptedBase64"];    
+ *           // Do Post!
+ *           [[RKClient sharedClient] post:postResourcePath params:params delegate:self];
+ *   }
+ *
  */
 function decrypt_data($b64_data) {
     global $gPassword;
