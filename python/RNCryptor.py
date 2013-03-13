@@ -1,3 +1,4 @@
+#!/usr/bin/python
 from Crypto.Cipher import AES
 from Crypto import Random
 import StringIO
