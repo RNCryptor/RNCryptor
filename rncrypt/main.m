@@ -13,8 +13,10 @@
 
 NSData *GetDataForHex(NSString *hex)
 {
-  NSString *hexNoSpaces = [hex stringByReplacingOccurrencesOfString:@" " withString:@""];
-  
+  NSString *hexNoSpaces = [[[hex stringByReplacingOccurrencesOfString:@" " withString:@""]
+                            stringByReplacingOccurrencesOfString:@"<" withString:@""]
+                           stringByReplacingOccurrencesOfString:@">" withString:@""];
+
   NSMutableData *data = [[NSMutableData alloc] init];
   unsigned char whole_byte = 0;
   char byte_chars[3] = {'\0','\0','\0'};
@@ -33,6 +35,17 @@ void usage() {
   exit(2);
 }
 
+void OutputData(NSData *data)
+{
+  NSString *string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+  if (string) {
+    printf("%s\n", [string UTF8String]);
+  }
+  else {
+    printf("%s\n", [[data description] UTF8String]);
+  }
+}
+
 int main(int argc, char * const argv[])
 {
   @autoreleasepool {
@@ -42,7 +55,7 @@ int main(int argc, char * const argv[])
     NSString *message = nil;
 
     char ch;
-    
+
     /* options descriptor */
     struct option longopts[] = {
       { "decrypt",    no_argument,            &decrypt_flag,    1 },
@@ -71,24 +84,25 @@ int main(int argc, char * const argv[])
     message = [NSString stringWithUTF8String:argv[0]];
 
     NSError *error;
+    NSData *data;
     if (decrypt_flag) {
-      NSData *decryptedData = [RNDecryptor decryptData:GetDataForHex(message)
-                                          withPassword:password
-                                                 error:&error];
-      if (error) {
-        NSLog(@"Failed: %@", error);
-        exit(1);
-      }
-      else {
-        NSString *string = [[NSString alloc] initWithData:decryptedData encoding:NSUTF8StringEncoding];
-        if (string) {
-          printf("%s\n", [string UTF8String]);
-        }
-        else {
-          printf("%s\n", [[decryptedData description] UTF8String]);
-        }
-      }
+      data = [RNDecryptor decryptData:GetDataForHex(message)
+                         withPassword:password
+                                error:&error];
     }
-    return 0;
+    else {
+      data = [RNEncryptor encryptData:[message dataUsingEncoding:NSUTF8StringEncoding]
+                         withSettings:kRNCryptorAES256Settings
+                             password:password
+                                error:&error];
+    }
+    if (error) {
+      NSLog(@"Failed: %@", error);
+      exit(1);
+    }
+    else {
+      OutputData(data);
+    }
   }
+  return 0;
 }
