@@ -107,6 +107,21 @@ const uint8_t kRNCryptorFileVersion = 2;
 
 // For use with OS X 10.6
 // Based on http://opensource.apple.com/source/CommonCrypto/CommonCrypto-55010/Source/API/CommonKeyDerivation.c
+/*-
+ * Copyright (c) 2008 Damien Bergamini <damien.bergamini@free.fr>
+ *
+ * Permission to use, copy, modify, and distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
 #define CC_MAX_PRF_WORKSPACE 128+4
 #define kCCPRFHmacAlgSHA1hlen	CC_SHA1_DIGEST_LENGTH
 #define kCCPRFHmacAlgSHA224hlen CC_SHA224_DIGEST_LENGTH
@@ -243,6 +258,8 @@ RN_CCKeyDerivationPBKDF( CCPBKDFAlgorithm algorithm, const char *password, size_
 	return 0;
 }
 
+/* End code derived from CommonKeyDerivation.c */
+
 
 + (NSData *)keyForPassword:(NSString *)password salt:(NSData *)salt settings:(RNCryptorKeyDerivationSettings)keySettings
 {
@@ -281,6 +298,29 @@ RN_CCKeyDerivationPBKDF( CCPBKDFAlgorithm algorithm, const char *password, size_
 
 // For use on OS X 10.6
 // Based on http://www.opensource.apple.com/source/Security/Security-55179.1/sec/Security/SecFramework.c
+// Modified by Rob Napier April, 2013.
+/*
+ * Copyright (c) 2006-2010 Apple Inc. All Rights Reserved.
+ *
+ * @APPLE_LICENSE_HEADER_START@
+ *
+ * This file contains Original Code and/or Modifications of Original Code
+ * as defined in and that are subject to the Apple Public Source License
+ * Version 2.0 (the 'License'). You may not use this file except in
+ * compliance with the License. Please obtain a copy of the License at
+ * http://www.opensource.apple.com/apsl/ and read it before using this
+ * file.
+ *
+ * The Original Code and all software distributed under the License are
+ * distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
+ * EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
+ * INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR NON-INFRINGEMENT.
+ * Please see the License for the specific language governing rights and
+ * limitations under the License.
+ *
+ * @APPLE_LICENSE_HEADER_END@
+ */
 int RN_SecRandomCopyBytes(void *rnd, size_t count, uint8_t *bytes) {
   static int kSecRandomFD;
   static dispatch_once_t onceToken;
@@ -306,6 +346,7 @@ int RN_SecRandomCopyBytes(void *rnd, size_t count, uint8_t *bytes) {
 
 	return 0;
 }
+/* End code dervied from SecFramework.c */
 
 + (NSData *)randomDataOfLength:(size_t)length
 {
