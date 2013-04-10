@@ -73,7 +73,6 @@ static const NSUInteger kPreambleSize = 2;
 {
   RNDecryptor *cryptor = [[self alloc] initWithPassword:aPassword
                                                 handler:^(RNCryptor *c, NSData *d) {}];
-  cryptor.settings = kRNCryptorAES256Settings;
   return [self synchronousResultForCryptor:cryptor data:theCipherText error:anError];
 }
 
@@ -82,7 +81,6 @@ static const NSUInteger kPreambleSize = 2;
   RNDecryptor *cryptor = [[self alloc] initWithEncryptionKey:encryptionKey
                                                      HMACKey:HMACKey
                                                      handler:^(RNCryptor *c, NSData *d) {}];
-  cryptor.settings = kRNCryptorAES256Settings;
   return [self synchronousResultForCryptor:cryptor data:theCipherText error:anError];
 }
 
@@ -92,6 +90,7 @@ static const NSUInteger kPreambleSize = 2;
   if (self) {
     _encryptionKey = [anEncryptionKey copy];
     _HMACKey = [anHMACKey copy];
+    _settings = kRNCryptorAES256Settings;
   }
 
   return self;
@@ -104,6 +103,7 @@ static const NSUInteger kPreambleSize = 2;
   self = [self initWithEncryptionKey:nil HMACKey:nil handler:aHandler];
   if (self) {
     _password = aPassword;
+    _settings = kRNCryptorAES256Settings;
   }
   return self;
 }
