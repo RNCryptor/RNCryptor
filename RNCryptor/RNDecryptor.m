@@ -159,7 +159,7 @@ static const NSUInteger kPreambleSize = 2;
   }
 }
 
-- (BOOL)getSettingsForPreamble:(NSData *)preamble
+- (BOOL)updateOptionsForPreamble:(NSData *)preamble
 {
   const uint8_t *bytes = [preamble bytes];
 
@@ -186,7 +186,7 @@ static const NSUInteger kPreambleSize = 2;
     return;
   }
 
-  if (![self getSettingsForPreamble:[data subdataWithRange:NSMakeRange(0, kPreambleSize)]]) {
+  if (![self updateOptionsForPreamble:[data subdataWithRange:NSMakeRange(0, kPreambleSize)]]) {
     [self cleanupAndNotifyWithError:[NSError errorWithDomain:kRNCryptorErrorDomain
                                                         code:kRNCryptorUnknownHeader
                                                     userInfo:[NSDictionary dictionaryWithObject:@"Unknown header" /* DNL */
