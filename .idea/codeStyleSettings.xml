@@ -7,25 +7,25 @@
           <option name="GENERATE_INSTANCE_VARIABLES_FOR_PROPERTIES" value="ASK" />
           <option name="RELEASE_STYLE" value="IVAR" />
           <file>
-            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="Import" />
-            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="Macro" />
-            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="Typedef" />
-            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="Struct" />
-            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="Enum" />
-            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="ClassPredef" />
-            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="Constant" />
-            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="Global" />
-            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="FunctionPredecl" />
-            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="Function" />
-            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="Class" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="Import" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="Macro" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="Typedef" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="Struct" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="Enum" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="ClassPredef" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="Constant" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="Global" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="FunctionPredecl" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="Function" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="Class" />
           </file>
           <class>
-            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="Property" />
-            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="Synthesize" />
-            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="InitMethod" />
-            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="StaticMethod" />
-            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="InstanceMethod" />
-            <option name="com.jetbrains.objc.lang.OCDeclarationKind" value="DeallocMethod" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="Property" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="Synthesize" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="InitMethod" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="StaticMethod" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="InstanceMethod" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="DeallocMethod" />
           </class>
         </Objective-C-extensions>
         <XML>
