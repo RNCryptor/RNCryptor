@@ -108,7 +108,7 @@ typedef void (^RNCryptorHandler)(RNCryptor *cryptor, NSData *data);
 @property (nonatomic, readonly, strong) NSError *error;
 @property (nonatomic, readonly, getter=isFinished) BOOL finished;
 @property (nonatomic, readonly, copy) RNCryptorHandler handler;
-@property (nonatomic, readwrite) dispatch_queue_t responseQueue;
+@property (nonatomic, readwrite, assign) dispatch_queue_t responseQueue;
 
 - (void)addData:(NSData *)data;
 - (void)finish;
