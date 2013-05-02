@@ -102,7 +102,7 @@ static const NSUInteger kPreambleSize = 2;
 
   self = [self initWithEncryptionKey:nil HMACKey:nil handler:aHandler];
   if (self) {
-    _password = aPassword;
+    _password = [aPassword copy];
     _settings = kRNCryptorAES256Settings;
   }
   return self;
