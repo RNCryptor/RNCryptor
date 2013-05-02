@@ -369,12 +369,8 @@ int RN_SecRandomCopyBytes(void *rnd, size_t count, uint8_t *bytes) {
   NSParameterAssert(handler);
   self = [super init];
   if (self) {
-      NSString *responseQueueName = [@"net.robnapier.response." stringByAppendingString:NSStringFromClass([self class])];
-      _responseQueue = dispatch_queue_create([responseQueueName UTF8String], NULL);
-
-#if !OS_OBJECT_USE_OBJC
-    dispatch_retain(_responseQueue);
-#endif
+    NSString *responseQueueName = [@"net.robnapier.response." stringByAppendingString:NSStringFromClass([self class])];
+    _responseQueue = dispatch_queue_create([responseQueueName UTF8String], NULL);
 
     NSString *queueName = [@"net.robnapier." stringByAppendingString:NSStringFromClass([self class])];
     _queue = dispatch_queue_create([queueName UTF8String], DISPATCH_QUEUE_SERIAL);
