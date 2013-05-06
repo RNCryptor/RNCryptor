@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		90CAAF5A1737E408005C53B2 /* RNCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB75651A1512D3E9007B806B /* RNCryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		90CAAF5B1737E408005C53B2 /* RNDecryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B807A /* RNDecryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		90CAAF5C1737E408005C53B2 /* RNEncryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8076 /* RNEncryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		90CAAF5D1737E408005C53B2 /* RNOpenSSLCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B806E /* RNOpenSSLCryptor.h */; };
+		90CAAF5E1737E408005C53B2 /* RNOpenSSLDecryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B808E /* RNOpenSSLDecryptor.h */; };
+		90CAAF5F1737E408005C53B2 /* RNOpenSSLEncryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B808C /* RNOpenSSLEncryptor.h */; };
+		90CAAF601737E408005C53B2 /* RNCryptorEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B807E /* RNCryptorEngine.h */; };
+		90CAAF611737E408005C53B2 /* RNCryptor+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8084 /* RNCryptor+Private.h */; };
 		90DE45221721AFF600B153AF /* RNCryptor.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = FB75651A1512D3E9007B806B /* RNCryptor.h */; };
 		90DE45231721AFF600B153AF /* RNDecryptor.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B807A /* RNDecryptor.h */; };
 		90DE45241721AFF600B153AF /* RNEncryptor.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8076 /* RNEncryptor.h */; };
@@ -358,6 +366,14 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				90CAAF5A1737E408005C53B2 /* RNCryptor.h in Headers */,
+				90CAAF5B1737E408005C53B2 /* RNDecryptor.h in Headers */,
+				90CAAF5C1737E408005C53B2 /* RNEncryptor.h in Headers */,
+				90CAAF5D1737E408005C53B2 /* RNOpenSSLCryptor.h in Headers */,
+				90CAAF5E1737E408005C53B2 /* RNOpenSSLDecryptor.h in Headers */,
+				90CAAF5F1737E408005C53B2 /* RNOpenSSLEncryptor.h in Headers */,
+				90CAAF601737E408005C53B2 /* RNCryptorEngine.h in Headers */,
+				90CAAF611737E408005C53B2 /* RNCryptor+Private.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -629,6 +645,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = RNCryptor;
 				SDKROOT = macosx;
+				SYMROOT = ../../build;
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Debug;
@@ -656,6 +673,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				PRODUCT_NAME = RNCryptor;
 				SDKROOT = macosx;
+				SYMROOT = ../../build;
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Release;
