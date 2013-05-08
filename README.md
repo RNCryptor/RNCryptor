@@ -1,4 +1,4 @@
-# Overview
+# Overview (See at the bottom of this README for extra Addendum info!)
 
 Encryptor/Decryptor for iOS
  
@@ -269,3 +269,14 @@ Portions of ths code, indicated in the source, are licensed under the APSL licen
      *
      * @APPLE_LICENSE_HEADER_END@
      */
+     
+# Addendum
+
+Forked from https://github.com/rnapier/RNCryptor with the intention of modifying to make it work on iOS 4.2+
+
+See this StackOverflow answer (http://stackoverflow.com/questions/9958661/how-to-compile-and-use-commoncrypto-for-ios-4/16358916#16358916) in which I supplied the information in getting the CommonCryptor open source to work and build for iOS 4.2.
+
+Used in conjunction with https://github.com/t0mm13b/JNCryptor, it is truly is cross-platform encrypting/decrypting.
+
+
+

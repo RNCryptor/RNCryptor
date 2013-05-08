@@ -26,7 +26,7 @@
 
 #import <Foundation/Foundation.h>
 #import <CommonCrypto/CommonCryptor.h>
-#import <CommonCrypto/CommonKeyDerivation.h>
+#import "CommonKeyDerivation.h"
 #import <Security/Security.h>
 
 extern NSString *const kRNCryptorErrorDomain;
@@ -66,7 +66,7 @@ static const RNCryptorSettings kRNCryptorAES256Settings = {
         .saltSize = 8,
         .PBKDFAlgorithm = kCCPBKDF2,
         .PRF = kCCPRFHmacAlgSHA1,
-        .rounds = 10000
+        .rounds = 1000
     },
 
     .HMACKeySettings = {
@@ -74,7 +74,7 @@ static const RNCryptorSettings kRNCryptorAES256Settings = {
         .saltSize = 8,
         .PBKDFAlgorithm = kCCPBKDF2,
         .PRF = kCCPRFHmacAlgSHA1,
-        .rounds = 10000
+        .rounds = 1000
     }
 };
 
@@ -105,7 +105,7 @@ typedef void (^RNCryptorHandler)(RNCryptor *cryptor, NSData *data);
 //
 
 @interface RNCryptor : NSObject
-@property (nonatomic, readonly, strong) NSError *error;
+@property (nonatomic, readonly, retain) NSError *error;
 @property (nonatomic, readonly, getter=isFinished) BOOL finished;
 @property (nonatomic, readonly, copy) RNCryptorHandler handler;
 @property (nonatomic, readwrite) dispatch_queue_t responseQueue;

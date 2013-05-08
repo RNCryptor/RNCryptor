@@ -31,7 +31,7 @@
 #import "RNOpenSSLCryptor.h"
 
 @interface RNDecryptor (Private)
-@property (nonatomic, readwrite, strong) NSMutableData *inData;
+@property (nonatomic, readwrite, retain) NSMutableData *inData;
 @property (nonatomic, readwrite, copy) NSData *encryptionKey;
 @property (nonatomic, readwrite, copy) NSData *HMACKey;
 @property (nonatomic, readwrite, copy) NSString *password;
