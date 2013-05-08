@@ -30,16 +30,16 @@
 @class RNCryptorEngine;
 
 @interface RNCryptor ()
-@property (nonatomic, readwrite, strong) RNCryptorEngine *engine;
+@property (nonatomic, readwrite, retain) RNCryptorEngine *engine;
 #if OS_OBJECT_USE_OBJC
-@property (nonatomic, readwrite, strong) dispatch_queue_t queue;
+@property (nonatomic, readwrite, retain) dispatch_queue_t queue;
 #else
 @property (nonatomic, readwrite, assign) dispatch_queue_t queue;
 #endif
 @property (nonatomic, readonly) NSMutableData *outData;
 @property (nonatomic, readwrite, copy) RNCryptorHandler handler;
 @property (nonatomic, readwrite, assign) NSUInteger HMACLength;
-@property (nonatomic, readwrite, strong) NSError *error;
+@property (nonatomic, readwrite, retain) NSError *error;
 @property (nonatomic, readwrite, assign, getter=isFinished) BOOL finished;
 @property (nonatomic, readwrite, assign) RNCryptorOptions options;
 

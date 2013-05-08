@@ -32,7 +32,7 @@
 static const NSUInteger kPreambleSize = 2;
 
 @interface RNDecryptor ()
-@property (nonatomic, readonly, strong) NSMutableData *inData;
+@property (nonatomic, readonly, retain) NSMutableData *inData;
 @property (nonatomic, readwrite, copy) NSData *encryptionKey;
 @property (nonatomic, readwrite, copy) NSData *HMACKey;
 @property (nonatomic, readwrite, copy) NSString *password;
@@ -43,14 +43,15 @@ static const NSUInteger kPreambleSize = 2;
 @end
 
 @implementation RNDecryptor
-{
+//{
   CCHmacContext _HMACContext;
   NSMutableData *__inData;
-}
+//}
 @synthesize encryptionKey = _encryptionKey;
 @synthesize HMACKey = _HMACKey;
 @synthesize password = _password;
 @synthesize settings = _settings;
+@synthesize hasV1HMAC;
 
 + (NSData *)decryptData:(NSData *)theCipherText withSettings:(RNCryptorSettings)settings password:(NSString *)aPassword error:(NSError **)anError
 {

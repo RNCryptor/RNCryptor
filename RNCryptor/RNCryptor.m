@@ -27,6 +27,7 @@
 #import "RNCryptor.h"
 #import "RNCryptor+Private.h"
 #import <Security/SecRandom.h>
+#import <fcntl.h>
 
 extern int SecRandomCopyBytes(SecRandomRef rnd, size_t count, uint8_t *bytes) __attribute__((weak_import));
 extern int
@@ -79,7 +80,7 @@ const uint8_t kRNCryptorFileVersion = 2;
 
   cryptor.handler = handler;
 
-  dispatch_queue_t queue = dispatch_queue_create("net.robnapier.RNEncryptor.response", DISPATCH_QUEUE_SERIAL);
+	dispatch_queue_t queue = dispatch_queue_create("net.robnapier.RNEncryptor.response", NULL); //DISPATCH_QUEUE_SERIAL);
   cryptor.responseQueue = queue;
   [cryptor addData:inData];
   [cryptor finish];
@@ -369,11 +370,15 @@ int RN_SecRandomCopyBytes(void *rnd, size_t count, uint8_t *bytes) {
   NSParameterAssert(handler);
   self = [super init];
   if (self) {
-    NSString *responseQueueName = [@"net.robnapier.response." stringByAppendingString:NSStringFromClass([self class])];
-    _responseQueue = dispatch_queue_create([responseQueueName UTF8String], NULL);
+      NSString *responseQueueName = [@"net.robnapier.response." stringByAppendingString:NSStringFromClass([self class])];
+      _responseQueue = dispatch_queue_create([responseQueueName UTF8String], NULL);
+
+#if !OS_OBJECT_USE_OBJC
+    dispatch_retain(_responseQueue);
+#endif
 
     NSString *queueName = [@"net.robnapier." stringByAppendingString:NSStringFromClass([self class])];
-    _queue = dispatch_queue_create([queueName UTF8String], DISPATCH_QUEUE_SERIAL);
+	  _queue = dispatch_queue_create([queueName UTF8String], NULL); //DISPATCH_QUEUE_SERIAL);
     __outData = [NSMutableData data];
 
     _handler = [handler copy];

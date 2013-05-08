@@ -30,16 +30,16 @@
 #import "RNCryptorEngine.h"
 
 @interface RNEncryptor ()
-@property (nonatomic, readwrite, strong) NSData *encryptionSalt;
-@property (nonatomic, readwrite, strong) NSData *HMACSalt;
-@property (nonatomic, readwrite, strong) NSData *IV;
+@property (nonatomic, readwrite, retain) NSData *encryptionSalt;
+@property (nonatomic, readwrite, retain) NSData *HMACSalt;
+@property (nonatomic, readwrite, retain) NSData *IV;
 @property (nonatomic, readwrite, assign) BOOL haveWrittenHeader;
 @end
 
 @implementation RNEncryptor
-{
+//{
   CCHmacContext _HMACContext;
-}
+//}
 @synthesize encryptionSalt = _encryptionSalt;
 @synthesize HMACSalt = _HMACSalt;
 @synthesize IV = _IV;

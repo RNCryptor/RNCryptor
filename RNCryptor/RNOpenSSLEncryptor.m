@@ -52,7 +52,7 @@
 #import "RNOpenSSLCryptor.h"
 
 @interface RNOpenSSLEncryptor ()
-@property (nonatomic, readwrite, strong) NSData *encryptionSalt;
+@property (nonatomic, readwrite, retain) NSData *encryptionSalt;
 @end
 
 @implementation RNOpenSSLEncryptor
