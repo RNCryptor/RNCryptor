@@ -3,3 +3,6 @@
 .pearrc
 pear
 
+# other stuff
+coverage
+
