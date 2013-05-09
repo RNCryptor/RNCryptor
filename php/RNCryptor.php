@@ -19,12 +19,27 @@ class RNCryptor {
 	/* kRNCryptorAES256Settings */
 	const ALGORITHM = MCRYPT_RIJNDAEL_128;
 	const KEY_SIZE = 32;
-	const MODE = MCRYPT_MODE_CBC;
+	const RNCRYPTOR_1x_MODE = 'ctr';
+	const RNCRYPTOR_2x_MODE = 'cbc';
 	const SALT_SIZE = 8;
 	const PBKDF2_ITERATIONS = 10000;
 	const PBKDF2_PRF = 'sha1';
 	const HMAC_ALGORITHM = 'sha256';
 	const HMAC_SIZE = 32;
+
+	private $_randomSource;
+
+	public function __construct() {
+		$this->_setupRandomSource();
+	}
+
+	private function _setupRandomSource() {
+		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+			$this->_randomSource = MCRYPT_RAND;
+		} else {
+			$this->_randomSource = MCRYPT_DEV_RANDOM;
+		}
+	}
 
 	/**
 	 * Encrypt plaintext using RNCryptor's algorithm
@@ -36,129 +51,218 @@ class RNCryptor {
 	 * @param string $password Password to use
 	 * @param int $version (Optional) RNCryptor file version to use.
 	 *                     Defaults to 2.
-	 * @return string Encrypted, Base64-encoded text
+	 * @return string Encrypted, Base64-encoded string
 	 */
 	public function encrypt($plaintext, $password, $version = 2) {
 
 		$this->_assertVersionIsSupported($version);
 
+		$keySalt = mcrypt_create_iv(self::SALT_SIZE, $this->_randomSource);
+		$key = $this->_generateKey($keySalt, $password);
+
 		$versionChr = chr($version);
-		$optionsChr = chr(1);  /* We're using a password */
 
-		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-			$random_source = MCRYPT_RAND;
-		} else {
-			$random_source = MCRYPT_DEV_RANDOM;
-		}
-
-		$td = mcrypt_module_open(self::ALGORITHM, '', self::MODE, '');
-		$iv = mcrypt_create_iv(mcrypt_enc_get_iv_size($td), $random_source);
-
-		$key_salt = mcrypt_create_iv(self::SALT_SIZE, $random_source);
-		$hmac_salt = mcrypt_create_iv(self::SALT_SIZE, $random_source);
+		$cryptor = $this->_getCryptor($versionChr);
+		$iv = $this->_generateIv($cryptor);
 		
-		$key = hash_pbkdf2(self::PBKDF2_PRF, $password, $key_salt, self::PBKDF2_ITERATIONS, self::KEY_SIZE, true);
-		$hmac_key = hash_pbkdf2(self::PBKDF2_PRF, $password, $hmac_salt, self::PBKDF2_ITERATIONS, self::KEY_SIZE, true);
+		$padded_plaintext = $this->_padToBlockSizeMultiple($cryptor, $plaintext);
 		
-		$block_size = mcrypt_enc_get_block_size($td);
-		$pad_size = $block_size - (strlen($plaintext) % $block_size);
-		$padded_plaintext = $plaintext . str_repeat(chr($pad_size), $pad_size);
+		mcrypt_generic_init($cryptor, $key, $iv);
+		$ciphertext = mcrypt_generic($cryptor, $padded_plaintext);
+		
+		mcrypt_generic_deinit($cryptor);
+		mcrypt_module_close($cryptor);
 
-		mcrypt_generic_init($td, $key, $iv);
-		$encrypted = mcrypt_generic($td, $padded_plaintext);
-		mcrypt_generic_deinit($td);
-		mcrypt_module_close($td);
+		$hmacSalt = $this->_generateHmacSalt();
+		$optionsChr = $this->_generateOptions($versionChr);
+		$binaryData = $versionChr . $optionsChr . $keySalt . $hmacSalt . $iv . $ciphertext;
 
-		$message = $versionChr . $optionsChr . $key_salt . $hmac_salt . $iv . $encrypted;
+		$hmac = $this->_generateHmac($binaryData, $password);
 		
-		switch ($version) {
-			case 1:
-				$hmac_message = $encrypted;
-				break;
-
-			case 2:
-				$hmac_message = $message;
-				break;
-		}
-		
-		$hmac = hash_hmac(self::HMAC_ALGORITHM, $hmac_message, $hmac_key, true);
-		
-		return base64_encode($message . $hmac);
+		return base64_encode($binaryData . $hmac);
 	}
 
 	/**
-	 * Decrypt RNCryptor-encrypted text
-	 * 
+	 * Decrypt RNCryptor-encrypted data
+	 *
 	 * Adapted from:
-	 * 
+	 *
 	 *   AES128-apis.php
-	 * 
+	 *
 	 *   RNCryptor PHP BackEnd Script
 	 *   Using kCCAlgorithmAES128
 	 *   Advanced Encryption Standard, 128-bit block
 	 *   Copyright (c) 2013 Guysung Kim
 	 *
 	 * Suppport added by Curtis Farnham for RNCryptor file version 1.
-	 * 
+	 *
 	 * @param string $encrypted Encrypted, Base64-encoded text
 	 * @param string $password Password the text was encoded with
 	 * @param bool $stripTrailingControlCharacters Whether to strip trailing
-	 *                                             non-null padding characters 
+	 *                                             non-null padding characters
 	 *                                             after decryption
-	 * @return string|false Decrypted text, or false if decryption failed
+	 * @return string|false Decrypted string, or false if decryption failed
 	 */
 	public function decrypt($b64_data, $password, $stripTrailingControlCharacters = true) {
-
-		$bin_data = base64_decode($b64_data);
-
-		$versionChr = substr($bin_data, 0, 1);
-		$optionsChr = substr($bin_data, 1, 1);
-		$salt = substr($bin_data, 2, 8);
-		$hmac_salt = substr($bin_data, 10, 8);
-		$iv = substr($bin_data, 18, 16);
-
-		$headerLength = 34;
-
-		$data = substr($bin_data, $headerLength, strlen($bin_data) - $headerLength - self::HMAC_SIZE);
-
+	
+		$binaryData = base64_decode($b64_data);
+	
+		$versionChr = $this->_extractVersionFromBinData($binaryData);
 		$this->_assertVersionIsSupported(ord($versionChr));
-		
-		switch (ord($versionChr)) {
-			case 1:
-				// see http://robnapier.net/blog/rncryptor-hmac-vulnerability-827
-				$dataWithoutHMAC = $data;
-				break;
-			case 2:
-				$dataWithoutHMAC = $versionChr.$optionsChr.$salt.$hmac_salt.$iv.$data;
-				break;
-		}
 
-		$hmac = substr($bin_data, strlen($bin_data) - self::HMAC_SIZE);
-		$hmac_key = hash_pbkdf2(self::PBKDF2_PRF, $password, $hmac_salt, self::PBKDF2_ITERATIONS, self::KEY_SIZE, true);
-		$hmac_hash = hash_hmac(self::HMAC_ALGORITHM, $dataWithoutHMAC , $hmac_key, true);
-		if ($hmac_hash != $hmac) {
+		if (!$this->_hmacIsValid($binaryData, $password)) {
 			return false;
 		}
 
-		$key = hash_pbkdf2(self::PBKDF2_PRF, $password, $salt, self::PBKDF2_ITERATIONS, self::KEY_SIZE, true);
+		$keySalt = $this->_extractSaltFromBinData($binaryData);
+		$key = $this->_generateKey($keySalt, $password);
+		$iv = $this->_extractIvFromBinData($binaryData);
 
-		$cypher = mcrypt_module_open(MCRYPT_RIJNDAEL_128, '', self::MODE, '');
-		if (mcrypt_generic_init($cypher, $key, $iv) != -1) {
+		$ciphertext = $this->_extractCiphertextFromBinData($binaryData);
 
-			$decrypted = mdecrypt_generic($cypher, $data);
+		$cryptor = $this->_getCryptor($versionChr);
+		mcrypt_generic_init($cryptor, $key, $iv);
+		$plaintext = mdecrypt_generic($cryptor, $ciphertext);
 
-			if ($stripTrailingControlCharacters) {
-				// Sometimes the resulting padding is not null characters "\0" but rather one of several control characters.
-				// If you know your data is not supposed to have any trailing control characters "as we did" you can strip them like so.
-				// See http://www.php.net/manual/en/function.mdecrypt-generic.php
-				$decrypted = preg_replace("/\p{Cc}*$/u", "", $decrypted);
-			}
-
-			mcrypt_generic_deinit($cypher);
-			mcrypt_module_close($cypher);
-			return trim($decrypted);
+		mcrypt_generic_deinit($cryptor);
+		mcrypt_module_close($cryptor);
+	
+		if ($stripTrailingControlCharacters) {
+			$plaintext = $this->_stripTrailingControlChars($plaintext);
 		}
-		return false;
+	
+		return trim($plaintext);
+	}
+
+	private function _generateKey($salt, $password) {
+		return hash_pbkdf2(self::PBKDF2_PRF, $password, $salt, self::PBKDF2_ITERATIONS, self::KEY_SIZE, true);
+	}
+
+	private function _getCryptor($versionChr) {
+		$mode = $this->_getEncryptionMode($versionChr);
+		return mcrypt_module_open(self::ALGORITHM, '', $mode, '');
+	}
+	
+	private function _generateOptions($versionChr) {
+
+		switch (ord($versionChr)) {
+			case 0:
+				$optionsChr = chr(0);
+				break;
+			case 1:
+			case 2:
+				$optionsChr = chr(1); /* We're using a password */
+				break;
+			default:
+				throw new Exception('Unsupported version ' . ord($versionChr));
+		}
+		return $optionsChr;
+	}
+
+	private function _generateIv($cryptor) {
+		return mcrypt_create_iv(mcrypt_enc_get_iv_size($cryptor), $this->_randomSource);
+	}
+
+	private function _generateHmacSalt() {
+		return mcrypt_create_iv(self::SALT_SIZE, $this->_randomSource);
+	}
+
+	private function _generateHmac($binaryData, $password) {
+
+		$version = ord($this->_extractVersionFromBinData($binaryData));
+		switch ($version) {
+			case 0:
+			case 1:
+				$hmac_message = $this->_extractCiphertextFromBinData($binaryData);
+				break;
+		
+			case 2:
+				$hmac_message = $binaryData;
+				break;
+		}
+
+		$hmac_salt = $this->_extractHmacSaltFromBinData($binaryData);
+
+		$hmac_key = hash_pbkdf2(self::PBKDF2_PRF, $password, $hmac_salt, self::PBKDF2_ITERATIONS, self::KEY_SIZE, true);
+		return hash_hmac(self::HMAC_ALGORITHM, $hmac_message, $hmac_key, true);
+	}
+
+	private function _padToBlockSizeMultiple($cryptor, $plaintext) {
+		$block_size = mcrypt_enc_get_block_size($cryptor);
+		$pad_size = $block_size - (strlen($plaintext) % $block_size);
+		return $plaintext . str_repeat(chr($pad_size), $pad_size);
+	}
+
+	/**
+	 * Sometimes the resulting padding is not null characters "\0" but rather 
+	 * one of several control characters. If you know your data is not supposed
+	 * to have any trailing control characters "as we did" you can strip them
+	 * like so.
+	 * 
+	 * See http://www.php.net/manual/en/function.mdecrypt-generic.php
+	 */
+	private function _stripTrailingControlChars($plaintext) {
+		return preg_replace("/\p{Cc}*$/u", "", $plaintext);
+	}
+
+	private function _hmacIsValid($binaryData, $password) {
+
+		$versionChr = $this->_extractVersionFromBinData($binaryData);
+		switch (ord($versionChr)) {
+			case 0:
+			case 1:
+				// see http://robnapier.net/blog/rncryptor-hmac-vulnerability-827
+				$dataWithoutHMAC = $this->_extractCiphertextFromBinData($binaryData);
+				break;
+			case 2:
+				$dataWithoutHMAC = substr($binaryData, 0, strlen($binaryData) - self::HMAC_SIZE);
+				break;
+		}
+		
+		$hmac = substr($binaryData, strlen($binaryData) - self::HMAC_SIZE);
+
+		$hmac_salt = $this->_extractHmacSaltFromBinData($binaryData);
+		$hmac_key = hash_pbkdf2(self::PBKDF2_PRF, $password, $hmac_salt, self::PBKDF2_ITERATIONS, self::KEY_SIZE, true);
+
+		$hmac_hash = hash_hmac(self::HMAC_ALGORITHM, $dataWithoutHMAC , $hmac_key, true);
+		
+		return ($hmac_hash == $hmac);
+	}
+
+	private function _extractVersionFromBinData($binaryData) {
+		return substr($binaryData, 0, 1);
+	}
+
+	private function _extractSaltFromBinData($binaryData) {
+		return substr($binaryData, 2, 8);
+	}
+
+	private function _extractHmacSaltFromBinData($binaryData) {
+		return substr($binaryData, 10, 8);
+	}
+
+	private function _extractIvFromBinData($binaryData) {
+		return substr($binaryData, 18, 16);
+	}
+
+	private function _extractCiphertextFromBinData($binaryData) {
+		return substr($binaryData, 34, strlen($binaryData) - 34 - self::HMAC_SIZE);
+	}
+
+	private function _getEncryptionMode($versionChr) {
+		switch (ord($versionChr)) {
+			case 0:
+				$mode = self::RNCRYPTOR_1x_MODE;
+				break;
+			case 1:
+			case 2:
+				$mode = self::RNCRYPTOR_2x_MODE;
+				break;
+			default:
+				throw new Exception('Unsupported version ' . ord($versionChr));
+		}
+
+		return $mode;
 	}
 
 	/**
@@ -168,7 +272,7 @@ class RNCryptor {
 	 * @throws Exception if not supported
 	 */
 	private function _assertVersionIsSupported($version) {
-		if ($version !== 1 && $version !== 2) {
+		if ($version !== 1 && $version !== 2 && $version !== 0) {
 			throw new Exception('Unsupported file version ' . $version);
 		}
 	}
