@@ -51,6 +51,7 @@ class RNCryptor {
 	 * @param string $password Password to use
 	 * @param int $version (Optional) RNCryptor file version to use.
 	 *                     Defaults to 2.
+	 * @throws Exception If the provided version (if any) is unsupported
 	 * @return string Encrypted, Base64-encoded string
 	 */
 	public function encrypt($plaintext, $password, $version = 2) {
@@ -101,6 +102,7 @@ class RNCryptor {
 	 * @param bool $stripTrailingControlCharacters Whether to strip trailing
 	 *                                             non-null padding characters
 	 *                                             after decryption
+	 * @throws Exception If the detected version is unsupported
 	 * @return string|false Decrypted string, or false if decryption failed
 	 */
 	public function decrypt($b64_data, $password, $stripTrailingControlCharacters = true) {
@@ -153,8 +155,6 @@ class RNCryptor {
 			case 2:
 				$optionsChr = chr(1); /* We're using a password */
 				break;
-			default:
-				throw new Exception('Unsupported version ' . ord($versionChr));
 		}
 		return $optionsChr;
 	}
@@ -258,8 +258,6 @@ class RNCryptor {
 			case 2:
 				$mode = self::RNCRYPTOR_2x_MODE;
 				break;
-			default:
-				throw new Exception('Unsupported version ' . ord($versionChr));
 		}
 
 		return $mode;
@@ -272,7 +270,7 @@ class RNCryptor {
 	 * @throws Exception if not supported
 	 */
 	private function _assertVersionIsSupported($version) {
-		if ($version !== 1 && $version !== 2 && $version !== 0) {
+		if ($version < 0 || $version > 2) {
 			throw new Exception('Unsupported file version ' . $version);
 		}
 	}
