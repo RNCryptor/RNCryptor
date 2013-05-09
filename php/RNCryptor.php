@@ -173,7 +173,7 @@ class RNCryptor {
 		switch ($version) {
 			case 0:
 			case 1:
-				$hmac_message = $this->_extractCiphertextFromBinData($binaryData);
+				$hmac_message = substr($binaryData, 34);
 				break;
 		
 			case 2:
