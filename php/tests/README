@@ -1,0 +1,15 @@
+RNCryptor PHP Tests
+-------------------
+
+To run the tests, do this first:
+
+# ./install-local-phpunit.sh
+
+This will download and install PHPUnit locally in case your OS doesn't have it
+installed.  The file in this folder named "phpunit" is a symlink to the local
+installation's PHPUnit executable.
+
+When the above script is done, run the tests using this:
+
+# ./phpunit
+
