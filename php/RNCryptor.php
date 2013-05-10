@@ -11,7 +11,8 @@ abstract class RNCryptor {
 	const SALT_SIZE = 8;
 	const PBKDF2_ITERATIONS = 10000;
 	const PBKDF2_PRF = 'sha1';
-	const HMAC_ALGORITHM = 'sha256';
+	const HMAC_ALGORITHM_1x = 'sha1';
+	const HMAC_ALGORITHM_2x = 'sha256';
 	const HMAC_SIZE = 32;
 
 	protected function _generateKey($salt, $password) {
@@ -43,6 +44,23 @@ abstract class RNCryptor {
 		}
 
 		return $mode;
+	}
+
+	protected function _getHmacAlgorithm($versionChr) {
+		switch (ord($versionChr)) {
+			case 0:
+				$algorithm = self::HMAC_ALGORITHM_1x;
+				break;
+		
+			case 1:
+				$algorithm = self::HMAC_ALGORITHM_2x;
+				break;
+		
+			case 2:
+				$algorithm = self::HMAC_ALGORITHM_2x;
+				break;
+		}
+		return $algorithm;
 	}
 
 	/**

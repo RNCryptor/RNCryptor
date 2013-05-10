@@ -90,8 +90,8 @@ class RNEncryptor extends RNCryptor {
 	
 	private function _generateHmac($binaryData, $password) {
 	
-		$version = ord($this->_extractVersionFromBinData($binaryData));
-		switch ($version) {
+		$versionChr = $this->_extractVersionFromBinData($binaryData);
+		switch (ord($versionChr)) {
 			case 0:
 			case 1:
 				$hmac_message = substr($binaryData, 34);
@@ -103,9 +103,16 @@ class RNEncryptor extends RNCryptor {
 		}
 
 		$hmac_salt = $this->_extractHmacSaltFromBinData($binaryData);
-	
 		$hmac_key = hash_pbkdf2(RNCryptor::PBKDF2_PRF, $password, $hmac_salt, RNCryptor::PBKDF2_ITERATIONS, RNCryptor::KEY_SIZE, true);
-		return hash_hmac(RNCryptor::HMAC_ALGORITHM, $hmac_message, $hmac_key, true);
+
+		$algorithm = $this->_getHmacAlgorithm($versionChr);
+		$hmac = hash_hmac($algorithm, $hmac_message, $hmac_key, true);
+		
+		if (ord($versionChr) == 0) {
+			$hmac = str_pad($hmac, 32, chr(0));
+		}
+		
+		return $hmac;
 	}
 	
 	private function _padToBlockSizeMultiple($cryptor, $plaintext) {

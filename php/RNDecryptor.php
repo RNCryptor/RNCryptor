@@ -43,7 +43,7 @@ class RNDecryptor extends RNCryptor {
 
 		mcrypt_generic_deinit($cryptor);
 		mcrypt_module_close($cryptor);
-	
+
 		if ($stripTrailingControlCharacters) {
 			$plaintext = $this->_stripTrailingControlChars($plaintext);
 		}
@@ -69,21 +69,26 @@ class RNDecryptor extends RNCryptor {
 		switch (ord($versionChr)) {
 			case 0:
 			case 1:
-				// see http://robnapier.net/blog/rncryptor-hmac-vulnerability-827
 				$dataWithoutHMAC = $this->_extractCiphertextFromBinData($binaryData);
 				break;
+
 			case 2:
 				$dataWithoutHMAC = substr($binaryData, 0, strlen($binaryData) - RNCryptor::HMAC_SIZE);
 				break;
 		}
-	
+
 		$hmac = substr($binaryData, strlen($binaryData) - RNCryptor::HMAC_SIZE);
-	
+
 		$hmac_salt = $this->_extractHmacSaltFromBinData($binaryData);
 		$hmac_key = hash_pbkdf2(RNCryptor::PBKDF2_PRF, $password, $hmac_salt, RNCryptor::PBKDF2_ITERATIONS, RNCryptor::KEY_SIZE, true);
-	
-		$hmac_hash = hash_hmac(RNCryptor::HMAC_ALGORITHM, $dataWithoutHMAC , $hmac_key, true);
-	
+
+		$algorithm = $this->_getHmacAlgorithm($versionChr);
+		$hmac_hash = hash_hmac($algorithm, $dataWithoutHMAC , $hmac_key, true);
+
+		if (ord($versionChr) == 0) {
+			$hmac_hash = str_pad($hmac_hash, 32, chr(0));
+		}
+		
 		return ($hmac_hash == $hmac);
 	}
 	
