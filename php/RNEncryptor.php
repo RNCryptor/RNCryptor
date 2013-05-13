@@ -27,9 +27,6 @@ class RNEncryptor extends RNCryptor {
 	/**
 	 * Encrypt plaintext using RNCryptor's algorithm
 	 * 
-	 * Adapted by Curtis Farnham <curtis@farnhamtech.com> from an 
-	 * undocumented source.  Support for RNCryptor file version 1 added.
-	 * 
 	 * @param string $plaintext Text to be encrypted
 	 * @param string $password Password to use
 	 * @param int $version (Optional) RNCryptor file version to use.
@@ -48,12 +45,12 @@ class RNEncryptor extends RNCryptor {
 
 		$cryptor = $this->_getCryptor($versionChr);
 		$iv = $this->_generateIv($cryptor);
-		
-		$padded_plaintext = $this->_padToBlockSizeMultiple($cryptor, $plaintext);
-		
+
+		$padded_plaintext = $this->_addPKCS7Padding($plaintext, $versionChr);
+
 		mcrypt_generic_init($cryptor, $key, $iv);
 		$ciphertext = mcrypt_generic($cryptor, $padded_plaintext);
-		
+
 		mcrypt_generic_deinit($cryptor);
 		mcrypt_module_close($cryptor);
 
@@ -65,7 +62,13 @@ class RNEncryptor extends RNCryptor {
 		
 		return base64_encode($binaryData . $hmac);
 	}
-	
+
+	private function _addPKCS7Padding($plaintext, $versionChr) {
+		$blockSize = $this->_getCryptorBlockSize($versionChr);
+		$padSize = $blockSize - (strlen($plaintext) % $blockSize);
+		return $plaintext . str_repeat(chr($padSize), $padSize);
+	}
+
 	private function _generateOptions($versionChr) {
 	
 		switch (ord($versionChr)) {
@@ -113,11 +116,5 @@ class RNEncryptor extends RNCryptor {
 		}
 		
 		return $hmac;
-	}
-	
-	private function _padToBlockSizeMultiple($cryptor, $plaintext) {
-		$block_size = mcrypt_enc_get_block_size($cryptor);
-		$pad_size = $block_size - (strlen($plaintext) % $block_size);
-		return $plaintext . str_repeat(chr($pad_size), $pad_size);
 	}
 }

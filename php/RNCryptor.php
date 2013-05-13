@@ -23,6 +23,11 @@ abstract class RNCryptor {
 		$mode = $this->_getEncryptionMode($versionChr);
 		return mcrypt_module_open(self::ALGORITHM, '', $mode, '');
 	}
+	
+	protected function _getCryptorBlockSize($versionChr) {
+		$mode = $this->_getEncryptionMode($versionChr);
+		return mcrypt_get_block_size(self::ALGORITHM, $mode);
+	}
 
 	protected function _extractVersionFromBinData($binaryData) {
 		return substr($binaryData, 0, 1);
@@ -32,7 +37,7 @@ abstract class RNCryptor {
 		return substr($binaryData, 10, 8);
 	}
 
-	private function _getEncryptionMode($versionChr) {
+	protected function _getEncryptionMode($versionChr) {
 		switch (ord($versionChr)) {
 			case 0:
 				$mode = self::RNCRYPTOR_1x_MODE;

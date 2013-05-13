@@ -19,6 +19,15 @@ class RNCryptorTest extends RNCryptorTestCase {
   		$this->assertEquals(RNCryptorTestCase::PLAINTEXT, $decrypted);
   	}
 
+  	public function testCanDecryptSelfEncryptedStringEqualToBlockSizeMultiple() {
+  		$encryptor = new RNEncryptor();
+  		$encrypted = $encryptor->encrypt(RNCryptorTestCase::PLAINTEXT_EQUAL_TO_BLOCK_SIZE, RNCryptorTestCase::GOOD_PASSWORD);
+  	
+  		$decryptor = new RNDecryptor();
+  		$decrypted = $decryptor->decrypt($encrypted, RNCryptorTestCase::GOOD_PASSWORD);
+  		$this->assertEquals(RNCryptorTestCase::PLAINTEXT_EQUAL_TO_BLOCK_SIZE, $decrypted);
+  	}
+
   	public function testCanDecryptSelfEncryptedVersion0() {
   		$encryptor = new RNEncryptor();
   		$encrypted = $encryptor->encrypt(RNCryptorTestCase::PLAINTEXT, RNCryptorTestCase::GOOD_PASSWORD, 0);

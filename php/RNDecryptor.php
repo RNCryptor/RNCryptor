@@ -14,13 +14,10 @@ class RNDecryptor extends RNCryptor {
 	 *
 	 * @param string $encrypted Encrypted, Base64-encoded text
 	 * @param string $password Password the text was encoded with
-	 * @param bool $stripTrailingControlCharacters Whether to strip trailing
-	 *                                             non-null padding characters
-	 *                                             after decryption
 	 * @throws Exception If the detected version is unsupported
 	 * @return string|false Decrypted string, or false if decryption failed
 	 */
-	public function decrypt($b64_data, $password, $stripTrailingControlCharacters = true) {
+	public function decrypt($b64_data, $password) {
 
 		$binaryData = base64_decode($b64_data);
 
@@ -44,25 +41,14 @@ class RNDecryptor extends RNCryptor {
 		mcrypt_generic_deinit($cryptor);
 		mcrypt_module_close($cryptor);
 
-		if ($stripTrailingControlCharacters) {
-			$plaintext = $this->_stripTrailingControlChars($plaintext);
-		}
-	
-		return trim($plaintext);
+		return $this->_stripPKCS7Padding($plaintext);
 	}
 
-	/**
-	 * Sometimes the resulting padding is not null characters "\0" but rather
-	 * one of several control characters. If you know your data is not supposed
-	 * to have any trailing control characters "as we did" you can strip them
-	 * like so.
-	 *
-	 * See http://www.php.net/manual/en/function.mdecrypt-generic.php
-	 */
-	private function _stripTrailingControlChars($plaintext) {
-		return preg_replace("/\p{Cc}*$/u", "", $plaintext);
+	private function _stripPKCS7Padding($plaintext) {
+		$padLength = ord(substr($plaintext, -1));
+		return substr($plaintext, 0, strlen($plaintext) - $padLength);
 	}
-	
+
 	private function _hmacIsValid($binaryData, $password) {
 	
 		$versionChr = $this->_extractVersionFromBinData($binaryData);
