@@ -38,15 +38,19 @@ class RNDecryptor extends RNCryptor {
 
 		switch (ord($versionChr)) {
 			case 0:
-				$plaintext = '';
 				$blockSize = $this->_getCryptorBlockSize($versionChr);
-				for ($blockNumber = 0; $blockNumber < ceil(strlen($ciphertext) / $blockSize); $blockNumber++) {
-					$blockCounter = chr(ord(substr($iv, 0, 1)) + $blockNumber) . substr($iv, 1, $blockSize - 1);
-					$blockCiphertext = substr($ciphertext, $blockSize * $blockNumber, $blockSize);
-					mcrypt_generic_init($cryptor, $key, $blockCounter);
-					$plaintext .= mdecrypt_generic($cryptor, $blockCiphertext);
+				$ciphertextChunks = str_split($ciphertext, $blockSize);
+				
+				$ctrCounter = $iv;
+				$plaintext = '';
+				foreach ($ciphertextChunks as $ciphertextChunk) {
+					mcrypt_generic_init($cryptor, $key, $ctrCounter);
+					$plaintext .= mdecrypt_generic($cryptor, $ciphertextChunk);
+					
+					$ctrCounter = $this->_incrementAesCtrLECounter($ctrCounter, $blockSize);
 				}
 				break;
+
 			case 1:
 			case 2:
 				mcrypt_generic_init($cryptor, $key, $iv);
@@ -59,6 +63,11 @@ class RNDecryptor extends RNCryptor {
 		mcrypt_module_close($cryptor);
 
 		return $plaintext;
+	}
+
+	private function _incrementAesCtrLECounter($counter, $blockSize) {
+		$ordinalOfFirstCharacter = ord(substr($counter, 0, 1)) + 1;
+		return chr($ordinalOfFirstCharacter) . substr($counter, 1, $blockSize - 1);
 	}
 
 	private function _stripPKCS7Padding($plaintext) {

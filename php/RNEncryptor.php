@@ -6,7 +6,7 @@ require_once __DIR__ . '/RNCryptor.php';
  * RNEncryptor for PHP
  * 
  * Encrypt data interchangeably with the iOS implementation
- * of RNCryptor. Supports file versions 1 and 2.
+ * of RNCryptor. Supports all schema versions through v2.
  */
 class RNEncryptor extends RNCryptor {
 
@@ -29,7 +29,7 @@ class RNEncryptor extends RNCryptor {
 	 * 
 	 * @param string $plaintext Text to be encrypted
 	 * @param string $password Password to use
-	 * @param int $version (Optional) RNCryptor file version to use.
+	 * @param int $version (Optional) RNCryptor schema version to use.
 	 *                     Defaults to 2.
 	 * @throws Exception If the provided version (if any) is unsupported
 	 * @return string Encrypted, Base64-encoded string
@@ -49,13 +49,16 @@ class RNEncryptor extends RNCryptor {
 		switch (ord($versionChr)) {
 
 			case 0:
-				$ciphertext = '';
 				$blockSize = $this->_getCryptorBlockSize($versionChr);
-				for ($blockNumber = 0; $blockNumber < ceil(strlen($plaintext) / $blockSize); $blockNumber++) {
-					$blockCounter = chr(ord(substr($iv, 0, 1)) + $blockNumber) . substr($iv, 1, $blockSize - 1);
-					$blockPlaintext = substr($plaintext, $blockSize * $blockNumber, $blockSize);
-					mcrypt_generic_init($cryptor, $key, $blockCounter);
-					$ciphertext .= mcrypt_generic($cryptor, $blockPlaintext);
+				$plaintextChunks = str_split($plaintext, $blockSize);
+
+				$ctrCounter = $iv;
+				$ciphertext = '';
+				foreach ($plaintextChunks as $plaintextChunk) {
+					mcrypt_generic_init($cryptor, $key, $ctrCounter);
+					$ciphertext .= mcrypt_generic($cryptor, $plaintextChunk);
+				
+					$ctrCounter = $this->_incrementAesCtrLECounter($ctrCounter, $blockSize);
 				}
 				break;
 
@@ -77,6 +80,11 @@ class RNEncryptor extends RNCryptor {
 		$hmac = $this->_generateHmac($binaryData, $password);
 		
 		return base64_encode($binaryData . $hmac);
+	}
+
+	private function _incrementAesCtrLECounter($counter, $blockSize) {
+		$ordinalOfFirstCharacter = ord(substr($counter, 0, 1)) + 1;
+		return chr($ordinalOfFirstCharacter) . substr($counter, 1, $blockSize - 1);
 	}
 
 	private function _addPKCS7Padding($plaintext, $versionChr) {

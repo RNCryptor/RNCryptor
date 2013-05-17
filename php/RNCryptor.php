@@ -69,14 +69,14 @@ abstract class RNCryptor {
 	}
 
 	/**
-	 * Ensure the RNCryptor file version is supported
+	 * Ensure the RNCryptor schema version is supported
 	 * 
 	 * @param int $version Version to check
 	 * @throws Exception if not supported
 	 */
 	protected function _assertVersionIsSupported($version) {
 		if ($version < 0 || $version > 2) {
-			throw new Exception('Unsupported file version ' . $version);
+			throw new Exception('Unsupported schema version ' . $version);
 		}
 	}
 

@@ -39,6 +39,12 @@ class RNDecryptorTest extends PHPUnit_Framework_TestCase {
   		$this->assertEquals(self::PLAINTEXT_V0_LESS_THAN_ONE_BLOCK, $decrypted);
   	}
 
+  	public function testCanDecryptIosEncryptedVersion0WithPlaintextReallyLong() {
+  		$decryptor = new RNDecryptor();
+  		$decrypted = $decryptor->decrypt(file_get_contents(__DIR__ . '/_files/lorem-ipsum-encrypted-base64-schema0.txt'), self::IOS_PASSWORD);
+  		$this->assertEquals(file_get_contents(__DIR__ . '/_files/lorem-ipsum.txt'), $decrypted);
+  	}
+
   	public function testCanDecryptIosEncryptedVersion0WithPlaintextLengthExactlyOneBlock() {
   		$decryptor = new RNDecryptor();
   		$decrypted = $decryptor->decrypt(self::IOS_ENCRYPTED_V0_EXACTLY_ONE_BLOCK, self::IOS_PASSWORD);
@@ -57,12 +63,24 @@ class RNDecryptorTest extends PHPUnit_Framework_TestCase {
   		$this->assertEquals(self::PLAINTEXT_V0_NON_BLOCK_INTERVAL, $decrypted);
   	}
 
+  	public function testCanDecryptIosEncryptedVersion1WithPlaintextReallyLong() {
+  		$decryptor = new RNDecryptor();
+  		$decrypted = $decryptor->decrypt(file_get_contents(__DIR__ . '/_files/lorem-ipsum-encrypted-base64-schema1.txt'), self::IOS_PASSWORD);
+  		$this->assertEquals(file_get_contents(__DIR__ . '/_files/lorem-ipsum.txt'), $decrypted);
+  	}
+  	
   	public function testCanDecryptIosEncryptedVersion1WithPlaintextLengthNotOnBlockInterval() {
   		$decryptor = new RNDecryptor();
   		$decrypted = $decryptor->decrypt(self::IOS_ENCRYPTED_V1_NON_BLOCK_INTERVAL, self::IOS_PASSWORD);
   		$this->assertEquals(self::PLAINTEXT_V1_NON_BLOCK_INTERVAL, $decrypted);
   	}
-  	
+
+  	public function testCanDecryptIosEncryptedVersion2WithPlaintextReallyLong() {
+  		$decryptor = new RNDecryptor();
+  		$decrypted = $decryptor->decrypt(file_get_contents(__DIR__ . '/_files/lorem-ipsum-encrypted-base64-schema2.txt'), self::IOS_PASSWORD);
+  		$this->assertEquals(file_get_contents(__DIR__ . '/_files/lorem-ipsum.txt'), $decrypted);
+  	}
+
   	public function testCanDecryptIosEncryptedVersion2WithPlaintextLengthNotOnBlockInterval() {
   		$decryptor = new RNDecryptor();
   		$decrypted = $decryptor->decrypt(self::IOS_ENCRYPTED_V2_NON_BLOCK_INTERVAL, self::IOS_PASSWORD);

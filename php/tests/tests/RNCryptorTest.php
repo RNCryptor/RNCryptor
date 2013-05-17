@@ -65,7 +65,7 @@ class RNCryptorTest extends PHPUnit_Framework_TestCase {
 
   	public function testCanDecryptLongText() {
 
-  		$text = file_get_contents(__DIR__ . '/' . self::TEXT_FILENAME);
+  		$text = file_get_contents(__DIR__ . '/_files/lorem-ipsum.txt');
   	
   		$encryptor = new RNEncryptor();
   		$encrypted = $encryptor->encrypt($text, self::SAMPLE_PASSWORD);
@@ -74,7 +74,22 @@ class RNCryptorTest extends PHPUnit_Framework_TestCase {
   		$decrypted = $decryptor->decrypt($encrypted, self::SAMPLE_PASSWORD);
   		$this->assertEquals($text, $decrypted);
   	}
+
+  	public function testCannotUseWithUnsupportedSchemaVersions() {
+  		$encrypted = $this->_generateFakeSchema3EncryptedString();
+  		$decryptor = new RNDecryptor();
+  		$this->setExpectedException('Exception', 'Unsupported schema version 3');
+  		$decryptor->decrypt($encrypted, self::SAMPLE_PASSWORD);
+  	}
   	
+  	private function _generateFakeSchema3EncryptedString() {
+  		$encryptor = new RNEncryptor();
+  		$encrypted = $encryptor->encrypt('It doesn\'t matter', self::SAMPLE_PASSWORD);
+  		
+  		$encryptedBinary = base64_decode($encrypted);
+  		$encryptedBinary = chr(3) . substr($encryptedBinary, 1, strlen($encryptedBinary - 1));
+  		return base64_encode($encryptedBinary);
+  	}
 }
 
 if (!defined('PHPUnit_MAIN_METHOD') || PHPUnit_MAIN_METHOD == 'RNCryptorTest::main') {
