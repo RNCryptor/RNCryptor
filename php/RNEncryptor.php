@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__) . '/RNCryptor.php';
+require_once __DIR__ . '/RNCryptor.php';
 
 /**
  * RNEncryptor for PHP
@@ -46,10 +46,26 @@ class RNEncryptor extends RNCryptor {
 		$cryptor = $this->_getCryptor($versionChr);
 		$iv = $this->_generateIv($cryptor);
 
-		$padded_plaintext = $this->_addPKCS7Padding($plaintext, $versionChr);
+		switch (ord($versionChr)) {
 
-		mcrypt_generic_init($cryptor, $key, $iv);
-		$ciphertext = mcrypt_generic($cryptor, $padded_plaintext);
+			case 0:
+				$ciphertext = '';
+				$blockSize = $this->_getCryptorBlockSize($versionChr);
+				for ($blockNumber = 0; $blockNumber < ceil(strlen($plaintext) / $blockSize); $blockNumber++) {
+					$blockCounter = chr(ord(substr($iv, 0, 1)) + $blockNumber) . substr($iv, 1, $blockSize - 1);
+					$blockPlaintext = substr($plaintext, $blockSize * $blockNumber, $blockSize);
+					mcrypt_generic_init($cryptor, $key, $blockCounter);
+					$ciphertext .= mcrypt_generic($cryptor, $blockPlaintext);
+				}
+				break;
+
+			case 1:
+			case 2:
+				$padded_plaintext = $this->_addPKCS7Padding($plaintext, $versionChr);
+				mcrypt_generic_init($cryptor, $key, $iv);
+				$ciphertext = mcrypt_generic($cryptor, $padded_plaintext);
+				break;
+		}
 
 		mcrypt_generic_deinit($cryptor);
 		mcrypt_module_close($cryptor);

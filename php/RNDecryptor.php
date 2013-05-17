@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__) . '/RNCryptor.php';
+require_once __DIR__ . '/RNCryptor.php';
 
 /**
  * RNDecryptor for PHP
@@ -35,13 +35,30 @@ class RNDecryptor extends RNCryptor {
 		$ciphertext = $this->_extractCiphertextFromBinData($binaryData);
 
 		$cryptor = $this->_getCryptor($versionChr);
-		mcrypt_generic_init($cryptor, $key, $iv);
-		$plaintext = mdecrypt_generic($cryptor, $ciphertext);
+
+		switch (ord($versionChr)) {
+			case 0:
+				$plaintext = '';
+				$blockSize = $this->_getCryptorBlockSize($versionChr);
+				for ($blockNumber = 0; $blockNumber < ceil(strlen($ciphertext) / $blockSize); $blockNumber++) {
+					$blockCounter = chr(ord(substr($iv, 0, 1)) + $blockNumber) . substr($iv, 1, $blockSize - 1);
+					$blockCiphertext = substr($ciphertext, $blockSize * $blockNumber, $blockSize);
+					mcrypt_generic_init($cryptor, $key, $blockCounter);
+					$plaintext .= mdecrypt_generic($cryptor, $blockCiphertext);
+				}
+				break;
+			case 1:
+			case 2:
+				mcrypt_generic_init($cryptor, $key, $iv);
+				$plaintext = mdecrypt_generic($cryptor, $ciphertext);
+				$plaintext = $this->_stripPKCS7Padding($plaintext);
+				break;
+		}
 
 		mcrypt_generic_deinit($cryptor);
 		mcrypt_module_close($cryptor);
 
-		return $this->_stripPKCS7Padding($plaintext);
+		return $plaintext;
 	}
 
 	private function _stripPKCS7Padding($plaintext) {

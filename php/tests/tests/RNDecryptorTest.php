@@ -1,36 +1,77 @@
 <?php
 
-require_once dirname(__file__) . '/../../RNDecryptor.php';
-require_once dirname(__file__) . '/../RNCryptorTestCase.php';
+require_once __DIR__ . '/../../RNDecryptor.php';
 
-class RNDecryptorTest extends RNCryptorTestCase {
+class RNDecryptorTest extends PHPUnit_Framework_TestCase {
 
-    public static function main() {
-        $suite  = new PHPUnit_Framework_TestSuite(get_called_class());
-        $result = PHPUnit_TextUI_TestRunner::run($suite);
-    }
+	const IOS_PASSWORD = 'mypassword123$!';
 
-  	public function testCanDecryptIosEncryptedVersion0() {
+	const PLAINTEXT_V0_LESS_THAN_ONE_BLOCK = 'Monkey';
+	const IOS_ENCRYPTED_V0_LESS_THAN_ONE_BLOCK = 'AACoGb/5NAItZ9gY0YkCXK0Q7d+1p2mNyFFKIDldCA5QRqX5i9MNpezRS7CDX8jUDKGtIlZU6d8CZQeJAAAAAAAAAAAAAAAA';
+	
+	const PLAINTEXT_V0_EXACTLY_ONE_BLOCK = 'O happy day now.';
+	const IOS_ENCRYPTED_V0_EXACTLY_ONE_BLOCK = 'AADsM/JbTInOMSm0epc/7MqQ1Ol2Fu/ySnQ0FknhJeTD6GpZo+SF8JDloHN82yZIHrOcJ3vZuXmrCUt3AysLYg6Vpu4KDwAAAAAAAAAAAAAAAA==';
+	
+	const PLAINTEXT_V0_EXACTLY_TWO_BLOCKS = 'Earth is round, sun is round too';
+	const IOS_ENCRYPTED_V0_EXACTLY_TWO_BLOCKS = 'AAApp4OoYpg4Fz+WSZDbcf5KPJasOkhdCnptrmwVkt58BZi/lnTWoIOf2IhIZhHsvTKYYEJsds6bFL/nZC/GtENusHWFyEw1IdtQ7KFSp8XZEhiAT88AAAAAAAAAAAAAAAA=';
+	
+	const PLAINTEXT_V0_NON_BLOCK_INTERVAL = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do...';
+	const IOS_ENCRYPTED_V0_NON_BLOCK_INTERVAL = 'AADu55As8qH9KsSR17p1akydMUlbHrsHudMOr/yTj4olfQedJPTZg8hK4ua99zNkj3Nw7Hle1f1onHclWIYoLkWtMVk4Cp96CcxRhaWbBZqAVvTabtVruxcAi+GEB2K4rrmyARxB2QJH9tfz2yTFoFNMln+xOCUm0wAAAAAAAAAAAAAAAA==';
+	
+	const PLAINTEXT_V1_EXACTLY_ONE_BLOCK = 'Lorem ipsum dolor sit amet, cons';
+	
+	const PLAINTEXT_V1_NON_BLOCK_INTERVAL = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do...';
+	const IOS_ENCRYPTED_V1_NON_BLOCK_INTERVAL = 'AQE9u3aB1APkWDRHcfy1cvD3kwwoXUw+8JhtCkZ3xDkSQghIyFoqLgazX3cXBxv3Mj75sSofHoDI35KaFTdXovY3HQYAaQmMdPNvSRVGvlptkyr5LSBMUA3/Uj7lmhnaf515pN8pUbcbOV8RP+oWhXX4iKN009mrcMaX2j1KQz2JfFj8bfpbu9BOtj+1NotIe14=';
+	
+	const PLAINTEXT_V2_EXACTLY_ONE_BLOCK = 'Lorem ipsum dolor sit amet, cons';
+	
+	const PLAINTEXT_V2_NON_BLOCK_INTERVAL = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do...';
+	const IOS_ENCRYPTED_V2_NON_BLOCK_INTERVAL = 'AgG8X+ixN6HN9zFnuK1NMJAPntIuC0+WPsmFhGL314zLuq1T9xWDHYzpnzW8EqDz81Amj36+EqrjazQ1gO9ao6bpMwUKdT2xY4ZUrhtCQm3LD2okbEIGjj5dtMJtB3i759WdnmNf8K0ULDWNzNQHPzdNDcEE2BPh+2kRaqVzWyBOzJppJoD5n+WdglS7BEBU+4U=';
+
+	public static function main() {
+		$suite  = new PHPUnit_Framework_TestSuite(get_called_class());
+		$result = PHPUnit_TextUI_TestRunner::run($suite);
+	}
+
+  	public function testCanDecryptIosEncryptedVersion0WithPlaintextLengthLessThanOneBlock() {
   		$decryptor = new RNDecryptor();
-  		$decrypted = $decryptor->decrypt(RNCryptorTestCase::IOS_ENCRYPTED_V0, RNCryptorTestCase::GOOD_PASSWORD);
-  		$this->assertEquals(RNCryptorTestCase::PLAINTEXT, $decrypted);
+  		$decrypted = $decryptor->decrypt(self::IOS_ENCRYPTED_V0_LESS_THAN_ONE_BLOCK, self::IOS_PASSWORD);
+  		$this->assertEquals(self::PLAINTEXT_V0_LESS_THAN_ONE_BLOCK, $decrypted);
   	}
 
-  	public function testCanDecryptIosEncryptedVersion1() {
+  	public function testCanDecryptIosEncryptedVersion0WithPlaintextLengthExactlyOneBlock() {
   		$decryptor = new RNDecryptor();
-  		$decrypted = $decryptor->decrypt(RNCryptorTestCase::IOS_ENCRYPTED_V1, RNCryptorTestCase::GOOD_PASSWORD);
-  		$this->assertEquals(RNCryptorTestCase::PLAINTEXT, $decrypted);
+  		$decrypted = $decryptor->decrypt(self::IOS_ENCRYPTED_V0_EXACTLY_ONE_BLOCK, self::IOS_PASSWORD);
+  		$this->assertEquals(self::PLAINTEXT_V0_EXACTLY_ONE_BLOCK, $decrypted);
+  	}
+
+  	public function testCanDecryptIosEncryptedVersion0WithPlaintextLengthExactlyTwoBlocks() {
+  		$decryptor = new RNDecryptor();
+  		$decrypted = $decryptor->decrypt(self::IOS_ENCRYPTED_V0_EXACTLY_TWO_BLOCKS, self::IOS_PASSWORD);
+  		$this->assertEquals(self::PLAINTEXT_V0_EXACTLY_TWO_BLOCKS, $decrypted);
   	}
   	
-  	public function testCanDecryptIosEncryptedVersion2() {
+  	public function testCanDecryptIosEncryptedVersion0WithPlaintextLengthNotOnBlockInterval() {
   		$decryptor = new RNDecryptor();
-  		$decrypted = $decryptor->decrypt(RNCryptorTestCase::IOS_ENCRYPTED_V2, RNCryptorTestCase::GOOD_PASSWORD);
-  		$this->assertEquals(RNCryptorTestCase::PLAINTEXT, $decrypted);
+  		$decrypted = $decryptor->decrypt(self::IOS_ENCRYPTED_V0_NON_BLOCK_INTERVAL, self::IOS_PASSWORD);
+  		$this->assertEquals(self::PLAINTEXT_V0_NON_BLOCK_INTERVAL, $decrypted);
+  	}
+
+  	public function testCanDecryptIosEncryptedVersion1WithPlaintextLengthNotOnBlockInterval() {
+  		$decryptor = new RNDecryptor();
+  		$decrypted = $decryptor->decrypt(self::IOS_ENCRYPTED_V1_NON_BLOCK_INTERVAL, self::IOS_PASSWORD);
+  		$this->assertEquals(self::PLAINTEXT_V1_NON_BLOCK_INTERVAL, $decrypted);
+  	}
+  	
+  	public function testCanDecryptIosEncryptedVersion2WithPlaintextLengthNotOnBlockInterval() {
+  		$decryptor = new RNDecryptor();
+  		$decrypted = $decryptor->decrypt(self::IOS_ENCRYPTED_V2_NON_BLOCK_INTERVAL, self::IOS_PASSWORD);
+  		$this->assertEquals(self::PLAINTEXT_V2_NON_BLOCK_INTERVAL, $decrypted);
   	}
 
   	public function testDecryptingWithBadPasswordFails() {
   		$decryptor = new RNDecryptor();
-  		$decrypted = $decryptor->decrypt(RNCryptorTestCase::IOS_ENCRYPTED_V2, RNCryptorTestCase::BAD_PASSWORD);
+  		$decrypted = $decryptor->decrypt(self::IOS_ENCRYPTED_V2_NON_BLOCK_INTERVAL, 'badpass');
   		$this->assertEquals(false, $decrypted);
   	}
   	
