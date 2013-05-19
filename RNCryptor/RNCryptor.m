@@ -164,7 +164,7 @@ PRF(CCPseudoRandomAlgorithm prf, const char *password, size_t passwordLen, u_int
 	}
 }
 
-int
+static int
 RN_CCKeyDerivationPBKDF( CCPBKDFAlgorithm algorithm, const char *password, size_t passwordLen,
                      const uint8_t *salt, size_t saltLen,
                      CCPseudoRandomAlgorithm prf, uint rounds,
@@ -321,7 +321,7 @@ RN_CCKeyDerivationPBKDF( CCPBKDFAlgorithm algorithm, const char *password, size_
  *
  * @APPLE_LICENSE_HEADER_END@
  */
-int RN_SecRandomCopyBytes(void *rnd, size_t count, uint8_t *bytes) {
+static int RN_SecRandomCopyBytes(void *rnd, size_t count, uint8_t *bytes) {
   static int kSecRandomFD;
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
