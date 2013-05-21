@@ -9,54 +9,83 @@ require_once __DIR__ . '/RNCryptor.php';
  */
 class RNDecryptor extends RNCryptor {
 
-	const HMAC_SIZE = 32;
-
 	/**
 	 * Decrypt RNCryptor-encrypted data
 	 *
-	 * @param string $encrypted Encrypted, Base64-encoded text
+	 * @param string $base64EncryptedData Encrypted, Base64-encoded text
 	 * @param string $password Password the text was encoded with
 	 * @throws Exception If the detected version is unsupported
 	 * @return string|false Decrypted string, or false if decryption failed
 	 */
-	public function decrypt($b64_data, $password) {
+	public function decrypt($encryptedBase64Data, $password) {
 
-		$binaryData = base64_decode($b64_data);
+		$components = $this->_unpackEncryptedBase64Data($encryptedBase64Data);
 
-		$versionChr = $this->_extractVersionFromBinData($binaryData);
-		$this->_assertVersionIsSupported(ord($versionChr));
-
-		if (!$this->_hmacIsValid($binaryData, $password)) {
+		if (!$this->_hmacIsValid($components, $password)) {
 			return false;
 		}
 
-		$keySalt = $this->_extractSaltFromBinData($binaryData);
-		$key = $this->_generateKey($keySalt, $password);
-		$iv = $this->_extractIvFromBinData($binaryData);
-
-		$ciphertext = $this->_extractCiphertextFromBinData($binaryData);
-
-		switch (ord($versionChr)) {
-			case 0:
-				$plaintext = $this->_aesCtrDecrypt($ciphertext, $key, $iv);
+		$key = $this->_generateKey($components->headers->salt, $password);
+		
+		switch ($this->_settings->mode) {
+			case 'ctr':
+				$plaintext = $this->_aesCtrLittleEndianCrypt($components->ciphertext, $key, $components->headers->iv);
 				break;
 
-			case 1:
-			case 2:
-				$plaintext = $this->_aesCbcDecrypt($ciphertext, $key, $iv);
+			case 'cbc':
+				$paddedPlaintext = mcrypt_decrypt($this->_settings->algorithm, $key, $components->ciphertext, 'cbc', $components->headers->iv);
+				$plaintext = $this->_stripPKCS7Padding($paddedPlaintext);
 				break;
 		}
 
 		return $plaintext;
 	}
 
-	private function _aesCtrDecrypt($ciphertext, $key, $iv) {
-		return $this->_aesCtrCrypt($ciphertext, $key, $iv);
+	private function _unpackEncryptedBase64Data($encryptedBase64Data) {
+
+		$binaryData = base64_decode($encryptedBase64Data);
+		
+		$components = new stdClass();
+		$components->headers = $this->_parseHeaders($binaryData);
+		$components->hmac = substr($binaryData, - $this->_settings->hmac->length);
+
+		$headerLength = $components->headers->length;
+		$components->ciphertext = substr($binaryData, $headerLength, strlen($binaryData) - $headerLength - strlen($components->hmac));
+
+		return $components;
 	}
 
-	private function _aesCbcDecrypt($ciphertext, $key, $iv) {
-		$plaintext = mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $key, $ciphertext, MCRYPT_MODE_CBC, $iv);
-		return $this->_stripPKCS7Padding($plaintext);
+	private function _parseHeaders($binData) {
+
+		$offset = 0;
+		$versionChr = substr($binData, $offset, 1);
+
+		$this->_configureSettings(ord($versionChr));
+		
+		$offset += strlen($versionChr);
+		$optionsChr = substr($binData, $offset, 1);
+		
+		$offset += strlen($optionsChr);
+		$salt = substr($binData, $offset, $this->_settings->saltLength);
+		
+		$offset += strlen($salt);
+		$hmacSalt = substr($binData, $offset, $this->_settings->saltLength);
+		
+		$offset += strlen($hmacSalt);
+		$iv = substr($binData, $offset, $this->_settings->ivLength);
+		
+		$offset += strlen($iv);
+
+		$headers = (object)array(
+			'version' => $versionChr,
+			'options' => $optionsChr,
+			'salt' => $salt,
+			'hmacSalt' => $hmacSalt,
+			'iv' => $iv,
+			'length' => $offset
+		);
+
+		return $headers;
 	}
 	
 	private function _stripPKCS7Padding($plaintext) {
@@ -64,31 +93,8 @@ class RNDecryptor extends RNCryptor {
 		return substr($plaintext, 0, strlen($plaintext) - $padLength);
 	}
 
-	private function _hmacIsValid($binaryData, $password) {
-
-		$hmac = substr($binaryData, strlen($binaryData) - self::HMAC_SIZE);
-		$versionChr = $this->_extractVersionFromBinData($binaryData);
-
-		$binaryDataWithoutHmac = substr($binaryData, 0, strlen($binaryData) - self::HMAC_SIZE);
-		$hmacHash = $this->_generateHmac($binaryDataWithoutHmac, $password, $versionChr);
-		
-		return ($hmacHash == $hmac);
-	}
-
-	private function _extractVersionFromBinData($binaryData) {
-		return substr($binaryData, 0, 1);
-	}
-
-	private function _extractSaltFromBinData($binaryData) {
-		return substr($binaryData, 2, 8);
-	}
-	
-	private function _extractIvFromBinData($binaryData) {
-		return substr($binaryData, 18, 16);
-	}
-
-	private function _extractCiphertextFromBinData($binaryData) {
-		return substr($binaryData, 34, strlen($binaryData) - 34 - self::HMAC_SIZE);
+	private function _hmacIsValid($components, $password) {
+		return ($components->hmac == $this->_generateHmac($components, $password));
 	}
 
 }

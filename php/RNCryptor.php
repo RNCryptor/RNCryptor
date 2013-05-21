@@ -3,7 +3,60 @@ require_once __DIR__ . '/functions.php';
 
 abstract class RNCryptor {
 
-	protected function _aesCtrCrypt($payload, $key, $iv) {
+	protected $_settings;
+
+	protected function _configureSettings($version) {
+		
+		$settings = new stdClass();
+		
+		$settings->algorithm = MCRYPT_RIJNDAEL_128;
+		$settings->saltLength = 8;
+		$settings->ivLength = 16;
+
+		$settings->pbkdf2 = new stdClass();
+		$settings->pbkdf2->prf = 'sha1';
+		$settings->pbkdf2->iterations = 10000;
+		$settings->pbkdf2->keyLength = 32;
+		
+		$settings->hmac = new stdClass();
+		$settings->hmac->length = 32;
+
+		switch ($version) {
+			case 0:
+				$settings->mode = 'ctr';
+				$settings->options = 0;
+				$settings->hmac->includesHeader = false;
+				$settings->hmac->algorithm = 'sha1';
+				$settings->hmac->includesPadding = true;
+				break;
+
+			case 1:
+				$settings->mode = 'cbc';
+				$settings->options = 1;
+				$settings->hmac->includesHeader = false;
+				$settings->hmac->algorithm = 'sha256';
+				$settings->hmac->includesPadding = false;
+				break;
+
+			case 2:
+				$settings->mode = 'cbc';
+				$settings->options = 1;
+				$settings->hmac->includesHeader = true;
+				$settings->hmac->algorithm = 'sha256';
+				$settings->hmac->includesPadding = false;
+				break;
+
+			default:
+				throw new Exception('Unsupported schema version ' . $version);
+		}
+		
+		$this->_settings = $settings;
+	}
+	
+	/**
+	 * Encrypt or decrypt using AES CTR Little Endian mode
+	 */
+	protected function _aesCtrLittleEndianCrypt($payload, $key, $iv) {
 
 		$numOfBlocks = ceil(strlen($payload) / strlen($iv));
 		$counter = '';
@@ -16,67 +69,35 @@ abstract class RNCryptor {
 			$iv[0] = chr(ord(substr($iv, 0, 1)) + 1);
 		}
 
-		return $payload ^ mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $counter, MCRYPT_MODE_ECB);
+		return $payload ^ mcrypt_encrypt($this->_settings->algorithm, $key, $counter, 'ecb');
 	}
 
-	protected function _generateHmac($binaryDataWithoutHmac, $password, $versionChr) {
-	
-		switch (ord($versionChr)) {
-			case 0:
-			case 1:
-				$hmacMessage = substr($binaryDataWithoutHmac, 34);
-				break;
-	
-			case 2:
-				$hmacMessage = $binaryDataWithoutHmac;
-				break;
+	protected function _generateHmac(stdClass $components, $password) {
+
+		$hmacMessage = '';
+		if ($this->_settings->hmac->includesHeader) {
+			$hmacMessage .= $components->headers->version
+							. $components->headers->options
+							. $components->headers->salt
+							. $components->headers->hmacSalt
+							. $components->headers->iv;
 		}
+
+		$hmacMessage .= $components->ciphertext;
+
+		$hmacKey = $this->_generateKey($components->headers->hmacSalt, $password);
 	
-		$hmacSalt = $this->_extractHmacSaltFromBinData($binaryDataWithoutHmac);
-		$hmacKey = $this->_generateKey($hmacSalt, $password);
-	
-		$algorithm = $this->_getHmacAlgorithm($versionChr);
-		$hmac = hash_hmac($algorithm, $hmacMessage, $hmacKey, true);
-	
-		if (ord($versionChr) == 0) {
-			$hmac = str_pad($hmac, 32, chr(0));
+		$hmac = hash_hmac($this->_settings->hmac->algorithm, $hmacMessage, $hmacKey, true);
+
+		if ($this->_settings->hmac->includesPadding) {
+			$hmac = str_pad($hmac, $this->_settings->hmac->length, chr(0));
 		}
 	
 		return $hmac;
 	}
 
-	private function _extractHmacSaltFromBinData($binaryData) {
-		return substr($binaryData, 10, 8);
-	}
-
 	protected function _generateKey($salt, $password) {
-		return hash_pbkdf2('sha1', $password, $salt, 10000, 32, true);
-	}
-
-	protected function _getHmacAlgorithm($versionChr) {
-		switch (ord($versionChr)) {
-			case 0:
-				$algorithm = 'sha1';
-				break;
-		
-			case 1:
-			case 2:
-				$algorithm = 'sha256';
-				break;
-		}
-		return $algorithm;
-	}
-
-	/**
-	 * Ensure the RNCryptor schema version is supported
-	 * 
-	 * @param int $version Version to check
-	 * @throws Exception if not supported
-	 */
-	protected function _assertVersionIsSupported($version) {
-		if ($version < 0 || $version > 2) {
-			throw new Exception('Unsupported schema version ' . $version);
-		}
+		return hash_pbkdf2($this->_settings->pbkdf2->prf, $password, $salt, $this->_settings->pbkdf2->iterations, $this->_settings->pbkdf2->keyLength, true);
 	}
 
 }

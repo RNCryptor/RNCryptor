@@ -22,51 +22,40 @@ class RNEncryptor extends RNCryptor {
 	 */
 	public function encrypt($plaintext, $password, $version = 2) {
 
-		$this->_assertVersionIsSupported($version);
+		$this->_configureSettings($version);
 
-		$keySalt = $this->_generateSalt();
-		$key = $this->_generateKey($keySalt, $password);
+		$components = new stdClass();
+		$components->headers = new stdClass();
+		$components->headers->version = chr($version);
+		$components->headers->options = chr($this->_settings->options);
+		$components->headers->salt = $this->_generateSalt();
+		$components->headers->hmacSalt = $this->_generateSalt();
+		$components->headers->iv = $this->_generateIv($this->_settings->ivLength);
 
-		$versionChr = chr($version);
-
-		switch (ord($versionChr)) {
-
-			case 0:
-				list($iv, $ciphertext) = $this->_aesCtrEncrypt($plaintext, $key);
+		$key = $this->_generateKey($components->headers->salt, $password);
+		
+		switch ($this->_settings->mode) {
+			case 'ctr':
+				$components->ciphertext = $this->_aesCtrLittleEndianCrypt($plaintext, $key, $components->headers->iv);
 				break;
 
-			case 1:
-			case 2:
-				list($iv, $ciphertext) = $this->_aesCbcEncrypt($plaintext, $key);
+			case 'cbc':
+				$paddedPlaintext = $this->_addPKCS7Padding($plaintext, strlen($components->headers->iv));
+				$components->ciphertext = mcrypt_encrypt($this->_settings->algorithm, $key, $paddedPlaintext, 'cbc', $components->headers->iv);
 				break;
 		}
 
-		$hmacSalt = $this->_generateSalt();
-		$optionsChr = $this->_generateOptions($versionChr);
-		$binaryData = $versionChr . $optionsChr . $keySalt . $hmacSalt . $iv . $ciphertext;
+		$binaryData = ''
+			. $components->headers->version
+			. $components->headers->options
+			. $components->headers->salt
+			. $components->headers->hmacSalt
+			. $components->headers->iv
+			. $components->ciphertext;
 
-		$hmac = $this->_generateHmac($binaryData, $password, $versionChr);
+		$hmac = $this->_generateHmac($components, $password);
 		
 		return base64_encode($binaryData . $hmac);
-	}
-
-	private function _aesCtrEncrypt($plaintext, $key) {
-		$blockSize = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, 'ctr');
-		$iv = $this->_generateIv($blockSize);
-		
-		$ciphertext = $this->_aesCtrCrypt($plaintext, $key, $iv);
-		
-		return array($iv, $ciphertext);
-	}
-	
-	private function _aesCbcEncrypt($plaintext, $key) {
-		$blockSize = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, 'cbc');
-		$iv = $this->_generateIv($blockSize);
-
-		$padded_plaintext = $this->_addPKCS7Padding($plaintext, strlen($iv));
-		$ciphertext = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $padded_plaintext, MCRYPT_MODE_CBC, $iv);
-		
-		return array($iv, $ciphertext);
 	}
 	
 	private function _addPKCS7Padding($plaintext, $blockSize) {
@@ -74,22 +63,8 @@ class RNEncryptor extends RNCryptor {
 		return $plaintext . str_repeat(chr($padSize), $padSize);
 	}
 
-	private function _generateOptions($versionChr) {
-	
-		switch (ord($versionChr)) {
-			case 0:
-				$optionsChr = chr(0);
-				break;
-			case 1:
-			case 2:
-				$optionsChr = chr(1);
-				break;
-		}
-		return $optionsChr;
-	}
-
 	private function _generateSalt() {
-		return $this->_generateIv(8);
+		return $this->_generateIv($this->_settings->saltLength);
 	}
 
 	private function _generateIv($blockSize) {
@@ -98,7 +73,6 @@ class RNEncryptor extends RNCryptor {
 		} else {
 			$randomSource = MCRYPT_DEV_RANDOM;
 		}
-		
 		return mcrypt_create_iv($blockSize, $randomSource);
 	}
 }
