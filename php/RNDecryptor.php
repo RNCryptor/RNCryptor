@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__) . '/RNCryptor.php';
+require_once __DIR__ . '/RNCryptor.php';
 
 /**
  * RNDecryptor for PHP
@@ -12,96 +12,89 @@ class RNDecryptor extends RNCryptor {
 	/**
 	 * Decrypt RNCryptor-encrypted data
 	 *
-	 * @param string $encrypted Encrypted, Base64-encoded text
+	 * @param string $base64EncryptedData Encrypted, Base64-encoded text
 	 * @param string $password Password the text was encoded with
-	 * @param bool $stripTrailingControlCharacters Whether to strip trailing
-	 *                                             non-null padding characters
-	 *                                             after decryption
 	 * @throws Exception If the detected version is unsupported
 	 * @return string|false Decrypted string, or false if decryption failed
 	 */
-	public function decrypt($b64_data, $password, $stripTrailingControlCharacters = true) {
+	public function decrypt($encryptedBase64Data, $password) {
 
-		$binaryData = base64_decode($b64_data);
+		$components = $this->_unpackEncryptedBase64Data($encryptedBase64Data);
 
-		$versionChr = $this->_extractVersionFromBinData($binaryData);
-		$this->_assertVersionIsSupported(ord($versionChr));
-
-		if (!$this->_hmacIsValid($binaryData, $password)) {
+		if (!$this->_hmacIsValid($components, $password)) {
 			return false;
 		}
 
-		$keySalt = $this->_extractSaltFromBinData($binaryData);
-		$key = $this->_generateKey($keySalt, $password);
-		$iv = $this->_extractIvFromBinData($binaryData);
-
-		$ciphertext = $this->_extractCiphertextFromBinData($binaryData);
-
-		$cryptor = $this->_getCryptor($versionChr);
-		mcrypt_generic_init($cryptor, $key, $iv);
-		$plaintext = mdecrypt_generic($cryptor, $ciphertext);
-
-		mcrypt_generic_deinit($cryptor);
-		mcrypt_module_close($cryptor);
-
-		if ($stripTrailingControlCharacters) {
-			$plaintext = $this->_stripTrailingControlChars($plaintext);
-		}
-	
-		return trim($plaintext);
-	}
-
-	/**
-	 * Sometimes the resulting padding is not null characters "\0" but rather
-	 * one of several control characters. If you know your data is not supposed
-	 * to have any trailing control characters "as we did" you can strip them
-	 * like so.
-	 *
-	 * See http://www.php.net/manual/en/function.mdecrypt-generic.php
-	 */
-	private function _stripTrailingControlChars($plaintext) {
-		return preg_replace("/\p{Cc}*$/u", "", $plaintext);
-	}
-	
-	private function _hmacIsValid($binaryData, $password) {
-	
-		$versionChr = $this->_extractVersionFromBinData($binaryData);
-		switch (ord($versionChr)) {
-			case 0:
-			case 1:
-				$dataWithoutHMAC = $this->_extractCiphertextFromBinData($binaryData);
-				break;
-
-			case 2:
-				$dataWithoutHMAC = substr($binaryData, 0, strlen($binaryData) - RNCryptor::HMAC_SIZE);
-				break;
-		}
-
-		$hmac = substr($binaryData, strlen($binaryData) - RNCryptor::HMAC_SIZE);
-
-		$hmac_salt = $this->_extractHmacSaltFromBinData($binaryData);
-		$hmac_key = hash_pbkdf2(RNCryptor::PBKDF2_PRF, $password, $hmac_salt, RNCryptor::PBKDF2_ITERATIONS, RNCryptor::KEY_SIZE, true);
-
-		$algorithm = $this->_getHmacAlgorithm($versionChr);
-		$hmac_hash = hash_hmac($algorithm, $dataWithoutHMAC , $hmac_key, true);
-
-		if (ord($versionChr) == 0) {
-			$hmac_hash = str_pad($hmac_hash, 32, chr(0));
-		}
+		$key = $this->_generateKey($components->headers->salt, $password);
 		
-		return ($hmac_hash == $hmac);
+		switch ($this->_settings->mode) {
+			case 'ctr':
+				$plaintext = $this->_aesCtrLittleEndianCrypt($components->ciphertext, $key, $components->headers->iv);
+				break;
+
+			case 'cbc':
+				$paddedPlaintext = mcrypt_decrypt($this->_settings->algorithm, $key, $components->ciphertext, 'cbc', $components->headers->iv);
+				$plaintext = $this->_stripPKCS7Padding($paddedPlaintext);
+				break;
+		}
+
+		return $plaintext;
+	}
+
+	private function _unpackEncryptedBase64Data($encryptedBase64Data) {
+
+		$binaryData = base64_decode($encryptedBase64Data);
+		
+		$components = new stdClass();
+		$components->headers = $this->_parseHeaders($binaryData);
+		$components->hmac = substr($binaryData, - $this->_settings->hmac->length);
+
+		$headerLength = $components->headers->length;
+		$components->ciphertext = substr($binaryData, $headerLength, strlen($binaryData) - $headerLength - strlen($components->hmac));
+
+		return $components;
+	}
+
+	private function _parseHeaders($binData) {
+
+		$offset = 0;
+		$versionChr = substr($binData, $offset, 1);
+
+		$this->_configureSettings(ord($versionChr));
+		
+		$offset += strlen($versionChr);
+		$optionsChr = substr($binData, $offset, 1);
+		
+		$offset += strlen($optionsChr);
+		$salt = substr($binData, $offset, $this->_settings->saltLength);
+		
+		$offset += strlen($salt);
+		$hmacSalt = substr($binData, $offset, $this->_settings->saltLength);
+		
+		$offset += strlen($hmacSalt);
+		$iv = substr($binData, $offset, $this->_settings->ivLength);
+		
+		$offset += strlen($iv);
+
+		$headers = (object)array(
+			'version' => $versionChr,
+			'options' => $optionsChr,
+			'salt' => $salt,
+			'hmacSalt' => $hmacSalt,
+			'iv' => $iv,
+			'length' => $offset
+		);
+
+		return $headers;
 	}
 	
-	private function _extractSaltFromBinData($binaryData) {
-		return substr($binaryData, 2, 8);
+	private function _stripPKCS7Padding($plaintext) {
+		$padLength = ord(substr($plaintext, -1));
+		return substr($plaintext, 0, strlen($plaintext) - $padLength);
 	}
 
-	private function _extractIvFromBinData($binaryData) {
-		return substr($binaryData, 18, 16);
-	}
-
-	private function _extractCiphertextFromBinData($binaryData) {
-		return substr($binaryData, 34, strlen($binaryData) - 34 - RNCryptor::HMAC_SIZE);
+	private function _hmacIsValid($components, $password) {
+		return ($components->hmac == $this->_generateHmac($components, $password));
 	}
 
 }

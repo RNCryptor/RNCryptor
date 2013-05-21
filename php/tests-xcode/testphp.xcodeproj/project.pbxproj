@@ -64,7 +64,6 @@
 		FBFBB5BC16B178DC002BA3EA = {
 			isa = PBXGroup;
 			children = (
-				FBFBB5EA16B179D3002BA3EA /* Security.framework */,
 				FBFBB5CD16B178DD002BA3EA /* testphp */,
 				FBFBB5CA16B178DD002BA3EA /* Frameworks */,
 				FBFBB5C816B178DD002BA3EA /* Products */,
@@ -82,6 +81,7 @@
 		FBFBB5CA16B178DD002BA3EA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FBFBB5EA16B179D3002BA3EA /* Security.framework */,
 				FBFBB5CB16B178DD002BA3EA /* Foundation.framework */,
 			);
 			name = Frameworks;
@@ -276,6 +276,7 @@
 				FBFBB5D816B178DD002BA3EA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
