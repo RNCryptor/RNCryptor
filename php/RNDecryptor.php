@@ -9,6 +9,8 @@ require_once __DIR__ . '/RNCryptor.php';
  */
 class RNDecryptor extends RNCryptor {
 
+	const HMAC_SIZE = 32;
+
 	/**
 	 * Decrypt RNCryptor-encrypted data
 	 *
@@ -34,86 +36,59 @@ class RNDecryptor extends RNCryptor {
 
 		$ciphertext = $this->_extractCiphertextFromBinData($binaryData);
 
-		$cryptor = $this->_getCryptor($versionChr);
-
 		switch (ord($versionChr)) {
 			case 0:
-				$blockSize = $this->_getCryptorBlockSize($versionChr);
-				$ciphertextChunks = str_split($ciphertext, $blockSize);
-				
-				$ctrCounter = $iv;
-				$plaintext = '';
-				foreach ($ciphertextChunks as $ciphertextChunk) {
-					mcrypt_generic_init($cryptor, $key, $ctrCounter);
-					$plaintext .= mdecrypt_generic($cryptor, $ciphertextChunk);
-					
-					$ctrCounter = $this->_incrementAesCtrLECounter($ctrCounter, $blockSize);
-				}
+				$plaintext = $this->_aesCtrDecrypt($ciphertext, $key, $iv);
 				break;
 
 			case 1:
 			case 2:
-				mcrypt_generic_init($cryptor, $key, $iv);
-				$plaintext = mdecrypt_generic($cryptor, $ciphertext);
-				$plaintext = $this->_stripPKCS7Padding($plaintext);
+				$plaintext = $this->_aesCbcDecrypt($ciphertext, $key, $iv);
 				break;
 		}
-
-		mcrypt_generic_deinit($cryptor);
-		mcrypt_module_close($cryptor);
 
 		return $plaintext;
 	}
 
-	private function _incrementAesCtrLECounter($counter, $blockSize) {
-		$ordinalOfFirstCharacter = ord(substr($counter, 0, 1)) + 1;
-		return chr($ordinalOfFirstCharacter) . substr($counter, 1, $blockSize - 1);
+	private function _aesCtrDecrypt($ciphertext, $key, $iv) {
+		return $this->_aesCtrCrypt($ciphertext, $key, $iv);
 	}
 
+	private function _aesCbcDecrypt($ciphertext, $key, $iv) {
+		$plaintext = mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $key, $ciphertext, MCRYPT_MODE_CBC, $iv);
+		return $this->_stripPKCS7Padding($plaintext);
+	}
+	
 	private function _stripPKCS7Padding($plaintext) {
 		$padLength = ord(substr($plaintext, -1));
 		return substr($plaintext, 0, strlen($plaintext) - $padLength);
 	}
 
 	private function _hmacIsValid($binaryData, $password) {
-	
+
+		$hmac = substr($binaryData, strlen($binaryData) - self::HMAC_SIZE);
 		$versionChr = $this->_extractVersionFromBinData($binaryData);
-		switch (ord($versionChr)) {
-			case 0:
-			case 1:
-				$dataWithoutHMAC = $this->_extractCiphertextFromBinData($binaryData);
-				break;
 
-			case 2:
-				$dataWithoutHMAC = substr($binaryData, 0, strlen($binaryData) - RNCryptor::HMAC_SIZE);
-				break;
-		}
-
-		$hmac = substr($binaryData, strlen($binaryData) - RNCryptor::HMAC_SIZE);
-
-		$hmac_salt = $this->_extractHmacSaltFromBinData($binaryData);
-		$hmac_key = hash_pbkdf2(RNCryptor::PBKDF2_PRF, $password, $hmac_salt, RNCryptor::PBKDF2_ITERATIONS, RNCryptor::KEY_SIZE, true);
-
-		$algorithm = $this->_getHmacAlgorithm($versionChr);
-		$hmac_hash = hash_hmac($algorithm, $dataWithoutHMAC , $hmac_key, true);
-
-		if (ord($versionChr) == 0) {
-			$hmac_hash = str_pad($hmac_hash, 32, chr(0));
-		}
+		$binaryDataWithoutHmac = substr($binaryData, 0, strlen($binaryData) - self::HMAC_SIZE);
+		$hmacHash = $this->_generateHmac($binaryDataWithoutHmac, $password, $versionChr);
 		
-		return ($hmac_hash == $hmac);
+		return ($hmacHash == $hmac);
 	}
-	
+
+	private function _extractVersionFromBinData($binaryData) {
+		return substr($binaryData, 0, 1);
+	}
+
 	private function _extractSaltFromBinData($binaryData) {
 		return substr($binaryData, 2, 8);
 	}
-
+	
 	private function _extractIvFromBinData($binaryData) {
 		return substr($binaryData, 18, 16);
 	}
 
 	private function _extractCiphertextFromBinData($binaryData) {
-		return substr($binaryData, 34, strlen($binaryData) - 34 - RNCryptor::HMAC_SIZE);
+		return substr($binaryData, 34, strlen($binaryData) - 34 - self::HMAC_SIZE);
 	}
 
 }

@@ -3,66 +3,65 @@ require_once __DIR__ . '/functions.php';
 
 abstract class RNCryptor {
 
-	/* kRNCryptorAES256Settings */
-	const ALGORITHM = MCRYPT_RIJNDAEL_128;
-	const KEY_SIZE = 32;
-	const RNCRYPTOR_1x_MODE = 'ctr';
-	const RNCRYPTOR_2x_MODE = 'cbc';
-	const SALT_SIZE = 8;
-	const PBKDF2_ITERATIONS = 10000;
-	const PBKDF2_PRF = 'sha1';
-	const HMAC_ALGORITHM_1x = 'sha1';
-	const HMAC_ALGORITHM_2x = 'sha256';
-	const HMAC_SIZE = 32;
+	protected function _aesCtrCrypt($payload, $key, $iv) {
 
-	protected function _generateKey($salt, $password) {
-		return hash_pbkdf2(self::PBKDF2_PRF, $password, $salt, self::PBKDF2_ITERATIONS, self::KEY_SIZE, true);
+		$numOfBlocks = ceil(strlen($payload) / strlen($iv));
+		$counter = '';
+		for ($i = 0; $i < $numOfBlocks; ++$i) {
+			$counter .= $iv;
+
+			// Yes, the next line only ever increments the first character
+			// of the counter string, ignoring overflow conditions.  This
+			// matches CommonCrypto's behavior!
+			$iv[0] = chr(ord(substr($iv, 0, 1)) + 1);
+		}
+
+		return $payload ^ mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $counter, MCRYPT_MODE_ECB);
 	}
 
-	protected function _getCryptor($versionChr) {
-		$mode = $this->_getEncryptionMode($versionChr);
-		return mcrypt_module_open(self::ALGORITHM, '', $mode, '');
-	}
+	protected function _generateHmac($binaryDataWithoutHmac, $password, $versionChr) {
 	
-	protected function _getCryptorBlockSize($versionChr) {
-		$mode = $this->_getEncryptionMode($versionChr);
-		return mcrypt_get_block_size(self::ALGORITHM, $mode);
+		switch (ord($versionChr)) {
+			case 0:
+			case 1:
+				$hmacMessage = substr($binaryDataWithoutHmac, 34);
+				break;
+	
+			case 2:
+				$hmacMessage = $binaryDataWithoutHmac;
+				break;
+		}
+	
+		$hmacSalt = $this->_extractHmacSaltFromBinData($binaryDataWithoutHmac);
+		$hmacKey = $this->_generateKey($hmacSalt, $password);
+	
+		$algorithm = $this->_getHmacAlgorithm($versionChr);
+		$hmac = hash_hmac($algorithm, $hmacMessage, $hmacKey, true);
+	
+		if (ord($versionChr) == 0) {
+			$hmac = str_pad($hmac, 32, chr(0));
+		}
+	
+		return $hmac;
 	}
 
-	protected function _extractVersionFromBinData($binaryData) {
-		return substr($binaryData, 0, 1);
-	}
-
-	protected function _extractHmacSaltFromBinData($binaryData) {
+	private function _extractHmacSaltFromBinData($binaryData) {
 		return substr($binaryData, 10, 8);
 	}
 
-	protected function _getEncryptionMode($versionChr) {
-		switch (ord($versionChr)) {
-			case 0:
-				$mode = self::RNCRYPTOR_1x_MODE;
-				break;
-			case 1:
-			case 2:
-				$mode = self::RNCRYPTOR_2x_MODE;
-				break;
-		}
-
-		return $mode;
+	protected function _generateKey($salt, $password) {
+		return hash_pbkdf2('sha1', $password, $salt, 10000, 32, true);
 	}
 
 	protected function _getHmacAlgorithm($versionChr) {
 		switch (ord($versionChr)) {
 			case 0:
-				$algorithm = self::HMAC_ALGORITHM_1x;
+				$algorithm = 'sha1';
 				break;
 		
 			case 1:
-				$algorithm = self::HMAC_ALGORITHM_2x;
-				break;
-		
 			case 2:
-				$algorithm = self::HMAC_ALGORITHM_2x;
+				$algorithm = 'sha256';
 				break;
 		}
 		return $algorithm;

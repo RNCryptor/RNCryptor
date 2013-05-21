@@ -10,20 +10,6 @@ require_once __DIR__ . '/RNCryptor.php';
  */
 class RNEncryptor extends RNCryptor {
 
-	private $_randomSource;
-
-	public function __construct() {
-		$this->_setupRandomSource();
-	}
-
-	private function _setupRandomSource() {
-		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-			$this->_randomSource = MCRYPT_RAND;
-		} else {
-			$this->_randomSource = MCRYPT_DEV_RANDOM;
-		}
-	}
-
 	/**
 	 * Encrypt plaintext using RNCryptor's algorithm
 	 * 
@@ -38,57 +24,52 @@ class RNEncryptor extends RNCryptor {
 
 		$this->_assertVersionIsSupported($version);
 
-		$keySalt = mcrypt_create_iv(RNCryptor::SALT_SIZE, $this->_randomSource);
+		$keySalt = $this->_generateSalt();
 		$key = $this->_generateKey($keySalt, $password);
 
 		$versionChr = chr($version);
 
-		$cryptor = $this->_getCryptor($versionChr);
-		$iv = $this->_generateIv($cryptor);
-
 		switch (ord($versionChr)) {
 
 			case 0:
-				$blockSize = $this->_getCryptorBlockSize($versionChr);
-				$plaintextChunks = str_split($plaintext, $blockSize);
-
-				$ctrCounter = $iv;
-				$ciphertext = '';
-				foreach ($plaintextChunks as $plaintextChunk) {
-					mcrypt_generic_init($cryptor, $key, $ctrCounter);
-					$ciphertext .= mcrypt_generic($cryptor, $plaintextChunk);
-				
-					$ctrCounter = $this->_incrementAesCtrLECounter($ctrCounter, $blockSize);
-				}
+				list($iv, $ciphertext) = $this->_aesCtrEncrypt($plaintext, $key);
 				break;
 
 			case 1:
 			case 2:
-				$padded_plaintext = $this->_addPKCS7Padding($plaintext, $versionChr);
-				mcrypt_generic_init($cryptor, $key, $iv);
-				$ciphertext = mcrypt_generic($cryptor, $padded_plaintext);
+				list($iv, $ciphertext) = $this->_aesCbcEncrypt($plaintext, $key);
 				break;
 		}
 
-		mcrypt_generic_deinit($cryptor);
-		mcrypt_module_close($cryptor);
-
-		$hmacSalt = $this->_generateHmacSalt();
+		$hmacSalt = $this->_generateSalt();
 		$optionsChr = $this->_generateOptions($versionChr);
 		$binaryData = $versionChr . $optionsChr . $keySalt . $hmacSalt . $iv . $ciphertext;
 
-		$hmac = $this->_generateHmac($binaryData, $password);
+		$hmac = $this->_generateHmac($binaryData, $password, $versionChr);
 		
 		return base64_encode($binaryData . $hmac);
 	}
 
-	private function _incrementAesCtrLECounter($counter, $blockSize) {
-		$ordinalOfFirstCharacter = ord(substr($counter, 0, 1)) + 1;
-		return chr($ordinalOfFirstCharacter) . substr($counter, 1, $blockSize - 1);
+	private function _aesCtrEncrypt($plaintext, $key) {
+		$blockSize = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, 'ctr');
+		$iv = $this->_generateIv($blockSize);
+		
+		$ciphertext = $this->_aesCtrCrypt($plaintext, $key, $iv);
+		
+		return array($iv, $ciphertext);
 	}
+	
+	private function _aesCbcEncrypt($plaintext, $key) {
+		$blockSize = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, 'cbc');
+		$iv = $this->_generateIv($blockSize);
 
-	private function _addPKCS7Padding($plaintext, $versionChr) {
-		$blockSize = $this->_getCryptorBlockSize($versionChr);
+		$padded_plaintext = $this->_addPKCS7Padding($plaintext, strlen($iv));
+		$ciphertext = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $padded_plaintext, MCRYPT_MODE_CBC, $iv);
+		
+		return array($iv, $ciphertext);
+	}
+	
+	private function _addPKCS7Padding($plaintext, $blockSize) {
 		$padSize = $blockSize - (strlen($plaintext) % $blockSize);
 		return $plaintext . str_repeat(chr($padSize), $padSize);
 	}
@@ -101,44 +82,23 @@ class RNEncryptor extends RNCryptor {
 				break;
 			case 1:
 			case 2:
-				$optionsChr = chr(1); /* We're using a password */
+				$optionsChr = chr(1);
 				break;
 		}
 		return $optionsChr;
 	}
-	
-	private function _generateIv($cryptor) {
-		return mcrypt_create_iv(mcrypt_enc_get_iv_size($cryptor), $this->_randomSource);
-	}
-	
-	private function _generateHmacSalt() {
-		return mcrypt_create_iv(RNCryptor::SALT_SIZE, $this->_randomSource);
-	}
-	
-	private function _generateHmac($binaryData, $password) {
-	
-		$versionChr = $this->_extractVersionFromBinData($binaryData);
-		switch (ord($versionChr)) {
-			case 0:
-			case 1:
-				$hmac_message = substr($binaryData, 34);
-				break;
-	
-			case 2:
-				$hmac_message = $binaryData;
-				break;
-		}
 
-		$hmac_salt = $this->_extractHmacSaltFromBinData($binaryData);
-		$hmac_key = hash_pbkdf2(RNCryptor::PBKDF2_PRF, $password, $hmac_salt, RNCryptor::PBKDF2_ITERATIONS, RNCryptor::KEY_SIZE, true);
+	private function _generateSalt() {
+		return $this->_generateIv(8);
+	}
 
-		$algorithm = $this->_getHmacAlgorithm($versionChr);
-		$hmac = hash_hmac($algorithm, $hmac_message, $hmac_key, true);
-		
-		if (ord($versionChr) == 0) {
-			$hmac = str_pad($hmac, 32, chr(0));
+	private function _generateIv($blockSize) {
+		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+			$randomSource = MCRYPT_RAND;
+		} else {
+			$randomSource = MCRYPT_DEV_RANDOM;
 		}
 		
-		return $hmac;
+		return mcrypt_create_iv($blockSize, $randomSource);
 	}
 }
