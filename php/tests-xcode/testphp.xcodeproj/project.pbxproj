@@ -90,6 +90,8 @@
 		FBFBB5CD16B178DD002BA3EA /* testphp */ = {
 			isa = PBXGroup;
 			children = (
+				FBFBB5E716B17931002BA3EA /* Base64.h */,
+				FBFBB5E816B17931002BA3EA /* Base64.m */,
 				FBFBB5E616B1791C002BA3EA /* RNCryptor */,
 				FBFBB5CE16B178DD002BA3EA /* main.m */,
 				FBFBB5D016B178DD002BA3EA /* Supporting Files */,
@@ -117,8 +119,6 @@
 				FBFBB5DF16B178FD002BA3EA /* RNDecryptor.m */,
 				FBFBB5E016B178FD002BA3EA /* RNEncryptor.h */,
 				FBFBB5E116B178FD002BA3EA /* RNEncryptor.m */,
-				FBFBB5E716B17931002BA3EA /* Base64.h */,
-				FBFBB5E816B17931002BA3EA /* Base64.m */,
 			);
 			name = RNCryptor;
 			sourceTree = "<group>";
