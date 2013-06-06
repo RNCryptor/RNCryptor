@@ -641,7 +641,8 @@
 				GCC_PREFIX_HEADER = "RNCryptor OS X/RNCryptor OS X-Prefix.pch";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				INFOPLIST_FILE = "RNCryptor OS X/RNCryptor OS X-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				INSTALL_PATH = "@rpath/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = RNCryptor;
 				SDKROOT = macosx;
@@ -670,7 +671,8 @@
 				GCC_PREFIX_HEADER = "RNCryptor OS X/RNCryptor OS X-Prefix.pch";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				INFOPLIST_FILE = "RNCryptor OS X/RNCryptor OS X-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				INSTALL_PATH = "@rpath/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = RNCryptor;
 				SDKROOT = macosx;
 				SYMROOT = ../../build;
