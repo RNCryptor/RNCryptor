@@ -1,9 +1,53 @@
 #!/usr/bin/env python
+# coding: utf-8
 
-import Crypto.Cipher.AES as AES
-import Crypto.Hash as Hash
-import Crypto.Protocol.KDF as KDF
-import Crypto.Random as Random
+from __future__ import print_function
+
+import hashlib
+import hmac
+import sys
+
+from Crypto.Cipher import AES
+from Crypto.Protocol import KDF
+from Crypto import Random
+
+
+PY2 = sys.version_info[0] == 2
+PY3 = sys.version_info[0] == 3
+
+if PY2:
+    def to_bytes(s):
+        if isinstance(s, str):
+            return s
+        if isinstance(s, unicode):
+            return s.encode('utf-8')
+
+    to_str = to_bytes
+
+    def bchr(s):
+        return chr(s)
+
+    def bord(s):
+        return ord(s)
+
+elif PY3:
+    def to_bytes(s):
+        if isinstance(s, bytes):
+            return s
+        if isinstance(s, str):
+            return s.encode('utf-8')
+
+    def to_str(s):
+        if isinstance(s, bytes):
+            return s.decode('utf-8')
+        if isinstance(s, str):
+            return s
+
+    def bchr(s):
+        return bytes([s])
+
+    def bord(s):
+        return s
 
 
 class RNCryptor(object):
@@ -15,15 +59,19 @@ class RNCryptor(object):
 
     def pre_decrypt_data(self, data):
         """ Change this function for handling data before decryption. """
+
+        data = to_bytes(data)
         return data
 
     def post_decrypt_data(self, data):
         """ Removes useless symbols which appear over padding for AES (PKCS#7). """
 
-        return data[:-ord(data[-1])]
+        data = data[:-bord(data[-1])]
+        return to_str(data)
 
     def decrypt(self, data, password):
         data = self.pre_decrypt_data(data)
+        password = to_bytes(password)
 
         n = len(data)
 
@@ -48,15 +96,18 @@ class RNCryptor(object):
     def pre_encrypt_data(self, data):
         """ Does padding for the data for AES (PKCS#7). """
 
+        data = to_bytes(data)
         rem = self.AES_BLOCK_SIZE - len(data) % self.AES_BLOCK_SIZE
-        return data + rem * chr(rem)
+        return data + bchr(rem) * rem
 
     def post_encrypt_data(self, data):
         """ Change this function for handling data after encryption. """
+
         return data
 
     def encrypt(self, data, password):
         data = self.pre_encrypt_data(data)
+        password = to_bytes(password)
 
         encryption_salt = self.encryption_salt
         encryption_key = self._pbkdf2(password, encryption_salt)
@@ -67,10 +118,10 @@ class RNCryptor(object):
         iv = self.iv
         cipher_text = self._aes_encrypt(encryption_key, iv, data)
 
-        version = chr(2)
-        options = chr(1)
+        version = b'\x02'
+        options = b'\x01'
 
-        new_data = ''.join([version, options, encryption_salt, hmac_salt, iv, cipher_text])
+        new_data = b''.join([version, options, encryption_salt, hmac_salt, iv, cipher_text])
         encrypted_data = new_data + self._hmac(hmac_key, new_data)
 
         return self.post_encrypt_data(encrypted_data)
@@ -94,46 +145,36 @@ class RNCryptor(object):
         return AES.new(key, self.AES_MODE, iv).decrypt(text)
 
     def _hmac(self, key, data):
-        return Hash.HMAC.new(key, data, Hash.SHA256).digest()
+        return hmac.new(key, data, hashlib.sha256).digest()
 
     def _pbkdf2(self, password, salt, iterations=10000, key_length=32):
-        """ Several realisation may be used. Choose one you like (requires 3-party libraries). """
-
-        ## crypto version -- very slow
-        return KDF.PBKDF2(password, salt, dkLen=key_length, count=iterations)
-
-        ## requires https://github.com/mitsuhiko/python-pbkdf2 version -- medium speed
-        # from pbkdf2 import pbkdf2_bin
-        # return pbkdf2_bin(password, salt, iterations=iterations, keylen=key_length)
-
-        ## requires django 1.5 version -- fast enough
-        # import hashlib
-        # from django.utils.crypto import pbkdf2
-        # return pbkdf2(password, salt, iterations, dklen=key_length, digest=hashlib.sha1)
+        return KDF.PBKDF2(password, salt, dkLen=key_length, count=iterations,
+                          prf=lambda p, s: hmac.new(p, s, hashlib.sha1).digest())
 
 
-def test():
+def main():
     from time import time
 
     cryptor = RNCryptor()
-    password = 'p@s$VV0Rd'
-    texts = ['test', '', '1' * 16, '2' * 15, '3' * 17]
 
-    for text in texts:
-        print 'text: "{}"'.format(text)
+    passwords = 'p@s$VV0Rd', 'пароль'
+    texts = 'test', 'текст', '', '1' * 16, '2' * 15, '3' * 17
 
-        s = time()
-        encrypted_data = cryptor.encrypt(text, password)
-        print 'encrypted {}: "{}"'.format(time() - s, encrypted_data.encode('hex').replace('\n', ''))
+    for password in passwords:
+        for text in texts:
+            print('text: "{}"'.format(text))
 
-        s = time()
-        decrypted_data = cryptor.decrypt(encrypted_data, password)
-        print 'decrypted {}: "{}"'.format(time() - s, decrypted_data)
+            s = time()
+            encrypted_data = cryptor.encrypt(text, password)
+            print('encrypted', time() - s)
 
-        assert text == decrypted_data
-        print
+            s = time()
+            decrypted_data = cryptor.decrypt(encrypted_data, password)
+            print('decrypted {}: "{}"\n'.format(time() - s, decrypted_data))
+
+            assert text == decrypted_data
 
 
 if __name__ == '__main__':
 
-    test()
+    main()
