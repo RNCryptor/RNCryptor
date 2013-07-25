@@ -138,7 +138,7 @@ getPRFhlen(CCPseudoRandomAlgorithm prf)
 		case kCCPRFHmacAlgSHA256:	return kCCPRFHmacAlgSHA256hlen;
 		case kCCPRFHmacAlgSHA384:	return kCCPRFHmacAlgSHA384hlen;
 		case kCCPRFHmacAlgSHA512:	return kCCPRFHmacAlgSHA512hlen;
-		default: return 0;
+		default: return kCCPRFHmacAlgSHA256hlen;
 	}
 }
 
