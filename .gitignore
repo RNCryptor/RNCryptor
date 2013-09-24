@@ -1,5 +1,6 @@
 *.xcuserdatad
 .idea
+xcshareddata
 
 # Eclipse files
 .buildpath
