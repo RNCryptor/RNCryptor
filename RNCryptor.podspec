@@ -15,16 +15,14 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 LIC
   }
-  s.source = { :git => 'https://github.com/rnapier/RNCryptor.git', :tag => 'RNCryptor-2.0'}
+  s.source = { :git => 'https://github.com/rnapier/RNCryptor.git', :tag => "RNCryptor-#{s.version.to_s}" }
   s.description = 'Provides an easy-to-use, Objective-C interface to the AES functionality of CommonCrypto. Simplifies correct handling of password stretching (PBKDF2), salting, and IV.'
   s.homepage = 'https://github.com/rnapier/RNCryptor'
   s.source_files = 'RNCryptor/*.{h,m}'
   s.public_header_files = 'RNCryptor/*.h'
   s.requires_arc = true
-  s.ios.frameworks = 'Security'
-# OS X building is broken in 2.0.
-  s.platform = :ios, '5.0'
-# Comment the above and uncomment below to support OS X and iOS.
-#  s.ios.deployment_target = '5.0'
-#  s.osx.deployment_target = '10.7'
+  s.frameworks = 'Security'
+  s.ios.deployment_target = '5.0'
+  s.osx.deployment_target = '10.7'
 end
+
