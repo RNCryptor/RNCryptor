@@ -1,5 +1,5 @@
-import binascii
-from cStringIO import StringIO
+import six
+
 
 class PKCS7Encoder(object):
     '''
@@ -35,23 +35,15 @@ class PKCS7Encoder(object):
         '''
         Remove the PKCS#7 padding from a text string
         '''
-        nl = len(text)
-        val = int(binascii.hexlify(text[-1]), 16)
+        val = six.byte2int([text[-1]])
         if val > self.k:
             raise ValueError('Input is not padded or padding is corrupt')
-
-        l = nl - val
-        return text[:l]
+        return text[:-val]
 
     ## @param text The text to encode.
     def encode(self, text):
         '''
         Pad an input string according to PKCS#7
         '''
-        l = len(text)
-        output = StringIO()
-        val = self.k - (l % self.k)
-        for _ in xrange(val):
-            output.write('%02x' % val)
-        return text + binascii.unhexlify(output.getvalue())
-        
+        val = self.k - (len(text) % self.k)
+        return text + six.int2byte(val) * val

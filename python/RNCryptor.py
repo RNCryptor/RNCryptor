@@ -1,13 +1,15 @@
-#!/usr/bin/python
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-import Crypto.Hash.SHA
-import Crypto.Hash.SHA256
-import Crypto.Random
+import io
+
+import Crypto.Cipher
+import Crypto.Hash
 import Crypto.Protocol.KDF
-import Crypto.Cipher.AES
-import Crypto.Hash.HMAC
-from cStringIO import StringIO
+import Crypto.Random
+
 from pkcs7 import PKCS7Encoder
+
 
 class RNCryptor:
 	"""Cryptor for RNCryptor"""
@@ -35,22 +37,11 @@ class RNCryptor:
 
 		ciphertext = cipher.encrypt(self.pkcs7.encode(message))
 
-		output = StringIO()
-		output.write(chr(2)) # Version 2
-		output.write(chr(1)) # Password
-		output.write(encryption_salt)
-		output.write(hmac_salt)
-		output.write(iv)
-		output.write(ciphertext)
-
-		hmac = self.generate_hmac(password, hmac_salt, output.getvalue())
-
-		output.write(hmac)
-
-		return output.getvalue()
+		output = b'\x02\x01' + encryption_salt + hmac_salt + iv + ciphertext
+		return output + self.generate_hmac(password, hmac_salt, output)
 
 	def decrypt(self, message, password):
-		input = StringIO(message)
+		input = io.BytesIO(message)
 		version = input.read(1) # Version
 		option = input.read(1)
 		encryption_salt = input.read(8)
@@ -59,10 +50,7 @@ class RNCryptor:
 		ciphertext = input.read(len(message)-32-34)
 
 		hmac = input.read(32)
-		# print '\n<', len(message), '>', ''.join('%02x' % ord(byte) for byte in hmac)
-
 		new_hmac = self.generate_hmac(password, hmac_salt, message[0:len(message)-32])
-		# print '\n<nmac', len(message), '>', ''.join('%02x' % ord(byte) for byte in new_hmac)
 
 		if hmac != new_hmac :
 			return False
@@ -80,15 +68,28 @@ class RNCryptor:
 		hmac = Crypto.Hash.HMAC.new(hmac_key, msg, self.HMAC_hash_algo)
 		return hmac.digest()
 
-def main():
-	plaintext = b"Attack at dawn"
-	password = b"mypassword"
-	
-	message = RNCryptor().encrypt(plaintext, password)
-	print ''.join('%02x' % ord(byte) for byte in message)
 
-	plain = RNCryptor().decrypt(message, password)
-	print plain
+def main():
+	from time import time
+
+	cryptor = RNCryptor()
+
+	passwords = u'p@s$VV0Rd'.encode('utf-8'), u'пароль'.encode('utf-8')
+	texts = b'Attack at dawn', u'текст'.encode('utf-8'), b'', b'1' * 16, b'2' * 15, b'3' * 17
+
+	for password in passwords:
+		for text in texts:
+			print('text: {!r}'.format(text))
+
+			s = time()
+			encrypted_data = cryptor.encrypt(text, password)
+			print('encrypted', time() - s)
+
+			s = time()
+			decrypted_data = cryptor.decrypt(encrypted_data, password)
+			print('decrypted {}: {!r}\n'.format(time() - s, decrypted_data))
+
+			assert text == decrypted_data
 
 
 if __name__ == '__main__':
