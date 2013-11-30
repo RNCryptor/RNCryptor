@@ -64,7 +64,7 @@ class RNCryptor:
 		new_hmac = self.generate_hmac(password, hmac_salt, message[0:len(message)-32])
 		# print '\n<nmac', len(message), '>', ''.join('%02x' % ord(byte) for byte in new_hmac)
 
-		if hmac != new_hmac :
+		if not self.constant_time_compare(hmac, new_hmac):
 			return False
 
 		encryption_key = Crypto.Protocol.KDF.PBKDF2(password, encryption_salt, self.key_length, self.iterations)
@@ -79,6 +79,24 @@ class RNCryptor:
 		hmac_key = Crypto.Protocol.KDF.PBKDF2(password, hmac_salt, self.key_length, self.iterations)
 		hmac = Crypto.Hash.HMAC.new(hmac_key, msg, self.HMAC_hash_algo)
 		return hmac.digest()
+
+	def constant_time_compare(self, val1, val2):
+		"""
+		Returns True if the two strings are equal, False otherwise.
+
+		The time taken is independent of the number of characters that match, but does depend
+		on the length of the string. In the case of RNCRyptor, HMAC length is known in any case,
+		so this is not a concern.
+
+		This method is based on code from the Django project, (c) Django Software Foundation and individual contributors.
+
+		"""
+		if len(val1) != len(val2):
+			return False
+		result = 0
+		for x, y in zip(val1, val2):
+			result |= ord(x) ^ ord(y)
+		return result == 0
 
 def main():
 	plaintext = b"Attack at dawn"
