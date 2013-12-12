@@ -319,7 +319,7 @@ NSString *const kBadPassword = @"NotThePassword";
 // echo Test data | openssl enc -aes-256-cbc -out test.enc -k Passw0rd
 
 static NSString *const kOpenSSLString = @"Test data\n";
-static NSString *const kOpenSSLPath = @"test.enc";
+static NSString *const kOpenSSLPath = @"openssl.enc";
 static NSString *const kOpenSSLPassword = @"Passw0rd";
 
 - (void)testOpenSSLEncrypt
