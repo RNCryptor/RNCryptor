@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4ABDC61718615875000DE03F /* RNCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB75651A1512D3E9007B806B /* RNCryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4ABDC61818615875000DE03F /* RNOpenSSLCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B806E /* RNOpenSSLCryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4ABDC61918615894000DE03F /* RNEncryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8076 /* RNEncryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4ABDC61A18615894000DE03F /* RNOpenSSLDecryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B808E /* RNOpenSSLDecryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4ABDC61B18615894000DE03F /* RNOpenSSLEncryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B808C /* RNOpenSSLEncryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4ABDC61C18615894000DE03F /* RNCryptorEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B807E /* RNCryptorEngine.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4ABDC61D186158B2000DE03F /* RNDecryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B807A /* RNDecryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4ABDC61E186158B2000DE03F /* RNCryptor+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8084 /* RNCryptor+Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		AB13428615E0FC2300456914 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = AB13428415E0FC2300456914 /* InfoPlist.strings */; };
 		AB13428F15E0FC4600456914 /* RNOpenSSLDecryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8090 /* RNOpenSSLDecryptor.m */; };
 		AB13429015E0FC4600456914 /* RNOpenSSLEncryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B808A /* RNOpenSSLEncryptor.m */; };
@@ -341,6 +349,14 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4ABDC61718615875000DE03F /* RNCryptor.h in Headers */,
+				4ABDC61818615875000DE03F /* RNOpenSSLCryptor.h in Headers */,
+				4ABDC61D186158B2000DE03F /* RNDecryptor.h in Headers */,
+				4ABDC61A18615894000DE03F /* RNOpenSSLDecryptor.h in Headers */,
+				4ABDC61B18615894000DE03F /* RNOpenSSLEncryptor.h in Headers */,
+				4ABDC61C18615894000DE03F /* RNCryptorEngine.h in Headers */,
+				4ABDC61918615894000DE03F /* RNEncryptor.h in Headers */,
+				4ABDC61E186158B2000DE03F /* RNCryptor+Private.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
