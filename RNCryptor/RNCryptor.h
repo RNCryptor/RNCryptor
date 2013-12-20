@@ -39,6 +39,7 @@ typedef struct _RNCryptorKeyDerivationSettings
   CCPBKDFAlgorithm PBKDFAlgorithm;
   CCPseudoRandomAlgorithm PRF;
   uint rounds;
+  BOOL hasV2Password; // See Issue #77. V2 incorrectly handled multi-byte characters.
 } RNCryptorKeyDerivationSettings;
 
 typedef struct _RNCryptorSettings
