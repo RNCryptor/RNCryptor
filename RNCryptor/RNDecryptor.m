@@ -172,6 +172,16 @@ static const NSUInteger kPreambleSize = 2;
   }
 #endif
 
+  if (bytes[0] == 2) {
+    self.options = bytes[1];
+
+    RNCryptorSettings settings = self.settings;
+    settings.keySettings.hasV2Password = YES;
+    settings.HMACKeySettings.hasV2Password = YES;
+    self.settings = settings;
+    return YES;
+  }
+
   if (bytes[0] == kRNCryptorFileVersion) {
     self.options = bytes[1];
     return YES;

@@ -319,8 +319,8 @@ NSString *const kBadPassword = @"NotThePassword";
 // Issue #77: KeyForPassword() broken for multi-byte passwords (UTF-8)
 - (void)testMultibytePasswordTruncation {
   NSData *data = [RNCryptor randomDataOfLength:1024];
-  NSString *password = @"中文密码";
-  NSString *truncatedPassword = @"中文中文";  // Same first-half, different last-half (but same overall length).
+  NSString *password = @"中文密码"; // 4 characters, 8 bytes => uses first 2 characters
+  NSString *truncatedPassword = @"中文xx";  // 4 characters, 6 bytes => uses first 2 characters
 
   NSError *error;
   NSData *encryptedData = [RNEncryptor encryptData:data withSettings:kRNCryptorAES256Settings password:password error:&error];
@@ -332,6 +332,19 @@ NSString *const kBadPassword = @"NotThePassword";
   NSData *decryptedData = [RNDecryptor decryptData:encryptedData withPassword:truncatedPassword error:&decryptionError];
   XCTAssertNil(decryptedData, @"Decryption should be nil: %@", decryptedData);
   XCTAssertEqual([decryptionError code], (NSInteger)kRNCryptorHMACMismatch, @"Should have received kRNCryptorHMACMismatch");
+}
+
+// Issue #77: KeyForPassword() broken for multi-byte passwords (UTF-8)
+- (void)testReadVersion2PasswordTruncation {
+  NSString *plaintext = @"Attack at dawn";
+  NSString *password = @"中文密码";
+  NSData *v2EncryptionWithPasswordTrunction =
+  [[NSData alloc] initWithBase64Encoding:@"AgHOKe1rygDPDDk5DBInKERD85Ezo1EAU5uj+PyEz22o2dtFAjPyaJhY3jW0BXD4W9L4GnAhiscr8PKZ+zOzWDbTFB3/6alv2LWQ1TCG4cpT0g=="];
+
+  NSError *decryptionError = nil;
+  NSData *decryptedData = [RNDecryptor decryptData:v2EncryptionWithPasswordTrunction withPassword:password error:&decryptionError];
+  XCTAssertNil(decryptionError, @"Error decrypting:%@", decryptionError);
+  XCTAssertEqualObjects(decryptedData, [plaintext dataUsingEncoding:NSUTF8StringEncoding], @"Incorrect decryption.");
 }
 
 //
