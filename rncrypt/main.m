@@ -42,7 +42,7 @@ void OutputData(NSData *data)
     printf("%s\n", [string UTF8String]);
   }
   else {
-    printf("%s\n", [[data description] UTF8String]);
+    printf("%s\n", [[data base64EncodedStringWithOptions:0] UTF8String]);
   }
 }
 
@@ -86,7 +86,8 @@ int main(int argc, char * const argv[])
     NSError *error;
     NSData *data;
     if (decrypt_flag) {
-      data = [RNDecryptor decryptData:GetDataForHex(message)
+      data = [RNDecryptor decryptData:[[NSData alloc] initWithBase64EncodedString:message
+                                                                          options:NSDataBase64DecodingIgnoreUnknownCharacters]
                          withPassword:password
                                 error:&error];
     }
