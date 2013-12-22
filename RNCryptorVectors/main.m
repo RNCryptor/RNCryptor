@@ -119,6 +119,7 @@ NSData *GetDataForHex(NSString *hex) {
 
 void VerifyKeyVector(NSDictionary *vector) {
   NSCParameterAssert(vector[@"title"]);
+  NSCParameterAssert(vector[@"version"]);
   NSCParameterAssert(vector[@"enc_key"]);
   NSCParameterAssert(vector[@"hmac_key"]);
   NSCParameterAssert(vector[@"iv"]);
@@ -127,21 +128,21 @@ void VerifyKeyVector(NSDictionary *vector) {
 
   NSError *error;
 
-  NSData *cipherText = [RNEncryptor encryptData:GetDataForHex(vector[@"plaintext"])
-                                   withSettings:kRNCryptorAES256Settings
-                                  encryptionKey:GetDataForHex(vector[@"enc_key"])
-                                        HMACKey:GetDataForHex(vector[@"hmac_key"])
-                                             IV:GetDataForHex(vector[@"iv"])
-                                          error:&error];
-  if (! cipherText || ! [cipherText isEqual:GetDataForHex(vector[@"ciphertext"])]) {
-    printf("Failed encrypting test: %s\n", [vector[@"title"] UTF8String]);
-    printf("Error: %s\n", [[error description] UTF8String]);
-    printf("Expected: %s\n", [vector[@"plaintext"] UTF8String]);
-    printf("Found: %s\n", [[cipherText description] UTF8String]);
-    abort();
+  if ([vector[@"version"] intValue] == kRNCryptorFileVersion) {
+    NSData *cipherText = [RNEncryptor encryptData:GetDataForHex(vector[@"plaintext"])
+                                     withSettings:kRNCryptorAES256Settings
+                                    encryptionKey:GetDataForHex(vector[@"enc_key"])
+                                          HMACKey:GetDataForHex(vector[@"hmac_key"])
+                                               IV:GetDataForHex(vector[@"iv"])
+                                            error:&error];
+    if (! cipherText || ! [cipherText isEqual:GetDataForHex(vector[@"ciphertext"])]) {
+      printf("Failed encrypting test (v%d): %s\n", [vector[@"version"] intValue], [vector[@"title"] UTF8String]);
+      printf("Error: %s\n", [[error description] UTF8String]);
+      printf("Expected: %s\n", [vector[@"plaintext"] UTF8String]);
+      printf("Found: %s\n", [[cipherText description] UTF8String]);
+      abort();
+    }
   }
-
-
 
   NSData *plaintext = [RNDecryptor decryptData:GetDataForHex(vector[@"ciphertext"])
                              withEncryptionKey:GetDataForHex(vector[@"enc_key"])
@@ -149,7 +150,7 @@ void VerifyKeyVector(NSDictionary *vector) {
                                          error:&error];
 
   if (! plaintext || ! [plaintext isEqual:GetDataForHex(vector[@"plaintext"])]) {
-    printf("Failed decrypting test: %s\n", [vector[@"title"] UTF8String]);
+    printf("Failed decrypting test: (v%d) %s \n", [vector[@"version"] intValue], [vector[@"title"] UTF8String]);
     printf("Error: %s\n", [[error description] UTF8String]);
     printf("Expected: %s\n", [vector[@"plaintext"] UTF8String]);
     printf("Found: %s\n", [[plaintext description] UTF8String]);
@@ -175,9 +176,8 @@ int main(int argc, const char * argv[])
 
     NSString *vectorPath = @(argv[1]);
     VerifyKeyVectors(
-                GetVectorsFromPath([vectorPath stringByAppendingPathComponent:@"key"])
-    )
-    ;
+                     GetVectorsFromPath([vectorPath stringByAppendingPathComponent:@"key"])
+                     );
 
   }
   return 0;
