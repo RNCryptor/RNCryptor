@@ -37,7 +37,20 @@
                          password:(NSString *)password
                           handler:(RNCryptorHandler)handler;
 
+- (RNEncryptor *)initWithSettings:(RNCryptorSettings)theSettings
+                    encryptionKey:(NSData *)anEncryptionKey
+                          HMACKey:(NSData *)anHMACKey
+                               IV:(NSData *)anIV
+                          handler:(RNCryptorHandler)aHandler;
+
 + (NSData *)encryptData:(NSData *)data withSettings:(RNCryptorSettings)settings password:(NSString *)password error:(NSError **)error;
 + (NSData *)encryptData:(NSData *)data withSettings:(RNCryptorSettings)settings encryptionKey:(NSData *)encryptionKey HMACKey:(NSData *)HMACKey error:(NSError **)error;
++ (NSData *)encryptData:(NSData *)thePlaintext
+           withSettings:(RNCryptorSettings)theSettings
+          encryptionKey:(NSData *)anEncryptionKey
+                HMACKey:(NSData *)anHMACKey
+                     IV:(NSData *)anIV
+                  error:(NSError **)anError;
+
 
 @end

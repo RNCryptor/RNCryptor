@@ -54,8 +54,7 @@
   return [self synchronousResultForCryptor:cryptor data:thePlaintext error:anError];
 }
 
-+ (NSData *)encryptData:(NSData *)thePlaintext withSettings:(RNCryptorSettings)theSettings encryptionKey:(NSData *)anEncryptionKey HMACKey:(NSData *)anHMACKey error:(NSError **)anError
-{
++ (NSData *)encryptData:(NSData *)thePlaintext withSettings:(RNCryptorSettings)theSettings encryptionKey:(NSData *)anEncryptionKey HMACKey:(NSData *)anHMACKey error:(NSError **)anError {
   RNEncryptor *cryptor = [[self alloc] initWithSettings:theSettings
                                           encryptionKey:anEncryptionKey
                                                 HMACKey:anHMACKey
@@ -63,11 +62,42 @@
   return [self synchronousResultForCryptor:cryptor data:thePlaintext error:anError];
 }
 
-- (RNEncryptor *)initWithSettings:(RNCryptorSettings)theSettings encryptionKey:(NSData *)anEncryptionKey HMACKey:(NSData *)anHMACKey handler:(RNCryptorHandler)aHandler
+
++ (NSData *)encryptData:(NSData *)thePlaintext
+           withSettings:(RNCryptorSettings)theSettings
+          encryptionKey:(NSData *)anEncryptionKey
+                HMACKey:(NSData *)anHMACKey
+                     IV:(NSData *)anIV
+                  error:(NSError **)anError
+{
+  RNEncryptor *cryptor = [[self alloc] initWithSettings:theSettings
+                                          encryptionKey:anEncryptionKey
+                                                HMACKey:anHMACKey
+                                                     IV:anIV
+                                                handler:^(RNCryptor *c, NSData *d) {}];
+  return [self synchronousResultForCryptor:cryptor data:thePlaintext error:anError];
+}
+
+- (RNEncryptor *)initWithSettings:(RNCryptorSettings)theSettings
+                    encryptionKey:(NSData *)anEncryptionKey
+                          HMACKey:(NSData *)anHMACKey
+                          handler:(RNCryptorHandler)aHandler {
+  return [self initWithSettings:kRNCryptorAES256Settings
+                  encryptionKey:anEncryptionKey
+                        HMACKey:anHMACKey
+                             IV:[[self class] randomDataOfLength:theSettings.IVSize]
+                        handler:aHandler];
+}
+
+- (RNEncryptor *)initWithSettings:(RNCryptorSettings)theSettings
+                    encryptionKey:(NSData *)anEncryptionKey
+                          HMACKey:(NSData *)anHMACKey
+                               IV:(NSData *)anIV
+                          handler:(RNCryptorHandler)aHandler
 {
   self = [super initWithHandler:aHandler];
   if (self) {
-    self.IV = [[self class] randomDataOfLength:theSettings.IVSize];
+    self.IV = anIV;
 
     if (anHMACKey) {
       CCHmacInit(&_HMACContext, theSettings.HMACAlgorithm, anHMACKey.bytes, anHMACKey.length);

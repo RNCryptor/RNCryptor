@@ -1,0 +1,15 @@
+# Test vectors for key-based encryption
+# title: trimmed-string
+# enc_key: hex-string (length=key size)
+# hmac_key: hex-string (length=key size)
+# iv: hex-string (length=16 bytes)
+# plaintext: hex-string (any length)
+# ciphertext: hex-string (any length)
+
+title:		All fields empty or zero
+enc_key:	00000000000000000000000000000000
+hmac_key:	00000000000000000000000000000000
+iv:			00000000000000000000000000000000
+plaintext:
+ciphertext:	03000000 00000000 00000000 00000000 00000143 db63ee66 b0cdff9f 69917680 151e0e67 e6f5aea8 30ced4af ef779fe7 e5b3767e b06ea81a 0bb8a7a0 bf62c6b0 0405
+
