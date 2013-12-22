@@ -54,6 +54,23 @@
   return [self synchronousResultForCryptor:cryptor data:thePlaintext error:anError];
 }
 
++ (NSData *)encryptData:(NSData *)thePlaintext
+           withSettings:(RNCryptorSettings)theSettings
+               password:(NSString *)aPassword
+                     IV:(NSData *)anIV
+         encryptionSalt:(NSData *)anEncryptionSalt
+               HMACSalt:(NSData *)anHMACSalt
+                  error:(NSError **)anError
+{
+  RNEncryptor *cryptor = [[self alloc] initWithSettings:theSettings
+                                               password:aPassword
+                                                     IV:anIV
+                                         encryptionSalt:anEncryptionSalt
+                                               HMACSalt:anHMACSalt
+                                                handler:^(RNCryptor *c, NSData *d) {}];
+  return [self synchronousResultForCryptor:cryptor data:thePlaintext error:anError];
+}
+
 + (NSData *)encryptData:(NSData *)thePlaintext withSettings:(RNCryptorSettings)theSettings encryptionKey:(NSData *)anEncryptionKey HMACKey:(NSData *)anHMACKey error:(NSError **)anError {
   RNEncryptor *cryptor = [[self alloc] initWithSettings:theSettings
                                           encryptionKey:anEncryptionKey
@@ -120,24 +137,40 @@
   return self;
 }
 
-- (RNEncryptor *)initWithSettings:(RNCryptorSettings)theSettings password:(NSString *)aPassword handler:(RNCryptorHandler)aHandler
+- (RNEncryptor *)initWithSettings:(RNCryptorSettings)theSettings password:(NSString *)aPassword handler:(RNCryptorHandler)aHandler {
+    return [self initWithSettings:theSettings
+                password:aPassword
+                      IV:[[self class] randomDataOfLength:theSettings.IVSize]
+          encryptionSalt:[[self class] randomDataOfLength:theSettings.keySettings.saltSize]
+                HMACSalt:[[self class] randomDataOfLength:theSettings.HMACKeySettings.saltSize]
+                 handler:aHandler];
+}
+
+
+- (RNEncryptor *)initWithSettings:(RNCryptorSettings)theSettings
+                         password:(NSString *)aPassword
+                               IV:(NSData *)anIV
+                   encryptionSalt:(NSData *)anEncryptionSalt
+                         HMACSalt:(NSData *)anHMACSalt
+                          handler:(RNCryptorHandler)aHandler;
 {
-  NSParameterAssert(aPassword != nil);
+  NSParameterAssert(aPassword);
+  NSParameterAssert(anIV);
+  NSParameterAssert(anEncryptionSalt);
+  NSParameterAssert(anHMACSalt);
 
-  NSData *encryptionSalt = [[self class] randomDataOfLength:theSettings.keySettings.saltSize];
-  NSData *encryptionKey = [[self class] keyForPassword:aPassword salt:encryptionSalt settings:theSettings.keySettings];
-
-  NSData *HMACSalt = [[self class] randomDataOfLength:theSettings.HMACKeySettings.saltSize];
-  NSData *HMACKey = [[self class] keyForPassword:aPassword salt:HMACSalt settings:theSettings.HMACKeySettings];
+  NSData *encryptionKey = [[self class] keyForPassword:aPassword salt:anEncryptionSalt settings:theSettings.keySettings];
+  NSData *HMACKey = [[self class] keyForPassword:aPassword salt:anHMACSalt settings:theSettings.HMACKeySettings];
 
   self = [self initWithSettings:theSettings
                   encryptionKey:encryptionKey
                         HMACKey:HMACKey
+                             IV:anIV
                         handler:aHandler];
   if (self) {
     self.options |= kRNCryptorOptionHasPassword;
-    self.encryptionSalt = encryptionSalt;
-    self.HMACSalt = HMACSalt;
+    self.encryptionSalt = anEncryptionSalt;
+    self.HMACSalt = anHMACSalt;
   }
   return self;
 }
