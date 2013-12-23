@@ -179,7 +179,7 @@ void VerifyPasswordVector(NSDictionary *vector) {
   if ([vector[@"version"] intValue] == kRNCryptorFileVersion) {
     NSData *cipherText = [RNEncryptor encryptData:GetDataForHex(vector[@"plaintext"])
                                      withSettings:kRNCryptorAES256Settings
-                                    password:vector[@"password"]
+                                         password:vector[@"password"]
                                                IV:GetDataForHex(vector[@"iv"])
                                    encryptionSalt:GetDataForHex(vector[@"enc_salt"])
                                          HMACSalt:GetDataForHex(vector[@"hmac_salt"])
@@ -206,12 +206,37 @@ void VerifyPasswordVector(NSDictionary *vector) {
   }
 }
 
-
 void VerifyPasswordVectors(NSArray *vectors) {
   for (NSDictionary *vector in vectors) {
     VerifyPasswordVector(vector);
   }
 }
+
+void VerifyKDFVector(NSDictionary *vector) {
+  NSCParameterAssert(vector[@"title"]);
+  NSCParameterAssert(vector[@"version"]);
+  NSCParameterAssert(vector[@"password"]);
+  NSCParameterAssert(vector[@"salt"]);
+  NSCParameterAssert(vector[@"key"]);
+
+  NSData *key = [RNCryptor keyForPassword:vector[@"password"]
+                                     salt:GetDataForHex(vector[@"salt"])
+                                 settings:kRNCryptorAES256Settings.keySettings];
+
+  if (! key || ! [key isEqual:GetDataForHex(vector[@"key"])]) {
+    printf("Failed kdf test (v%d): %s\n", [vector[@"version"] intValue], [vector[@"title"] UTF8String]);
+    printf("Expected: %s\n", [vector[@"key"] UTF8String]);
+    printf("Found: %s\n", [[key description] UTF8String]);
+    abort();
+  }
+}
+
+void VerifyKDFVectors(NSArray *vectors) {
+  for (NSDictionary *vector in vectors) {
+    VerifyKDFVector(vector);
+  }
+}
+
 
 int main(int argc, const char * argv[])
 {
@@ -224,13 +249,11 @@ int main(int argc, const char * argv[])
     }
 
     NSString *vectorPath = @(argv[1]);
-    VerifyKeyVectors(
-                     GetVectorsFromPath([vectorPath stringByAppendingPathComponent:@"key"])
-                     );
-
+    VerifyKeyVectors(GetVectorsFromPath([vectorPath stringByAppendingPathComponent:@"key"]));
     VerifyPasswordVectors(GetVectorsFromPath([vectorPath stringByAppendingPathComponent:@"password"]));
-
-
+    VerifyKDFVectors(GetVectorsFromPath([vectorPath stringByAppendingPathComponent:@"kdf"]));
+    
+    
   }
   return 0;
 }
