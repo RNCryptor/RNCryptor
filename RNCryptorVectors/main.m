@@ -158,12 +158,6 @@ void VerifyKeyVector(NSDictionary *vector) {
   }
 }
 
-void VerifyKeyVectors(NSArray *vectors) {
-  for (NSDictionary *vector in vectors) {
-    VerifyKeyVector(vector);
-  }
-}
-
 void VerifyPasswordVector(NSDictionary *vector) {
   NSCParameterAssert(vector[@"title"]);
   NSCParameterAssert(vector[@"version"]);
@@ -206,12 +200,6 @@ void VerifyPasswordVector(NSDictionary *vector) {
   }
 }
 
-void VerifyPasswordVectors(NSArray *vectors) {
-  for (NSDictionary *vector in vectors) {
-    VerifyPasswordVector(vector);
-  }
-}
-
 void VerifyKDFVector(NSDictionary *vector) {
   NSCParameterAssert(vector[@"title"]);
   NSCParameterAssert(vector[@"version"]);
@@ -231,15 +219,16 @@ void VerifyKDFVector(NSDictionary *vector) {
   }
 }
 
-void VerifyKDFVectors(NSArray *vectors) {
+typedef void(*TestFunction)(NSDictionary *);
+
+void ApplyTestToFile(TestFunction f, NSString *directory, NSString *filename) {
+  NSArray *vectors = GetVectorsFromPath([directory stringByAppendingPathComponent:filename]);
   for (NSDictionary *vector in vectors) {
-    VerifyKDFVector(vector);
+    f(vector);
   }
 }
 
-
-int main(int argc, const char * argv[])
-{
+int main(int argc, const char * argv[]) {
   @autoreleasepool {
     if (argc != 2) {
       printf("RNCryptorVectors: Verify test vectors for RNCryptor.\n");
@@ -249,11 +238,9 @@ int main(int argc, const char * argv[])
     }
 
     NSString *vectorPath = @(argv[1]);
-    VerifyKeyVectors(GetVectorsFromPath([vectorPath stringByAppendingPathComponent:@"key"]));
-    VerifyPasswordVectors(GetVectorsFromPath([vectorPath stringByAppendingPathComponent:@"password"]));
-    VerifyKDFVectors(GetVectorsFromPath([vectorPath stringByAppendingPathComponent:@"kdf"]));
-    
-    
+    ApplyTestToFile(&VerifyKeyVector, vectorPath, @"key");
+    ApplyTestToFile(&VerifyPasswordVector, vectorPath, @"password");
+    ApplyTestToFile(&VerifyKDFVector, vectorPath, @"kdf");
   }
   return 0;
 }
