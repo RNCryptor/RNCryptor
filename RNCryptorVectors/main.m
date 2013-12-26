@@ -117,6 +117,15 @@ NSData *GetDataForHex(NSString *hex) {
   return data;
 }
 
+void Verify(NSString *type, NSDictionary *vector, NSString *key, NSData *actual) {
+  if (! actual || ! [actual isEqual:GetDataForHex(vector[key])]) {
+    printf("Failed %s test (v%d): %s\n", [type UTF8String], [vector[@"version"] intValue], [vector[@"title"] UTF8String]);
+    printf("Expected: %s\n", [vector[key] UTF8String]);
+    printf("Found: %s\n", [[actual description] UTF8String]);
+    abort();
+  }
+}
+
 void VerifyKeyVector(NSDictionary *vector) {
   NSCParameterAssert(vector[@"title"]);
   NSCParameterAssert(vector[@"version"]);
@@ -190,14 +199,7 @@ void VerifyPasswordVector(NSDictionary *vector) {
   NSData *plaintext = [RNDecryptor decryptData:GetDataForHex(vector[@"ciphertext"])
                                   withPassword:vector[@"password"]
                                          error:&error];
-
-  if (! plaintext || ! [plaintext isEqual:GetDataForHex(vector[@"plaintext"])]) {
-    printf("Failed decrypting test: (v%d) %s \n", [vector[@"version"] intValue], [vector[@"title"] UTF8String]);
-    printf("Error: %s\n", [[error description] UTF8String]);
-    printf("Expected: %s\n", [vector[@"plaintext"] UTF8String]);
-    printf("Found: %s\n", [[plaintext description] UTF8String]);
-    abort();
-  }
+  Verify(@"decrypt", vector, @"plaintext", plaintext);
 }
 
 void VerifyKDFVector(NSDictionary *vector) {
@@ -210,13 +212,7 @@ void VerifyKDFVector(NSDictionary *vector) {
   NSData *key = [RNCryptor keyForPassword:vector[@"password"]
                                      salt:GetDataForHex(vector[@"salt"])
                                  settings:kRNCryptorAES256Settings.keySettings];
-
-  if (! key || ! [key isEqual:GetDataForHex(vector[@"key"])]) {
-    printf("Failed kdf test (v%d): %s\n", [vector[@"version"] intValue], [vector[@"title"] UTF8String]);
-    printf("Expected: %s\n", [vector[@"key"] UTF8String]);
-    printf("Found: %s\n", [[key description] UTF8String]);
-    abort();
-  }
+  Verify(@"kdf", vector, @"key", key);
 }
 
 typedef void(*TestFunction)(NSDictionary *);
