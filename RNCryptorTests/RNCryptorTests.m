@@ -350,6 +350,24 @@ NSString *const kBadPassword = @"NotThePassword";
   XCTAssertEqualObjects(decryptedData, [plaintext dataUsingEncoding:NSUTF8StringEncoding], @"Incorrect decryption.");
 }
 
+// Issue #24: Crash on 0-length input
+- (void)testZeroLengthInput {
+  NSData *data = [NSData data];
+
+  NSError *encryptionError;
+  NSData *encryptedData = [RNEncryptor encryptData:data withSettings:kRNCryptorAES256Settings password:kGoodPassword error:&encryptionError];
+
+  XCTAssertNil(encryptionError, @"Error while encrypting: %@", encryptionError);
+  XCTAssertNotNil(encryptedData, @"Failed to encrypt: %@", encryptionError);
+
+  NSError *decryptionError;
+  NSData *decryptedData  = [RNDecryptor decryptData:encryptedData withPassword:kGoodPassword error:&decryptionError];
+
+  XCTAssertNil(decryptionError, @"Error while decrypting: %@", decryptionError);
+  XCTAssertEqualObjects(decryptedData, data, @"Failed to decrypt.");
+}
+
+
 //
 //- (void)_testDataOfLength:(NSUInteger)length encryptPassword:(NSString *)encryptPassword decryptPassword:(NSString *)decryptPassword
 //{
