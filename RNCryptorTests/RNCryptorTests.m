@@ -84,21 +84,23 @@ NSString *const kBadPassword = @"NotThePassword";
   __block NSMutableData *buffer = [NSMutableData dataWithLength:blockSize];
 
   dispatch_block_t readStreamBlock = ^{
-    [buffer setLength:blockSize];
-    NSInteger bytesRead = [inputStream read:[buffer mutableBytes] maxLength:blockSize];
-    if (bytesRead < 0) {
-      XCTFail(@"Error reading block:%@", inputStream.streamError);
-      [inputStream close];
-      dispatch_semaphore_signal(sem);
-    }
-    else if (bytesRead == 0) {
-      [inputStream close];
-      [decryptor finish];
-    }
-    else {
-      [buffer setLength:bytesRead];
-      [decryptor addData:buffer];
-      NSLog(@"Sent %ld bytes to decryptor", (unsigned long)bytesRead);
+    @autoreleasepool {
+      [buffer setLength:blockSize];
+      NSInteger bytesRead = [inputStream read:[buffer mutableBytes] maxLength:blockSize];
+      if (bytesRead < 0) {
+        XCTFail(@"Error reading block:%@", inputStream.streamError);
+        [inputStream close];
+        dispatch_semaphore_signal(sem);
+      }
+      else if (bytesRead == 0) {
+        [inputStream close];
+        [decryptor finish];
+      }
+      else {
+        [buffer setLength:bytesRead];
+        [decryptor addData:buffer];
+        NSLog(@"Sent %ld bytes to decryptor", (unsigned long)bytesRead);
+      }
     }
   };
 
@@ -111,7 +113,8 @@ NSString *const kBadPassword = @"NotThePassword";
     }
     else {
       readStreamBlock();
-    }  }];
+    }
+  }];
 
   readStreamBlock();
 
