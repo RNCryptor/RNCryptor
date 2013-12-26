@@ -31,6 +31,51 @@
 
 static const NSUInteger kPreambleSize = 2;
 
+@interface NSData (RNCryptor_ConsistentCompare)
+
+/** Compare two NSData in time proportional to the compared data (otherData)
+ *
+ * isEqual:-based comparisons stop comparing at the first difference. This can be used by attackers, in some situations,
+ * to determine a secret value by considering the time required to compare the values.
+ *
+ * It is slightly better to call this as [secret rnc_isEqualInConsistentTime:attackersData] rather than the reverse,
+ * but it is not a major issue either way. In the first case, the time required is proportional to the attacker's data,
+ * which provides the attacker no information about the length of secret. In the second case, the time is proportional
+ * to the length of secret, which leaks a small amount of informaiont, but in a way that does not varry in proportion to
+ * the attacker's data.
+ *
+ * @param otherData data to compare
+ * @returns YES if values are equal
+ */
+- (BOOL)rnc_isEqualInConsistentTime:(NSData *)otherData;
+
+@end
+
+@implementation NSData (RNCryptor_ConstantCompare)
+
+- (BOOL)rnc_isEqualInConsistentTime:(NSData *)otherData {
+  // The point of this routine is XOR the bytes of each data and accumulate the results with OR.
+  // If any bytes are different, then the OR will accumulate some non-0 value.
+
+  uint8_t result = otherData.length - self.length;  // Start with 0 (equal) only if our lengths are equal
+
+  const uint8_t *myBytes = [self bytes];
+  const NSUInteger myLength = [self length];
+  const uint8_t *otherBytes = [otherData bytes];
+  const NSUInteger otherLength = [otherData length];
+
+  for (NSUInteger i = 0; i < otherLength; ++i) {
+    // Use mod to wrap around ourselves if they are longer than we are.
+    // Remember, we already broke equality if our lengths are different.
+    result |= myBytes[i % myLength] ^ otherBytes[i];
+  }
+
+  return result == 0;
+}
+
+@end
+
+
 @interface RNDecryptor ()
 @property (nonatomic, readonly, strong) NSMutableData *inData;
 @property (nonatomic, readwrite, copy) NSData *encryptionKey;
@@ -269,7 +314,7 @@ static const NSUInteger kPreambleSize = 2;
       NSMutableData *HMACData = [NSMutableData dataWithLength:self.HMACLength];
       CCHmacFinal(&_HMACContext, [HMACData mutableBytes]);
 
-      if (![HMACData isEqualToData:self.inData]) {
+      if (![HMACData rnc_isEqualInConsistentTime:self.inData]) {
         [self cleanupAndNotifyWithError:[NSError errorWithDomain:kRNCryptorErrorDomain
                                                             code:kRNCryptorHMACMismatch
                                                         userInfo:[NSDictionary dictionaryWithObject:@"HMAC Mismatch" /* DNL */
