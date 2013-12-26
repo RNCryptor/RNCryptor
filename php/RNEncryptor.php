@@ -71,7 +71,7 @@ class RNEncryptor extends RNCryptor {
 		if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
 			$randomSource = MCRYPT_RAND;
 		} else {
-			$randomSource = MCRYPT_DEV_RANDOM;
+			$randomSource = MCRYPT_DEV_URANDOM;
 		}
 		return mcrypt_create_iv($blockSize, $randomSource);
 	}
