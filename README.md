@@ -1,10 +1,20 @@
 # RNCryptor
 
-Cross-language AES Encryptor/Decryptor [data format](https://github.com/rnapier/RNCryptor/wiki/Data-Format).
+Cross-language AES Encryptor/Decryptor [data
+format](https://github.com/rnapier/RNCryptor/wiki/Data-Format).
  
-The primary target is Objective-C, but implementations are available in [C](https://github.com/megabri/MGCryptor), [Java](http://code.google.com/p/jncryptor/), [PHP](https://github.com/rnapier/RNCryptor/tree/master/php), [Python](https://github.com/rnapier/RNCryptor/blob/master/python/RNCryptor.py), and [Ruby](https://github.com/rnapier/RNCryptor/tree/master/ruby).
+The primary target is Objective-C, but implementations are available in
+[C](https://github.com/megabri/MGCryptor),
+[Java](http://code.google.com/p/jncryptor/),
+[PHP](https://github.com/rnapier/RNCryptor/tree/master/php),
+[Python](https://github.com/rnapier/RNCryptor/blob/master/python/RNCryptor.py),
+and [Ruby](https://github.com/rnapier/RNCryptor/tree/master/ruby).
 
-The data format includes all the metadata required to securely implement AES encryption, as described in ["Properly encrypting with AES with CommonCrypto,"](http://robnapier.net/blog/aes-commoncrypto) and [*iOS 6 Programming Pushing the Limits*](http://iosptl.com), Chapter 15. Specifically, it includes:
+The data format includes all the metadata required to securely implement AES
+encryption, as described in ["Properly encrypting with AES with
+CommonCrypto,"](http://robnapier.net/blog/aes-commoncrypto) and [*iOS 6
+Programming Pushing the Limits*](http://iosptl.com), Chapter 15. Specifically,
+it includes:
 
 * AES-256 encryption
 * CBC mode
@@ -26,7 +36,8 @@ NSData *encryptedData = [RNEncryptor encryptData:data
                                              error:&error];
 ```
 
-This generates an `NSData` including a header, encryption salt, HMAC salt, IV, ciphertext, and HMAC. To decrypt this bundle:
+This generates an `NSData` including a header, encryption salt, HMAC salt, IV,
+ciphertext, and HMAC. To decrypt this bundle:
 
 ``` objc
 NSData *decryptedData = [RNDecryptor decryptData:encryptedData
@@ -34,22 +45,27 @@ NSData *decryptedData = [RNDecryptor decryptData:encryptedData
                                            error:&error];
 ```
 
-Note that `RNDecryptor` does not require settings. These are read from the header.
+Note that `RNDecryptor` does not require settings. These are read from the
+header.
 
 ## Asynchronous use
 
-`RNCryptor` suports asynchronous use, specifically designed to work with `NSURLConnection`. This is also useful for cases where the encrypted or decrypted data will not comfortably fit in memory. If the data will comfortably fit in memory, asynchronous operation is best acheived using `dispatch_async()`.
+`RNCryptor suports asynchronous use, specifically designed to work with
+`NSURLConnection. This is also useful for cases where the encrypted or decrypted
+`data will not comfortably fit in memory. If the data will comfortably fit in
+`memory, asynchronous operation is best acheived using dispatch_async().
 
-To operate in asynchronous mode, you create an `RNEncryptor` or `RNDecryptor`, providing it a handler. This handler will be called as data is encrypted or decrypted. As data becomes available, call `addData:`. When you reach the end of the data call `finish`.
+To operate in asynchronous mode, you create an `RNEncryptor` or `RNDecryptor`,
+providing it a handler. This handler will be called as data is encrypted or
+decrypted. As data becomes available, call `addData:`. When you reach the end of
+the data call `finish`.
 
 ``` objc
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
-{
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
   [self.encryptedData addData:[self.cryptor addData:data]];
 }
 
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection
-{
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
   [self.cryptor finish];
 }
 
@@ -67,8 +83,7 @@ To operate in asynchronous mode, you create an `RNEncryptor` or `RNDecryptor`, p
   self.connection = nil;
 }
 
-- (void)decryptRequest:(NSURLRequest *)request
-{
+- (void)decryptRequest:(NSURLRequest *)request {
   self.encryptedData = [NSMutableData data];
   self.connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
   self.cryptor = [[RNDecryptor alloc] initWithPassword:self.password
@@ -83,7 +98,23 @@ To operate in asynchronous mode, you create an `RNEncryptor` or `RNDecryptor`, p
 
 ## Async and Streams
 
-When performing async operations on streams, the data can come very quickly (particularly if you're reading from a local file). If you use RNCryptor in a naïve way, you'll queue a work blocks faster than the engine can process them and your memory usage will spike. This is particularly true if there's only one core, such as on an iPad 1. The solution is to only dispatch new work blocks as the previous work blocks complete. When performing async operations on streams, the data can come very quickly (particularly if you're reading from a local file). If you use RNCryptor in a naïve way, you'll queue a work blocks faster than the engine can process them and your memory usage will spike. This is particularly true if there's only one core, such as on an iPad 1. The solution is to only dispatch new work blocks as the previous work blocks complete. When performing async operations on streams, the data can come very quickly (particularly if you're reading from a local file). If you use RNCryptor in a naïve way, you'll queue a work blocks faster than the engine can process them and your memory usage will spike. This is particularly true if there's only one core, such as on an iPad 1. The solution is to only dispatch new work blocks as the previous work blocks complete.
+When performing async operations on streams, the data can come very quickly
+(particularly if you're reading from a local file). If you use RNCryptor in a
+naïve way, you'll queue a work blocks faster than the engine can process them
+and your memory usage will spike. This is particularly true if there's only one
+core, such as on an iPad 1. The solution is to only dispatch new work blocks as
+the previous work blocks complete. When performing async operations on streams,
+the data can come very quickly (particularly if you're reading from a local
+file). If you use RNCryptor in a naïve way, you'll queue a work blocks faster
+than the engine can process them and your memory usage will spike. This is
+particularly true if there's only one core, such as on an iPad 1. The solution
+is to only dispatch new work blocks as the previous work blocks complete. When
+performing async operations on streams, the data can come very quickly
+(particularly if you're reading from a local file). If you use RNCryptor in a
+naïve way, you'll queue a work blocks faster than the engine can process them
+and your memory usage will spike. This is particularly true if there's only one
+core, such as on an iPad 1. The solution is to only dispatch new work blocks as
+the previous work blocks complete.
 
 ``` objc
 // Make sure that this number is larger than the header + 1 block.
@@ -135,11 +166,14 @@ decryptor = [[RNEncryptor alloc] initWithSettings:kRNCryptorAES256Settings
 readStreamBlock();
 ```
 
-I'll eventually get this into the API to simplify things. See [Cyrille's SO question](http://stackoverflow.com/a/14586231/97337) for more discussion. Pull requests welcome.
+I'll eventually get this into the API to simplify things. See [Cyrille's SO
+question](http://stackoverflow.com/a/14586231/97337) for more discussion. Pull
+requests welcome.
 
 ## Building
 
-Comes packaged as a static library, but the source files can be dropped into any project. The OpenSSL files are not required.
+Comes packaged as a static library, but the source files can be dropped into any
+project. The OpenSSL files are not required.
 
 Requires `Security.framework`.
 
@@ -163,25 +197,53 @@ This also requires that it fail correctly and provide good errors.
 
 ### Best practice security
 
-Wherever possible within the above constraints, the best available algorithms are applied. This means AES-256, HMAC+SHA1, and PBKDF2:
+Wherever possible within the above constraints, the best available algorithms
+are applied. This means AES-256, HMAC+SHA1, and PBKDF2:
 
-* AES-256. While Bruce Schneier has made some interesting recommendations regarding moving to AES-128 due to certain attacks on AES-256, my current thinking is in line with [Colin Percival](http://www.daemonology.net/blog/2009-07-31-thoughts-on-AES.html). PBKDF2 output is effectively random, which should negate related-keys attacks against the kinds of use cases we're interested in.
-* AES-CBC mode. This was a somewhat complex decision, but the ubiquity of CBC outweighs other considerations here. There are no major problems with CBC mode, and nonce-based modes like CTR have other trade-offs. See ["Mode changes for RNCryptor"](http://robnapier.net/blog/mode-rncryptor) for more details on this decision.
-* Encrypt-then-MAC. If there were a good authenticated AES mode on iOS (GCM for instance), I would probably use that for its simplicity. Colin Percival makes [good arguments for hand-coding an encrypt-than-MAC](http://www.daemonology.net/blog/2009-06-24-encrypt-then-mac.html) rather than using an authenticated AES mode, but in RNCryptor mananging the HMAC actually adds quite a bit of complexity. I'd rather the complexity at a more broadly peer-reviewed layer like CommonCryptor than at the RNCryptor layer. But this isn't an option, so I fall back to my own Encrypt-than-MAC.
+* AES-256. While Bruce Schneier has made some interesting recommendations
+regarding moving to AES-128 due to certain attacks on AES-256, my current
+thinking is in line with [Colin
+Percival](http://www.daemonology.net/blog/2009-07-31-thoughts-on-AES.html).
+PBKDF2 output is effectively random, which should negate related-keys attacks
+against the kinds of use cases we're interested in.
+
+* AES-CBC mode. This was a somewhat complex decision, but the ubiquity of CBC
+outweighs other considerations here. There are no major problems with CBC mode,
+and nonce-based modes like CTR have other trade-offs. See ["Mode changes for
+RNCryptor"](http://robnapier.net/blog/mode-rncryptor) for more details on this
+decision.
+
+* Encrypt-then-MAC. If there were a good authenticated AES mode on iOS (GCM for
+instance), I would probably use that for its simplicity. Colin Percival makes
+[good arguments for hand-coding an encrypt-than-
+MAC](http://www.daemonology.net/blog/2009-06-24-encrypt-then-mac.html) rather
+than using an authenticated AES mode, but in RNCryptor mananging the HMAC
+actually adds quite a bit of complexity. I'd rather the complexity at a more
+broadly peer-reviewed layer like CommonCryptor than at the RNCryptor layer. But
+this isn't an option, so I fall back to my own Encrypt-than-MAC.
+
 * HMAC+SHA256. No surprises here.
-* PBKDF2. While bcrypt and scrypt may be more secure than PBKDF2, CommonCryptor only supports PBKDF2. [NIST also continues to recommend PBKDF2](http://security.stackexchange.com/questions/4781/do-any-security-experts-recommend-bcrypt-for-password-storage). We use 10k rounds of PBKDF2 which represents about 80ms on an iPhone 4.
+
+* PBKDF2. While bcrypt and scrypt may be more secure than PBKDF2, CommonCryptor
+only supports PBKDF2. [NIST also continues to recommend
+PBKDF2](http://security.stackexchange.com/questions/4781/do-any-security-
+experts-recommend-bcrypt-for-password-storage). We use 10k rounds of PBKDF2
+which represents about 80ms on an iPhone 4.
 
 ### Code simplicity
 
-`RNCryptor` endeavors to be implemented as simply as possible, avoiding tricky code. It is designed to be easy to read and code review.
+`RNCryptor endeavors to be implemented as simply as possible, avoiding tricky
+`code. It is designed to be easy to read and code review.
 
 ### Performance
 
-Performance is a goal, but not the most important goal. The code must be secure and easy to use. Within that, it is as fast and memory-efficient as possible.
+Performance is a goal, but not the most important goal. The code must be secure
+and easy to use. Within that, it is as fast and memory-efficient as possible.
 
 ### Portability
 
-Without sacrificing other goals, it is preferable to read the output format of `RNCryptor` on other platforms.
+Without sacrificing other goals, it is preferable to read the output format of
+`RNCryptor` on other platforms.
 
 ## Version History
 
@@ -192,7 +254,9 @@ Without sacrificing other goals, it is preferable to read the output format of `
 
 
 ## LICENSE
-Except where otherwise indicated in the source code, this code is licensed under the MIT License:
+
+Except where otherwise indicated in the source code, this code is licensed under
+the MIT License:
 
 ```
 Permission is hereby granted, free of charge, to any person obtaining a 
@@ -214,7 +278,8 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 ```
 
-Portions of this code, indicated in the source, are licensed under the following license:
+Portions of this code, indicated in the source, are licensed under the following
+license:
 
 ```
 /*-
@@ -234,7 +299,8 @@ Portions of this code, indicated in the source, are licensed under the following
  */
 ```
 
-Portions of ths code, indicated in the source, are licensed under the APSL license:
+Portions of ths code, indicated in the source, are licensed under the APSL
+license:
 
 ```
 /*
