@@ -3,8 +3,8 @@ RNCryptor PHP
 
 This implementation is fully compatible with Rob Napier's iOS implementation of
 RNCryptor.  It supports both encryption and decryption of all RNCryptor schema
-versions through version 2.  Due to security concerns with schemas 0 and 1, 
-it is strongly recommended to use schema 2 wherever possible.  This is the
-default if none is specified.
+versions through version 2, with experimental support for version 3.  Due to 
+security concerns with schemas 0 and 1, it is strongly recommended to use 
+schema 2 wherever possible.  This is the default if none is specified.
 
 Basic usage is seen in the examples folder.

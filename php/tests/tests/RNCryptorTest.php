@@ -75,19 +75,72 @@ class RNCryptorTest extends PHPUnit_Framework_TestCase {
   		$this->assertEquals($text, $decrypted);
   	}
 
-  	public function testCannotUseWithUnsupportedSchemaVersions() {
-  		$encrypted = $this->_generateFakeSchema3EncryptedString();
+  	public function testVersion1TruncatesMultibytePasswords() {
+  		$password1 = '中文密码';
+  		$encryptor = new RNEncryptor();
+  		$encrypted = $encryptor->encrypt(self::SAMPLE_PLAINTEXT, $password1, 1);
+
+  		// Yikes, it's truncated! So with an all-multibyte password
+  		// like above, we can replace the last half of the string
+  		// with whatver we want, and decryption will still work.
+  		$password2 = '中文中文';
   		$decryptor = new RNDecryptor();
-  		$this->setExpectedException('Exception', 'Unsupported schema version 3');
+  		$decrypted = $decryptor->decrypt($encrypted, $password2);
+  		$this->assertEquals(self::SAMPLE_PLAINTEXT, $decrypted);
+  	
+  		$decryptor = new RNDecryptor();
+  		$decrypted = $decryptor->decrypt($encrypted, $password1);
+  		$this->assertEquals(self::SAMPLE_PLAINTEXT, $decrypted);
+  	}
+
+  	public function testVersion2TruncatesMultibytePasswords() {
+  		$password1 = '中文密码';
+  		$encryptor = new RNEncryptor();
+  		$encrypted = $encryptor->encrypt(self::SAMPLE_PLAINTEXT, $password1, 2);
+
+  		// Yikes, it's truncated! So with an all-multibyte password
+  		// like above, we can replace the last half of the string
+  		// with whatver we want, and decryption will still work.
+  		$password2 = '中文中文';
+  		$decryptor = new RNDecryptor();
+  		$decrypted = $decryptor->decrypt($encrypted, $password2);
+  		$this->assertEquals(self::SAMPLE_PLAINTEXT, $decrypted);
+
+  		$decryptor = new RNDecryptor();
+  		$decrypted = $decryptor->decrypt($encrypted, $password1);
+  		$this->assertEquals(self::SAMPLE_PLAINTEXT, $decrypted);
+  	}
+
+  	public function testVersion3AcceptsMultibytePasswords() {
+  		$password1 = '中文密码';
+  		$encryptor = new RNEncryptor();
+  		$encrypted = $encryptor->encrypt(self::SAMPLE_PLAINTEXT, $password1, 3);
+
+  		$password2 = '中文中文';
+  		$decryptor = new RNDecryptor();
+  		$decrypted = $decryptor->decrypt($encrypted, $password2);
+  		$this->assertFalse($decrypted);
+
+  		$decryptor = new RNDecryptor();
+  		$decrypted = $decryptor->decrypt($encrypted, $password1);
+  		$this->assertEquals(self::SAMPLE_PLAINTEXT, $decrypted);
+  	}
+
+  	public function testCannotUseWithUnsupportedSchemaVersions() {
+  		$fakeSchemaNumber = 57;
+  		$encrypted = $this->_generateEncryptedStringWithUnsupportedSchemaNumber($fakeSchemaNumber);
+  		$decryptor = new RNDecryptor();
+  		$this->setExpectedException('Exception');
   		$decryptor->decrypt($encrypted, self::SAMPLE_PASSWORD);
   	}
-  	
-  	private function _generateFakeSchema3EncryptedString() {
+
+  	private function _generateEncryptedStringWithUnsupportedSchemaNumber($fakeSchemaNumber) {
   		$encryptor = new RNEncryptor();
-  		$encrypted = $encryptor->encrypt('It doesn\'t matter', self::SAMPLE_PASSWORD);
-  		
+  		$plaintext = 'The price of ice is nice for mice';
+  		$encrypted = $encryptor->encrypt($plaintext, self::SAMPLE_PASSWORD);
+
   		$encryptedBinary = base64_decode($encrypted);
-  		$encryptedBinary = chr(3) . substr($encryptedBinary, 1, strlen($encryptedBinary - 1));
+  		$encryptedBinary = chr($fakeSchemaNumber) . substr($encryptedBinary, 1, strlen($encryptedBinary - 1));
   		return base64_encode($encryptedBinary);
   	}
 }
