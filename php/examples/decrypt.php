@@ -8,7 +8,5 @@ $base64Encrypted = "AgGXutvFqW9RqQuokYLjehbfM7F+8OO/2sD8g3auA+oNCQFoarRmc59qcKJv
 $cryptor = new RNDecryptor();
 $plaintext = $cryptor->decrypt($base64Encrypted, $password);
 
-echo "Base64 Encrypted: $base64Encrypted\n";
-echo "\n";
-echo "Plaintext: $plaintext\n";
-echo "\n";
+echo "Base64 Encrypted:\n$base64Encrypted\n\n";
+echo "Plaintext:\n$plaintext\n\n";

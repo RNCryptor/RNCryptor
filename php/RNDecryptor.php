@@ -4,8 +4,8 @@ require_once __DIR__ . '/RNCryptor.php';
 /**
  * RNDecryptor for PHP
  * 
- * Decrypt data interchangeably with the iOS implementation
- * of RNCryptor.
+ * Decrypt data interchangeably with Rob Napier's Objective-C implementation
+ * of RNCryptor
  */
 class RNDecryptor extends RNCryptor {
 
@@ -25,7 +25,7 @@ class RNDecryptor extends RNCryptor {
 			return false;
 		}
 
-		$key = $this->_generateKey($components->headers->salt, $password);
+		$key = $this->_generateKey($components->headers->encSalt, $password);
 
 		switch ($this->_settings->mode) {
 			case 'ctr':
@@ -68,19 +68,19 @@ class RNDecryptor extends RNCryptor {
 		$optionsChr = $binData[1];
 		$offset += strlen($optionsChr);
 
-		$salt = substr($binData, $offset, $this->_settings->saltLength);
-		$offset += strlen($salt);
-		
+		$encSalt = substr($binData, $offset, $this->_settings->saltLength);
+		$offset += strlen($encSalt);
+
 		$hmacSalt = substr($binData, $offset, $this->_settings->saltLength);
 		$offset += strlen($hmacSalt);
-		
+
 		$iv = substr($binData, $offset, $this->_settings->ivLength);
 		$offset += strlen($iv);
 
 		$headers = (object)array(
 			'version' => $versionChr,
 			'options' => $optionsChr,
-			'salt' => $salt,
+			'encSalt' => $encSalt,
 			'hmacSalt' => $hmacSalt,
 			'iv' => $iv,
 			'length' => $offset
@@ -95,7 +95,8 @@ class RNDecryptor extends RNCryptor {
 	}
 
 	private function _hmacIsValid($components, $password) {
-		return ($components->hmac == $this->_generateHmac($components, $password));
+		$hmacKey = $this->_generateKey($components->headers->hmacSalt, $password);
+		return ($components->hmac == $this->_generateHmac($components, $hmacKey));
 	}
 
 }

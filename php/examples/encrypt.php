@@ -8,7 +8,5 @@ $plaintext = "Here is my test vector. It's not too long, but more than a block a
 $cryptor = new RNEncryptor();
 $base64Encrypted = $cryptor->encrypt($plaintext, $password);
 
-echo "Plaintext: $plaintext\n";
-echo "\n";
-echo "Base64 Encrypted: $base64Encrypted\n";
-echo "\n";
+echo "Plaintext:\n$plaintext\n\n";
+echo "Base64 Encrypted:\n$base64Encrypted\n\n";

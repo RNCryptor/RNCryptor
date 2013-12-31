@@ -75,6 +75,57 @@ class RNCryptorTest extends PHPUnit_Framework_TestCase {
   		$this->assertEquals($text, $decrypted);
   	}
 
+  	public function testVersion1TruncatesMultibytePasswords() {
+  		$password1 = '中文密码';
+  		$encryptor = new RNEncryptor();
+  		$encrypted = $encryptor->encrypt(self::SAMPLE_PLAINTEXT, $password1, 1);
+
+  		// Yikes, it's truncated! So with an all-multibyte password
+  		// like above, we can replace the last half of the string
+  		// with whatver we want, and decryption will still work.
+  		$password2 = '中文中文';
+  		$decryptor = new RNDecryptor();
+  		$decrypted = $decryptor->decrypt($encrypted, $password2);
+  		$this->assertEquals(self::SAMPLE_PLAINTEXT, $decrypted);
+  	
+  		$decryptor = new RNDecryptor();
+  		$decrypted = $decryptor->decrypt($encrypted, $password1);
+  		$this->assertEquals(self::SAMPLE_PLAINTEXT, $decrypted);
+  	}
+
+  	public function testVersion2TruncatesMultibytePasswords() {
+  		$password1 = '中文密码';
+  		$encryptor = new RNEncryptor();
+  		$encrypted = $encryptor->encrypt(self::SAMPLE_PLAINTEXT, $password1, 2);
+
+  		// Yikes, it's truncated! So with an all-multibyte password
+  		// like above, we can replace the last half of the string
+  		// with whatver we want, and decryption will still work.
+  		$password2 = '中文中文';
+  		$decryptor = new RNDecryptor();
+  		$decrypted = $decryptor->decrypt($encrypted, $password2);
+  		$this->assertEquals(self::SAMPLE_PLAINTEXT, $decrypted);
+
+  		$decryptor = new RNDecryptor();
+  		$decrypted = $decryptor->decrypt($encrypted, $password1);
+  		$this->assertEquals(self::SAMPLE_PLAINTEXT, $decrypted);
+  	}
+
+  	public function testVersion3AcceptsMultibytePasswords() {
+  		$password1 = '中文密码';
+  		$encryptor = new RNEncryptor();
+  		$encrypted = $encryptor->encrypt(self::SAMPLE_PLAINTEXT, $password1, 3);
+
+  		$password2 = '中文中文';
+  		$decryptor = new RNDecryptor();
+  		$decrypted = $decryptor->decrypt($encrypted, $password2);
+  		$this->assertFalse($decrypted);
+
+  		$decryptor = new RNDecryptor();
+  		$decrypted = $decryptor->decrypt($encrypted, $password1);
+  		$this->assertEquals(self::SAMPLE_PLAINTEXT, $decrypted);
+  	}
+
   	public function testCannotUseWithUnsupportedSchemaVersions() {
   		$fakeSchemaNumber = 57;
   		$encrypted = $this->_generateEncryptedStringWithUnsupportedSchemaNumber($fakeSchemaNumber);

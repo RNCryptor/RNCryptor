@@ -3,9 +3,15 @@ require_once __DIR__ . '/functions.php';
 
 class RNCryptor {
 
-	const DEFAULT_SCHEMA_VERSION = 2;
+	const DEFAULT_SCHEMA_VERSION = 3;
 
 	protected $_settings;
+
+	public function __construct() {
+		if (!extension_loaded('mcrypt')) {
+			throw new Exception('The mcrypt extension is missing.');
+		}
+	}
 
 	protected function _configureSettings($version) {
 
@@ -30,6 +36,7 @@ class RNCryptor {
 				$settings->hmac->includesHeader = false;
 				$settings->hmac->algorithm = 'sha1';
 				$settings->hmac->includesPadding = true;
+				$settings->truncatesMultibytePasswords = true;
 				break;
 
 			case 1:
@@ -38,6 +45,7 @@ class RNCryptor {
 				$settings->hmac->includesHeader = false;
 				$settings->hmac->algorithm = 'sha256';
 				$settings->hmac->includesPadding = false;
+				$settings->truncatesMultibytePasswords = true;
 				break;
 
 			case 2:
@@ -46,6 +54,7 @@ class RNCryptor {
 				$settings->hmac->includesHeader = true;
 				$settings->hmac->algorithm = 'sha256';
 				$settings->hmac->includesPadding = false;
+				$settings->truncatesMultibytePasswords = true;
 				break;
 
 			case 3:
@@ -54,6 +63,7 @@ class RNCryptor {
 				$settings->hmac->includesHeader = true;
 				$settings->hmac->algorithm = 'sha256';
 				$settings->hmac->includesPadding = false;
+				$settings->truncatesMultibytePasswords = false;
 				break;
 
 			default:
@@ -82,36 +92,14 @@ class RNCryptor {
 		return $payload ^ mcrypt_encrypt($this->_settings->algorithm, $key, $counter, 'ecb');
 	}
 
-	protected function _generateHmac(stdClass $components, $password) {
-
-		$hmacMessage = '';
-		if ($this->_settings->hmac->includesHeader) {
-			$hmacMessage .= $components->headers->version
-							. $components->headers->options
-							. $components->headers->salt
-							. $components->headers->hmacSalt
-							. $components->headers->iv;
-		}
-
-		$hmacMessage .= $components->ciphertext;
-
-		$hmacKey = $this->_generateKey($components->headers->hmacSalt, $password);
-	
-		$hmac = hash_hmac($this->_settings->hmac->algorithm, $hmacMessage, $hmacKey, true);
-
-		if ($this->_settings->hmac->includesPadding) {
-			$hmac = str_pad($hmac, $this->_settings->hmac->length, chr(0));
-		}
-	
-		return $hmac;
-	}
-
-	protected function _generateHmacWithArbitraryKey(stdClass $components, $hmacKey) {
+	protected function _generateHmac(stdClass $components, $hmacKey) {
 	
 		$hmacMessage = '';
 		if ($this->_settings->hmac->includesHeader) {
 			$hmacMessage .= $components->headers->version
 							. $components->headers->options
+							. (isset($components->headers->encSalt) ? $components->headers->encSalt : '')
+							. (isset($components->headers->hmacSalt) ? $components->headers->hmacSalt : '')
 							. $components->headers->iv;
 		}
 
@@ -136,6 +124,12 @@ class RNCryptor {
 	}
 
 	protected function _generateKey($salt, $password) {
+
+		if ($this->_settings->truncatesMultibytePasswords) {
+			$utf8Length = mb_strlen($password, 'utf-8');
+			$password = substr($password, 0, $utf8Length);
+		}
+
 		return hash_pbkdf2($this->_settings->pbkdf2->prf, $password, $salt, $this->_settings->pbkdf2->iterations, $this->_settings->pbkdf2->keyLength, true);
 	}
 
