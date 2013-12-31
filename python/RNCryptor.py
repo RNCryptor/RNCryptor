@@ -118,7 +118,7 @@ class RNCryptor(object):
         iv = self.iv
         cipher_text = self._aes_encrypt(encryption_key, iv, data)
 
-        version = b'\x02'
+        version = b'\x03'
         options = b'\x01'
 
         new_data = b''.join([version, options, encryption_salt, hmac_salt, iv, cipher_text])
