@@ -9,13 +9,13 @@ abstract class VectorBase extends PHPUnit_Framework_TestCase {
 
 		$cryptor = new RNCryptor();
 		$key = $cryptor->generateKey(
-			$this->_prettyHexToBin($vector['salt']),
+			$this->_prettyHexToBin($vector['salt_hex']),
 			$vector['password'],
 			$vector['version']
 		);
 		
 		$this->assertEquals(
-			$this->_prettyHexToBin($vector['key']),
+			$this->_prettyHexToBin($vector['key_hex']),
 			$key
 		);
 	}
@@ -24,15 +24,15 @@ abstract class VectorBase extends PHPUnit_Framework_TestCase {
 
 		$encryptor = new RNEncryptor();
 		$encryptedB64 = $encryptor->encryptWithArbitraryKeys(
-			$vector['plaintext'],
-			$this->_prettyHexToBin($vector['enc_key']),
-			$this->_prettyHexToBin($vector['hmac_key']),
-			$this->_prettyHexToBin($vector['iv']),
+			$this->_prettyHexToBin($vector['plaintext_hex']),
+			$this->_prettyHexToBin($vector['enc_key_hex']),
+			$this->_prettyHexToBin($vector['hmac_key_hex']),
+			$this->_prettyHexToBin($vector['iv_hex']),
 			$vector['version']
 		);
 
 		$this->assertEquals(
-			$vector['ciphertext'],
+			$vector['ciphertext_hex'],
 			$this->_binToPrettyHex(base64_decode($encryptedB64))
 		);
 	}
@@ -41,23 +41,23 @@ abstract class VectorBase extends PHPUnit_Framework_TestCase {
 
 		$encryptor = new RNEncryptor();
 		$encryptedB64 = $encryptor->encryptWithArbitrarySalts(
-			$vector['plaintext'], 
-			$vector['password'], 
-			$this->_prettyHexToBin($vector['enc_salt']), 
-			$this->_prettyHexToBin($vector['hmac_salt']), 
-			$this->_prettyHexToBin($vector['iv']), 
+			$this->_prettyHexToBin($vector['plaintext_hex']),
+			$vector['password'],
+			$this->_prettyHexToBin($vector['enc_salt_hex']),
+			$this->_prettyHexToBin($vector['hmac_salt_hex']),
+			$this->_prettyHexToBin($vector['iv_hex']),
 			$vector['version']
 		);
 
 		$decryptor = new RNDecryptor();
 		$decrypted = $decryptor->decrypt($encryptedB64, $vector['password']);
 		$this->assertEquals(
-			$vector['plaintext'],
+			$this->_prettyHexToBin($vector['plaintext_hex']),
 			$decrypted
 		);
 
 		$this->assertEquals(
-			$vector['ciphertext'], 
+			$vector['ciphertext_hex'],
 			$this->_binToPrettyHex(base64_decode($encryptedB64))
 		);
 	}

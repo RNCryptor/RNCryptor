@@ -16,25 +16,25 @@ class KeyVectors extends VectorBase {
 	}
 	
 	public function testAllFieldsEmptyOrZero() {
-		$vector = json_decode('{"title":"All fields empty or zero","version":"3","enc_key":"00000000000000000000000000000000","hmac_key":"00000000000000000000000000000000","iv":"00000000000000000000000000000000","plaintext":"","ciphertext":"03000000 00000000 00000000 00000000 00000143 db63ee66 b0cdff9f 69917680 151e0e67 e6f5aea8 30ced4af ef779fe7 e5b3767e b06ea81a 0bb8a7a0 bf62c6b0 0405"}', true);
+		$vector = json_decode('{"title":"All fields empty or zero","version":"3","enc_key_hex":"00000000000000000000000000000000","hmac_key_hex":"00000000000000000000000000000000","iv_hex":"00000000000000000000000000000000","plaintext_hex":"","ciphertext_hex":"03000000 00000000 00000000 00000000 00000143 db63ee66 b0cdff9f 69917680 151e0e67 e6f5aea8 30ced4af ef779fe7 e5b3767e b06ea81a 0bb8a7a0 bf62c6b0 0405"}', true);
 		$this->_runKeyTest($vector);
 
 	}
 
 	public function testOneByte() {
-		$vector = json_decode('{"title":"One byte","version":"3","enc_key":"000102030405060708090a0b0c0d0e0f","hmac_key":"0102030405060708090a0b0c0d0e0f00","iv":"02030405060708090a0b0c0d0e0f0001","plaintext":"01","ciphertext":"03000203 04050607 08090a0b 0c0d0e0f 000198dc 7e36e7cc cb0cb7e8 2b048c46 0825ecd5 4ad9b093 3b236b74 8a1ce455 ee1ec4e9 3043f60b e2ed50dc cfb3c4b2 383c"}', true);
+		$vector = json_decode('{"title":"One byte","version":"3","enc_key_hex":"000102030405060708090a0b0c0d0e0f","hmac_key_hex":"0102030405060708090a0b0c0d0e0f00","iv_hex":"02030405060708090a0b0c0d0e0f0001","plaintext_hex":"01","ciphertext_hex":"03000203 04050607 08090a0b 0c0d0e0f 000198dc 7e36e7cc cb0cb7e8 2b048c46 0825ecd5 4ad9b093 3b236b74 8a1ce455 ee1ec4e9 3043f60b e2ed50dc cfb3c4b2 383c"}', true);
 		$this->_runKeyTest($vector);
 
 	}
 
 	public function testExactlyOneBlock() {
-		$vector = json_decode('{"title":"Exactly one block","version":"3","enc_key":"0102030405060708090a0b0c0d0e0f00","hmac_key":"02030405060708090a0b0c0d0e0f0001","iv":"030405060708090a0b0c0d0e0f000102","plaintext":"000102030405060708090a0b0c0d0e0f","ciphertext":"03000304 05060708 090a0b0c 0d0e0f00 01029228 f6538960 defc04a2 be30eee6 665ea738 f6c2f3fa 2b73c2ed bbe3a0d5 7f59d197 45313f9e a7ede5bb 6b1bd56f 2ff331dd d22f25dc 99bc11f3 d7ebbf49 14bc"}', true);
+		$vector = json_decode('{"title":"Exactly one block","version":"3","enc_key_hex":"0102030405060708090a0b0c0d0e0f00","hmac_key_hex":"02030405060708090a0b0c0d0e0f0001","iv_hex":"030405060708090a0b0c0d0e0f000102","plaintext_hex":"000102030405060708090a0b0c0d0e0f","ciphertext_hex":"03000304 05060708 090a0b0c 0d0e0f00 01029228 f6538960 defc04a2 be30eee6 665ea738 f6c2f3fa 2b73c2ed bbe3a0d5 7f59d197 45313f9e a7ede5bb 6b1bd56f 2ff331dd d22f25dc 99bc11f3 d7ebbf49 14bc"}', true);
 		$this->_runKeyTest($vector);
 
 	}
 
 	public function testMoreThanOneBlock() {
-		$vector = json_decode('{"title":"More than one block","version":"3","enc_key":"02030405060708090a0b0c0d0e0f0001","hmac_key":"030405060708090a0b0c0d0e0f000102","iv":"0405060708090a0b0c0d0e0f00010203","plaintext":"000102030405060708090a0b0c0d0e0f 000102030405060708","ciphertext":"03000405 06070809 0a0b0c0d 0e0f0001 0203a7c3 b4598b47 45fb62fb 266a54ee c7dcddc9 73d5ecb8 93586198 5407d656 2314d01f d9cddf52 859611d6 e917b6e2 40f82aa5 a508ddd8 8960df8b ceea3aeb e9de"}', true);
+		$vector = json_decode('{"title":"More than one block","version":"3","enc_key_hex":"02030405060708090a0b0c0d0e0f0001","hmac_key_hex":"030405060708090a0b0c0d0e0f000102","iv_hex":"0405060708090a0b0c0d0e0f00010203","plaintext_hex":"000102030405060708090a0b0c0d0e0f 000102030405060708","ciphertext_hex":"03000405 06070809 0a0b0c0d 0e0f0001 0203a7c3 b4598b47 45fb62fb 266a54ee c7dcddc9 73d5ecb8 93586198 5407d656 2314d01f d9cddf52 859611d6 e917b6e2 40f82aa5 a508ddd8 8960df8b ceea3aeb e9de"}', true);
 		$this->_runKeyTest($vector);
 
 	}

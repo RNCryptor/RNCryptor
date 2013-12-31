@@ -106,11 +106,3 @@ EOF;
 	writeLine($fd, $class);
 	fclose($fd);
 }
-
-
-
-
-
-
-
-
