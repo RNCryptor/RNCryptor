@@ -148,7 +148,7 @@ dispatch_block_t readStreamBlock = ^{
 };
 
 decryptor = [[RNEncryptor alloc] initWithSettings:kRNCryptorAES256Settings
-                                          password:@"blah"
+                                         password:@"blah"
                                           handler:^(RNCryptor *cryptor, NSData *data) {
                                             NSLog(@"Decryptor recevied %ld bytes", (unsigned long)data.length);
                                             [decryptedStream write:data.bytes maxLength:data.length];
