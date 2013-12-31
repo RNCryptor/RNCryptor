@@ -137,7 +137,7 @@
 		FB7565241512D9BE007B8090 /* RNOpenSSLDecryptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNOpenSSLDecryptor.m; sourceTree = "<group>"; };
 		FB7565241512D9BE007B8092 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = file.md; path = README.md; sourceTree = "<group>"; };
 		FBE1F73A16A899D800C90463 /* RNCryptorV1.enc */ = {isa = PBXFileReference; lastKnownFileType = file; path = RNCryptorV1.enc; sourceTree = SOURCE_ROOT; };
-		FBF7D58C167E5031004B6F0F /* RNCryptorVectors */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = RNCryptorVectors; sourceTree = BUILT_PRODUCTS_DIR; };
+		FBF7D58C167E5031004B6F0F /* rncryptorvectors */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = rncryptorvectors; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBF7D590167E5032004B6F0F /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		FBF7D593167E5032004B6F0F /* RNCryptorVectors-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RNCryptorVectors-Prefix.pch"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -271,7 +271,7 @@
 				FB7564F01512D3C4007B806B /* libRNCryptor.a */,
 				FB7565001512D3C4007B806B /* RNCryptorTests.xctest */,
 				AB13427A15E0FC2300456914 /* RNCryptor.framework */,
-				FBF7D58C167E5031004B6F0F /* RNCryptorVectors */,
+				FBF7D58C167E5031004B6F0F /* rncryptorvectors */,
 				FB6AC68C16F6704100CA0C0A /* rncrypt */,
 			);
 			name = Products;
@@ -475,7 +475,7 @@
 			);
 			name = rncryptorvectors;
 			productName = RNCryptorVectors;
-			productReference = FBF7D58C167E5031004B6F0F /* RNCryptorVectors */;
+			productReference = FBF7D58C167E5031004B6F0F /* rncryptorvectors */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
