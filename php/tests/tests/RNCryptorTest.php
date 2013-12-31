@@ -76,18 +76,20 @@ class RNCryptorTest extends PHPUnit_Framework_TestCase {
   	}
 
   	public function testCannotUseWithUnsupportedSchemaVersions() {
-  		$encrypted = $this->_generateFakeSchema3EncryptedString();
+  		$fakeSchemaNumber = 57;
+  		$encrypted = $this->_generateEncryptedStringWithUnsupportedSchemaNumber($fakeSchemaNumber);
   		$decryptor = new RNDecryptor();
-  		$this->setExpectedException('Exception', 'Unsupported schema version 3');
+  		$this->setExpectedException('Exception');
   		$decryptor->decrypt($encrypted, self::SAMPLE_PASSWORD);
   	}
-  	
-  	private function _generateFakeSchema3EncryptedString() {
+
+  	private function _generateEncryptedStringWithUnsupportedSchemaNumber($fakeSchemaNumber) {
   		$encryptor = new RNEncryptor();
-  		$encrypted = $encryptor->encrypt('It doesn\'t matter', self::SAMPLE_PASSWORD);
-  		
+  		$plaintext = 'The price of ice is nice for mice';
+  		$encrypted = $encryptor->encrypt($plaintext, self::SAMPLE_PASSWORD);
+
   		$encryptedBinary = base64_decode($encrypted);
-  		$encryptedBinary = chr(3) . substr($encryptedBinary, 1, strlen($encryptedBinary - 1));
+  		$encryptedBinary = chr($fakeSchemaNumber) . substr($encryptedBinary, 1, strlen($encryptedBinary - 1));
   		return base64_encode($encryptedBinary);
   	}
 }

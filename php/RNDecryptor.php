@@ -26,7 +26,7 @@ class RNDecryptor extends RNCryptor {
 		}
 
 		$key = $this->_generateKey($components->headers->salt, $password);
-		
+
 		switch ($this->_settings->mode) {
 			case 'ctr':
 				$plaintext = $this->_aesCtrLittleEndianCrypt($components->ciphertext, $key, $components->headers->iv);
@@ -44,9 +44,10 @@ class RNDecryptor extends RNCryptor {
 	private function _unpackEncryptedBase64Data($encryptedBase64Data) {
 
 		$binaryData = base64_decode($encryptedBase64Data);
-		
+
 		$components = new stdClass();
 		$components->headers = $this->_parseHeaders($binaryData);
+
 		$components->hmac = substr($binaryData, - $this->_settings->hmac->length);
 
 		$headerLength = $components->headers->length;
@@ -58,22 +59,22 @@ class RNDecryptor extends RNCryptor {
 	private function _parseHeaders($binData) {
 
 		$offset = 0;
-		$versionChr = substr($binData, $offset, 1);
+
+		$versionChr = $binData[0];
+		$offset += strlen($versionChr);
 
 		$this->_configureSettings(ord($versionChr));
-		
-		$offset += strlen($versionChr);
-		$optionsChr = substr($binData, $offset, 1);
-		
+
+		$optionsChr = $binData[1];
 		$offset += strlen($optionsChr);
+
 		$salt = substr($binData, $offset, $this->_settings->saltLength);
-		
 		$offset += strlen($salt);
+		
 		$hmacSalt = substr($binData, $offset, $this->_settings->saltLength);
-		
 		$offset += strlen($hmacSalt);
-		$iv = substr($binData, $offset, $this->_settings->ivLength);
 		
+		$iv = substr($binData, $offset, $this->_settings->ivLength);
 		$offset += strlen($iv);
 
 		$headers = (object)array(
@@ -87,9 +88,9 @@ class RNDecryptor extends RNCryptor {
 
 		return $headers;
 	}
-	
+
 	private function _stripPKCS7Padding($plaintext) {
-		$padLength = ord(substr($plaintext, -1));
+		$padLength = ord($plaintext[strlen($plaintext)-1]);
 		return substr($plaintext, 0, strlen($plaintext) - $padLength);
 	}
 

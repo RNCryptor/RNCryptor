@@ -1,5 +1,20 @@
 <?php
 
+if (!function_exists('hex2bin')) {
+
+	/**
+	 * Prior to PHP 5.4.0, there was no hex2bin() function.  This
+	 * takes the place of it in those instances.
+	 */
+	function hex2bin($data) {
+		$bin = '';
+		foreach (str_split($data, 2) as $pair) {
+			$bin .= chr(hexdec($pair));
+		}
+		return $bin;
+	}
+}
+
 if (!function_exists('hash_pbkdf2')) {
 
 	/**
