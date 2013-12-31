@@ -1,14 +1,22 @@
 <?php
 require_once __DIR__ . '/functions.php';
 
-abstract class RNCryptor {
+class RNCryptor {
+
+	const DEFAULT_SCHEMA_VERSION = 3;
 
 	protected $_settings;
 
+	public function __construct() {
+		if (!extension_loaded('mcrypt')) {
+			throw new Exception('The mcrypt extension is missing.');
+		}
+	}
+
 	protected function _configureSettings($version) {
-		
+
 		$settings = new stdClass();
-		
+
 		$settings->algorithm = MCRYPT_RIJNDAEL_128;
 		$settings->saltLength = 8;
 		$settings->ivLength = 16;
@@ -28,6 +36,7 @@ abstract class RNCryptor {
 				$settings->hmac->includesHeader = false;
 				$settings->hmac->algorithm = 'sha1';
 				$settings->hmac->includesPadding = true;
+				$settings->truncatesMultibytePasswords = true;
 				break;
 
 			case 1:
@@ -36,6 +45,7 @@ abstract class RNCryptor {
 				$settings->hmac->includesHeader = false;
 				$settings->hmac->algorithm = 'sha256';
 				$settings->hmac->includesPadding = false;
+				$settings->truncatesMultibytePasswords = true;
 				break;
 
 			case 2:
@@ -44,6 +54,16 @@ abstract class RNCryptor {
 				$settings->hmac->includesHeader = true;
 				$settings->hmac->algorithm = 'sha256';
 				$settings->hmac->includesPadding = false;
+				$settings->truncatesMultibytePasswords = true;
+				break;
+
+			case 3:
+				$settings->mode = 'cbc';
+				$settings->options = 1;
+				$settings->hmac->includesHeader = true;
+				$settings->hmac->algorithm = 'sha256';
+				$settings->hmac->includesPadding = false;
+				$settings->truncatesMultibytePasswords = false;
 				break;
 
 			default:
@@ -66,27 +86,25 @@ abstract class RNCryptor {
 			// Yes, the next line only ever increments the first character
 			// of the counter string, ignoring overflow conditions.  This
 			// matches CommonCrypto's behavior!
-			$iv[0] = chr(ord(substr($iv, 0, 1)) + 1);
+			$iv[0] = chr(ord($iv[0]) + 1);
 		}
 
 		return $payload ^ mcrypt_encrypt($this->_settings->algorithm, $key, $counter, 'ecb');
 	}
 
-	protected function _generateHmac(stdClass $components, $password) {
-
+	protected function _generateHmac(stdClass $components, $hmacKey) {
+	
 		$hmacMessage = '';
 		if ($this->_settings->hmac->includesHeader) {
 			$hmacMessage .= $components->headers->version
 							. $components->headers->options
-							. $components->headers->salt
-							. $components->headers->hmacSalt
+							. (isset($components->headers->encSalt) ? $components->headers->encSalt : '')
+							. (isset($components->headers->hmacSalt) ? $components->headers->hmacSalt : '')
 							. $components->headers->iv;
 		}
 
 		$hmacMessage .= $components->ciphertext;
 
-		$hmacKey = $this->_generateKey($components->headers->hmacSalt, $password);
-	
 		$hmac = hash_hmac($this->_settings->hmac->algorithm, $hmacMessage, $hmacKey, true);
 
 		if ($this->_settings->hmac->includesPadding) {
@@ -96,7 +114,22 @@ abstract class RNCryptor {
 		return $hmac;
 	}
 
+	/**
+	 * Key derivation -- This method is intended for testing.  It merely
+	 * exposes the underlying key-derivation functionality.
+	 */
+	public function generateKey($salt, $password, $version = self::DEFAULT_SCHEMA_VERSION) {
+		$this->_configureSettings($version);
+		return $this->_generateKey($salt, $password);
+	}
+
 	protected function _generateKey($salt, $password) {
+
+		if ($this->_settings->truncatesMultibytePasswords) {
+			$utf8Length = mb_strlen($password, 'utf-8');
+			$password = substr($password, 0, $utf8Length);
+		}
+
 		return hash_pbkdf2($this->_settings->pbkdf2->prf, $password, $salt, $this->_settings->pbkdf2->iterations, $this->_settings->pbkdf2->keyLength, true);
 	}
 
