@@ -129,22 +129,22 @@ void Verify(NSString *type, NSDictionary *vector, NSString *key, NSData *actual)
 void VerifyKeyVector(NSDictionary *vector) {
   NSCParameterAssert(vector[@"title"]);
   NSCParameterAssert(vector[@"version"]);
-  NSCParameterAssert(vector[@"enc_key"]);
-  NSCParameterAssert(vector[@"hmac_key"]);
-  NSCParameterAssert(vector[@"iv"]);
-  NSCParameterAssert(vector[@"plaintext"]);
-  NSCParameterAssert(vector[@"ciphertext"]);
+  NSCParameterAssert(vector[@"enc_key_hex"]);
+  NSCParameterAssert(vector[@"hmac_key_hex"]);
+  NSCParameterAssert(vector[@"iv_hex"]);
+  NSCParameterAssert(vector[@"plaintext_hex"]);
+  NSCParameterAssert(vector[@"ciphertext_hex"]);
 
   NSError *error;
 
   if ([vector[@"version"] intValue] == kRNCryptorFileVersion) {
-    NSData *cipherText = [RNEncryptor encryptData:GetDataForHex(vector[@"plaintext"])
+    NSData *cipherText = [RNEncryptor encryptData:GetDataForHex(vector[@"plaintext_hex"])
                                      withSettings:kRNCryptorAES256Settings
-                                    encryptionKey:GetDataForHex(vector[@"enc_key"])
-                                          HMACKey:GetDataForHex(vector[@"hmac_key"])
-                                               IV:GetDataForHex(vector[@"iv"])
+                                    encryptionKey:GetDataForHex(vector[@"enc_key_hex"])
+                                          HMACKey:GetDataForHex(vector[@"hmac_key_hex"])
+                                               IV:GetDataForHex(vector[@"iv_hex"])
                                             error:&error];
-    if (! cipherText || ! [cipherText isEqual:GetDataForHex(vector[@"ciphertext"])]) {
+    if (! cipherText || ! [cipherText isEqual:GetDataForHex(vector[@"ciphertext_hex"])]) {
       printf("Failed encrypting test (v%d): %s\n", [vector[@"version"] intValue], [vector[@"title"] UTF8String]);
       printf("Error: %s\n", [[error description] UTF8String]);
       printf("Expected: %s\n", [vector[@"ciphertext"] UTF8String]);
@@ -153,15 +153,15 @@ void VerifyKeyVector(NSDictionary *vector) {
     }
   }
 
-  NSData *plaintext = [RNDecryptor decryptData:GetDataForHex(vector[@"ciphertext"])
-                             withEncryptionKey:GetDataForHex(vector[@"enc_key"])
-                                       HMACKey:GetDataForHex(vector[@"hmac_key"])
+  NSData *plaintext = [RNDecryptor decryptData:GetDataForHex(vector[@"ciphertext_hex"])
+                             withEncryptionKey:GetDataForHex(vector[@"enc_key_hex"])
+                                       HMACKey:GetDataForHex(vector[@"hmac_key_hex"])
                                          error:&error];
 
-  if (! plaintext || ! [plaintext isEqual:GetDataForHex(vector[@"plaintext"])]) {
+  if (! plaintext || ! [plaintext isEqual:GetDataForHex(vector[@"plaintext_hex"])]) {
     printf("Failed decrypting test: (v%d) %s \n", [vector[@"version"] intValue], [vector[@"title"] UTF8String]);
     printf("Error: %s\n", [[error description] UTF8String]);
-    printf("Expected: %s\n", [vector[@"plaintext"] UTF8String]);
+    printf("Expected: %s\n", [vector[@"plaintext_hex"] UTF8String]);
     printf("Found: %s\n", [[plaintext description] UTF8String]);
     abort();
   }
@@ -171,26 +171,26 @@ void VerifyPasswordVector(NSDictionary *vector) {
   NSCParameterAssert(vector[@"title"]);
   NSCParameterAssert(vector[@"version"]);
   NSCParameterAssert(vector[@"password"]);
-  NSCParameterAssert(vector[@"iv"]);
-  NSCParameterAssert(vector[@"enc_salt"]);
-  NSCParameterAssert(vector[@"hmac_salt"]);
-  NSCParameterAssert(vector[@"plaintext"]);
-  NSCParameterAssert(vector[@"ciphertext"]);
+  NSCParameterAssert(vector[@"iv_hex"]);
+  NSCParameterAssert(vector[@"enc_salt_hex"]);
+  NSCParameterAssert(vector[@"hmac_salt_hex"]);
+  NSCParameterAssert(vector[@"plaintext_hex"]);
+  NSCParameterAssert(vector[@"ciphertext_hex"]);
 
   NSError *error;
 
   if ([vector[@"version"] intValue] == kRNCryptorFileVersion) {
-    NSData *cipherText = [RNEncryptor encryptData:GetDataForHex(vector[@"plaintext"])
+    NSData *cipherText = [RNEncryptor encryptData:GetDataForHex(vector[@"plaintext_hex"])
                                      withSettings:kRNCryptorAES256Settings
                                          password:vector[@"password"]
-                                               IV:GetDataForHex(vector[@"iv"])
-                                   encryptionSalt:GetDataForHex(vector[@"enc_salt"])
-                                         HMACSalt:GetDataForHex(vector[@"hmac_salt"])
+                                               IV:GetDataForHex(vector[@"iv_hex"])
+                                   encryptionSalt:GetDataForHex(vector[@"enc_salt_hex"])
+                                         HMACSalt:GetDataForHex(vector[@"hmac_salt_hex"])
                                             error:&error];
-    if (! cipherText || ! [cipherText isEqual:GetDataForHex(vector[@"ciphertext"])]) {
+    if (! cipherText || ! [cipherText isEqual:GetDataForHex(vector[@"ciphertext_hex"])]) {
       printf("Failed encrypting test (v%d): %s\n", [vector[@"version"] intValue], [vector[@"title"] UTF8String]);
       printf("Error: %s\n", [[error description] UTF8String]);
-      printf("Expected: %s\n", [vector[@"ciphertext"] UTF8String]);
+      printf("Expected: %s\n", [vector[@"ciphertext_hex"] UTF8String]);
       printf("Found: %s\n", [[cipherText description] UTF8String]);
       abort();
     }
@@ -206,13 +206,13 @@ void VerifyKDFVector(NSDictionary *vector) {
   NSCParameterAssert(vector[@"title"]);
   NSCParameterAssert(vector[@"version"]);
   NSCParameterAssert(vector[@"password"]);
-  NSCParameterAssert(vector[@"salt"]);
-  NSCParameterAssert(vector[@"key"]);
+  NSCParameterAssert(vector[@"salt_hex"]);
+  NSCParameterAssert(vector[@"key_hex"]);
 
   NSData *key = [RNCryptor keyForPassword:vector[@"password"]
-                                     salt:GetDataForHex(vector[@"salt"])
+                                     salt:GetDataForHex(vector[@"salt_hex"])
                                  settings:kRNCryptorAES256Settings.keySettings];
-  Verify(@"kdf", vector, @"key", key);
+  Verify(@"kdf", vector, @"key_hex", key);
 }
 
 typedef void(*TestFunction)(NSDictionary *);
