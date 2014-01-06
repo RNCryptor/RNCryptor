@@ -4,6 +4,7 @@
 # MIT License
 
 require 'openssl'
+require 'securerandom'
 
 class RubyRNCryptor
 	include OpenSSL
@@ -49,9 +50,9 @@ class RubyRNCryptor
 		
 		version =			version.chr.to_s		# Currently version 3
 		options =			1.chr.to_s				# Uses password
-		encryption_salt =	Random.random_bytes(8)
-		hmac_salt =			Random.random_bytes(8)
-		iv =				Random.random_bytes(16)
+		encryption_salt =	SecureRandom.random_bytes(8)
+		hmac_salt =			SecureRandom.random_bytes(8)
+		iv =				SecureRandom.random_bytes(16)
 		cipher_text =		data[34,data.length-66]
 
 		hmac_key = PKCS5.pbkdf2_hmac_sha1(password, hmac_salt, 10000, 32)
