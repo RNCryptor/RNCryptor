@@ -4,6 +4,7 @@
 //
 //  Test vector verifier
 //  vectors/
+//    v3/
 //    key       key-based test vectors
 //    password  password-based test vectors
 //
