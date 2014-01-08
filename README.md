@@ -1,7 +1,7 @@
 # RNCryptor
 
 Cross-language AES Encryptor/Decryptor [data
-format](https://github.com/rnapier/RNCryptor/wiki/Data-Format).
+format](https://github.com/RNCryptor/RNCryptor-Spec/blob/master/RNCryptor-Spec-v3.md).
  
 The primary target is Objective-C, but implementations are available in
 [C](https://github.com/megabri/MGCryptor),
