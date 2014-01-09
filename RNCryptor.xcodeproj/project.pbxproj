@@ -29,6 +29,7 @@
 		FB53C181187EE93900952674 /* key in CopyFiles */ = {isa = PBXBuildFile; fileRef = FB53C17D187EE90400952674 /* key */; };
 		FB53C182187EE93900952674 /* password in CopyFiles */ = {isa = PBXBuildFile; fileRef = FB53C17E187EE90400952674 /* password */; };
 		FB53C183187EE93900952674 /* password-short in CopyFiles */ = {isa = PBXBuildFile; fileRef = FB53C17F187EE90400952674 /* password-short */; };
+		FB53C187187EEDB600952674 /* kdf-short in CopyFiles */ = {isa = PBXBuildFile; fileRef = FB53C186187EEDA900952674 /* kdf-short */; };
 		FB6AC68D16F6704200CA0C0A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7564F31512D3C4007B806B /* Foundation.framework */; };
 		FB6AC69016F6704200CA0C0A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FB6AC68F16F6704200CA0C0A /* main.m */; };
 		FB6AC69D16F672F700CA0C0A /* RNCryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB75651B1512D3E9007B806B /* RNCryptor.m */; };
@@ -91,6 +92,7 @@
 			dstPath = vectors/v3;
 			dstSubfolderSpec = 16;
 			files = (
+				FB53C187187EEDB600952674 /* kdf-short in CopyFiles */,
 				FB53C180187EE93900952674 /* kdf in CopyFiles */,
 				FB53C181187EE93900952674 /* key in CopyFiles */,
 				FB53C182187EE93900952674 /* password in CopyFiles */,
@@ -114,6 +116,7 @@
 		FB53C17D187EE90400952674 /* key */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = key; sourceTree = "<group>"; };
 		FB53C17E187EE90400952674 /* password */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = password; sourceTree = "<group>"; };
 		FB53C17F187EE90400952674 /* password-short */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "password-short"; sourceTree = "<group>"; };
+		FB53C186187EEDA900952674 /* kdf-short */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "kdf-short"; sourceTree = "<group>"; };
 		FB6AC68C16F6704100CA0C0A /* rncrypt */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = rncrypt; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB6AC68F16F6704200CA0C0A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		FB6AC69216F6704200CA0C0A /* rncrypt-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "rncrypt-Prefix.pch"; sourceTree = "<group>"; };
@@ -241,6 +244,7 @@
 			isa = PBXGroup;
 			children = (
 				FB53C17C187EE90400952674 /* kdf */,
+				FB53C186187EEDA900952674 /* kdf-short */,
 				FB53C17D187EE90400952674 /* key */,
 				FB53C17E187EE90400952674 /* password */,
 				FB53C17F187EE90400952674 /* password-short */,
