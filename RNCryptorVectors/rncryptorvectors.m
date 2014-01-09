@@ -203,6 +203,45 @@ void VerifyPasswordVector(NSDictionary *vector) {
   Verify(@"decrypt", vector, @"plaintext", plaintext);
 }
 
+void VerifyShortPasswordVector(NSDictionary *vector) {
+  NSCParameterAssert(vector[@"title"]);
+  NSCParameterAssert(vector[@"version"]);
+  NSCParameterAssert(vector[@"password"]);
+  NSCParameterAssert(vector[@"iterations"]);
+  NSCParameterAssert(vector[@"iv_hex"]);
+  NSCParameterAssert(vector[@"enc_salt_hex"]);
+  NSCParameterAssert(vector[@"hmac_salt_hex"]);
+  NSCParameterAssert(vector[@"plaintext_hex"]);
+  NSCParameterAssert(vector[@"ciphertext_hex"]);
+
+  NSError *error;
+
+  if ([vector[@"version"] intValue] == kRNCryptorFileVersion) {
+    RNCryptorSettings settings = kRNCryptorAES256Settings;
+    settings.keySettings.rounds = [vector[@"iterations"] intValue];
+    settings.keySettings.rounds = [vector[@"iterations"] intValue];
+    NSData *cipherText = [RNEncryptor encryptData:GetDataForHex(vector[@"plaintext_hex"])
+                                     withSettings:settings
+                                         password:vector[@"password"]
+                                               IV:GetDataForHex(vector[@"iv_hex"])
+                                   encryptionSalt:GetDataForHex(vector[@"enc_salt_hex"])
+                                         HMACSalt:GetDataForHex(vector[@"hmac_salt_hex"])
+                                            error:&error];
+    if (! cipherText || ! [cipherText isEqual:GetDataForHex(vector[@"ciphertext_hex"])]) {
+      printf("Failed encrypting test (v%d): %s\n", [vector[@"version"] intValue], [vector[@"title"] UTF8String]);
+      printf("Error: %s\n", [[error description] UTF8String]);
+      printf("Expected: %s\n", [vector[@"ciphertext_hex"] UTF8String]);
+      printf("Found: %s\n", [[cipherText description] UTF8String]);
+      abort();
+    }
+  }
+
+  NSData *plaintext = [RNDecryptor decryptData:GetDataForHex(vector[@"ciphertext"])
+                                  withPassword:vector[@"password"]
+                                         error:&error];
+  Verify(@"decrypt", vector, @"plaintext", plaintext);
+}
+
 void VerifyKDFVector(NSDictionary *vector) {
   NSCParameterAssert(vector[@"title"]);
   NSCParameterAssert(vector[@"version"]);
@@ -237,6 +276,7 @@ int main(int argc, const char * argv[]) {
     NSString *vectorPath = @(argv[1]);
     ApplyTestToFile(&VerifyKeyVector, vectorPath, @"key");
     ApplyTestToFile(&VerifyPasswordVector, vectorPath, @"password");
+    ApplyTestToFile(&VerifyShortPasswordVector, vectorPath, @"password-short");
     ApplyTestToFile(&VerifyKDFVector, vectorPath, @"kdf");
   }
   return 0;
