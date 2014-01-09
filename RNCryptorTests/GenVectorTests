@@ -1,0 +1,65 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+
+class String
+  def unindent 
+    gsub(/^#{scan(/^\s*/).min_by{|l|l.length}}/, "")
+  end
+end
+
+def getUncommentedLinesFromPath(path)
+  File.readlines(path)
+  .select{ |line| line !~ /^#/ }
+  .map { |line| line.sub(/^\s#.*/, "").chomp }
+end
+
+def getBlocksFromLines(lines)
+  lines.chunk { |l| (l =~ /^\s*$/) == nil }
+  .map { |not_blank, a| a if not_blank }
+  .compact
+end
+
+def mapBlocksToVectors(blocks)
+  blocks.map { |block|
+    Hash[*
+      block.map { |l| l.split(/\s*:\s*/, 2) }
+      .flatten
+    ]
+  }
+end
+
+def getVectorsFromPath(path)
+  mapBlocksToVectors getBlocksFromLines getUncommentedLinesFromPath path
+end
+
+options = {}
+
+opt_parser = OptionParser.new do |opt|
+  opt.banner = "Usage: GenVectorTest -o VectorTests.m -3 v3_directory"
+  opt.separator  ""
+  opt.on("-o","--output PATH","path to output code") do |output_path|
+    options[:output_path] = output_path
+  end
+  opt.on("-3", "-3 PATH", "path to v3 directory") do |v3_directory|
+    options[:v3_directory] = v3_directory
+  end
+end
+
+opt_parser.parse!
+
+raise OptionParser::MissingArgument if options[:output_path].nil?
+raise OptionParser::MissingArgument if options[:v3_directory].nil?
+
+File.open(options[:output_path], "w") do |output|
+  output << <<-HEADER.unindent
+    #import <XCTest/XCTest.h>
+    #import "RNEncryptor.h"
+    #import "RNDecryptor.h"
+    @interface RNVectorTests : XCTestCase
+    @end
+    @implementation RNVectorTests
+  HEADER
+
+  puts getVectorsFromPath(options[:v3_directory] + "/kdf")
+end
