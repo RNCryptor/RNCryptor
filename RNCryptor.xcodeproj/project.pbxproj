@@ -152,7 +152,7 @@
 		FB7565241512D9BE007B808E /* RNOpenSSLDecryptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNOpenSSLDecryptor.h; sourceTree = "<group>"; };
 		FB7565241512D9BE007B8090 /* RNOpenSSLDecryptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNOpenSSLDecryptor.m; sourceTree = "<group>"; };
 		FB7565241512D9BE007B8092 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = file.md; path = README.md; sourceTree = "<group>"; };
-		FB799106187F7EE00069BEB4 /* RNCryptorGeneratedVectorTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RNCryptorGeneratedVectorTests.m; path = "../Debug-iphonesimulator/RNCryptorGeneratedVectorTests.m"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FB799106187F7EE00069BEB4 /* RNCryptorGeneratedVectorTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RNCryptorGeneratedVectorTests.m; path = "RNCryptorGeneratedVectorTests.m"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBE1F73A16A899D800C90463 /* RNCryptorV1.enc */ = {isa = PBXFileReference; lastKnownFileType = file; path = RNCryptorV1.enc; sourceTree = SOURCE_ROOT; };
 		FBF7D58C167E5031004B6F0F /* rncryptorvectors */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = rncryptorvectors; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBF7D590167E5032004B6F0F /* rncryptorvectors.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = rncryptorvectors.m; sourceTree = "<group>"; };
