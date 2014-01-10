@@ -2,7 +2,6 @@ language: objective-c
 xcode_project: RNCryptor.xcodeproj
 xcode_scheme: RNCryptor
 
-language: ruby
 rvm:
   - 2.0.0
 
