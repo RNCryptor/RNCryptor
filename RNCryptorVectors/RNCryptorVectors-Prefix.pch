@@ -1,7 +1,0 @@
-//
-// Prefix header for all source files of the 'RNCryptorVectors' target in the 'RNCryptorVectors' project
-//
-
-#ifdef __OBJC__
-  #import <Foundation/Foundation.h>
-#endif
