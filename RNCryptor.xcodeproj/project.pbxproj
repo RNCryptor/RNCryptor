@@ -62,6 +62,7 @@
 		FB7565241512D9BE007B808D /* RNOpenSSLEncryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B808C /* RNOpenSSLEncryptor.h */; };
 		FB7565241512D9BE007B808F /* RNOpenSSLDecryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B808E /* RNOpenSSLDecryptor.h */; };
 		FB7565241512D9BE007B8091 /* RNOpenSSLDecryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8090 /* RNOpenSSLDecryptor.m */; };
+		FB799107187F7EE00069BEB4 /* RNCryptorGeneratedVectorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FB799106187F7EE00069BEB4 /* RNCryptorGeneratedVectorTests.m */; };
 		FBF7D58E167E5031004B6F0F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7564F31512D3C4007B806B /* Foundation.framework */; };
 		FBF7D591167E5032004B6F0F /* rncryptorvectors.m in Sources */ = {isa = PBXBuildFile; fileRef = FBF7D590167E5032004B6F0F /* rncryptorvectors.m */; };
 		FBF7D5A9167E515D004B6F0F /* RNCryptor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB13427A15E0FC2300456914 /* RNCryptor.framework */; };
@@ -151,6 +152,7 @@
 		FB7565241512D9BE007B808E /* RNOpenSSLDecryptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNOpenSSLDecryptor.h; sourceTree = "<group>"; };
 		FB7565241512D9BE007B8090 /* RNOpenSSLDecryptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNOpenSSLDecryptor.m; sourceTree = "<group>"; };
 		FB7565241512D9BE007B8092 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = file.md; path = README.md; sourceTree = "<group>"; };
+		FB799106187F7EE00069BEB4 /* RNCryptorGeneratedVectorTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RNCryptorGeneratedVectorTests.m; path = "../Debug-iphonesimulator/RNCryptorGeneratedVectorTests.m"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBE1F73A16A899D800C90463 /* RNCryptorV1.enc */ = {isa = PBXFileReference; lastKnownFileType = file; path = RNCryptorV1.enc; sourceTree = SOURCE_ROOT; };
 		FBF7D58C167E5031004B6F0F /* rncryptorvectors */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = rncryptorvectors; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBF7D590167E5032004B6F0F /* rncryptorvectors.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = rncryptorvectors.m; sourceTree = "<group>"; };
@@ -352,6 +354,7 @@
 		FB7565091512D3C4007B806B /* RNCryptorTests */ = {
 			isa = PBXGroup;
 			children = (
+				FB799108187F7F900069BEB4 /* Generated Files */,
 				FB7565101512D3C5007B806B /* RNCryptorTests.m */,
 				FB6C9617185A0F1700CC2098 /* RNOpenSSLTests.m */,
 				FB6C9619185A0F7600CC2098 /* RNCryptorTestHelpers.h */,
@@ -371,6 +374,14 @@
 				FB75650C1512D3C4007B806B /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		FB799108187F7F900069BEB4 /* Generated Files */ = {
+			isa = PBXGroup;
+			children = (
+				FB799106187F7EE00069BEB4 /* RNCryptorGeneratedVectorTests.m */,
+			);
+			name = "Generated Files";
 			sourceTree = "<group>";
 		};
 		FBF7D58F167E5031004B6F0F /* RNCryptorVectors */ = {
@@ -575,13 +586,19 @@
 			files = (
 			);
 			inputPaths = (
+				"$(SRCROOT)/Spec/vectors/v3/kdf",
+				"$(SRCROOT)/Spec/vectors/v3/kdf-short",
+				"$(SRCROOT)/Spec/vectors/v3/key",
+				"$(SRCROOT)/Spec/vectors/v3/password",
+				"$(SRCROOT)/Spec/vectors/v3/password-short",
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/RNCryptorGenerateVectorTests.m",
+				"$(BUILT_PRODUCTS_DIR)/RNCryptorGenerateVectorTests.m",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "${SRCROOT}/${TARGETNAME}/GenVectorTests -o ${DERIVED_FILE_DIR}/RNCryptorGeneratedVectorTests.m -3 ${SRCROOT}/Spec/vectors/v3";
+			shellScript = "export LANG=en_US.UTF-8\nexport LANGUAGE=en_US.UTF-8\nexport LC_ALL=en_US.UTF-8\n${SRCROOT}/${TARGETNAME}/GenVectorTests -o ${BUILT_PRODUCTS_DIR}/RNCryptorGeneratedVectorTests.m -3 ${SRCROOT}/Spec/vectors/v3";
+			showEnvVarsInLog = 0;
 		};
 		FB7564FE1512D3C4007B806B /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -643,6 +660,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FB799107187F7EE00069BEB4 /* RNCryptorGeneratedVectorTests.m in Sources */,
 				FB6C9618185A0F1700CC2098 /* RNOpenSSLTests.m in Sources */,
 				FB7565111512D3C5007B806B /* RNCryptorTests.m in Sources */,
 				FB53C196187F6AB300952674 /* RNCryptorVectorTests.m in Sources */,
