@@ -28,8 +28,6 @@
 
 #import "RNEncryptor.h"
 #import "RNDecryptor.h"
-#import "RNOpenSSLEncryptor.h"
-#import "RNOpenSSLDecryptor.h"
 
 NSString *const kGoodPassword = @"Passw0rd!";
 NSString *const kBadPassword = @"NotThePassword";

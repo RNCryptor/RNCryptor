@@ -33,6 +33,10 @@ def getVectorsFromPath(path)
   mapBlocksToVectors getBlocksFromLines getUncommentedLinesFromPath path
 end
 
+def dictionaryForHash(hash)
+  "@{\n" + hash.collect { |key, value| %Q(    @"#{key}": @"#{value}") }.join(",\n") + "}"
+end
+
 options = {}
 
 opt_parser = OptionParser.new do |opt|
@@ -52,14 +56,26 @@ raise OptionParser::MissingArgument if options[:output_path].nil?
 raise OptionParser::MissingArgument if options[:v3_directory].nil?
 
 File.open(options[:output_path], "w") do |output|
-  output << <<-HEADER.unindent
-    #import <XCTest/XCTest.h>
-    #import "RNEncryptor.h"
-    #import "RNDecryptor.h"
-    @interface RNVectorTests : XCTestCase
-    @end
-    @implementation RNVectorTests
-  HEADER
+  output << <<-HEADER
+#import "RNCryptorVectorTests.h"
+@interface RNCryptorGeneratedVectorTests : RNCryptorVectorTests
+@end
+@implementation RNCryptorGeneratedVectorTests
+HEADER
 
-  puts getVectorsFromPath(options[:v3_directory] + "/kdf")
+  getVectorsFromPath(options[:v3_directory] + "/kdf").each do |vector|
+    output << <<-TEST_CASE
+
+- (void)test_#{vector["title"].gsub(' ', '_')} {
+  [self verifyKDFVector:#{dictionaryForHash(vector)}];
+}
+
+TEST_CASE
+
+  end
+
+  output<< <<-FOOTER
+@end
+FOOTER
+
 end
