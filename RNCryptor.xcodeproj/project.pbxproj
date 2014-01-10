@@ -597,7 +597,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export LANG=en_US.UTF-8\nexport LANGUAGE=en_US.UTF-8\nexport LC_ALL=en_US.UTF-8\n\n${SRCROOT}/${TARGETNAME}/GenVectorTests -o ${BUILT_PRODUCTS_DIR}/RNCryptorGeneratedVectorTests.m -3 ${SRCROOT}/Spec/vectors/v3\n";
+			shellScript = "export LANG=en_US.UTF-8\nexport LANGUAGE=en_US.UTF-8\nexport LC_ALL=en_US.UTF-8\n\n[[ -s \"$HOME/.rvm/scripts/rvm\" ]] && . \"$HOME/.rvm/scripts/rvm\"\n\n${SRCROOT}/${TARGETNAME}/GenVectorTests -o ${BUILT_PRODUCTS_DIR}/RNCryptorGeneratedVectorTests.m -3 ${SRCROOT}/Spec/vectors/v3\n";
 			showEnvVarsInLog = 0;
 		};
 		FB7564FE1512D3C4007B806B /* ShellScript */ = {
