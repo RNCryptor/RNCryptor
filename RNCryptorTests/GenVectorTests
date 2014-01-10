@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
 require 'optparse'
-require 'enumerator'
 
 class String
   def unindent 
@@ -10,17 +9,22 @@ class String
 end
 
 def getUncommentedLinesFromPath(path)
-  File.readlines(path).select{ |line| line !~ /^#/ }.map { |line| line.sub(/^\s#.*/, "").chomp }
+  File.readlines(path)
+  .select{ |line| line !~ /^#/ }
+  .map { |line| line.sub(/^\s#.*/, "").chomp }
 end
 
 def getBlocksFromLines(lines)
-  lines.chunk { |l| (l =~ /^\s*$/) == nil }.map { |not_blank, a| a if not_blank }.compact
+  lines.chunk { |l| (l =~ /^\s*$/) == nil }
+  .map { |not_blank, a| a if not_blank }
+  .compact
 end
 
 def mapBlocksToVectors(blocks)
   blocks.map { |block|
     Hash[*
-      block.map { |l| l.split(/\s*:\s*/, 2) }.flatten
+      block.map { |l| l.split(/\s*:\s*/, 2) }
+      .flatten
     ]
   }
 end
