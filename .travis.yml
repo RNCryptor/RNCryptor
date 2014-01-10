@@ -1,7 +1,12 @@
 language: objective-c
 xcode_project: RNCryptor.xcodeproj
-xcode_scheme: RNCryptor
-xcode_sdk: iphonesimulator
+
+matrix:
+  include:
+    - xcode_scheme: RNCryptor
+      xcode_sdk: iphonesimulator7.0
+    - xcode_scheme: "RNCryptor OS X"
+      xcode_sdk: macosx10.9
 
 before_install:
   - git submodule update --init --recursive
