@@ -3,14 +3,14 @@ xcode_project: RNCryptor.xcodeproj
 
 xcode_scheme: RNCryptor
 xcode_sdk: iphonesimulator7.0
-xcode_sdk: iphonesimulator4.0
+xcode_sdk: iphonesimulator5.0
 
 matrix:
   include:
     - xcode_scheme: "RNCryptor OS X"
       xcode_sdk: macosx10.9
     - xcode_scheme: "RNCryptor OS X"
-      xcode_sdk: macosx10.6
+      xcode_sdk: macosx10.8
 
 before_install:
   - git submodule update --init --recursive

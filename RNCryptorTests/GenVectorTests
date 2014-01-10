@@ -1,56 +1,9 @@
 #!/usr/bin/env ruby
 
 require 'optparse'
+require File.join(File.dirname(__FILE__), '../Spec/vectors', 'vectorparser')
 
-class String
-  def unindent 
-    gsub(/^#{scan(/^\s*/).min_by{|l|l.length}}/, "")
-  end
-end
-
-def getUncommentedLinesFromPath(path)
-  File.readlines(path).select{ |line| line !~ /^#/ }.map { |line| line.sub(/^\s#.*/, "").chomp }
-end
-
-def getBlocksFromLines(lines)
-  blocks = []
-  block = []
-  lines.each do |line|
-    if line.length == 0
-      if block.length > 0
-        blocks << block
-        block = []
-      end
-      next
-    end
-
-    block << line
-  end
-
-  if block.length > 0
-    blocks << block
-  end
-
-  return blocks
-
-  # lines.chunk { |l| (l =~ /^\s*$/) == nil }
-  # .map { |not_blank, a| a if not_blank }
-  # .compact
-end
-
-def mapBlocksToVectors(blocks)
-  blocks.map { |block|
-    Hash[*
-      block.map { |l| l.split(/\s*:\s*/, 2) }.flatten
-    ]
-  }
-end
-
-def getVectorsFromPath(path)
-  mapBlocksToVectors getBlocksFromLines getUncommentedLinesFromPath path
-end
-
-def dictionaryForHash(hash)
+def NSDictionaryForHash(hash)
   "@{\n" + hash.collect { |key, value| %Q(    @"#{key}": @"#{value}") }.join(",\n") + "}"
 end
 
@@ -81,11 +34,11 @@ File.open(options[:output_path], "w") do |output|
 @implementation RNCryptorGeneratedVectorTests
 HEADER
 
-  getVectorsFromPath(options[:v3_directory] + "/kdf").each do |vector|
+  VectorParser.new(options[:v3_directory] + "/kdf").vectors.each do |vector|
     output << <<-TEST_CASE
 
 - (void)test_kdf_#{vector["title"].gsub(' ', '_')} {
-  [self verifyKDFVector:#{dictionaryForHash(vector)}];
+  [self verifyKDFVector:#{NSDictionaryForHash(vector)}];
 }
 
 TEST_CASE
