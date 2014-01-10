@@ -2,5 +2,8 @@ language: objective-c
 xcode_project: RNCryptor.xcodeproj
 xcode_scheme: RNCryptor
 
+rvm:
+  - 2.0.0
+
 before_install:
   - git submodule update --init --recursive
