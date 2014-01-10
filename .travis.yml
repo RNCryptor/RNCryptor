@@ -4,3 +4,4 @@ xcode_scheme: RNCryptor
 
 before_install:
   - git submodule update --init --recursive
+  - rvm get stable --auto-dotfiles
