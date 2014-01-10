@@ -25,12 +25,11 @@
 		AB13429515E0FC4600456914 /* RNCryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB75651B1512D3E9007B806B /* RNCryptor.m */; };
 		AB13429715E0FC4E00456914 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB13429615E0FC4E00456914 /* Security.framework */; };
 		AB13429915E0FD1D00456914 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB13429815E0FD1D00456914 /* Foundation.framework */; };
+		FB30216118802ED900BF8F3C /* RNCryptorGeneratedVectorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FB30216018802ED900BF8F3C /* RNCryptorGeneratedVectorTests.m */; };
 		FB53C180187EE93900952674 /* kdf in CopyFiles */ = {isa = PBXBuildFile; fileRef = FB53C17C187EE90400952674 /* kdf */; };
 		FB53C181187EE93900952674 /* key in CopyFiles */ = {isa = PBXBuildFile; fileRef = FB53C17D187EE90400952674 /* key */; };
 		FB53C182187EE93900952674 /* password in CopyFiles */ = {isa = PBXBuildFile; fileRef = FB53C17E187EE90400952674 /* password */; };
-		FB53C183187EE93900952674 /* password-short in CopyFiles */ = {isa = PBXBuildFile; fileRef = FB53C17F187EE90400952674 /* password-short */; };
-		FB53C187187EEDB600952674 /* kdf-short in CopyFiles */ = {isa = PBXBuildFile; fileRef = FB53C186187EEDA900952674 /* kdf-short */; };
-		FB53C196187F6AB300952674 /* RNCryptorVectorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FB53C195187F6AB300952674 /* RNCryptorVectorTests.m */; };
+		FB53C196187F6AB300952674 /* XCTestCase+RNCryptorVectorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FB53C195187F6AB300952674 /* XCTestCase+RNCryptorVectorTests.m */; };
 		FB6AC68D16F6704200CA0C0A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7564F31512D3C4007B806B /* Foundation.framework */; };
 		FB6AC69016F6704200CA0C0A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FB6AC68F16F6704200CA0C0A /* main.m */; };
 		FB6AC69D16F672F700CA0C0A /* RNCryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB75651B1512D3E9007B806B /* RNCryptor.m */; };
@@ -62,7 +61,6 @@
 		FB7565241512D9BE007B808D /* RNOpenSSLEncryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B808C /* RNOpenSSLEncryptor.h */; };
 		FB7565241512D9BE007B808F /* RNOpenSSLDecryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B808E /* RNOpenSSLDecryptor.h */; };
 		FB7565241512D9BE007B8091 /* RNOpenSSLDecryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8090 /* RNOpenSSLDecryptor.m */; };
-		FB799107187F7EE00069BEB4 /* RNCryptorGeneratedVectorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FB799106187F7EE00069BEB4 /* RNCryptorGeneratedVectorTests.m */; };
 		FBF7D58E167E5031004B6F0F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7564F31512D3C4007B806B /* Foundation.framework */; };
 		FBF7D591167E5032004B6F0F /* rncryptorvectors.m in Sources */ = {isa = PBXBuildFile; fileRef = FBF7D590167E5032004B6F0F /* rncryptorvectors.m */; };
 		FBF7D5A9167E515D004B6F0F /* RNCryptor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB13427A15E0FC2300456914 /* RNCryptor.framework */; };
@@ -94,11 +92,9 @@
 			dstPath = vectors/v3;
 			dstSubfolderSpec = 16;
 			files = (
-				FB53C187187EEDB600952674 /* kdf-short in CopyFiles */,
 				FB53C180187EE93900952674 /* kdf in CopyFiles */,
 				FB53C181187EE93900952674 /* key in CopyFiles */,
 				FB53C182187EE93900952674 /* password in CopyFiles */,
-				FB53C183187EE93900952674 /* password-short in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -114,13 +110,14 @@
 		AB13428715E0FC2300456914 /* RNCryptor OS X-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RNCryptor OS X-Prefix.pch"; sourceTree = "<group>"; };
 		AB13429615E0FC4E00456914 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/Security.framework; sourceTree = DEVELOPER_DIR; };
 		AB13429815E0FD1D00456914 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		FB30216018802ED900BF8F3C /* RNCryptorGeneratedVectorTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCryptorGeneratedVectorTests.m; sourceTree = "<group>"; };
+		FB30216218802F5000BF8F3C /* kdf_short */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = kdf_short; sourceTree = "<group>"; };
+		FB30216318802F5000BF8F3C /* password_short */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = password_short; sourceTree = "<group>"; };
 		FB53C17C187EE90400952674 /* kdf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = kdf; sourceTree = "<group>"; };
 		FB53C17D187EE90400952674 /* key */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = key; sourceTree = "<group>"; };
 		FB53C17E187EE90400952674 /* password */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = password; sourceTree = "<group>"; };
-		FB53C17F187EE90400952674 /* password-short */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "password-short"; sourceTree = "<group>"; };
-		FB53C186187EEDA900952674 /* kdf-short */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "kdf-short"; sourceTree = "<group>"; };
-		FB53C195187F6AB300952674 /* RNCryptorVectorTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCryptorVectorTests.m; sourceTree = "<group>"; };
-		FB53C197187F6C6500952674 /* RNCryptorVectorTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNCryptorVectorTests.h; sourceTree = "<group>"; };
+		FB53C195187F6AB300952674 /* XCTestCase+RNCryptorVectorTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "XCTestCase+RNCryptorVectorTests.m"; sourceTree = "<group>"; };
+		FB53C197187F6C6500952674 /* XCTestCase+RNCryptorVectorTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "XCTestCase+RNCryptorVectorTests.h"; sourceTree = "<group>"; };
 		FB6AC68C16F6704100CA0C0A /* rncrypt */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = rncrypt; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB6AC68F16F6704200CA0C0A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		FB6AC69216F6704200CA0C0A /* rncrypt-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "rncrypt-Prefix.pch"; sourceTree = "<group>"; };
@@ -152,7 +149,6 @@
 		FB7565241512D9BE007B808E /* RNOpenSSLDecryptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNOpenSSLDecryptor.h; sourceTree = "<group>"; };
 		FB7565241512D9BE007B8090 /* RNOpenSSLDecryptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNOpenSSLDecryptor.m; sourceTree = "<group>"; };
 		FB7565241512D9BE007B8092 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = file.md; path = README.md; sourceTree = "<group>"; };
-		FB799106187F7EE00069BEB4 /* RNCryptorGeneratedVectorTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RNCryptorGeneratedVectorTests.m; path = "RNCryptorGeneratedVectorTests.m"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBE1F73A16A899D800C90463 /* RNCryptorV1.enc */ = {isa = PBXFileReference; lastKnownFileType = file; path = RNCryptorV1.enc; sourceTree = SOURCE_ROOT; };
 		FBF7D58C167E5031004B6F0F /* rncryptorvectors */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = rncryptorvectors; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBF7D590167E5032004B6F0F /* rncryptorvectors.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = rncryptorvectors.m; sourceTree = "<group>"; };
@@ -236,6 +232,14 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		FB30215F18802E9700BF8F3C /* Generated */ = {
+			isa = PBXGroup;
+			children = (
+				FB30216018802ED900BF8F3C /* RNCryptorGeneratedVectorTests.m */,
+			);
+			path = Generated;
+			sourceTree = "<group>";
+		};
 		FB53C175187EE90400952674 /* vectors */ = {
 			isa = PBXGroup;
 			children = (
@@ -248,11 +252,11 @@
 		FB53C17B187EE90400952674 /* v3 */ = {
 			isa = PBXGroup;
 			children = (
+				FB30216218802F5000BF8F3C /* kdf_short */,
+				FB30216318802F5000BF8F3C /* password_short */,
 				FB53C17C187EE90400952674 /* kdf */,
-				FB53C186187EEDA900952674 /* kdf-short */,
 				FB53C17D187EE90400952674 /* key */,
 				FB53C17E187EE90400952674 /* password */,
-				FB53C17F187EE90400952674 /* password-short */,
 			);
 			path = v3;
 			sourceTree = "<group>";
@@ -354,14 +358,14 @@
 		FB7565091512D3C4007B806B /* RNCryptorTests */ = {
 			isa = PBXGroup;
 			children = (
-				FB799108187F7F900069BEB4 /* Generated Files */,
+				FB30215F18802E9700BF8F3C /* Generated */,
+				FB53C197187F6C6500952674 /* XCTestCase+RNCryptorVectorTests.h */,
+				FB53C195187F6AB300952674 /* XCTestCase+RNCryptorVectorTests.m */,
 				FB7565101512D3C5007B806B /* RNCryptorTests.m */,
 				FB6C9617185A0F1700CC2098 /* RNOpenSSLTests.m */,
 				FB6C9619185A0F7600CC2098 /* RNCryptorTestHelpers.h */,
 				FB6C961A185A0F7600CC2098 /* RNCryptorTestHelpers.m */,
 				FB75650A1512D3C4007B806B /* Supporting Files */,
-				FB53C197187F6C6500952674 /* RNCryptorVectorTests.h */,
-				FB53C195187F6AB300952674 /* RNCryptorVectorTests.m */,
 			);
 			path = RNCryptorTests;
 			sourceTree = "<group>";
@@ -374,14 +378,6 @@
 				FB75650C1512D3C4007B806B /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		FB799108187F7F900069BEB4 /* Generated Files */ = {
-			isa = PBXGroup;
-			children = (
-				FB799106187F7EE00069BEB4 /* RNCryptorGeneratedVectorTests.m */,
-			);
-			name = "Generated Files";
 			sourceTree = "<group>";
 		};
 		FBF7D58F167E5031004B6F0F /* RNCryptorVectors */ = {
@@ -597,7 +593,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/bin/sh -e -x";
-			shellScript = "export LANG=en_US.UTF-8\nexport LANGUAGE=en_US.UTF-8\nexport LC_ALL=en_US.UTF-8\n\n${SRCROOT}/${TARGETNAME}/GenVectorTests -o ${BUILT_PRODUCTS_DIR}/RNCryptorGeneratedVectorTests.m -3 ${SRCROOT}/Spec/vectors/v3\n";
+			shellScript = "export LANG=en_US.UTF-8\nexport LANGUAGE=en_US.UTF-8\nexport LC_ALL=en_US.UTF-8\n\n${SRCROOT}/${TARGETNAME}/GenVectorTests -o ${SRCROOT}/RNCryptorTests/Generated/RNCryptorGeneratedVectorTests.m -3 ${SRCROOT}/Spec/vectors/v3\n";
 			showEnvVarsInLog = 0;
 		};
 		FB7564FE1512D3C4007B806B /* ShellScript */ = {
@@ -660,10 +656,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FB799107187F7EE00069BEB4 /* RNCryptorGeneratedVectorTests.m in Sources */,
+				FB30216118802ED900BF8F3C /* RNCryptorGeneratedVectorTests.m in Sources */,
 				FB6C9618185A0F1700CC2098 /* RNOpenSSLTests.m in Sources */,
 				FB7565111512D3C5007B806B /* RNCryptorTests.m in Sources */,
-				FB53C196187F6AB300952674 /* RNCryptorVectorTests.m in Sources */,
+				FB53C196187F6AB300952674 /* XCTestCase+RNCryptorVectorTests.m in Sources */,
 				FB6C961B185A0F7600CC2098 /* RNCryptorTestHelpers.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

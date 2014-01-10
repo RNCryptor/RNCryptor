@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Rob Napier. All rights reserved.
 //
 
-#import "RNCryptorVectorTests.h"
+#import "XCTestCase+RNCryptorVectorTests.h"
 
 NSData *GetDataForHex(NSString *hex) {
   NSString *hexNoSpaces = [[[hex stringByReplacingOccurrencesOfString:@" " withString:@""]
@@ -26,25 +26,13 @@ NSData *GetDataForHex(NSString *hex) {
   return data;
 }
 
-@implementation RNCryptorVectorTests
-
-- (void)setUp
-{
-    [super setUp];
-    // Put setup code here; it will be run once, before the first test case.
-}
-
-- (void)tearDown
-{
-    // Put teardown code here; it will be run once, after the last test case.
-    [super tearDown];
-}
+@implementation XCTestCase (RNCryptorVectorTests)
 
 - (void)verifyVector:(NSDictionary *)vector key:(NSString *)key equals:(NSData *)actual title:(NSString*)title {
   XCTAssertEqualObjects(actual, GetDataForHex(vector[key]), @"Failed %@ test (v%d): %s\n", title, [vector[@"version"] intValue], [vector[@"title"] UTF8String]);
 }
 
-- (void)verifyKDFVector:(NSDictionary *)vector {
+- (void)verify_kdf:(NSDictionary *)vector {
   NSCParameterAssert(vector[@"title"]);
   NSCParameterAssert(vector[@"version"]);
   NSCParameterAssert(vector[@"password"]);
@@ -57,6 +45,22 @@ NSData *GetDataForHex(NSString *hex) {
   [self verifyVector:vector key:@"key_hex" equals:key title:@"kdf"];
 }
 
+- (void)verify_kdf_short:(NSDictionary *)vector {
+  NSCParameterAssert(vector[@"title"]);
+  NSCParameterAssert(vector[@"version"]);
+  NSCParameterAssert(vector[@"password"]);
+  NSCParameterAssert(vector[@"iterations"]);
+  NSCParameterAssert(vector[@"salt_hex"]);
+  NSCParameterAssert(vector[@"key_hex"]);
+
+  RNCryptorKeyDerivationSettings settings = kRNCryptorAES256Settings.keySettings;
+  settings.rounds = 1000;
+
+  NSData *key = [RNCryptor keyForPassword:vector[@"password"]
+                                     salt:GetDataForHex(vector[@"salt_hex"])
+                                 settings:settings];
+  [self verifyVector:vector key:@"key_hex" equals:key title:@"short kdf"];
+}
 
 @end
 

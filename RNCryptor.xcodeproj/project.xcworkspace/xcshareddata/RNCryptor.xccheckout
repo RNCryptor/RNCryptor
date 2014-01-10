@@ -5,36 +5,48 @@
 	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
-	<string>57325159-086D-4DB3-936B-D4FEFABDF4DB</string>
+	<string>3ABD3F64-A1E8-41CD-8789-63CBB720A99A</string>
 	<key>IDESourceControlProjectName</key>
 	<string>RNCryptor</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>1D1067EB-8A1B-4368-9F17-F3953E22ACE9</key>
-		<string>ssh://github.com/rnapier/RNCryptor.git</string>
+		<key>AB89CCB2-8938-48E0-92DF-EE3DD2C75CCB</key>
+		<string>ssh://github.com/RNCryptor/RNCryptor-Spec.git</string>
+		<key>D68E4317-45C0-46EA-86CB-15B52B489B23</key>
+		<string>ssh://github.com/RNCryptor/RNCryptor.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>RNCryptor.xcodeproj/project.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>1D1067EB-8A1B-4368-9F17-F3953E22ACE9</key>
+		<key>AB89CCB2-8938-48E0-92DF-EE3DD2C75CCB</key>
+		<string>../../Spec</string>
+		<key>D68E4317-45C0-46EA-86CB-15B52B489B23</key>
 		<string>../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>ssh://github.com/rnapier/RNCryptor.git</string>
+	<string>ssh://github.com/RNCryptor/RNCryptor.git</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>110</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>1D1067EB-8A1B-4368-9F17-F3953E22ACE9</string>
+	<string>D68E4317-45C0-46EA-86CB-15B52B489B23</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>1D1067EB-8A1B-4368-9F17-F3953E22ACE9</string>
+			<string>D68E4317-45C0-46EA-86CB-15B52B489B23</string>
 			<key>IDESourceControlWCCName</key>
 			<string>RNCryptor</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>AB89CCB2-8938-48E0-92DF-EE3DD2C75CCB</string>
+			<key>IDESourceControlWCCName</key>
+			<string>Spec</string>
 		</dict>
 	</array>
 </dict>

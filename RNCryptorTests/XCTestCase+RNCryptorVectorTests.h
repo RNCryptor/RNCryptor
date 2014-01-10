@@ -11,6 +11,7 @@
 #import "RNEncryptor.h"
 #import "RNDecryptor.h"
 
-@interface RNCryptorVectorTests : XCTestCase
-- (void)verifyKDFVector:(NSDictionary *)vector;
+@interface XCTestCase (RNCryptorVectorTests)
+- (void)verify_kdf:(NSDictionary *)vector;
+- (void)verify_kdf_short:(NSDictionary *)vector;
 @end
