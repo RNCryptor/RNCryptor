@@ -3,8 +3,9 @@ language: objective-c
 before_install:
   - git submodule update --init --recursive
 
-script: 
-  - xctool -project RNCryptor.xcodeproj -scheme RNCryptor -sdk iphonesimulator5.0 build test
-  - xctool -project RNCryptor.xcodeproj -scheme RNCryptor -sdk iphonesimulator7.0 build test
-  - xctool -project RNCryptor.xcodeproj -scheme "RNCryptor OS X" -sdk macosx10.9 build
-  - xctool -project RNCryptor.xcodeproj -scheme "RNCryptor OS X" -sdk macosx10.8 build
+matrix:
+  include:
+    - script: xctool -project RNCryptor.xcodeproj -scheme RNCryptor -sdk iphonesimulator5.0 build test
+    - script: xctool -project RNCryptor.xcodeproj -scheme RNCryptor -sdk iphonesimulator7.0 build test
+    - script: xctool -project RNCryptor.xcodeproj -scheme "RNCryptor OS X" -sdk macosx10.9 build
+    - script: xctool -project RNCryptor.xcodeproj -scheme "RNCryptor OS X" -sdk macosx10.8 build
