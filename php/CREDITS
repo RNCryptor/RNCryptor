@@ -1,9 +1,0 @@
-Special thanks to:
-
-Rob Napier - RNCryptor iOS library and original PHP implementation of the encryption function
-
-Guysung Kim - PHP decryption function
-
-Curtis Farnham - Converting procedural PHP encrypt and decrypt functions to Object-Oriented classes.
-				 Adding PHPUnit test suite
-				 Adding support for schemas 0 and 1

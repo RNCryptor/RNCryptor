@@ -1,8 +1,0 @@
-
-# PEAR stuff, for running PHPUnit
-.pearrc
-pear
-
-# other stuff
-coverage
-
