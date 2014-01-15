@@ -12,7 +12,7 @@ and [Ruby](https://github.com/rnapier/RNCryptor/tree/master/ruby).
 
 The data format includes all the metadata required to securely implement AES
 encryption, as described in ["Properly encrypting with AES with
-CommonCrypto,"](http://robnapier.net/blog/aes-commoncrypto) and [*iOS 6
+CommonCrypto,"](http://robnapier.net/aes-commoncrypto) and [*iOS 6
 Programming Pushing the Limits*](http://iosptl.com), Chapter 15. Specifically,
 it includes:
 
