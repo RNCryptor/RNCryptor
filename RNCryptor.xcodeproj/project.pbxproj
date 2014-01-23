@@ -8,24 +8,24 @@
 
 /* Begin PBXBuildFile section */
 		4ABDC61718615875000DE03F /* RNCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB75651A1512D3E9007B806B /* RNCryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4ABDC61818615875000DE03F /* RNOpenSSLCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B806E /* RNOpenSSLCryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4ABDC61918615894000DE03F /* RNEncryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8076 /* RNEncryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4ABDC61A18615894000DE03F /* RNOpenSSLDecryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B808E /* RNOpenSSLDecryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4ABDC61B18615894000DE03F /* RNOpenSSLEncryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B808C /* RNOpenSSLEncryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4ABDC61C18615894000DE03F /* RNCryptorEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B807E /* RNCryptorEngine.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4ABDC61D186158B2000DE03F /* RNDecryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B807A /* RNDecryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4ABDC61E186158B2000DE03F /* RNCryptor+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8084 /* RNCryptor+Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		AB13428615E0FC2300456914 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = AB13428415E0FC2300456914 /* InfoPlist.strings */; };
-		AB13428F15E0FC4600456914 /* RNOpenSSLDecryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8090 /* RNOpenSSLDecryptor.m */; };
-		AB13429015E0FC4600456914 /* RNOpenSSLEncryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B808A /* RNOpenSSLEncryptor.m */; };
 		AB13429115E0FC4600456914 /* RNCryptorEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B807C /* RNCryptorEngine.m */; };
 		AB13429215E0FC4600456914 /* RNDecryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8078 /* RNDecryptor.m */; };
 		AB13429315E0FC4600456914 /* RNEncryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8074 /* RNEncryptor.m */; };
-		AB13429415E0FC4600456914 /* RNOpenSSLCryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B806C /* RNOpenSSLCryptor.m */; };
 		AB13429515E0FC4600456914 /* RNCryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB75651B1512D3E9007B806B /* RNCryptor.m */; };
 		AB13429715E0FC4E00456914 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB13429615E0FC4E00456914 /* Security.framework */; };
 		AB13429915E0FD1D00456914 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB13429815E0FD1D00456914 /* Foundation.framework */; };
 		FB30216118802ED900BF8F3C /* RNCryptorGeneratedVectorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FB30216018802ED900BF8F3C /* RNCryptorGeneratedVectorTests.m */; };
+		FB3A1ED11890A81D00B1E193 /* RNOpenSSLCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB3A1ECB1890A81D00B1E193 /* RNOpenSSLCryptor.h */; };
+		FB3A1ED21890A81D00B1E193 /* RNOpenSSLCryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3A1ECC1890A81D00B1E193 /* RNOpenSSLCryptor.m */; };
+		FB3A1ED31890A81D00B1E193 /* RNOpenSSLDecryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB3A1ECD1890A81D00B1E193 /* RNOpenSSLDecryptor.h */; };
+		FB3A1ED41890A81D00B1E193 /* RNOpenSSLDecryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3A1ECE1890A81D00B1E193 /* RNOpenSSLDecryptor.m */; };
+		FB3A1ED51890A81D00B1E193 /* RNOpenSSLEncryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB3A1ECF1890A81D00B1E193 /* RNOpenSSLEncryptor.h */; };
+		FB3A1ED61890A81D00B1E193 /* RNOpenSSLEncryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3A1ED01890A81D00B1E193 /* RNOpenSSLEncryptor.m */; };
 		FB53C196187F6AB300952674 /* XCTestCase+RNCryptorVectorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FB53C195187F6AB300952674 /* XCTestCase+RNCryptorVectorTests.m */; };
 		FB6AC68D16F6704200CA0C0A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7564F31512D3C4007B806B /* Foundation.framework */; };
 		FB6AC69016F6704200CA0C0A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FB6AC68F16F6704200CA0C0A /* main.m */; };
@@ -45,8 +45,6 @@
 		FB75651D1512D3E9007B806B /* RNCryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB75651B1512D3E9007B806B /* RNCryptor.m */; };
 		FB75651F1512D7F8007B806B /* RNCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB75651A1512D3E9007B806B /* RNCryptor.h */; };
 		FB7565241512D9BE007B806B /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7565221512D9A8007B806B /* Security.framework */; };
-		FB7565241512D9BE007B806D /* RNOpenSSLCryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B806C /* RNOpenSSLCryptor.m */; };
-		FB7565241512D9BE007B806F /* RNOpenSSLCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B806E /* RNOpenSSLCryptor.h */; };
 		FB7565241512D9BE007B8075 /* RNEncryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8074 /* RNEncryptor.m */; };
 		FB7565241512D9BE007B8077 /* RNEncryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8076 /* RNEncryptor.h */; };
 		FB7565241512D9BE007B8079 /* RNDecryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8078 /* RNDecryptor.m */; };
@@ -54,10 +52,6 @@
 		FB7565241512D9BE007B807D /* RNCryptorEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B807C /* RNCryptorEngine.m */; };
 		FB7565241512D9BE007B807F /* RNCryptorEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B807E /* RNCryptorEngine.h */; };
 		FB7565241512D9BE007B8085 /* RNCryptor+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8084 /* RNCryptor+Private.h */; };
-		FB7565241512D9BE007B808B /* RNOpenSSLEncryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B808A /* RNOpenSSLEncryptor.m */; };
-		FB7565241512D9BE007B808D /* RNOpenSSLEncryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B808C /* RNOpenSSLEncryptor.h */; };
-		FB7565241512D9BE007B808F /* RNOpenSSLDecryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B808E /* RNOpenSSLDecryptor.h */; };
-		FB7565241512D9BE007B8091 /* RNOpenSSLDecryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8090 /* RNOpenSSLDecryptor.m */; };
 		FBF7D58E167E5031004B6F0F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7564F31512D3C4007B806B /* Foundation.framework */; };
 		FBF7D5A9167E515D004B6F0F /* RNCryptor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB13427A15E0FC2300456914 /* RNCryptor.framework */; };
 /* End PBXBuildFile section */
@@ -104,6 +98,12 @@
 		AB13429615E0FC4E00456914 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/Security.framework; sourceTree = DEVELOPER_DIR; };
 		AB13429815E0FD1D00456914 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		FB30216018802ED900BF8F3C /* RNCryptorGeneratedVectorTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCryptorGeneratedVectorTests.m; sourceTree = "<group>"; };
+		FB3A1ECB1890A81D00B1E193 /* RNOpenSSLCryptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNOpenSSLCryptor.h; sourceTree = "<group>"; };
+		FB3A1ECC1890A81D00B1E193 /* RNOpenSSLCryptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNOpenSSLCryptor.m; sourceTree = "<group>"; };
+		FB3A1ECD1890A81D00B1E193 /* RNOpenSSLDecryptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNOpenSSLDecryptor.h; sourceTree = "<group>"; };
+		FB3A1ECE1890A81D00B1E193 /* RNOpenSSLDecryptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNOpenSSLDecryptor.m; sourceTree = "<group>"; };
+		FB3A1ECF1890A81D00B1E193 /* RNOpenSSLEncryptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNOpenSSLEncryptor.h; sourceTree = "<group>"; };
+		FB3A1ED01890A81D00B1E193 /* RNOpenSSLEncryptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNOpenSSLEncryptor.m; sourceTree = "<group>"; };
 		FB53C195187F6AB300952674 /* XCTestCase+RNCryptorVectorTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "XCTestCase+RNCryptorVectorTests.m"; sourceTree = "<group>"; };
 		FB53C197187F6C6500952674 /* XCTestCase+RNCryptorVectorTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "XCTestCase+RNCryptorVectorTests.h"; sourceTree = "<group>"; };
 		FB6AC68C16F6704100CA0C0A /* rncrypt */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = rncrypt; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -123,8 +123,6 @@
 		FB75651A1512D3E9007B806B /* RNCryptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCryptor.h; sourceTree = "<group>"; };
 		FB75651B1512D3E9007B806B /* RNCryptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCryptor.m; sourceTree = "<group>"; };
 		FB7565221512D9A8007B806B /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
-		FB7565241512D9BE007B806C /* RNOpenSSLCryptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNOpenSSLCryptor.m; sourceTree = "<group>"; };
-		FB7565241512D9BE007B806E /* RNOpenSSLCryptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNOpenSSLCryptor.h; sourceTree = "<group>"; };
 		FB7565241512D9BE007B8074 /* RNEncryptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNEncryptor.m; sourceTree = "<group>"; };
 		FB7565241512D9BE007B8076 /* RNEncryptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNEncryptor.h; sourceTree = "<group>"; };
 		FB7565241512D9BE007B8078 /* RNDecryptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNDecryptor.m; sourceTree = "<group>"; };
@@ -132,10 +130,6 @@
 		FB7565241512D9BE007B807C /* RNCryptorEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNCryptorEngine.m; sourceTree = "<group>"; };
 		FB7565241512D9BE007B807E /* RNCryptorEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCryptorEngine.h; sourceTree = "<group>"; };
 		FB7565241512D9BE007B8084 /* RNCryptor+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RNCryptor+Private.h"; sourceTree = "<group>"; };
-		FB7565241512D9BE007B808A /* RNOpenSSLEncryptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNOpenSSLEncryptor.m; sourceTree = "<group>"; };
-		FB7565241512D9BE007B808C /* RNOpenSSLEncryptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNOpenSSLEncryptor.h; sourceTree = "<group>"; };
-		FB7565241512D9BE007B808E /* RNOpenSSLDecryptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNOpenSSLDecryptor.h; sourceTree = "<group>"; };
-		FB7565241512D9BE007B8090 /* RNOpenSSLDecryptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNOpenSSLDecryptor.m; sourceTree = "<group>"; };
 		FB7565241512D9BE007B8092 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = file.md; path = README.md; sourceTree = "<group>"; };
 		FBF7D58C167E5031004B6F0F /* rncryptorvectors */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = rncryptorvectors; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -225,6 +219,19 @@
 			path = Generated;
 			sourceTree = "<group>";
 		};
+		FB3A1ECA1890A81D00B1E193 /* RNOpenSSLCryptor */ = {
+			isa = PBXGroup;
+			children = (
+				FB3A1ECB1890A81D00B1E193 /* RNOpenSSLCryptor.h */,
+				FB3A1ECC1890A81D00B1E193 /* RNOpenSSLCryptor.m */,
+				FB3A1ECD1890A81D00B1E193 /* RNOpenSSLDecryptor.h */,
+				FB3A1ECE1890A81D00B1E193 /* RNOpenSSLDecryptor.m */,
+				FB3A1ECF1890A81D00B1E193 /* RNOpenSSLEncryptor.h */,
+				FB3A1ED01890A81D00B1E193 /* RNOpenSSLEncryptor.m */,
+			);
+			path = RNOpenSSLCryptor;
+			sourceTree = "<group>";
+		};
 		FB6AC68E16F6704200CA0C0A /* rncrypt */ = {
 			isa = PBXGroup;
 			children = (
@@ -240,19 +247,6 @@
 				FB6AC69216F6704200CA0C0A /* rncrypt-Prefix.pch */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		FB6C961C185A149400CC2098 /* OpenSSL */ = {
-			isa = PBXGroup;
-			children = (
-				FB7565241512D9BE007B806E /* RNOpenSSLCryptor.h */,
-				FB7565241512D9BE007B806C /* RNOpenSSLCryptor.m */,
-				FB7565241512D9BE007B8090 /* RNOpenSSLDecryptor.m */,
-				FB7565241512D9BE007B808E /* RNOpenSSLDecryptor.h */,
-				FB7565241512D9BE007B808C /* RNOpenSSLEncryptor.h */,
-				FB7565241512D9BE007B808A /* RNOpenSSLEncryptor.m */,
-			);
-			name = OpenSSL;
 			sourceTree = "<group>";
 		};
 		FB7564E51512D3C4007B806B = {
@@ -295,6 +289,7 @@
 		FB7564F51512D3C4007B806B /* RNCryptor */ = {
 			isa = PBXGroup;
 			children = (
+				FB3A1ECA1890A81D00B1E193 /* RNOpenSSLCryptor */,
 				FB75651A1512D3E9007B806B /* RNCryptor.h */,
 				FB75651B1512D3E9007B806B /* RNCryptor.m */,
 				FB7565241512D9BE007B807A /* RNDecryptor.h */,
@@ -304,7 +299,6 @@
 				FB7565241512D9BE007B807E /* RNCryptorEngine.h */,
 				FB7565241512D9BE007B807C /* RNCryptorEngine.m */,
 				FB7565241512D9BE007B8084 /* RNCryptor+Private.h */,
-				FB6C961C185A149400CC2098 /* OpenSSL */,
 				FB7564F61512D3C4007B806B /* Supporting Files */,
 			);
 			path = RNCryptor;
@@ -351,10 +345,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4ABDC61718615875000DE03F /* RNCryptor.h in Headers */,
-				4ABDC61818615875000DE03F /* RNOpenSSLCryptor.h in Headers */,
 				4ABDC61D186158B2000DE03F /* RNDecryptor.h in Headers */,
-				4ABDC61A18615894000DE03F /* RNOpenSSLDecryptor.h in Headers */,
-				4ABDC61B18615894000DE03F /* RNOpenSSLEncryptor.h in Headers */,
 				4ABDC61C18615894000DE03F /* RNCryptorEngine.h in Headers */,
 				4ABDC61918615894000DE03F /* RNEncryptor.h in Headers */,
 				4ABDC61E186158B2000DE03F /* RNCryptor+Private.h in Headers */,
@@ -366,13 +357,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				FB75651F1512D7F8007B806B /* RNCryptor.h in Headers */,
-				FB7565241512D9BE007B806F /* RNOpenSSLCryptor.h in Headers */,
+				FB3A1ED31890A81D00B1E193 /* RNOpenSSLDecryptor.h in Headers */,
+				FB3A1ED11890A81D00B1E193 /* RNOpenSSLCryptor.h in Headers */,
 				FB7565241512D9BE007B8077 /* RNEncryptor.h in Headers */,
+				FB3A1ED51890A81D00B1E193 /* RNOpenSSLEncryptor.h in Headers */,
 				FB7565241512D9BE007B807B /* RNDecryptor.h in Headers */,
 				FB7565241512D9BE007B807F /* RNCryptorEngine.h in Headers */,
 				FB7565241512D9BE007B8085 /* RNCryptor+Private.h in Headers */,
-				FB7565241512D9BE007B808D /* RNOpenSSLEncryptor.h in Headers */,
-				FB7565241512D9BE007B808F /* RNOpenSSLDecryptor.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -560,12 +551,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AB13428F15E0FC4600456914 /* RNOpenSSLDecryptor.m in Sources */,
-				AB13429015E0FC4600456914 /* RNOpenSSLEncryptor.m in Sources */,
 				AB13429115E0FC4600456914 /* RNCryptorEngine.m in Sources */,
 				AB13429215E0FC4600456914 /* RNDecryptor.m in Sources */,
 				AB13429315E0FC4600456914 /* RNEncryptor.m in Sources */,
-				AB13429415E0FC4600456914 /* RNOpenSSLCryptor.m in Sources */,
 				AB13429515E0FC4600456914 /* RNCryptor.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -587,12 +575,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				FB75651D1512D3E9007B806B /* RNCryptor.m in Sources */,
-				FB7565241512D9BE007B806D /* RNOpenSSLCryptor.m in Sources */,
 				FB7565241512D9BE007B8075 /* RNEncryptor.m in Sources */,
 				FB7565241512D9BE007B8079 /* RNDecryptor.m in Sources */,
+				FB3A1ED61890A81D00B1E193 /* RNOpenSSLEncryptor.m in Sources */,
 				FB7565241512D9BE007B807D /* RNCryptorEngine.m in Sources */,
-				FB7565241512D9BE007B808B /* RNOpenSSLEncryptor.m in Sources */,
-				FB7565241512D9BE007B8091 /* RNOpenSSLDecryptor.m in Sources */,
+				FB3A1ED21890A81D00B1E193 /* RNOpenSSLCryptor.m in Sources */,
+				FB3A1ED41890A81D00B1E193 /* RNOpenSSLDecryptor.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
