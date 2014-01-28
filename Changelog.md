@@ -1,3 +1,8 @@
+# Version ...
+
+* Remove OpenSSL support. This has been moved to RNOpenSSLCryptor.
+* Remove warnings on OS X 10.8
+* 
 # Version 2.2
 
 Version 2.2 is a fairly large release. It's been almost a year since 2.1 came out, and there are many small and large bug fixes.
