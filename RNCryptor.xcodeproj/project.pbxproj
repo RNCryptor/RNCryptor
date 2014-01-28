@@ -45,8 +45,6 @@
 		FB7565241512D9BE007B807D /* RNCryptorEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B807C /* RNCryptorEngine.m */; };
 		FB7565241512D9BE007B807F /* RNCryptorEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B807E /* RNCryptorEngine.h */; };
 		FB7565241512D9BE007B8085 /* RNCryptor+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8084 /* RNCryptor+Private.h */; };
-		FBF7D58E167E5031004B6F0F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7564F31512D3C4007B806B /* Foundation.framework */; };
-		FBF7D5A9167E515D004B6F0F /* RNCryptor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB13427A15E0FC2300456914 /* RNCryptor.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,15 +62,6 @@
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 12;
 			dstPath = "";
-			dstSubfolderSpec = 16;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		FBF7D58A167E5031004B6F0F /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 12;
-			dstPath = vectors/v3;
 			dstSubfolderSpec = 16;
 			files = (
 			);
@@ -117,7 +106,6 @@
 		FB7565241512D9BE007B807E /* RNCryptorEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCryptorEngine.h; sourceTree = "<group>"; };
 		FB7565241512D9BE007B8084 /* RNCryptor+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RNCryptor+Private.h"; sourceTree = "<group>"; };
 		FB7565241512D9BE007B8092 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = file.md; path = README.md; sourceTree = "<group>"; };
-		FBF7D58C167E5031004B6F0F /* rncryptorvectors */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = rncryptorvectors; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -154,15 +142,6 @@
 				FB7565051512D3C4007B806B /* Foundation.framework in Frameworks */,
 				FB7565081512D3C4007B806B /* libRNCryptor.a in Frameworks */,
 				FB7565241512D9BE007B806B /* Security.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		FBF7D589167E5031004B6F0F /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				FBF7D5A9167E515D004B6F0F /* RNCryptor.framework in Frameworks */,
-				FBF7D58E167E5031004B6F0F /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -243,7 +222,6 @@
 				FB7564F01512D3C4007B806B /* libRNCryptor.a */,
 				FB7565001512D3C4007B806B /* RNCryptorTests.xctest */,
 				AB13427A15E0FC2300456914 /* RNCryptor.framework */,
-				FBF7D58C167E5031004B6F0F /* rncryptorvectors */,
 				FB6AC68C16F6704100CA0C0A /* rncrypt */,
 			);
 			name = Products;
@@ -410,23 +388,6 @@
 			productReference = FB7565001512D3C4007B806B /* RNCryptorTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		FBF7D58B167E5031004B6F0F /* rncryptorvectors */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = FBF7D596167E5032004B6F0F /* Build configuration list for PBXNativeTarget "rncryptorvectors" */;
-			buildPhases = (
-				FBF7D588167E5031004B6F0F /* Sources */,
-				FBF7D589167E5031004B6F0F /* Frameworks */,
-				FBF7D58A167E5031004B6F0F /* CopyFiles */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = rncryptorvectors;
-			productName = RNCryptorVectors;
-			productReference = FBF7D58C167E5031004B6F0F /* rncryptorvectors */;
-			productType = "com.apple.product-type.tool";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -452,7 +413,6 @@
 				FB7564EF1512D3C4007B806B /* RNCryptor */,
 				AB13427915E0FC2300456914 /* RNCryptor OS X */,
 				FB7564FF1512D3C4007B806B /* RNCryptorTests */,
-				FBF7D58B167E5031004B6F0F /* rncryptorvectors */,
 				FB6AC68B16F6704100CA0C0A /* rncrypt */,
 			);
 		};
@@ -557,13 +517,6 @@
 				FB7565111512D3C5007B806B /* RNCryptorTests.m in Sources */,
 				FB53C196187F6AB300952674 /* XCTestCase+RNCryptorVectorTests.m in Sources */,
 				FB6C961B185A0F7600CC2098 /* RNCryptorTestHelpers.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		FBF7D588167E5031004B6F0F /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -790,44 +743,6 @@
 			};
 			name = Release;
 		};
-		FBF7D597167E5032004B6F0F /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "RNCryptorVectors/RNCryptorVectors-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-			};
-			name = Debug;
-		};
-		FBF7D598167E5032004B6F0F /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "RNCryptorVectors/RNCryptorVectors-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = "";
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -872,15 +787,6 @@
 			buildConfigurations = (
 				FB7565181512D3C5007B806B /* Debug */,
 				FB7565191512D3C5007B806B /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		FBF7D596167E5032004B6F0F /* Build configuration list for PBXNativeTarget "rncryptorvectors" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				FBF7D597167E5032004B6F0F /* Debug */,
-				FBF7D598167E5032004B6F0F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
