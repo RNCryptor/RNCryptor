@@ -32,7 +32,7 @@ NSData *GetDataForHex(NSString *hex) {
   XCTAssertEqualObjects(actual, GetDataForHex(vector[key]), @"Failed %@ test (v%d): %s\n", title, [vector[@"version"] intValue], [vector[@"title"] UTF8String]);
 }
 
-- (void)_verifyKDF:(NSDictionary *)vector settings:(RNCryptorKeyDerivationSettings)keySettings name:(NSString *)name {
+- (void)verify_v3_kdf:(NSDictionary *)vector {
   NSCParameterAssert(vector[@"title"]);
   NSCParameterAssert(vector[@"version"]);
   NSCParameterAssert(vector[@"password"]);
@@ -41,23 +41,11 @@ NSData *GetDataForHex(NSString *hex) {
 
   NSData *key = [RNCryptor keyForPassword:vector[@"password"]
                                      salt:GetDataForHex(vector[@"salt_hex"])
-                                 settings:keySettings];
-  [self verifyVector:vector key:@"key_hex" equals:key title:name];
+                                 settings:kRNCryptorAES256Settings.keySettings];
+  [self verifyVector:vector key:@"key_hex" equals:key title:@"kdf"];
 }
 
-- (void)verify_kdf:(NSDictionary *)vector {
-  [self _verifyKDF:vector settings:kRNCryptorAES256Settings.keySettings name:@"kdf"];
-}
-
-- (void)verify_kdf_short:(NSDictionary *)vector {
-  NSCParameterAssert(vector[@"iterations"]);
-
-  RNCryptorKeyDerivationSettings settings = kRNCryptorAES256Settings.keySettings;
-  settings.rounds = 1000;
-  [self _verifyKDF:vector settings:settings name:@"short kdf"];
-}
-
-- (void)_verifyPassword:(NSDictionary *)vector settings:(RNCryptorSettings)settings name:(NSString *)name {
+- (void)verify_v3_password:(NSDictionary *)vector {
   NSCParameterAssert(vector[@"title"]);
   NSCParameterAssert(vector[@"version"]);
   NSCParameterAssert(vector[@"password"]);
@@ -68,10 +56,11 @@ NSData *GetDataForHex(NSString *hex) {
   NSCParameterAssert(vector[@"ciphertext_hex"]);
 
   NSError *error;
+  NSString *name = @"password";
 
   if ([vector[@"version"] intValue] == kRNCryptorFileVersion) {
     NSData *ciphertext = [RNEncryptor encryptData:GetDataForHex(vector[@"plaintext_hex"])
-                                     withSettings:settings
+                                     withSettings:kRNCryptorAES256Settings
                                          password:vector[@"password"]
                                                IV:GetDataForHex(vector[@"iv_hex"])
                                    encryptionSalt:GetDataForHex(vector[@"enc_salt_hex"])
@@ -86,20 +75,7 @@ NSData *GetDataForHex(NSString *hex) {
   [self verifyVector:vector key:@"plaintext" equals:plaintext title:[name stringByAppendingString:@" encrypt"]];
 }
 
-- (void)verify_password:(NSDictionary *)vector {
-  [self _verifyPassword:vector settings:kRNCryptorAES256Settings name:@"password"];
-}
-
-- (void)verify_password_short:(NSDictionary *)vector {
-  NSCParameterAssert(vector[@"iterations"]);
-
-  RNCryptorSettings settings = kRNCryptorAES256Settings;
-  settings.keySettings.rounds = [vector[@"iterations"] intValue];
-  settings.HMACKeySettings.rounds = [vector[@"iterations"] intValue];
-  [self _verifyPassword:vector settings:settings name:@"short password"];
-}
-
-- (void)verify_key:(NSDictionary *)vector {
+- (void)verify_v3_key:(NSDictionary *)vector {
   NSCParameterAssert(vector[@"title"]);
   NSCParameterAssert(vector[@"version"]);
   NSCParameterAssert(vector[@"enc_key_hex"]);

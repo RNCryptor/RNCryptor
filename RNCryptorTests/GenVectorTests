@@ -3,7 +3,7 @@
 require 'optparse'
 require File.join(File.dirname(__FILE__), '../Spec/vectors', 'vectorparser')
 
-@test_files = ["kdf", "kdf_short", "password", "password_short", "key"]
+@test_files = ["v3/kdf", "v3/password", "v3/key"]
 
 @options = {}
 
@@ -25,12 +25,12 @@ end
 
 # Output the tests for a given filename to the output stream
 def outputTestsForFile(output, name)
-
-  VectorParser.new(@options[:v3_directory] + "/" + name).vectors.each do |vector|
+  name_identifier = name.gsub('/', '_')
+  VectorParser.new(@options[:vector_directory] + '/' + name).vectors.each do |vector|
     output << <<-TEST_CASE
 
-- (void)test_#{name}_#{vector["title"].gsub(/[ ()-]+/, '_')} {
-  [self verify_#{name}:#{NSDictionaryForHash(vector)}];
+- (void)test_#{name_identifier}_#{vector["title"].gsub(/[ ()-]+/, '_')} {
+  [self verify_#{name_identifier}:#{NSDictionaryForHash(vector)}];
 }
 
 TEST_CASE
@@ -49,7 +49,7 @@ end
 ### MAIN
 ###################
 opt_parser = OptionParser.new do |opt|
-  opt.banner = "Usage: GenVectorTest -o VectorTests.m -3 v3_directory"
+  opt.banner = "Usage: GenVectorTest -o VectorTests.m <vector_directory>"
   opt.separator  ""
   opt.on("-o","--output PATH","path to output code") do |output_path|
     @options[:output_path] = output_path
@@ -62,7 +62,9 @@ end
 opt_parser.parse!
 
 raise OptionParser::MissingArgument if @options[:output_path].nil?
-raise OptionParser::MissingArgument if @options[:v3_directory].nil?
+raise OptionParser::MissingArgument if ARGV.length != 1
+
+@options[:vector_directory] = ARGV[0]
 
 File.open(@options[:output_path], "w") do |output|
   outputHeader(output)

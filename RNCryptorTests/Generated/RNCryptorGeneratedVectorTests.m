@@ -4,8 +4,8 @@
 @end
 @implementation RNCryptorGeneratedVectorTests
 
-- (void)test_kdf_One_byte {
-  [self verify_kdf:@{
+- (void)test_v3_kdf_One_byte {
+  [self verify_v3_kdf:@{
     @"title": @"One byte",
     @"version": @"3",
     @"password": @"a",
@@ -14,8 +14,8 @@
 }
 
 
-- (void)test_kdf_Short_password {
-  [self verify_kdf:@{
+- (void)test_v3_kdf_Short_password {
+  [self verify_v3_kdf:@{
     @"title": @"Short password",
     @"version": @"3",
     @"password": @"thepassword",
@@ -24,8 +24,8 @@
 }
 
 
-- (void)test_kdf_Passphrase {
-  [self verify_kdf:@{
+- (void)test_v3_kdf_Passphrase {
+  [self verify_v3_kdf:@{
     @"title": @"Passphrase",
     @"version": @"3",
     @"password": @"this is a bit longer password",
@@ -34,8 +34,8 @@
 }
 
 
-- (void)test_kdf_Long_passphrase {
-  [self verify_kdf:@{
+- (void)test_v3_kdf_Long_passphrase {
+  [self verify_v3_kdf:@{
     @"title": @"Long passphrase",
     @"version": @"3",
     @"password": @"$$$it was the epoch of belief, it was the epoch of incredulity; it was the season of Light, it was the season of Darkness; it was the spring of hope, it was the winter of despair; we had everything before us, we had nothing before us; we were all going directly to Heaven, we were all going the other way.",
@@ -44,8 +44,8 @@
 }
 
 
-- (void)test_kdf_Multibyte {
-  [self verify_kdf:@{
+- (void)test_v3_kdf_Multibyte {
+  [self verify_v3_kdf:@{
     @"title": @"Multibyte",
     @"version": @"3",
     @"password": @"中文密码",
@@ -54,8 +54,8 @@
 }
 
 
-- (void)test_kdf_Mixed_language {
-  [self verify_kdf:@{
+- (void)test_v3_kdf_Mixed_language {
+  [self verify_v3_kdf:@{
     @"title": @"Mixed language",
     @"version": @"3",
     @"password": @"中文密码 with a little English, too.",
@@ -64,74 +64,8 @@
 }
 
 
-- (void)test_kdf_short_One_byte {
-  [self verify_kdf_short:@{
-    @"title": @"One byte",
-    @"version": @"3",
-    @"password": @"a",
-    @"iterations": @"1000",
-    @"salt_hex": @"0102030405060708",
-    @"key_hex": @"d48f10b7 ae39bd25 2bb68e1f af12acea 3474d7d7 702a15b2 ede3246e 82dbb2fd"}];
-}
-
-
-- (void)test_kdf_short_Short_password {
-  [self verify_kdf_short:@{
-    @"title": @"Short password",
-    @"version": @"3",
-    @"password": @"thepassword",
-    @"iterations": @"1000",
-    @"salt_hex": @"0203040506070801",
-    @"key_hex": @"3d3f64cd 31d8057b 5624567a 2caeace4 84adcfda 3fbf6401 a1f03a09 5cee6dd1"}];
-}
-
-
-- (void)test_kdf_short_Passphrase {
-  [self verify_kdf_short:@{
-    @"title": @"Passphrase",
-    @"version": @"3",
-    @"password": @"this is a bit longer password",
-    @"iterations": @"1000",
-    @"salt_hex": @"0304050607080102",
-    @"key_hex": @"18d42ea5 900f9a94 932a6a5f 10e8f89d 5222ad47 8328ecde f7ba7fe9 1b08240c"}];
-}
-
-
-- (void)test_kdf_short_Long_passphrase {
-  [self verify_kdf_short:@{
-    @"title": @"Long passphrase",
-    @"version": @"3",
-    @"password": @"$$$it was the epoch of belief, it was the epoch of incredulity; it was the season of Light, it was the season of Darkness; it was the spring of hope, it was the winter of despair; we had everything before us, we had nothing before us; we were all going directly to Heaven, we were all going the other way.",
-    @"iterations": @"1000",
-    @"salt_hex": @"0405060708010203",
-    @"key_hex": @"7a7d41ca 9eb92999 23b47d63 6ff18068 1ca5449d f77b7568 2a09fa25 001618db"}];
-}
-
-
-- (void)test_kdf_short_Multibyte {
-  [self verify_kdf_short:@{
-    @"title": @"Multibyte",
-    @"version": @"3",
-    @"password": @"中文密码",
-    @"iterations": @"1000",
-    @"salt_hex": @"0506070801020304",
-    @"key_hex": @"10ac6088 7fce25a3 5cb96b41 86e85fde 088f2cb5 5bdac89c 5deffad6 95ba8a20"}];
-}
-
-
-- (void)test_kdf_short_Mixed_language {
-  [self verify_kdf_short:@{
-    @"title": @"Mixed language",
-    @"version": @"3",
-    @"password": @"中文密码 with a little English, too.",
-    @"iterations": @"1000",
-    @"salt_hex": @"0607080102030405",
-    @"key_hex": @"1aecc100 8bf00812 1b6bbb30 201b4d62 22cf472c 3f438bcd fc52c0a0 fa03f659"}];
-}
-
-
-- (void)test_password_All_fields_empty_or_zero_with_one_byte_password_ {
-  [self verify_password:@{
+- (void)test_v3_password_All_fields_empty_or_zero_with_one_byte_password_ {
+  [self verify_v3_password:@{
     @"title": @"All fields empty or zero (with one-byte password)",
     @"version": @"3",
     @"password": @"a",
@@ -143,8 +77,8 @@
 }
 
 
-- (void)test_password_One_byte {
-  [self verify_password:@{
+- (void)test_v3_password_One_byte {
+  [self verify_v3_password:@{
     @"title": @"One byte",
     @"version": @"3",
     @"password": @"thepassword",
@@ -156,8 +90,8 @@
 }
 
 
-- (void)test_password_Exactly_one_block {
-  [self verify_password:@{
+- (void)test_v3_password_Exactly_one_block {
+  [self verify_v3_password:@{
     @"title": @"Exactly one block",
     @"version": @"3",
     @"password": @"thepassword",
@@ -169,8 +103,8 @@
 }
 
 
-- (void)test_password_More_than_one_block {
-  [self verify_password:@{
+- (void)test_v3_password_More_than_one_block {
+  [self verify_v3_password:@{
     @"title": @"More than one block",
     @"version": @"3",
     @"password": @"thepassword",
@@ -182,8 +116,8 @@
 }
 
 
-- (void)test_password_Multibyte_password {
-  [self verify_password:@{
+- (void)test_v3_password_Multibyte_password {
+  [self verify_v3_password:@{
     @"title": @"Multibyte password",
     @"version": @"3",
     @"password": @"中文密码",
@@ -195,8 +129,8 @@
 }
 
 
-- (void)test_password_Longer_text_and_password {
-  [self verify_password:@{
+- (void)test_v3_password_Longer_text_and_password {
+  [self verify_v3_password:@{
     @"title": @"Longer text and password",
     @"version": @"3",
     @"password": @"It was the best of times, it was the worst of times; it was the age of wisdom, it was the age of foolishness;",
@@ -208,92 +142,8 @@
 }
 
 
-- (void)test_password_short_All_fields_empty_or_zero_with_one_byte_password_ {
-  [self verify_password_short:@{
-    @"title": @"All fields empty or zero (with one-byte password)",
-    @"version": @"3",
-    @"password": @"a",
-    @"iterations": @"1000",
-    @"enc_salt_hex": @"0000000000000000",
-    @"hmac_salt_hex": @"0000000000000000",
-    @"iv_hex": @"00000000000000000000000000000000",
-    @"plaintext_hex": @"",
-    @"ciphertext_hex": @"03010000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 0000be42 dc470392 a3cf1106 3ffcc247 e2161363 d415cfd9 5c5f03b1 542426f8 b3cd2660 642fbcf4 7252e199 43204ed2 23a0"}];
-}
-
-
-- (void)test_password_short_One_byte {
-  [self verify_password_short:@{
-    @"title": @"One byte",
-    @"version": @"3",
-    @"password": @"thepassword",
-    @"iterations": @"1000",
-    @"enc_salt_hex": @"0001020304050607",
-    @"hmac_salt_hex": @"0102030405060708",
-    @"iv_hex": @"02030405060708090a0b0c0d0e0f0001",
-    @"plaintext_hex": @"01",
-    @"ciphertext_hex": @"03010001 02030405 06070102 03040506 07080203 04050607 08090a0b 0c0d0e0f 00013b5c 7ec811da d8e794d7 9bf5a113 67e7a9df a9f5613c b896edab c8ce6dcf a28416b0 da31ed4a 608aecb0 a9d0e387 a86c"}];
-}
-
-
-- (void)test_password_short_Exactly_one_block {
-  [self verify_password_short:@{
-    @"title": @"Exactly one block",
-    @"version": @"3",
-    @"password": @"thepassword",
-    @"iterations": @"1000",
-    @"enc_salt_hex": @"0102030405060700",
-    @"hmac_salt_hex": @"0203040506070801",
-    @"iv_hex": @"030405060708090a0b0c0d0e0f000102",
-    @"plaintext_hex": @"0123456789abcdef",
-    @"ciphertext_hex": @"03010102 03040506 07000203 04050607 08010304 05060708 090a0b0c 0d0e0f00 0102cfae 082f48a6 4274eaa9 7c227c0f f1cdbd9d e91dd8be 65256932 5ba7b748 66bc9ea1 3aeeb460 6ccbf34f feee44c0 88b7"}];
-}
-
-
-- (void)test_password_short_More_than_one_block {
-  [self verify_password_short:@{
-    @"title": @"More than one block",
-    @"version": @"3",
-    @"password": @"thepassword",
-    @"iterations": @"1000",
-    @"enc_salt_hex": @"0203040506070001",
-    @"hmac_salt_hex": @"0304050607080102",
-    @"iv_hex": @"0405060708090a0b0c0d0e0f00010203",
-    @"plaintext_hex": @"0123456789abcdef 01234567",
-    @"ciphertext_hex": @"03010203 04050607 00010304 05060708 01020405 06070809 0a0b0c0d 0e0f0001 0203e6fa 1522aa8b 0312ca18 63d8d69c 0e8b3371 509bc42e 412a4b86 e44441a3 b41eca2a 22bad8fb 5cbebb81 d310b7ee b9cb"}];
-}
-
-
-- (void)test_password_short_Multibyte_password {
-  [self verify_password_short:@{
-    @"title": @"Multibyte password",
-    @"version": @"3",
-    @"password": @"中文密码",
-    @"iterations": @"1000",
-    @"enc_salt_hex": @"0304050607000102",
-    @"hmac_salt_hex": @"0405060708010203",
-    @"iv_hex": @"05060708090a0b0c0d0e0f0001020304",
-    @"plaintext_hex": @"23456789abcdef 0123456701",
-    @"ciphertext_hex": @"03010304 05060700 01020405 06070801 02030506 0708090a 0b0c0d0e 0f000102 03049bec 58c6184f 78fbfc7c d6f05618 e5f228b6 d62386ba f3d50ebb aeabdf92 d2b6a897 e7371de3 e8fdb68b 8c568360 73ff"}];
-}
-
-
-- (void)test_password_short_Longer_text_and_password {
-  [self verify_password_short:@{
-    @"title": @"Longer text and password",
-    @"version": @"3",
-    @"password": @"It was the best of times, it was the worst of times; it was the age of wisdom, it was the age of foolishness;",
-    @"iterations": @"1000",
-    @"enc_salt_hex": @"0405060700010203",
-    @"hmac_salt_hex": @"0506070801020304",
-    @"iv_hex": @"060708090a0b0c0d0e0f000102030405",
-    @"plaintext_hex": @"69 74 20 77 61 73 20 74 68 65 20 65 70 6f 63 68 20 6f 66 20 62 65 6c 69 65 66 2c 20 69 74 20 77 61 73 20 74 68 65 20 65 70 6f 63 68 20 6f 66 20 69 6e 63 72 65 64 75 6c 69 74 79 3b 20 69 74 20 77 61 73 20 74 68 65 20 73 65 61 73 6f 6e 20 6f 66 20 4c 69 67 68 74 2c 20 69 74 20 77 61 73 20 74 68 65 20 73 65 61 73 6f 6e 20 6f 66 20 44 61 72 6b 6e 65 73 73 3b 20 69 74 20 77 61 73 20 74 68 65 20 73 70 72 69 6e 67 20 6f 66 20 68 6f 70 65 2c 20 69 74 20 77 61 73 20 74 68 65 20 77 69 6e 74 65 72 20 6f 66 20 64 65 73 70 61 69 72 3b 20 77 65 20 68 61 64 20 65 76 65 72 79 74 68 69 6e 67 20 62 65 66 6f 72 65 20 75 73 2c 20 77 65 20 68 61 64 20 6e 6f 74 68 69 6e 67 20 62 65 66 6f 72 65 20 75 73 3b 20 77 65 20 77 65 72 65 20 61 6c 6c 20 67 6f 69 6e 67 20 64 69 72 65 63 74 6c 79 20 74 6f 20 48 65 61 76 65 6e 2c 20 77 65 20 77 65 72 65 20 61 6c 6c 20 67 6f 69 6e 67 20 74 68 65 20 6f 74 68 65 72 20 77 61 79 2e 0a 0a",
-    @"ciphertext_hex": @"03010405 06070001 02030506 07080102 03040607 08090a0b 0c0d0e0f 00010203 0405c678 0c8a41db 7f8b2d36 d337093e 483e780b 5b53c16a 8c705e87 383ab1b3 597902d8 251b8be2 c81c969a 643b7e3f c87b2714 074a0a72 7b396c26 9956de30 ff67b014 3a1c3225 e2a61ec4 5a60503b cc042167 d72defed a950385b 34d3c2ce 4af05029 23302c05 ee6849e0 ad383b9f 564bca8d 12f3e4c4 47988f09 8b5a08f9 f5f6d3f7 e0181ca6 2e0083c9 8b81fa7a 74b91e17 55981304 8f93901d eaa02c11 beae201f f5d10e0d 908288bc 72dc2056 cade79ec 9dd2cc77 7481db41 368fde8b 56c8c044 bb05a81e bd33adcb ec55e71d 9f16e14a bd2491e9 f2ffe156 4c26dfb5 c30aa2fb e7ab8614 c8a70d75 d48d2060 8aa44b8e f5987530 9274e538 318f69cb 8172328c 2016f712 2e1cd9dc 37c708d2 787b6027 38f86439 b32d0334 f1ab232c 2b4ac0dc 4f307315 c7670c3a 040ca9d5 cfaab19d b125e676 3854b104 f3717e9e 561233cf a1181c46 ea893eb1 36b68756 d5a3e775 ff0b3ce9 d5a4bb3a 61c43273 60e2"}];
-}
-
-
-- (void)test_key_All_fields_empty_or_zero {
-  [self verify_key:@{
+- (void)test_v3_key_All_fields_empty_or_zero {
+  [self verify_v3_key:@{
     @"title": @"All fields empty or zero",
     @"version": @"3",
     @"enc_key_hex": @"00000000000000000000000000000000",
@@ -304,8 +154,8 @@
 }
 
 
-- (void)test_key_One_byte {
-  [self verify_key:@{
+- (void)test_v3_key_One_byte {
+  [self verify_v3_key:@{
     @"title": @"One byte",
     @"version": @"3",
     @"enc_key_hex": @"000102030405060708090a0b0c0d0e0f",
@@ -316,8 +166,8 @@
 }
 
 
-- (void)test_key_Exactly_one_block {
-  [self verify_key:@{
+- (void)test_v3_key_Exactly_one_block {
+  [self verify_v3_key:@{
     @"title": @"Exactly one block",
     @"version": @"3",
     @"enc_key_hex": @"0102030405060708090a0b0c0d0e0f00",
@@ -328,8 +178,8 @@
 }
 
 
-- (void)test_key_More_than_one_block {
-  [self verify_key:@{
+- (void)test_v3_key_More_than_one_block {
+  [self verify_v3_key:@{
     @"title": @"More than one block",
     @"version": @"3",
     @"enc_key_hex": @"02030405060708090a0b0c0d0e0f0001",

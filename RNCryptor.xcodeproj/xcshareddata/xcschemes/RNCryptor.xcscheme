@@ -37,6 +37,11 @@
                BlueprintName = "RNCryptorTests"
                ReferencedContainer = "container:RNCryptor.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "RNCryptorTests">
+               </Test>
+            </SkippedTests>
          </TestableReference>
       </Testables>
    </TestAction>
