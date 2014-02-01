@@ -18,4 +18,11 @@
 - (void)verify_v3_kdf:(NSDictionary *)vector;
 - (void)verify_v3_password:(NSDictionary *)vector;
 - (void)verify_v3_key:(NSDictionary *)vector;
+
+- (void)verify_v2_kdf:(NSDictionary *)vector;
+- (void)verify_v2_password:(NSDictionary *)vector;
+
+- (void)verify_v1_kdf:(NSDictionary *)vector;
+- (void)verify_v1_password:(NSDictionary *)vector;
+
 @end

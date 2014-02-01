@@ -3,7 +3,10 @@
 require 'optparse'
 require File.join(File.dirname(__FILE__), '../Spec/vectors', 'vectorparser')
 
-@test_files = ["v3/kdf", "v3/password", "v3/key"]
+@test_files = ["v3/kdf", "v3/password", "v3/key", 
+               "v2/kdf", "v2/password",
+               "v1/kdf", "v1/password",
+              ]
 
 @options = {}
 

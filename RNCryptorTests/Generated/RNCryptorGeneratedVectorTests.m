@@ -189,4 +189,110 @@
     @"ciphertext_hex": @"03000405 06070809 0a0b0c0d 0e0f0001 0203a7c3 b4598b47 45fb62fb 266a54ee c7dcddc9 73d5ecb8 93586198 5407d656 2314d01f d9cddf52 859611d6 e917b6e2 40f82aa5 a508ddd8 8960df8b ceea3aeb e9de"}];
 }
 
+
+- (void)test_v2_kdf_One_byte {
+  [self verify_v2_kdf:@{
+    @"title": @"One byte",
+    @"version": @"2",
+    @"password": @"a",
+    @"salt_hex": @"0102030405060708",
+    @"key_hex": @"fc632b0c a6b23eff 9a9dc3e0 e585167f 5a328916 ed19f835 58be3ba9 828797cd"}];
+}
+
+
+- (void)test_v2_kdf_Short_password {
+  [self verify_v2_kdf:@{
+    @"title": @"Short password",
+    @"version": @"2",
+    @"password": @"thepassword",
+    @"salt_hex": @"0203040506070801",
+    @"key_hex": @"0ea84f52 52310dc3 e3a7607c 33bfd1eb 580805fb 68293005 da21037c cf499626"}];
+}
+
+
+- (void)test_v2_kdf_Passphrase {
+  [self verify_v2_kdf:@{
+    @"title": @"Passphrase",
+    @"version": @"2",
+    @"password": @"this is a bit longer password",
+    @"salt_hex": @"0304050607080102",
+    @"key_hex": @"71343acb 1e9675b0 16ac65dc fe5ddac2 e57ed9c3 5565fdbb 2dd6d2ce fe263d5b"}];
+}
+
+
+- (void)test_v2_kdf_Long_passphrase {
+  [self verify_v2_kdf:@{
+    @"title": @"Long passphrase",
+    @"version": @"2",
+    @"password": @"$$$it was the epoch of belief, it was the epoch of incredulity; it was the season of Light, it was the season of Darkness; it was the spring of hope, it was the winter of despair; we had everything before us, we had nothing before us; we were all going directly to Heaven, we were all going the other way.",
+    @"salt_hex": @"0405060708010203",
+    @"key_hex": @"11b52c50 cbf45be6 a636a314 2b8c30b8 5a624481 4a7d43e3 7457f38d e46c6735"}];
+}
+
+
+- (void)test_v2_password_Multi_block {
+  [self verify_v2_password:@{
+    @"title": @"Multi-block",
+    @"version": @"2",
+    @"password": @"password",
+    @"enc_salt_hex": @"9707 6dc6 61b6 e0ce",
+    @"hmac_salt_hex": @"9da3 bb43 d95b cd45",
+    @"iv_hex": @"ee39 6d39 e342 ffdb 679b 270d cd9c 557c",
+    @"plaintext_hex": @"546869732069732061206c6f6e676572207465737420766563746f722069 6e74656e64656420746f206265206c6f6e676572207468616e206f6e6520 626c6f636b2e",
+    @"ciphertext_hex": @"020197076dc661b6e0ce9da3bb43d95bcd45ee396d39e342ffdb679b270d cd9c557c37055fffcc1b663b1e6b8c5694dbb96d97a3ac0fa3f355db6668 c5a8a2a06f10056ce92384a618a35bf0fa9eb612b0b4fa72f749f76e2f72 8c16574dc2f15b7cec1786d291c2135f932ddc5a34d9eafd6b45f99491ac 23c34299af0be68a43e6e8113bb748fbc19bcad638ea79b07309"}];
+}
+
+
+- (void)test_v1_kdf_One_byte {
+  [self verify_v1_kdf:@{
+    @"title": @"One byte",
+    @"version": @"1",
+    @"password": @"a",
+    @"salt_hex": @"0102030405060708",
+    @"key_hex": @"fc632b0c a6b23eff 9a9dc3e0 e585167f 5a328916 ed19f835 58be3ba9 828797cd"}];
+}
+
+
+- (void)test_v1_kdf_Short_password {
+  [self verify_v1_kdf:@{
+    @"title": @"Short password",
+    @"version": @"1",
+    @"password": @"thepassword",
+    @"salt_hex": @"0203040506070801",
+    @"key_hex": @"0ea84f52 52310dc3 e3a7607c 33bfd1eb 580805fb 68293005 da21037c cf499626"}];
+}
+
+
+- (void)test_v1_kdf_Passphrase {
+  [self verify_v1_kdf:@{
+    @"title": @"Passphrase",
+    @"version": @"1",
+    @"password": @"this is a bit longer password",
+    @"salt_hex": @"0304050607080102",
+    @"key_hex": @"71343acb 1e9675b0 16ac65dc fe5ddac2 e57ed9c3 5565fdbb 2dd6d2ce fe263d5b"}];
+}
+
+
+- (void)test_v1_kdf_Long_passphrase {
+  [self verify_v1_kdf:@{
+    @"title": @"Long passphrase",
+    @"version": @"1",
+    @"password": @"$$$it was the epoch of belief, it was the epoch of incredulity; it was the season of Light, it was the season of Darkness; it was the spring of hope, it was the winter of despair; we had everything before us, we had nothing before us; we were all going directly to Heaven, we were all going the other way.",
+    @"salt_hex": @"0405060708010203",
+    @"key_hex": @"11b52c50 cbf45be6 a636a314 2b8c30b8 5a624481 4a7d43e3 7457f38d e46c6735"}];
+}
+
+
+- (void)test_v1_password_Multi_block {
+  [self verify_v1_password:@{
+    @"title": @"Multi-block",
+    @"version": @"1",
+    @"password": @"password",
+    @"enc_salt_hex": @"9707 6dc6 61b6 e0ce",
+    @"hmac_salt_hex": @"9da3 bb43 d95b cd45",
+    @"iv_hex": @"ee39 6d39 e342 ffdb 679b 270d cd9c 557c",
+    @"plaintext_hex": @"546869732069732061206c6f6e676572207465737420766563746f722069 6e74656e64656420746f206265206c6f6e676572207468616e206f6e6520 626c6f636b2e",
+    @"ciphertext_hex": @"0101d5e9b0eeefa3336d7578c1f9babe4b5de9ecf9598c104ae1e080ec71 e0cabad22204d8d0dc5bf77203fa7e46465d09136cd4a194aadf2b5593d5 f9122aa13b27dc7afaca7ca1548e046a92298ee884c014b5b4a55503be28 852ba1a2750208fd5f0e410e7c1eb969c3990c621b3b73a65715de4d9ff5 6e159ee7625e852517b135dbccef0b9460350a04cd6e3d10e925"}];
+}
+
 @end
