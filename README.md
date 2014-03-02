@@ -4,11 +4,13 @@ Cross-language AES Encryptor/Decryptor [data
 format](https://github.com/RNCryptor/RNCryptor-Spec/blob/master/RNCryptor-Spec-v3.md).
  
 The primary target is Objective-C, but implementations are available in
-[C](https://github.com/megabri/MGCryptor),
-[Java](http://code.google.com/p/jncryptor/),
-[PHP](https://github.com/rnapier/RNCryptor/tree/master/php),
-[Python](https://github.com/rnapier/RNCryptor/blob/master/python/RNCryptor.py),
-and [Ruby](https://github.com/rnapier/RNCryptor/tree/master/ruby).
+[C++](https://github.com/RNCryptor/RNCryptor-cpp),
+[C#](https://github.com/RNCryptor/RNCryptor-cs),
+[Java](https://github.com/RNCryptor/JNCryptor),
+[PHP](https://github.com/RNCryptor/RNCryptor-php),
+[Python](https://github.com/RNCryptor/RNCryptor-python),
+[Javascript](https://github.com/RNCryptor/rncryptor-js),
+and [Ruby](https://github.com/RNCryptor/ruby_rncryptor).
 
 The data format includes all the metadata required to securely implement AES
 encryption, as described in ["Properly encrypting with AES with
