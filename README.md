@@ -299,7 +299,7 @@ license:
  */
 ```
 
-Portions of ths code, indicated in the source, are licensed under the APSL
+Portions of this code, indicated in the source, are licensed under the APSL
 license:
 
 ```
