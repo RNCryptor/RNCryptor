@@ -97,6 +97,75 @@ static const NSUInteger kPreambleSize = 2;
 @synthesize password = _password;
 @synthesize settings = _settings;
 
++ (void)ansychronouslyDecryptDataFromPath:(NSString *)fromPath
+                                   toPath:(NSString *)toPath
+                                 password:(NSString *)aPassword
+                             successBlock:(void (^)(NSString *toPath))successBlock
+                             failureBlock:(void (^)(NSError *error))failureBlock {
+    // Make sure that this number is larger than the header + 1 block.
+    // 33+16 bytes = 49 bytes. So it shouldn't be a problem.
+    int blockSize = 32 * 1024;
+    
+    NSInputStream *cryptedStream = [NSInputStream inputStreamWithFileAtPath:fromPath];
+    NSOutputStream *decryptedStream = [NSOutputStream outputStreamToFileAtPath:toPath append:NO];
+    
+    [cryptedStream open];
+    [decryptedStream open];
+    
+    // We don't need to keep making new NSData objects. We can just use one repeatedly.
+    __block NSMutableData *data = [NSMutableData dataWithLength:blockSize];
+    __block RNDecryptor *decryptor = nil;
+    
+    dispatch_block_t readStreamBlock = ^{
+        [data setLength:blockSize];
+        NSInteger bytesRead = [cryptedStream read:[data mutableBytes] maxLength:blockSize];
+        if (bytesRead < 0) {
+            // Throw an error
+            NSError *error = [NSError errorWithDomain:kRNCryptorErrorDomain
+                                                 code:0
+                                             userInfo:@{NSLocalizedDescriptionKey:
+                                                            @"Cannot Read from provide fromPath."}];
+            if (failureBlock) {
+                failureBlock(error);
+            }
+        }
+        else if (bytesRead == 0) {
+            [decryptor finish];
+        }
+        else {
+            [data setLength:bytesRead];
+            [decryptor addData:data];
+            NSLog(@"Sent %ld bytes to decryptor", (unsigned long)bytesRead);
+        }
+    };
+    
+    decryptor = [[RNDecryptor alloc] initWithPassword:aPassword
+                                              handler:^(RNCryptor *cryptor, NSData *data) {
+                                                  NSLog(@"Decryptor recevied %ld bytes", (unsigned long)data.length);
+                                                  if (cryptor.error == nil) {
+                                                      [decryptedStream write:data.bytes maxLength:data.length];
+                                                      if (cryptor.isFinished) {
+                                                          [decryptedStream close];
+                                                          // call my delegate that I'm finished with decrypting
+                                                          if (successBlock) {
+                                                              successBlock(toPath);
+                                                          }
+                                                      }
+                                                      else {
+                                                          // Might want to put this in a dispatch_async(), but I don't think you need it.
+                                                          readStreamBlock();
+                                                      }
+                                                  } else {
+                                                      if (failureBlock) {
+                                                          failureBlock(cryptor.error);
+                                                      }
+                                                  }
+                                              }];
+    
+    // Read the first block to kick things off
+    readStreamBlock();
+}
+
 + (NSData *)decryptData:(NSData *)theCipherText withSettings:(RNCryptorSettings)settings password:(NSString *)aPassword error:(NSError **)anError
 {
   RNDecryptor *cryptor = [[self alloc] initWithPassword:aPassword

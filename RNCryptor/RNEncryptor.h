@@ -53,6 +53,11 @@
                          HMACSalt:(NSData *)anHMACSalt
                           handler:(RNCryptorHandler)handler;
 
++ (void)ansychronouslyEncryptDataFromPath:(NSString *)fromPath
+                                   toPath:(NSString *)toPath
+                                 password:(NSString *)aPassword
+                             successBlock:(void (^)(NSString *toPath))successBlock
+                             failureBlock:(void (^)(NSError *error))failureBlock;
 
 + (NSData *)encryptData:(NSData *)data withSettings:(RNCryptorSettings)settings password:(NSString *)password error:(NSError **)error;
 + (NSData *)encryptData:(NSData *)data withSettings:(RNCryptorSettings)settings encryptionKey:(NSData *)encryptionKey HMACKey:(NSData *)HMACKey error:(NSError **)error;
