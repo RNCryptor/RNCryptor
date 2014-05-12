@@ -103,7 +103,7 @@ NSString *const kBadPassword = @"NotThePassword";
   };
 
   decryptor = [[RNDecryptor alloc] initWithPassword:kGoodPassword handler:^(RNCryptor *cryptor, NSData *data) {
-    NSLog(@"Received %d bytes", data.length);
+    NSLog(@"Received %lu bytes", (unsigned long)data.length);
     [outputStream write:data.bytes maxLength:data.length];
     if (cryptor.isFinished) {
       [outputStream close];
@@ -259,7 +259,7 @@ NSString *const kBadPassword = @"NotThePassword";
 
   NSData *decrypted = [RNDecryptor decryptData:encrypted withPassword:kGoodPassword error:&error];
   XCTAssertNil(decrypted, @"Decrypt should have failed");
-  XCTAssertEqual([error code], (NSInteger)kRNCryptorUnknownHeader, @"Wrong error code:%d", [error code]);
+  XCTAssertEqual([error code], (NSInteger)kRNCryptorUnknownHeader, @"Wrong error code:%ld", (long)[error code]);
 }
 
 - (void)testActuallyEncrypting
