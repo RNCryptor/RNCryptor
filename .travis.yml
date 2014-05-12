@@ -2,6 +2,7 @@ language: objective-c
 
 before_install:
   - git submodule update --init --recursive
+  - brew update
   - brew upgrade xctool
 
 xcode_project: RNCryptor.xcodeproj
