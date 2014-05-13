@@ -105,17 +105,6 @@ When performing async operations on streams, the data can come very quickly
 naïve way, you'll queue a work blocks faster than the engine can process them
 and your memory usage will spike. This is particularly true if there's only one
 core, such as on an iPad 1. The solution is to only dispatch new work blocks as
-the previous work blocks complete. When performing async operations on streams,
-the data can come very quickly (particularly if you're reading from a local
-file). If you use RNCryptor in a naïve way, you'll queue a work blocks faster
-than the engine can process them and your memory usage will spike. This is
-particularly true if there's only one core, such as on an iPad 1. The solution
-is to only dispatch new work blocks as the previous work blocks complete. When
-performing async operations on streams, the data can come very quickly
-(particularly if you're reading from a local file). If you use RNCryptor in a
-naïve way, you'll queue a work blocks faster than the engine can process them
-and your memory usage will spike. This is particularly true if there's only one
-core, such as on an iPad 1. The solution is to only dispatch new work blocks as
 the previous work blocks complete.
 
 ``` objc
