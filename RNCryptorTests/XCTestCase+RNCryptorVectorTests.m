@@ -18,9 +18,9 @@ NSData *GetDataForHex(NSString *hex) {
   char byte_chars[3] = {'\0','\0','\0'};
   int i;
   for (i=0; i < [hexNoSpaces length] / 2; i++) {
-    byte_chars[0] = [hexNoSpaces characterAtIndex:i*2];
-    byte_chars[1] = [hexNoSpaces characterAtIndex:i*2+1];
-    whole_byte = strtol(byte_chars, NULL, 16);
+    byte_chars[0] = (unsigned char)[hexNoSpaces characterAtIndex:i*2];
+    byte_chars[1] = (unsigned char)[hexNoSpaces characterAtIndex:i*2+1];
+    whole_byte = (unsigned char)strtol(byte_chars, NULL, 16);
     [data appendBytes:&whole_byte length:1];
   }
   return data;

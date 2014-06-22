@@ -57,12 +57,12 @@ static const NSUInteger kPreambleSize = 2;
   // The point of this routine is XOR the bytes of each data and accumulate the results with OR.
   // If any bytes are different, then the OR will accumulate some non-0 value.
 
-  uint8_t result = otherData.length - self.length;  // Start with 0 (equal) only if our lengths are equal
-
   const uint8_t *myBytes = [self bytes];
   const NSUInteger myLength = [self length];
   const uint8_t *otherBytes = [otherData bytes];
   const NSUInteger otherLength = [otherData length];
+
+  uint8_t result = otherLength != myLength;  // Start with 0 (equal) only if our lengths are equal
 
   for (NSUInteger i = 0; i < otherLength; ++i) {
     // Use mod to wrap around ourselves if they are longer than we are.
