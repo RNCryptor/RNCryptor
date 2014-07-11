@@ -37,6 +37,10 @@ NSString *const kBadPassword = @"NotThePassword";
 @property (nonatomic, readwrite, strong) RNEncryptor *encryptor;
 @end
 
+@interface NSData (RNCryptor_ConsistentCompare)
+- (BOOL)rnc_isEqualInConsistentTime:(NSData *)otherData;
+@end
+
 @implementation RNCryptorTests
 
 - (void)setUp
@@ -365,6 +369,22 @@ NSString *const kBadPassword = @"NotThePassword";
   XCTAssertEqualObjects(decryptedData, data, @"Failed to decrypt.");
 }
 
+- (void)testEqualInConsistentTime
+{
+    NSData *data = [RNCryptor randomDataOfLength:101];
+    NSData *data2 = [RNCryptor randomDataOfLength:102];
+    
+    XCTAssertFalse([data rnc_isEqualInConsistentTime:nil]);
+    XCTAssertFalse([data rnc_isEqualInConsistentTime:[NSData data]]);
+    XCTAssertFalse([data rnc_isEqualInConsistentTime:data2]);
+    XCTAssertTrue([data rnc_isEqualInConsistentTime:data]);
+    
+    /* There was a bug where two datas whose length differed by a multiple of 256 could return YES */
+    NSData *data256 = [RNCryptor randomDataOfLength:256];
+    NSMutableData *data512 = [data256 mutableCopy];
+    [data512 appendData:data256];
+    XCTAssertFalse([data256 rnc_isEqualInConsistentTime:data512]);
+}
 
 //
 //- (void)_testDataOfLength:(NSUInteger)length encryptPassword:(NSString *)encryptPassword decryptPassword:(NSString *)decryptPassword
