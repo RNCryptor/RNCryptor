@@ -217,8 +217,7 @@ this isn't an option, so I fall back to my own Encrypt-than-MAC.
 
 * PBKDF2. While bcrypt and scrypt may be more secure than PBKDF2, CommonCryptor
 only supports PBKDF2. [NIST also continues to recommend
-PBKDF2](http://security.stackexchange.com/questions/4781/do-any-security-
-experts-recommend-bcrypt-for-password-storage). We use 10k rounds of PBKDF2
+PBKDF2](http://security.stackexchange.com/questions/4781/do-any-security-experts-recommend-bcrypt-for-password-storage). We use 10k rounds of PBKDF2
 which represents about 80ms on an iPhone 4.
 
 ### Code simplicity
