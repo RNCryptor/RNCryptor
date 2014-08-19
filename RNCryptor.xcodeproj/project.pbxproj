@@ -771,6 +771,7 @@
 		FB7565151512D3C5007B806B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				DSTROOT = /tmp/RNCryptor.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RNCryptor/RNCryptor-Prefix.pch";
@@ -782,12 +783,14 @@
 				SKIP_INSTALL = YES;
 				SYMROOT = ../../build;
 				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../../SharedCode/";
+				VALID_ARCHS = "arm64 armv7 armv7s x86_64";
 			};
 			name = Debug;
 		};
 		FB7565161512D3C5007B806B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				DSTROOT = /tmp/RNCryptor.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RNCryptor/RNCryptor-Prefix.pch";
@@ -800,6 +803,7 @@
 				SYMROOT = ../../build;
 				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../../SharedCode/";
 				VALIDATE_PRODUCT = NO;
+				VALID_ARCHS = "arm64 armv7 armv7s x86_64";
 			};
 			name = Release;
 		};
