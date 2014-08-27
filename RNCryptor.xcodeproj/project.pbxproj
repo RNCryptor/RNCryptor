@@ -449,7 +449,7 @@
 			name = RNCryptorTests;
 			productName = RNCryptTests;
 			productReference = FB7565001512D3C4007B806B /* RNCryptorTests.octest */;
-			productType = "com.apple.product-type.bundle";
+			productType = "com.apple.product-type.bundle.ocunit-test";
 		};
 		FBF7D58B167E5031004B6F0F /* RNCryptorVectors */ = {
 			isa = PBXNativeTarget;
@@ -475,7 +475,8 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = RN;
-				LastUpgradeCheck = 0460;
+				LastTestingUpgradeCheck = 0600;
+				LastUpgradeCheck = 0600;
 				ORGANIZATIONNAME = "Rob Napier";
 			};
 			buildConfigurationList = FB7564EA1512D3C4007B806B /* Build configuration list for PBXProject "RNCryptor" */;
@@ -631,10 +632,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
-				);
+				FRAMEWORK_SEARCH_PATHS = "";
 				FRAMEWORK_VERSION = A;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -646,7 +644,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = RNCryptor;
 				SDKROOT = macosx;
-				SYMROOT = ../../build;
+				SYMROOT = "$(SRCROOT)/../../build";
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Debug;
@@ -661,10 +659,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SYSTEM_APPS_DIR)/Xcode.app/Contents/Developer/Library/Frameworks\"",
-				);
+				FRAMEWORK_SEARCH_PATHS = "";
 				FRAMEWORK_VERSION = A;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -675,7 +670,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = RNCryptor;
 				SDKROOT = macosx;
-				SYMROOT = ../../build;
+				SYMROOT = "$(SRCROOT)/../../build";
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Release;
@@ -780,8 +775,8 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = RNCryptor;
 				SKIP_INSTALL = YES;
-				SYMROOT = ../../build;
-				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../../SharedCode/";
+				SYMROOT = "$(SRCROOT)/../../build";
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../../SharedCode/**";
 			};
 			name = Debug;
 		};
@@ -797,8 +792,8 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = RNCryptor;
 				SKIP_INSTALL = YES;
-				SYMROOT = ../../build;
-				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../../SharedCode/";
+				SYMROOT = "$(SRCROOT)/../../build";
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../../SharedCode/**";
 				VALIDATE_PRODUCT = NO;
 			};
 			name = Release;

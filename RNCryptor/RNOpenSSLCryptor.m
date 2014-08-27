@@ -66,7 +66,7 @@ static NSData *GetHashForHash(NSData *hash, NSData *passwordSalt) {
 NSData *RNOpenSSLCryptorGetKey(NSString *password, NSData *salt, RNCryptorKeyDerivationSettings keySettings) {
   // FIXME: This is all very inefficient; we repeat ourselves in IVForKey:...
 
-  NSMutableData *key;
+  NSData *key;
   NSMutableData *passwordSalt = [[password dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
   [passwordSalt appendData:salt];
 
@@ -93,7 +93,7 @@ NSData *RNOpenSSLCryptorGetKey(NSString *password, NSData *salt, RNCryptorKeyDer
     NSData *hash2 = GetHashForHash(hash1, passwordSalt);
 
     key = [hash1 mutableCopy];
-    [key appendData:hash2];
+    [(NSMutableData*)key appendData:hash2];
   }
   return key;
 }
