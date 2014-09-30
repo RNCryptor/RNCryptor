@@ -221,7 +221,7 @@
 			children = (
 				AB13428215E0FC2300456914 /* Supporting Files */,
 			);
-			path = "RNCryptorOSX";
+			path = RNCryptorOSX;
 			sourceTree = "<group>";
 		};
 		AB13428215E0FC2300456914 /* Supporting Files */ = {
@@ -393,8 +393,8 @@
 			);
 			dependencies = (
 			);
-			name = "RNCryptorOSX";
-			productName = "RNCryptorOSX";
+			name = RNCryptorOSX;
+			productName = RNCryptorOSX;
 			productReference = AB13427A15E0FC2300456914 /* RNCryptor.framework */;
 			productType = "com.apple.product-type.framework";
 		};
@@ -767,6 +767,7 @@
 		FB7565151512D3C5007B806B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				DSTROOT = /tmp/RNCryptor.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RNCryptor/RNCryptor-Prefix.pch";
@@ -784,6 +785,7 @@
 		FB7565161512D3C5007B806B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				DSTROOT = /tmp/RNCryptor.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RNCryptor/RNCryptor-Prefix.pch";
