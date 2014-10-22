@@ -31,7 +31,7 @@ NSData *GetDataForHex(NSString *hex)
 }
 
 void usage() {
-  printf("Not like that\n");
+  printf("Encode: rncrypt -p <password> Some text to encode\nDecode: rncrypt -d -p <password> Some text to decode\n");
   exit(2);
 }
 
@@ -50,7 +50,7 @@ int main(int argc, char * const argv[])
 {
   @autoreleasepool {
 
-    int decrypt_flag;
+    int decrypt_flag = 0;
     NSString *password = nil;
     NSString *message = nil;
 
