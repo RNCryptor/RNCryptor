@@ -25,8 +25,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <CommonCrypto/CommonCryptor.h>
-#import <CommonCrypto/CommonKeyDerivation.h>
 #import <Security/Security.h>
 
 extern NSString *const kRNCryptorErrorDomain;
@@ -36,45 +34,45 @@ typedef struct _RNCryptorKeyDerivationSettings
 {
   size_t keySize;
   size_t saltSize;
-  CCPBKDFAlgorithm PBKDFAlgorithm;
-  CCPseudoRandomAlgorithm PRF;
+  uint32_t PBKDFAlgorithm;
+  uint32_t PRF;
   uint rounds;
   BOOL hasV2Password; // See Issue #77. V2 incorrectly handled multi-byte characters.
 } RNCryptorKeyDerivationSettings;
 
 typedef struct _RNCryptorSettings
 {
-  CCAlgorithm algorithm;
+  int algorithm;
   size_t blockSize;
   size_t IVSize;
-  CCOptions options;
-  CCHmacAlgorithm HMACAlgorithm;
+  uint32_t options;
+  int HMACAlgorithm;
   size_t HMACLength;
   RNCryptorKeyDerivationSettings keySettings;
   RNCryptorKeyDerivationSettings HMACKeySettings;
 } RNCryptorSettings;
 
 static const RNCryptorSettings kRNCryptorAES256Settings = {
-    .algorithm = kCCAlgorithmAES128,
-    .blockSize = kCCBlockSizeAES128,
-    .IVSize = kCCBlockSizeAES128,
-    .options = kCCOptionPKCS7Padding,
-    .HMACAlgorithm = kCCHmacAlgSHA256,
-    .HMACLength = CC_SHA256_DIGEST_LENGTH,
+    .algorithm = 0,
+    .blockSize = 16,
+    .IVSize = 16,
+    .options = 0x0001,
+    .HMACAlgorithm = 2,
+    .HMACLength = 32,
 
     .keySettings = {
-        .keySize = kCCKeySizeAES256,
+        .keySize = 32,
         .saltSize = 8,
-        .PBKDFAlgorithm = kCCPBKDF2,
-        .PRF = kCCPRFHmacAlgSHA1,
+        .PBKDFAlgorithm = 2,
+        .PRF = 1,
         .rounds = 10000
     },
 
     .HMACKeySettings = {
-        .keySize = kCCKeySizeAES256,
+        .keySize = 32,
         .saltSize = 8,
-        .PBKDFAlgorithm = kCCPBKDF2,
-        .PRF = kCCPRFHmacAlgSHA1,
+        .PBKDFAlgorithm = 2,
+        .PRF = 1,
         .rounds = 10000
     }
 };

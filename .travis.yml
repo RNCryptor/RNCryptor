@@ -11,6 +11,6 @@ xcode_sdk: iphonesimulator7.0
 
 matrix:
   include:
-    - script: xctool -project RNCryptor.xcodeproj -scheme RNCryptor -sdk iphonesimulator6.1 build
+    - script: xctool -project RNCryptor.xcodeproj -scheme RNCryptor -sdk iphonesimulator7.0 build
     - script: xctool -project RNCryptor.xcodeproj -scheme "RNCryptor OS X" -sdk macosx10.9 build
-    - script: xctool -project RNCryptor.xcodeproj -scheme "RNCryptor OS X" -sdk macosx10.8 build
+    - script: xctool -project RNCryptor.xcodeproj -scheme "RNCryptor OS X" -sdk macosx10.10 build
