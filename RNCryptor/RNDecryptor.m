@@ -28,6 +28,8 @@
 #import "RNCryptor+Private.h"
 #import "RNDecryptor.h"
 #import "RNCryptorEngine.h"
+#import <CommonCrypto/CommonCryptor.h>
+#import <CommonCrypto/CommonKeyDerivation.h>
 
 static const NSUInteger kPreambleSize = 2;
 

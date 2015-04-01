@@ -28,6 +28,8 @@
 #import "RNCryptor+Private.h"
 #import "RNEncryptor.h"
 #import "RNCryptorEngine.h"
+#import <CommonCrypto/CommonCryptor.h>
+#import <CommonCrypto/CommonKeyDerivation.h>
 
 @interface RNEncryptor ()
 @property (nonatomic, readwrite, strong) NSData *encryptionSalt;

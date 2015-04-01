@@ -24,10 +24,13 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 //
+#import <CommonCrypto/CommonCryptor.h>
+#import <CommonCrypto/CommonKeyDerivation.h>
 #import "RNCryptor.h"
 #import "RNCryptor+Private.h"
 #import <Security/SecRandom.h>
 #import <fcntl.h>
+
 
 extern int SecRandomCopyBytes(SecRandomRef rnd, size_t count, uint8_t *bytes) __attribute__((weak_import));
 extern int
