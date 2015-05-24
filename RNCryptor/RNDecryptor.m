@@ -24,7 +24,6 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-
 #import "RNCryptor+Private.h"
 #import "RNDecryptor.h"
 #import "RNCryptorEngine.h"

@@ -5,17 +5,17 @@
 //
 //  This code is licensed under the MIT License:
 //
-//  Permission is hereby granted, free of charge, to any person obtaining a 
+//  Permission is hereby granted, free of charge, to any person obtaining a
 //  copy of this software and associated documentation files (the "Software"),
 //  to deal in the Software without restriction, including without limitation
 //  the rights to use, copy, modify, merge, publish, distribute, sublicense,
 //  and/or sell copies of the Software, and to permit persons to whom the
 //  Software is furnished to do so, subject to the following conditions:
-//  
+//
 //  The above copyright notice and this permission notice shall be included in
 //  all copies or substantial portions of the Software.
 //
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 //  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 //  FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
 //  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -25,8 +25,14 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <CommonCrypto/CommonCryptor.h>
-#import <CommonCrypto/CommonKeyDerivation.h>
+
+// Swift doesn't like to import these. See https://github.com/RNCryptor/RNCryptor/issues/147
+// When RNCryptor is ported to Swift, we can bring these back. For now, everything we need
+// has been copied into RNCryptor+Swift.h
+//#import <CommonCrypto/CommonCryptor.h>
+//#import <CommonCrypto/CommonKeyDerivation.h>
+#import "RNCryptor+Swift.h"
+
 #import <Security/Security.h>
 
 extern NSString *const kRNCryptorErrorDomain;
@@ -55,28 +61,28 @@ typedef struct _RNCryptorSettings
 } RNCryptorSettings;
 
 static const RNCryptorSettings kRNCryptorAES256Settings = {
-    .algorithm = kCCAlgorithmAES128,
-    .blockSize = kCCBlockSizeAES128,
-    .IVSize = kCCBlockSizeAES128,
-    .options = kCCOptionPKCS7Padding,
-    .HMACAlgorithm = kCCHmacAlgSHA256,
-    .HMACLength = CC_SHA256_DIGEST_LENGTH,
+  .algorithm = kCCAlgorithmAES128,
+  .blockSize = kCCBlockSizeAES128,
+  .IVSize = kCCBlockSizeAES128,
+  .options = kCCOptionPKCS7Padding,
+  .HMACAlgorithm = kCCHmacAlgSHA256,
+  .HMACLength = CC_SHA256_DIGEST_LENGTH,
 
-    .keySettings = {
-        .keySize = kCCKeySizeAES256,
-        .saltSize = 8,
-        .PBKDFAlgorithm = kCCPBKDF2,
-        .PRF = kCCPRFHmacAlgSHA1,
-        .rounds = 10000
-    },
+  .keySettings = {
+    .keySize = kCCKeySizeAES256,
+    .saltSize = 8,
+    .PBKDFAlgorithm = kCCPBKDF2,
+    .PRF = kCCPRFHmacAlgSHA1,
+    .rounds = 10000
+  },
 
-    .HMACKeySettings = {
-        .keySize = kCCKeySizeAES256,
-        .saltSize = 8,
-        .PBKDFAlgorithm = kCCPBKDF2,
-        .PRF = kCCPRFHmacAlgSHA1,
-        .rounds = 10000
-    }
+  .HMACKeySettings = {
+    .keySize = kCCKeySizeAES256,
+    .saltSize = 8,
+    .PBKDFAlgorithm = kCCPBKDF2,
+    .PRF = kCCPRFHmacAlgSHA1,
+    .rounds = 10000
+  }
 };
 
 enum _RNCryptorOptions
@@ -115,20 +121,20 @@ typedef void (^RNCryptorHandler)(RNCryptor *cryptor, NSData *data);
 - (void)finish;
 
 /** Generate key given a password and salt using a PBKDF
-*
-* @param password Password to use for PBKDF
-* @param salt Salt for password
-* @param keySettings Settings for the derivation (RNCryptorKeyDerivationSettings)
-* @returns Key
-* @throws if settings are illegal
-*/
+ *
+ * @param password Password to use for PBKDF
+ * @param salt Salt for password
+ * @param keySettings Settings for the derivation (RNCryptorKeyDerivationSettings)
+ * @returns Key
+ * @throws if settings are illegal
+ */
 + (NSData *)keyForPassword:(NSString *)password salt:(NSData *)salt settings:(RNCryptorKeyDerivationSettings)keySettings;
 
 /** Generate random data
-*
-* @param length Length of data to generate
-* @returns random data
-*/
+ *
+ * @param length Length of data to generate
+ * @returns random data
+ */
 + (NSData *)randomDataOfLength:(size_t)length;
 
 @end

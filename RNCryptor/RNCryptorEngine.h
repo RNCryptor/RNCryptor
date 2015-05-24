@@ -25,7 +25,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <CommonCrypto/CommonCryptor.h>
 #import "RNCryptor.h"
 
 @interface RNCryptorEngine : NSObject
