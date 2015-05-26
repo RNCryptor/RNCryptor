@@ -16,7 +16,7 @@ FOUNDATION_EXPORT const unsigned char RNCryptor_iOSVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <RNCryptor_iOS/PublicHeader.h>
 
-#import <RNCryptor_iOS/RNCryptor.h>
-#import <RNCryptor_iOS/RNDecryptor.h>
-#import <RNCryptor_iOS/RNEncryptor.h>
-#import <RNCryptor_iOS/RNCryptorEngine.h>
+#import <RNCryptor/RNCryptor.h>
+#import <RNCryptor/RNDecryptor.h>
+#import <RNCryptor/RNEncryptor.h>
+#import <RNCryptor/RNCryptorEngine.h>

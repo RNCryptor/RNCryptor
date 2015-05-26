@@ -20,12 +20,12 @@
 		659135061B14266100B82A96 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7565221512D9A8007B806B /* Security.framework */; };
 		659135071B14266700B82A96 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB7564F31512D3C4007B806B /* Foundation.framework */; };
 		659135081B14268500B82A96 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = AB13428415E0FC2300456914 /* InfoPlist.strings */; };
-		659135091B14271500B82A96 /* RNCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB75651A1512D3E9007B806B /* RNCryptor.h */; };
-		6591350A1B14271500B82A96 /* RNDecryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B807A /* RNDecryptor.h */; };
-		6591350B1B14271500B82A96 /* RNEncryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8076 /* RNEncryptor.h */; };
-		6591350C1B14271500B82A96 /* RNCryptorEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B807E /* RNCryptorEngine.h */; };
+		659135091B14271500B82A96 /* RNCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB75651A1512D3E9007B806B /* RNCryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6591350A1B14271500B82A96 /* RNDecryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B807A /* RNDecryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6591350B1B14271500B82A96 /* RNEncryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8076 /* RNEncryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6591350C1B14271500B82A96 /* RNCryptorEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B807E /* RNCryptorEngine.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6591350D1B14271500B82A96 /* RNCryptor+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8084 /* RNCryptor+Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		6591350E1B14271500B82A96 /* RNCryptor+Swift.h in Headers */ = {isa = PBXBuildFile; fileRef = FB9BC8751B124EEF008E61DE /* RNCryptor+Swift.h */; };
+		6591350E1B14271500B82A96 /* RNCryptor+Swift.h in Headers */ = {isa = PBXBuildFile; fileRef = FB9BC8751B124EEF008E61DE /* RNCryptor+Swift.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AB13428615E0FC2300456914 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = AB13428415E0FC2300456914 /* InfoPlist.strings */; };
 		AB13429115E0FC4600456914 /* RNCryptorEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B807C /* RNCryptorEngine.m */; };
 		AB13429215E0FC4600456914 /* RNDecryptor.m in Sources */ = {isa = PBXBuildFile; fileRef = FB7565241512D9BE007B8078 /* RNDecryptor.m */; };
@@ -341,12 +341,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				659134EE1B14262C00B82A96 /* RNCryptor iOS.h in Headers */,
-				6591350D1B14271500B82A96 /* RNCryptor+Private.h in Headers */,
 				659135091B14271500B82A96 /* RNCryptor.h in Headers */,
 				6591350A1B14271500B82A96 /* RNDecryptor.h in Headers */,
 				6591350B1B14271500B82A96 /* RNEncryptor.h in Headers */,
 				6591350C1B14271500B82A96 /* RNCryptorEngine.h in Headers */,
 				6591350E1B14271500B82A96 /* RNCryptor+Swift.h in Headers */,
+				6591350D1B14271500B82A96 /* RNCryptor+Private.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -956,6 +956,7 @@
 				659134FD1B14262C00B82A96 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		AB13428D15E0FC2300456914 /* Build configuration list for PBXNativeTarget "RNCryptor OS X" */ = {
 			isa = XCConfigurationList;
