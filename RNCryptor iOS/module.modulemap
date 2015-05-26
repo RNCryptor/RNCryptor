@@ -1,0 +1,6 @@
+framework module RNCryptor {
+    umbrella header "RNCryptor iOS.h"
+
+    export *
+    module * { export * }
+}
