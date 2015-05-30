@@ -111,6 +111,8 @@
                                IV:(NSData *)anIV
                           handler:(RNCryptorHandler)aHandler
 {
+  NSParameterAssert(anEncryptionKey.length == theSettings.keySettings.keySize);
+  NSParameterAssert(anHMACKey.length == theSettings.HMACKeySettings.keySize);
   self = [super initWithHandler:aHandler];
   if (self) {
     self.IV = anIV;
