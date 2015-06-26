@@ -62,12 +62,12 @@ public func keyForPassword(password: String, salt: [UInt8]) throws -> [UInt8] {
 }
 
 public protocol DataSinkType /*: SinkType -- can I express this in Swift? */ {
-    mutating func put(data: [UInt8]) throws
+    mutating func put(data: UnsafeBufferPointer<UInt8>) throws
 }
 
 public final class DataSink: DataSinkType, CustomStringConvertible {
     public var array = [UInt8]()
-    public func put(data: [UInt8]) throws {
+    public func put(data: UnsafeBufferPointer<UInt8>) throws {
         self.array.extend(data)
     }
     public init() {}
@@ -126,25 +126,29 @@ public struct Cryptor: DataSinkType {
         header.extend([Version, UInt8(0)])  // FIXME: Refactor to support password option
         header.extend(iv)
 
-        try self.updateWith(header)
+        try self.updateWith(UnsafeBufferPointer(start: header, count:header.count))
     }
 
-    private mutating func updateWith(data: [UInt8]) throws {
-        CCHmacUpdate(&self.HMACContext, data, data.count)
+    private mutating func updateWith(data: UnsafeBufferPointer<UInt8>) throws {
+        CCHmacUpdate(&self.HMACContext, data.baseAddress, data.count)
         try self.sink.put(data)
     }
 
-    public mutating func put(data: [UInt8]) throws {
+    public mutating func put(data: UnsafeBufferPointer<UInt8>) throws {
         let outputLength = CCCryptorGetOutputLength(self.cryptor, data.count, false)
         var output = Array<UInt8>(count: outputLength, repeatedValue: 0)  // FIXME: Reuse buffer
         var dataOutMoved: Int = 0
         try checkResult(CCCryptorUpdate(
             self.cryptor,
-            data, data.count,
+            data.baseAddress, data.count,
             &output, outputLength,
             &dataOutMoved))
 
-        try updateWith(Array(output[0..<dataOutMoved])) // FIXME: Does this make a real copy?
+        try self.updateWith(UnsafeBufferPointer(start: output, count:dataOutMoved)) // FIXME: Does this make a real copy?
+    }
+
+    public mutating func put(data: [UInt8]) throws {
+        try self.put(UnsafeBufferPointer(start: data, count: data.count))
     }
 
     public mutating func finish() throws {
@@ -159,12 +163,12 @@ public struct Cryptor: DataSinkType {
             )
         )
 
-        try updateWith(Array(output[0..<dataOutMoved])) // FIXME: Does this make a real copy?
+        try updateWith(UnsafeBufferPointer(start: output, count: dataOutMoved))
 
         var HMAC = Array<UInt8>(count: HMACSize, repeatedValue: 0)
         CCHmacFinal(&self.HMACContext, &HMAC)
 
-        try self.sink.put(HMAC)
+        try self.sink.put(UnsafeBufferPointer(start: HMAC, count: HMAC.count))
     }
 }
 
