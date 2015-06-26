@@ -55,10 +55,10 @@ class RNCryptorTests: XCTestCase {
     func testRandomData() {
         let len = 1024
         do {
-            let data = try RNCryptor.randomDataOfLength(len)
+            let data = try randomDataOfLength(len)
             XCTAssertEqual(data.count, len)
 
-            let secondData = try RNCryptor.randomDataOfLength(len)
+            let secondData = try randomDataOfLength(len)
             XCTAssertNotEqual(data, secondData, "Random data this long should never be equal")
 
         } catch {
@@ -71,7 +71,7 @@ class RNCryptorTests: XCTestCase {
             let password = "a"
 
             guard let salt = "0102030405060708".dataFromHexString() else { XCTFail(); return }
-            let key = try RNCryptor.keyForPassword(password, salt: salt)
+            let key = try keyForPassword(password, salt: salt)
 
             guard let expect = "fc632b0c a6b23eff 9a9dc3e0 e585167f 5a328916 ed19f835 58be3ba9 828797cd".dataFromHexString() else { XCTFail(); return }
             XCTAssertEqual(key, expect)
@@ -80,26 +80,25 @@ class RNCryptorTests: XCTestCase {
         }
     }
 
-    func testKey() {
+    func testCryptorKey() {
         do {
-            let data = try RNCryptor.randomDataOfLength(1024)
-            let encryptKey = try RNCryptor.randomDataOfLength(RNCryptor.KeySize)
-            let HMACKey = try RNCryptor.randomDataOfLength(RNCryptor.KeySize)
+            let data = try randomDataOfLength(1024)
+            let encryptKey = try randomDataOfLength(RNCryptor.KeySize)
+            let iv = try randomDataOfLength(RNCryptor.IVSize)
 
-            let encrypted = RNCryptor.DataSink()
-            var encryptor = try RNCryptor.Cryptor(operation: CCOperation(kCCEncrypt), encryptionKey: encryptKey, HMACKey: HMACKey, sink: encrypted)
+            let encrypted = DataSink()
+            var encryptor = try Cryptor(operation: CCOperation(kCCEncrypt), key: encryptKey, IV: iv, sink: encrypted)
             try encryptor.put(data)
             try encryptor.finish()
 
-            print(encrypted)
+            let decrypted = DataSink()
+            var decryptor = try Cryptor(operation: CCOperation(kCCDecrypt), key: encryptKey, IV: iv, sink: decrypted)
+            try decryptor.put(encrypted.array)
+            try decryptor.finish()
 
-
-            //                let encryptedData = try RNCryptor.encryptData(data, encryptionKey: encryptKey, HMACKey: HMACKey)
-            //                let decryptedData = try RNCryptor.decryptData(data, encryptionKey: encryptKey, HMACKey: HMACKey)
-            //                XCTAssertEqual(data, decryptedData)
+            XCTAssertEqual(decrypted.array, data)
         } catch {
-            XCTFail("Encryption failed: \(error)")
+            XCTFail("\(error)")
         }
     }
-    
 }

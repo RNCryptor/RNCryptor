@@ -65,8 +65,17 @@ public protocol DataSinkType /*: SinkType -- can I express this in Swift? */ {
     mutating func put(data: UnsafeBufferPointer<UInt8>) throws
 }
 
+public extension DataSinkType {
+    public mutating func put(data: [UInt8]) throws {
+        try data.withUnsafeBufferPointer {
+            try self.put($0)
+        }
+    }
+}
+
+
 public final class DataSink: DataSinkType, CustomStringConvertible {
-    public var array = [UInt8]()
+    public var array: [UInt8] = []
     public func put(data: UnsafeBufferPointer<UInt8>) throws {
         self.array.extend(data)
     }
@@ -76,9 +85,76 @@ public final class DataSink: DataSinkType, CustomStringConvertible {
     }
 }
 
+private struct HMACSink: DataSinkType {
+    var sink: DataSinkType
+    var context: CCHmacContext
+
+    init(key: [UInt8], sink: DataSinkType) throws {
+        self.sink = sink
+
+        guard key.count == KeySize else {
+            throw Error.ParameterError
+        }
+
+        self.context = {
+            var context = CCHmacContext()
+            CCHmacInit(
+                &context,
+                CCHmacAlgorithm(kCCHmacAlgSHA256),
+                key,
+                key.count
+            )
+            return context
+            }()
+    }
+    mutating func put(data: UnsafeBufferPointer<UInt8>) throws {
+        CCHmacUpdate(&self.context, data.baseAddress, data.count)
+    }
+
+    mutating func final() -> [UInt8] {
+        var hmac = Array<UInt8>(count: HMACSize, repeatedValue: 0)
+        CCHmacFinal(&self.context, &hmac)
+        return hmac
+    }
+}
+
 private func checkResult(result: CCCryptorStatus) throws {
     guard result == CCCryptorStatus(kCCSuccess) else {
         throw NSError(domain: CCErrorDomain, code: Int(result), userInfo: nil)
+    }
+}
+
+public struct Encryptor: DataSinkType {
+    public var sink: DataSinkType
+
+    private var cryptor: Cryptor
+    private var hmacSink: HMACSink
+
+    public init(encryptionKey: [UInt8], HMACKey: [UInt8], sink: DataSinkType) throws {
+        self.sink = sink
+
+        self.hmacSink = try HMACSink(key: HMACKey, sink: sink)
+
+        let iv = try randomDataOfLength(IVSize)
+
+        self.cryptor = try Cryptor(operation: CCOperation(kCCEncrypt), key: encryptionKey, IV: HMACKey, sink: self.hmacSink)
+
+        var header = [UInt8]()
+        header.extend([Version, UInt8(0)])  // FIXME: Refactor to support password option
+        header.extend(iv)
+
+        try header.withUnsafeBufferPointer {
+            try self.hmacSink.put($0)
+        }
+    }
+
+    public mutating func put(data: UnsafeBufferPointer<UInt8>) throws {
+        try self.hmacSink.put(data)
+    }
+
+    public mutating func finish() throws {
+        try self.cryptor.finish()
+        try self.sink.put(self.hmacSink.final())
     }
 }
 
@@ -86,16 +162,13 @@ public struct Cryptor: DataSinkType {
     public var sink: DataSinkType
 
     private let cryptor: CCCryptorRef
-    private var HMACContext: CCHmacContext
 
-    public init(operation: CCOperation, encryptionKey: [UInt8], HMACKey: [UInt8], sink: DataSinkType) throws {
+    public init(operation: CCOperation, key: [UInt8], IV: [UInt8], sink: DataSinkType) throws {
         self.sink = sink
 
-        guard encryptionKey.count == KeySize && HMACKey.count == KeySize else {
+        guard key.count == KeySize else {
             throw Error.ParameterError
         }
-
-        let iv = try randomDataOfLength(IVSize)
 
         self.cryptor = try {
             var cryptorOut = CCCryptorRef()
@@ -103,35 +176,13 @@ public struct Cryptor: DataSinkType {
                 CCCryptorCreate(
                     operation,
                     CCAlgorithm(kCCAlgorithmAES128), CCOptions(kCCOptionPKCS7Padding),
-                    encryptionKey, encryptionKey.count,
-                    iv,
+                    key, key.count,
+                    IV,
                     &cryptorOut
                 )
             )
             return cryptorOut
             }()
-
-        self.HMACContext = {
-            var HMACOut = CCHmacContext()
-            CCHmacInit(
-                &HMACOut,
-                CCHmacAlgorithm(kCCHmacAlgSHA256),
-                HMACKey,
-                HMACKey.count
-            )
-            return HMACOut
-            }()
-
-        var header = [UInt8]()
-        header.extend([Version, UInt8(0)])  // FIXME: Refactor to support password option
-        header.extend(iv)
-
-        try self.updateWith(UnsafeBufferPointer(start: header, count:header.count))
-    }
-
-    private mutating func updateWith(data: UnsafeBufferPointer<UInt8>) throws {
-        CCHmacUpdate(&self.HMACContext, data.baseAddress, data.count)
-        try self.sink.put(data)
     }
 
     public mutating func put(data: UnsafeBufferPointer<UInt8>) throws {
@@ -144,11 +195,9 @@ public struct Cryptor: DataSinkType {
             &output, outputLength,
             &dataOutMoved))
 
-        try self.updateWith(UnsafeBufferPointer(start: output, count:dataOutMoved)) // FIXME: Does this make a real copy?
-    }
-
-    public mutating func put(data: [UInt8]) throws {
-        try self.put(UnsafeBufferPointer(start: data, count: data.count))
+        try output.withUnsafeBufferPointer {
+            try self.sink.put(UnsafeBufferPointer(start: $0.baseAddress, count: dataOutMoved))
+        }
     }
 
     public mutating func finish() throws {
@@ -163,14 +212,10 @@ public struct Cryptor: DataSinkType {
             )
         )
 
-        try updateWith(UnsafeBufferPointer(start: output, count: dataOutMoved))
-
-        var HMAC = Array<UInt8>(count: HMACSize, repeatedValue: 0)
-        CCHmacFinal(&self.HMACContext, &HMAC)
-
-        try self.sink.put(UnsafeBufferPointer(start: HMAC, count: HMAC.count))
+        try self.sink.put(UnsafeBufferPointer(start: output, count:dataOutMoved))
     }
 }
+
 
 
 //public func encryptData(data: NSData, encryptionKey: NSData, HMACKey: NSData) throws -> NSData {
