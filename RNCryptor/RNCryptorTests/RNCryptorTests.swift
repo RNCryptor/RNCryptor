@@ -8,15 +8,16 @@
 
 import XCTest
 import RNCryptor
+import CommonCrypto
 
 let kGoodPassword = "Passw0rd!"
 let kBadPassword = "NotThePassword"
 
 
 extension String {
-    public func dataFromHexString() -> NSData? {
+    public func dataFromHexString() -> [UInt8]? {
         // Based on: http://stackoverflow.com/a/2505561/313633
-        let data = NSMutableData()
+        var data = [UInt8]()
 
         let input = self.stringByReplacingOccurrencesOfString(" ", withString: "")
             .stringByReplacingOccurrencesOfString("<", withString: "")
@@ -30,7 +31,7 @@ extension String {
                 let scanner = NSScanner(string: string)
                 var value: UInt32 = 0
                 scanner.scanHexInt(&value)
-                data.appendBytes(&value, length: 1)
+                data.append(UInt8(value))
                 string = ""
             }
         }
@@ -55,7 +56,7 @@ class RNCryptorTests: XCTestCase {
         let len = 1024
         do {
             let data = try RNCryptor.randomDataOfLength(len)
-            XCTAssertEqual(data.length, len)
+            XCTAssertEqual(data.count, len)
 
             let secondData = try RNCryptor.randomDataOfLength(len)
             XCTAssertNotEqual(data, secondData, "Random data this long should never be equal")
@@ -79,15 +80,26 @@ class RNCryptorTests: XCTestCase {
         }
     }
 
-    //    func testSimple() {
-    //        do {
-    //            let data = try RNCryptor.randomDataOfLength(1024)
-    //            let encryptedData = try RNCryptor.encryptData(data, password: kGoodPassword)
-    //            let decryptedData = try RNCryptor.decryptData(data, password: kGoodPassword)
-    //            XCTAssertEqual(data, decryptedData)
-    //        } catch {
-    //            XCTFail("Encryption failed: \(error)")
-    //        }
-    //    }
+    func testKey() {
+        do {
+            let data = try RNCryptor.randomDataOfLength(1024)
+            let encryptKey = try RNCryptor.randomDataOfLength(RNCryptor.KeySize)
+            let HMACKey = try RNCryptor.randomDataOfLength(RNCryptor.KeySize)
+
+            let encrypted = RNCryptor.DataSink()
+            var encryptor = try RNCryptor.Cryptor(operation: CCOperation(kCCEncrypt), encryptionKey: encryptKey, HMACKey: HMACKey, sink: encrypted)
+            try encryptor.put(data)
+            try encryptor.finish()
+
+            print(encrypted)
+
+
+            //                let encryptedData = try RNCryptor.encryptData(data, encryptionKey: encryptKey, HMACKey: HMACKey)
+            //                let decryptedData = try RNCryptor.decryptData(data, encryptionKey: encryptKey, HMACKey: HMACKey)
+            //                XCTAssertEqual(data, decryptedData)
+        } catch {
+            XCTFail("Encryption failed: \(error)")
+        }
+    }
     
 }
