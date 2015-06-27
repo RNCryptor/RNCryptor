@@ -7,15 +7,16 @@
 //
 
 import XCTest
-import RNCryptor
 import CommonCrypto
+
+@testable import RNCryptor
 
 let kGoodPassword = "Passw0rd!"
 let kBadPassword = "NotThePassword"
 
 
 extension String {
-    public func dataFromHexString() -> [UInt8]? {
+    public func dataFromHexString() -> [UInt8] {
         // Based on: http://stackoverflow.com/a/2505561/313633
         var data = [UInt8]()
 
@@ -30,7 +31,7 @@ extension String {
             if(string.characters.count == 2) {
                 let scanner = NSScanner(string: string)
                 var value: UInt32 = 0
-                scanner.scanHexInt(&value)
+                guard scanner.scanHexInt(&value) else { fatalError() }
                 data.append(UInt8(value))
                 string = ""
             }
@@ -70,17 +71,17 @@ class RNCryptorTests: XCTestCase {
         do {
             let password = "a"
 
-            guard let salt = "0102030405060708".dataFromHexString() else { XCTFail(); return }
+            let salt = "0102030405060708".dataFromHexString()
             let key = try keyForPassword(password, salt: salt)
 
-            guard let expect = "fc632b0c a6b23eff 9a9dc3e0 e585167f 5a328916 ed19f835 58be3ba9 828797cd".dataFromHexString() else { XCTFail(); return }
+            let expect = "fc632b0c a6b23eff 9a9dc3e0 e585167f 5a328916 ed19f835 58be3ba9 828797cd".dataFromHexString()
             XCTAssertEqual(key, expect)
         } catch  {
             XCTFail("Failed: \(error)")
         }
     }
 
-    func testCryptorKey() {
+    func testCryptor() {
         do {
             let data = try randomDataOfLength(1024)
             let encryptKey = try randomDataOfLength(RNCryptor.KeySize)
@@ -99,6 +100,25 @@ class RNCryptorTests: XCTestCase {
             XCTAssertEqual(decrypted.array, data)
         } catch {
             XCTFail("\(error)")
+        }
+    }
+
+    func testEncryptor() {
+        do {
+            let encryptKey = "000102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f".dataFromHexString()
+            let hmacKey = "0102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f00".dataFromHexString()
+            let iv = "02030405060708090a0b0c0d0e0f0001".dataFromHexString()
+            let plaintext = "01".dataFromHexString()
+            let ciphertext = "03000203 04050607 08090a0b 0c0d0e0f 0001981b 22e7a644 8118d695 bd654f72 e9d6ed75 ec14ae2a a067eed2 a98a56e0 993dfe22 ab5887b3 f6e3cdd4 0767f519 5eb5".dataFromHexString()
+
+            let encrypted = DataSink()
+            var encryptor = try Encryptor(encryptionKey: encryptKey, HMACKey: hmacKey, IV: iv, sink: encrypted)
+            try encryptor.put(plaintext)
+            try encryptor.finish()
+
+            XCTAssertEqual(encrypted.array, ciphertext)
+        } catch  {
+            XCTFail("Failed: \(error)")
         }
     }
 }

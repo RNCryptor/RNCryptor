@@ -8,6 +8,10 @@
 
 import Foundation
 
+//
+// This is just needed until withUnsafe* has rethrows
+//
+
 enum Result<T> {
     case Success(T)
     case Failure(ErrorType)
