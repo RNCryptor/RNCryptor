@@ -29,7 +29,7 @@ enum Result<T> {
     }
 }
 
-extension Array {
+public extension Array {
     func withUnsafeBufferPointer<R>(@noescape body: (UnsafeBufferPointer<T>) throws -> R) throws -> R {
         return try self.withUnsafeBufferPointer { buf in
             return Result{ try body(buf) }}.value()
@@ -38,5 +38,23 @@ extension Array {
     mutating func withUnsafeMutableBufferPointer<R>(@noescape body: (inout UnsafeMutableBufferPointer<T>) throws -> R) throws-> R {
         return try self.withUnsafeMutableBufferPointer { (inout buf: UnsafeMutableBufferPointer<T>) in
             return Result{try body(&buf)}}.value()
+    }
+}
+
+public extension ArraySlice {
+    func withUnsafeBufferPointer<R>(@noescape body: (UnsafeBufferPointer<T>) throws -> R) throws -> R {
+        return try self.withUnsafeBufferPointer { buf in
+            return Result{ try body(buf) }}.value()
+    }
+
+    mutating func withUnsafeMutableBufferPointer<R>(@noescape body: (inout UnsafeMutableBufferPointer<T>) throws -> R) throws-> R {
+        return try self.withUnsafeMutableBufferPointer { (inout buf: UnsafeMutableBufferPointer<T>) in
+            return Result{try body(&buf)}}.value()
+    }
+}
+
+extension UnsafeBufferPointer: Sliceable {
+    public subscript (bounds: Range<Index>) -> UnsafeBufferPointer<T> {
+        return(UnsafeBufferPointer(start: self.baseAddress + bounds.startIndex, count: bounds.count))
     }
 }

@@ -55,16 +55,11 @@ class RNCryptorTests: XCTestCase {
 
     func testRandomData() {
         let len = 1024
-        do {
-            let data = try randomDataOfLength(len)
-            XCTAssertEqual(data.count, len)
+        let data = randomDataOfLength(len)
+        XCTAssertEqual(data.count, len)
 
-            let secondData = try randomDataOfLength(len)
-            XCTAssertNotEqual(data, secondData, "Random data this long should never be equal")
-
-        } catch {
-            XCTFail("Failed: \(error)")
-        }
+        let secondData = randomDataOfLength(len)
+        XCTAssertNotEqual(data, secondData, "Random data this long should never be equal")
     }
 
     func testKDF() {
@@ -83,17 +78,17 @@ class RNCryptorTests: XCTestCase {
 
     func testCryptor() {
         do {
-            let data = try randomDataOfLength(1024)
-            let encryptKey = try randomDataOfLength(RNCryptor.KeySize)
-            let iv = try randomDataOfLength(RNCryptor.IVSize)
+            let data = randomDataOfLength(1024)
+            let encryptKey = randomDataOfLength(RNCryptor.KeySize)
+            let iv = randomDataOfLength(RNCryptor.IVSize)
 
             let encrypted = DataSink()
-            let encryptor = try Cryptor(operation: CCOperation(kCCEncrypt), key: encryptKey, IV: iv, sink: encrypted)
+            let encryptor = Cryptor(operation: CCOperation(kCCEncrypt), key: encryptKey, IV: iv, sink: encrypted)
             try encryptor.put(data)
             try encryptor.finish()
 
             let decrypted = DataSink()
-            let decryptor = try Cryptor(operation: CCOperation(kCCDecrypt), key: encryptKey, IV: iv, sink: decrypted)
+            let decryptor = Cryptor(operation: CCOperation(kCCDecrypt), key: encryptKey, IV: iv, sink: decrypted)
             try decryptor.put(encrypted.array)
             try decryptor.finish()
 
@@ -103,7 +98,7 @@ class RNCryptorTests: XCTestCase {
         }
     }
 
-    func testEncryptor() {
+    func testKeyEncryptor() {
         do {
             let encryptKey = "000102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f".dataFromHexString()
             let hmacKey = "0102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f00".dataFromHexString()
@@ -112,13 +107,32 @@ class RNCryptorTests: XCTestCase {
             let ciphertext = "03000203 04050607 08090a0b 0c0d0e0f 0001981b 22e7a644 8118d695 bd654f72 e9d6ed75 ec14ae2a a067eed2 a98a56e0 993dfe22 ab5887b3 f6e3cdd4 0767f519 5eb5".dataFromHexString()
 
             let encrypted = DataSink()
-            let encryptor = try Encryptor(encryptionKey: encryptKey, HMACKey: hmacKey, IV: iv, sink: encrypted)
+            let encryptor = Encryptor(encryptionKey: encryptKey, HMACKey: hmacKey, IV: iv, sink: encrypted)
             try encryptor.put(plaintext)
             try encryptor.finish()
 
             XCTAssertEqual(encrypted.array, ciphertext)
-        } catch  {
+        } catch {
             XCTFail("Failed: \(error)")
         }
     }
+
+    func testKeyDecryptor() {
+        do {
+            let encryptKey = "000102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f".dataFromHexString()
+            let hmacKey = "0102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f00".dataFromHexString()
+            let plaintext = "01".dataFromHexString()
+            let ciphertext = "03000203 04050607 08090a0b 0c0d0e0f 0001981b 22e7a644 8118d695 bd654f72 e9d6ed75 ec14ae2a a067eed2 a98a56e0 993dfe22 ab5887b3 f6e3cdd4 0767f519 5eb5".dataFromHexString()
+
+            let decrypted = DataSink()
+            let decryptor = try KeyDecryptorV3(encryptionKey: encryptKey, hmacKey: hmacKey, sink: decrypted)
+            try decryptor.put(ciphertext)
+            try decryptor.finish()
+            
+            XCTAssertEqual(decrypted.array, plaintext)
+        } catch {
+            XCTFail("Failed: \(error)")
+        }
+    }
+    
 }

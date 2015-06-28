@@ -12,28 +12,33 @@ public class Cryptor: DataSinkType {
     public var sink: DataSinkType
 
     private let cryptor: CCCryptorRef
+    public var error: NSError?
 
-    public init(operation: CCOperation, key: [UInt8], IV: [UInt8], sink: DataSinkType) throws {
+    public init(operation: CCOperation, key: [UInt8], IV: [UInt8], sink: DataSinkType) {
+        assert(key.count == KeySize)
+        assert(IV.count == IVSize)
         self.sink = sink
 
-        do {
-            var cryptorOut = CCCryptorRef()
-            try checkResult(
-                CCCryptorCreate(
-                    operation,
-                    CCAlgorithm(kCCAlgorithmAES128), CCOptions(kCCOptionPKCS7Padding),
-                    key, key.count,
-                    IV,
-                    &cryptorOut
-                )
-            )
-            self.cryptor = cryptorOut
-        } catch {
-            self.cryptor = CCCryptorRef()
+        var cryptorOut = CCCryptorRef()
+        let result = CCCryptorCreate(
+            operation,
+            CCAlgorithm(kCCAlgorithmAES128), CCOptions(kCCOptionPKCS7Padding),
+            key, key.count,
+            IV,
+            &cryptorOut
+        )
+        self.cryptor = cryptorOut
+        if result != CCCryptorStatus(kCCSuccess) {
+            assertionFailure("Failed to create CCCryptor")
+            self.error = NSError(domain: CCErrorDomain, code: Int(result), userInfo: nil)
         }
     }
 
     public func put(data: UnsafeBufferPointer<UInt8>) throws {
+        if let err = self.error {
+            throw err
+        }
+
         let outputLength = CCCryptorGetOutputLength(self.cryptor, data.count, false)
         var output = Array<UInt8>(count: outputLength, repeatedValue: 0)  // FIXME: Reuse buffer
         var dataOutMoved: Int = 0
@@ -43,8 +48,10 @@ public class Cryptor: DataSinkType {
             &output, outputLength,
             &dataOutMoved))
 
-        try output.withUnsafeBufferPointer {
-            try self.sink.put(UnsafeBufferPointer(start: $0.baseAddress, count: dataOutMoved))
+        if dataOutMoved > 0 {
+            try output.withUnsafeBufferPointer { buf -> Void in
+                try self.sink.put(buf[0..<dataOutMoved])
+            }
         }
     }
 
@@ -60,8 +67,10 @@ public class Cryptor: DataSinkType {
             )
         )
 
-        try output.withUnsafeBufferPointer {
-            try self.sink.put(UnsafeBufferPointer(start: $0.baseAddress, count: dataOutMoved))
+        if dataOutMoved > 0 {
+            try output.withUnsafeBufferPointer {
+                try self.sink.put($0[0..<dataOutMoved])
+            }
         }
     }
 }

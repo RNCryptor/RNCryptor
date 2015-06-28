@@ -13,6 +13,10 @@
 		FB627FD21B2B7A1700C3A579 /* RNCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB627FD11B2B7A1700C3A579 /* RNCryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FB627FD91B2B7A1800C3A579 /* RNCryptor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB627FCE1B2B7A1700C3A579 /* RNCryptor.framework */; };
 		FB627FDE1B2B7A1800C3A579 /* RNCryptorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB627FDD1B2B7A1800C3A579 /* RNCryptorTests.swift */; };
+		FBA08AB11B3F450F00F97862 /* Sliceable.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA08AB01B3F450F00F97862 /* Sliceable.swift */; };
+		FBA08AB51B3F480700F97862 /* BufferSink.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA08AB41B3F480700F97862 /* BufferSink.swift */; };
+		FBA08AB71B3F566A00F97862 /* TeeSink.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA08AB61B3F566900F97862 /* TeeSink.swift */; };
+		FBA08AB91B40589400F97862 /* BufferSinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA08AB81B40589400F97862 /* BufferSinkTests.swift */; };
 		FBC514E01B3EE76700DB99DE /* Cryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBC514DF1B3EE76700DB99DE /* Cryptor.swift */; };
 		FBC514E21B3EEC9D00DB99DE /* Encryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBC514E11B3EEC9D00DB99DE /* Encryptor.swift */; };
 		FBC514E41B3EEED300DB99DE /* Decryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBC514E31B3EEED300DB99DE /* Decryptor.swift */; };
@@ -53,6 +57,10 @@
 		FB627FD81B2B7A1800C3A579 /* RNCryptorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RNCryptorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB627FDD1B2B7A1800C3A579 /* RNCryptorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNCryptorTests.swift; sourceTree = "<group>"; };
 		FB627FDF1B2B7A1800C3A579 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FBA08AB01B3F450F00F97862 /* Sliceable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sliceable.swift; sourceTree = "<group>"; };
+		FBA08AB41B3F480700F97862 /* BufferSink.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BufferSink.swift; sourceTree = "<group>"; };
+		FBA08AB61B3F566900F97862 /* TeeSink.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TeeSink.swift; sourceTree = "<group>"; };
+		FBA08AB81B40589400F97862 /* BufferSinkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BufferSinkTests.swift; sourceTree = "<group>"; };
 		FBC514DF1B3EE76700DB99DE /* Cryptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cryptor.swift; sourceTree = "<group>"; };
 		FBC514E11B3EEC9D00DB99DE /* Encryptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Encryptor.swift; sourceTree = "<group>"; };
 		FBC514E31B3EEED300DB99DE /* Decryptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Decryptor.swift; sourceTree = "<group>"; };
@@ -124,15 +132,18 @@
 		FB627FD01B2B7A1700C3A579 /* RNCryptor */ = {
 			isa = PBXGroup;
 			children = (
+				FBA08AB41B3F480700F97862 /* BufferSink.swift */,
 				FB627FD11B2B7A1700C3A579 /* RNCryptor.h */,
 				FB627FD31B2B7A1700C3A579 /* Info.plist */,
 				FB30A1FE1B2B7BF300BE5429 /* RNCryptor.swift */,
 				FBC514E11B3EEC9D00DB99DE /* Encryptor.swift */,
 				FBC514E31B3EEED300DB99DE /* Decryptor.swift */,
+				FBA08AB61B3F566900F97862 /* TeeSink.swift */,
 				FBC514DF1B3EE76700DB99DE /* Cryptor.swift */,
 				FBD2275F1B3DF5F00064EFBB /* UnsafeBufferPointerRethrows.swift */,
 				FBD227771B3EE5330064EFBB /* DataSink.swift */,
 				FBD227791B3EE5760064EFBB /* HMAC.swift */,
+				FBA08AB01B3F450F00F97862 /* Sliceable.swift */,
 			);
 			path = RNCryptor;
 			sourceTree = "<group>";
@@ -142,6 +153,7 @@
 			children = (
 				FB627FDD1B2B7A1800C3A579 /* RNCryptorTests.swift */,
 				FB627FDF1B2B7A1800C3A579 /* Info.plist */,
+				FBA08AB81B40589400F97862 /* BufferSinkTests.swift */,
 			);
 			path = RNCryptorTests;
 			sourceTree = "<group>";
@@ -302,10 +314,13 @@
 				FBC514E41B3EEED300DB99DE /* Decryptor.swift in Sources */,
 				FB30A1FF1B2B7BF300BE5429 /* RNCryptor.swift in Sources */,
 				FBD227601B3DF5F00064EFBB /* UnsafeBufferPointerRethrows.swift in Sources */,
+				FBA08AB51B3F480700F97862 /* BufferSink.swift in Sources */,
 				FBC514E01B3EE76700DB99DE /* Cryptor.swift in Sources */,
 				FBD2277A1B3EE5760064EFBB /* HMAC.swift in Sources */,
 				FBC514E21B3EEC9D00DB99DE /* Encryptor.swift in Sources */,
+				FBA08AB11B3F450F00F97862 /* Sliceable.swift in Sources */,
 				FBD227781B3EE5330064EFBB /* DataSink.swift in Sources */,
+				FBA08AB71B3F566A00F97862 /* TeeSink.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -313,6 +328,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FBA08AB91B40589400F97862 /* BufferSinkTests.swift in Sources */,
 				FB627FDE1B2B7A1800C3A579 /* RNCryptorTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

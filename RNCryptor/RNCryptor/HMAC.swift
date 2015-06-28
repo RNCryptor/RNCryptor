@@ -9,15 +9,10 @@
 import CommonCrypto
 
 internal final class HMACSink: DataSinkType {
-    var sink: DataSinkType
     var context: CCHmacContext = CCHmacContext()
 
-    init(key: [UInt8], sink: DataSinkType) throws {
-        self.sink = sink
-
-        guard key.count == KeySize else {
-            throw Error.ParameterError
-        }
+    init(key: [UInt8]) {
+        assert(key.count == KeySize)
         CCHmacInit(
             &self.context,
             CCHmacAlgorithm(kCCHmacAlgSHA256),
@@ -28,7 +23,6 @@ internal final class HMACSink: DataSinkType {
 
     func put(data: UnsafeBufferPointer<UInt8>) throws {
         CCHmacUpdate(&self.context, data.baseAddress, data.count)
-        try self.sink.put(data)
     }
 
     func final() -> [UInt8] {

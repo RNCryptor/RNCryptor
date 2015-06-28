@@ -25,12 +25,13 @@ public enum Error: ErrorType {
     case ParameterError
 }
 
-public func randomDataOfLength(length: Int) throws -> [UInt8] {
+public func randomDataOfLength(length: Int) -> [UInt8] {
     var data = [UInt8](count: length, repeatedValue: 0)
 
     let result = SecRandomCopyBytes(kSecRandomDefault, length, &data)
+
     if result != errSecSuccess {
-        throw NSError(domain: CCErrorDomain, code: Int(errno), userInfo: nil)
+        fatalError("Could not generate secure random numbers. Something is terribly wrong.")
     }
 
     return data
