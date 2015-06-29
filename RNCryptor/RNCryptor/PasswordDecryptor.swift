@@ -8,25 +8,24 @@
 
 import CommonCrypto
 
-final class KeyDecryptorV3: DataSinkType, DecryptorType {
+final class PasswordDecryptorV3: DataSinkType, DecryptorType {
     // Buffer -> Tee -> HMAC
     //               -> Cryptor -> Sink
 
     static let version = UInt8(3)
-    static let options = UInt8(0)
-    static let headerLength: Int = sizeofValue(version) + sizeofValue(options) + IVSize
+    static let options = UInt8(1)
+    static var headerLength: Int = sizeofValue(version) + sizeofValue(options) + SaltSize + SaltSize + IVSize
 
     private var bufferSink: BufferSink
     private var hmacSink: HMACSink
     private var cryptor: Cryptor
     private var pendingHeader: [UInt8]?
 
-    init?(encryptionKey: [UInt8], hmacKey: [UInt8], header: [UInt8], sink: DataSinkType) {
-        guard encryptionKey.count == KeySize &&
-            hmacKey.count == KeySize &&
-            header.count == KeyDecryptorV3.headerLength &&
-            header[0] == KeyDecryptorV3.version &&
-            header[1] == KeyDecryptorV3.options
+    init?(password: String, header: [UInt8], sink: DataSinkType) {
+        guard password != "" &&
+            header.count == PasswordDecryptorV3.headerLength &&
+            header[0] == PasswordDecryptorV3.version &&
+            header[1] == PasswordDecryptorV3.options
             else {
                 // Shouldn't have to set these, but Swift 2 requires it
                 self.bufferSink = BufferSink(capacity: 0, sink: NullSink())
@@ -37,7 +36,13 @@ final class KeyDecryptorV3: DataSinkType, DecryptorType {
 
         self.pendingHeader = header
 
-        let iv = Array(header[2..<18])
+        let encryptionSalt = Array(header[2...9])
+        let hmacSalt = Array(header[10...17])
+        let iv = Array(header[18...33])
+
+        let encryptionKey = keyForPassword(password, salt: encryptionSalt)
+        let hmacKey = keyForPassword(password, salt: hmacSalt)
+
         self.cryptor = Cryptor(operation: CCOperation(kCCDecrypt), key: encryptionKey, IV: iv, sink: sink)
         self.hmacSink = HMACSink(key: hmacKey)
         let teeSink = TeeSink(self.cryptor, self.hmacSink)

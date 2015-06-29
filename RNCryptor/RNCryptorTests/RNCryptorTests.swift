@@ -121,7 +121,7 @@ class RNCryptorTests: XCTestCase {
         let ciphertext = "03000203 04050607 08090a0b 0c0d0e0f 0001981b 22e7a644 8118d695 bd654f72 e9d6ed75 ec14ae2a a067eed2 a98a56e0 993dfe22 ab5887b3 f6e3cdd4 0767f519 5eb5".dataFromHexString()
 
         let decrypted = DataSink()
-        let decryptor = KeyDecryptor(encryptionKey: encryptKey, hmacKey: hmacKey, sink: decrypted)
+        let decryptor = Decryptor(encryptionKey: encryptKey, hmacKey: hmacKey, sink: decrypted)
         do {
             try decryptor.put(ciphertext)
             try decryptor.finish()
