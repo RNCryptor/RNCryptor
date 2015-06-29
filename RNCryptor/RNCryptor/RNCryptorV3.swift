@@ -8,7 +8,7 @@
 
 import CommonCrypto
 
-public let V3 = (
+let V3 = (
     version: UInt8(3),
 
     keySize:  kCCKeySizeAES256,

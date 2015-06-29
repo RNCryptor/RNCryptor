@@ -72,11 +72,11 @@ class RNCryptorTests: XCTestCase {
 
     func testCryptor() {
         let data = randomDataOfLength(1024)
-        let encryptKey = randomDataOfLength(RNCryptor.V3.keySize)
-        let iv = randomDataOfLength(RNCryptor.V3.ivSize)
+        let encryptKey = randomDataOfLength(V3.keySize)
+        let iv = randomDataOfLength(V3.ivSize)
 
         let encrypted = DataSink()
-        let encryptor = Cryptor(operation: CCOperation(kCCEncrypt), key: encryptKey, IV: iv, sink: encrypted)
+        let encryptor = Cryptor(operation: .Encrypt, key: encryptKey, IV: iv, sink: encrypted)
         do {
             try encryptor.put(data)
             try encryptor.finish()
@@ -85,7 +85,7 @@ class RNCryptorTests: XCTestCase {
         }
 
         let decrypted = DataSink()
-        let decryptor = Cryptor(operation: CCOperation(kCCDecrypt), key: encryptKey, IV: iv, sink: decrypted)
+        let decryptor = Cryptor(operation: .Decrypt, key: encryptKey, IV: iv, sink: decrypted)
         do {
             try decryptor.put(encrypted.array)
             try decryptor.finish()

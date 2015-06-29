@@ -6,13 +6,11 @@
 //  Copyright © 2015 Rob Napier. All rights reserved.
 //
 
-import Foundation
-
 //
 // This is just needed until withUnsafe* has rethrows
 //
 
-enum Result<T> {
+private enum Result<T> {
     case Success(T)
     case Failure(ErrorType)
 
@@ -50,11 +48,5 @@ public extension ArraySlice {
     mutating func withUnsafeMutableBufferPointer<R>(@noescape body: (inout UnsafeMutableBufferPointer<T>) throws -> R) throws-> R {
         return try self.withUnsafeMutableBufferPointer { (inout buf: UnsafeMutableBufferPointer<T>) in
             return Result{try body(&buf)}}.value()
-    }
-}
-
-extension UnsafeBufferPointer: Sliceable {
-    public subscript (bounds: Range<Index>) -> UnsafeBufferPointer<T> {
-        return(UnsafeBufferPointer(start: self.baseAddress + bounds.startIndex, count: bounds.count))
     }
 }

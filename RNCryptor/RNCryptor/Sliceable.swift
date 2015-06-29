@@ -6,10 +6,14 @@
 //  Copyright © 2015 Rob Napier. All rights reserved.
 //
 
-import Foundation
-
 extension Sliceable {
     func splitAt(index: Index) -> (SubSlice, SubSlice) {
         return (self[startIndex..<index], self[index..<endIndex])
+    }
+}
+
+extension UnsafeBufferPointer: Sliceable {
+    public subscript (bounds: Range<Index>) -> UnsafeBufferPointer<T> {
+        return(UnsafeBufferPointer(start: self.baseAddress + bounds.startIndex, count: bounds.count))
     }
 }

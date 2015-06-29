@@ -53,6 +53,7 @@ public final class Decryptor: DataSinkType {
             throw Error.UnknownHeader
         }
     }
+    
     public func finish() throws {
         try self.decryptor?.finish()
     }
