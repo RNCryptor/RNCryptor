@@ -15,8 +15,6 @@ public class Cryptor: DataSinkType {
     public var error: NSError?
 
     public init(operation: CCOperation, key: [UInt8], IV: [UInt8], sink: DataSinkType) {
-        assert(key.count == KeySize)
-        assert(IV.count == IVSize)
         self.sink = sink
 
         var cryptorOut = CCCryptorRef()

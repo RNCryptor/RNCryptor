@@ -77,13 +77,21 @@ class RNCryptorTests: XCTestCase {
 
         let encrypted = DataSink()
         let encryptor = Cryptor(operation: CCOperation(kCCEncrypt), key: encryptKey, IV: iv, sink: encrypted)
-        try! encryptor.put(data)
-        try! encryptor.finish()
+        do {
+            try encryptor.put(data)
+            try encryptor.finish()
+        } catch {
+            XCTFail("Caught: \(error)")
+        }
 
         let decrypted = DataSink()
         let decryptor = Cryptor(operation: CCOperation(kCCDecrypt), key: encryptKey, IV: iv, sink: decrypted)
-        try! decryptor.put(encrypted.array)
-        try! decryptor.finish()
+        do {
+            try decryptor.put(encrypted.array)
+            try decryptor.finish()
+        } catch {
+            XCTFail("Caught: \(error)")
+        }
 
         XCTAssertEqual(decrypted.array, data)
     }
@@ -97,9 +105,12 @@ class RNCryptorTests: XCTestCase {
 
         let encrypted = DataSink()
         let encryptor = Encryptor(encryptionKey: encryptKey, HMACKey: hmacKey, IV: iv, sink: encrypted)
-        try! encryptor.put(plaintext)
-        try! encryptor.finish()
-
+        do {
+            try encryptor.put(plaintext)
+            try encryptor.finish()
+        } catch {
+            XCTFail("Caught: \(error)")
+        }
         XCTAssertEqual(encrypted.array, ciphertext)
     }
 
@@ -110,9 +121,13 @@ class RNCryptorTests: XCTestCase {
         let ciphertext = "03000203 04050607 08090a0b 0c0d0e0f 0001981b 22e7a644 8118d695 bd654f72 e9d6ed75 ec14ae2a a067eed2 a98a56e0 993dfe22 ab5887b3 f6e3cdd4 0767f519 5eb5".dataFromHexString()
 
         let decrypted = DataSink()
-        let decryptor = KeyDecryptorV3(encryptionKey: encryptKey, hmacKey: hmacKey, sink: decrypted)
-        try! decryptor.put(ciphertext)
-        try! decryptor.finish()
+        let decryptor = KeyDecryptor(encryptionKey: encryptKey, hmacKey: hmacKey, sink: decrypted)
+        do {
+            try decryptor.put(ciphertext)
+            try decryptor.finish()
+        } catch {
+            XCTFail("Caught: \(error)")
+        }
 
         XCTAssertEqual(decrypted.array, plaintext)
     }
@@ -128,8 +143,12 @@ class RNCryptorTests: XCTestCase {
         let encrypted = DataSink()
         let encryptor = Encryptor(password: password, encryptionSalt: encryptionSalt, hmacSalt: hmacSalt, iv: iv, sink: encrypted)
 
-        try! encryptor.put(plaintext)
-        try! encryptor.finish()
+        do {
+            try encryptor.put(plaintext)
+            try encryptor.finish()
+        } catch {
+            XCTFail("Caught: \(error)")
+        }
 
         XCTAssertEqual(encrypted.array, ciphertext)
     }

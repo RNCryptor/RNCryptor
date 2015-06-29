@@ -19,7 +19,7 @@
 		FBA08AB91B40589400F97862 /* BufferSinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA08AB81B40589400F97862 /* BufferSinkTests.swift */; };
 		FBC514E01B3EE76700DB99DE /* Cryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBC514DF1B3EE76700DB99DE /* Cryptor.swift */; };
 		FBC514E21B3EEC9D00DB99DE /* Encryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBC514E11B3EEC9D00DB99DE /* Encryptor.swift */; };
-		FBC514E41B3EEED300DB99DE /* Decryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBC514E31B3EEED300DB99DE /* Decryptor.swift */; };
+		FBC514E41B3EEED300DB99DE /* KeyDecryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBC514E31B3EEED300DB99DE /* KeyDecryptor.swift */; };
 		FBD227601B3DF5F00064EFBB /* UnsafeBufferPointerRethrows.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD2275F1B3DF5F00064EFBB /* UnsafeBufferPointerRethrows.swift */; };
 		FBD227781B3EE5330064EFBB /* DataSink.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD227771B3EE5330064EFBB /* DataSink.swift */; };
 		FBD2277A1B3EE5760064EFBB /* HMAC.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD227791B3EE5760064EFBB /* HMAC.swift */; };
@@ -63,7 +63,7 @@
 		FBA08AB81B40589400F97862 /* BufferSinkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BufferSinkTests.swift; sourceTree = "<group>"; };
 		FBC514DF1B3EE76700DB99DE /* Cryptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cryptor.swift; sourceTree = "<group>"; };
 		FBC514E11B3EEC9D00DB99DE /* Encryptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Encryptor.swift; sourceTree = "<group>"; };
-		FBC514E31B3EEED300DB99DE /* Decryptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Decryptor.swift; sourceTree = "<group>"; };
+		FBC514E31B3EEED300DB99DE /* KeyDecryptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyDecryptor.swift; sourceTree = "<group>"; };
 		FBD2275F1B3DF5F00064EFBB /* UnsafeBufferPointerRethrows.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnsafeBufferPointerRethrows.swift; sourceTree = "<group>"; };
 		FBD227771B3EE5330064EFBB /* DataSink.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataSink.swift; sourceTree = "<group>"; };
 		FBD227791B3EE5760064EFBB /* HMAC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HMAC.swift; sourceTree = "<group>"; };
@@ -137,7 +137,7 @@
 				FB627FD31B2B7A1700C3A579 /* Info.plist */,
 				FB30A1FE1B2B7BF300BE5429 /* RNCryptor.swift */,
 				FBC514E11B3EEC9D00DB99DE /* Encryptor.swift */,
-				FBC514E31B3EEED300DB99DE /* Decryptor.swift */,
+				FBC514E31B3EEED300DB99DE /* KeyDecryptor.swift */,
 				FBA08AB61B3F566900F97862 /* TeeSink.swift */,
 				FBC514DF1B3EE76700DB99DE /* Cryptor.swift */,
 				FBD2275F1B3DF5F00064EFBB /* UnsafeBufferPointerRethrows.swift */,
@@ -311,7 +311,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FBC514E41B3EEED300DB99DE /* Decryptor.swift in Sources */,
+				FBC514E41B3EEED300DB99DE /* KeyDecryptor.swift in Sources */,
 				FB30A1FF1B2B7BF300BE5429 /* RNCryptor.swift in Sources */,
 				FBD227601B3DF5F00064EFBB /* UnsafeBufferPointerRethrows.swift in Sources */,
 				FBA08AB51B3F480700F97862 /* BufferSink.swift in Sources */,

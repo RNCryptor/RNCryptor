@@ -12,7 +12,6 @@ internal final class HMACSink: DataSinkType {
     var context: CCHmacContext = CCHmacContext()
 
     init(key: [UInt8]) {
-        assert(key.count == KeySize)
         CCHmacInit(
             &self.context,
             CCHmacAlgorithm(kCCHmacAlgSHA256),
