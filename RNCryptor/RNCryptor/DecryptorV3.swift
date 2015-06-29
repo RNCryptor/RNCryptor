@@ -14,22 +14,22 @@ final class DecryptorV3: DataSinkType, DecryptorType {
 
     static let version = UInt8(3)
 
-    static let keyHeaderLength = 2 + IVSize
-    static let passwordHeaderLength = 2 + SaltSize + SaltSize + IVSize
+    static let keyHeaderLength = 2 + V3.ivSize
+    static let passwordHeaderLength = 2 + V3.saltSize + V3.saltSize + V3.ivSize
 
-    private var bufferSink: BufferSink
-    private var hmacSink: HMACSink
-    private var cryptor: Cryptor
+    private let bufferSink: BufferSink
+    private let hmacSink: HMACSink
+    private let cryptor: Cryptor
+
     private var pendingHeader: [UInt8]?
 
     private init(encryptionKey: [UInt8], hmacKey: [UInt8], iv: [UInt8], header: [UInt8], sink: DataSinkType) {
         self.pendingHeader = header
 
-        self.cryptor = Cryptor(operation: CCOperation(kCCDecrypt), key: encryptionKey, IV: iv, sink: sink)
+        self.cryptor = Cryptor(operation: .Decrypt, key: encryptionKey, IV: iv, sink: sink)
         self.hmacSink = HMACSink(key: hmacKey)
         let teeSink = TeeSink(self.cryptor, self.hmacSink)
-        self.bufferSink = BufferSink(capacity: HMACSize, sink: teeSink)
-
+        self.bufferSink = BufferSink(capacity: V3.hmacSize, sink: teeSink)
     }
 
     convenience init?(password: String, header: [UInt8], sink: DataSinkType) {
@@ -47,15 +47,15 @@ final class DecryptorV3: DataSinkType, DecryptorType {
         let hmacSalt = Array(header[10...17])
         let iv = Array(header[18...33])
 
-        let encryptionKey = keyForPassword(password, salt: encryptionSalt)
-        let hmacKey = keyForPassword(password, salt: hmacSalt)
+        let encryptionKey = V3.keyForPassword(password, salt: encryptionSalt)
+        let hmacKey = V3.keyForPassword(password, salt: hmacSalt)
 
         self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header, sink: sink)
     }
 
     convenience init?(encryptionKey: [UInt8], hmacKey: [UInt8], header: [UInt8], sink: DataSinkType) {
-        guard encryptionKey.count == KeySize &&
-            hmacKey.count == KeySize &&
+        guard encryptionKey.count == V3.keySize &&
+            hmacKey.count == V3.keySize &&
             header.count == DecryptorV3.keyHeaderLength &&
             header[0] == DecryptorV3.version &&
             header[1] == 0

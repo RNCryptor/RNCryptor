@@ -8,18 +8,23 @@
 
 import CommonCrypto
 
+public enum CryptorOperation: CCOperation {
+    case Encrypt = 0 // CCOperation(kCCEncrypt)
+    case Decrypt = 1 // CCOperation(kCCDecrypt)
+}
+
 public class Cryptor: DataSinkType {
     public var sink: DataSinkType
 
     private let cryptor: CCCryptorRef
     public var error: NSError?
 
-    public init(operation: CCOperation, key: [UInt8], IV: [UInt8], sink: DataSinkType) {
+    public init(operation: CryptorOperation, key: [UInt8], IV: [UInt8], sink: DataSinkType) {
         self.sink = sink
 
         var cryptorOut = CCCryptorRef()
         let result = CCCryptorCreate(
-            operation,
+            operation.rawValue,
             CCAlgorithm(kCCAlgorithmAES128), CCOptions(kCCOptionPKCS7Padding),
             key, key.count,
             IV,

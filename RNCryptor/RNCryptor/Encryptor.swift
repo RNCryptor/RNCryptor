@@ -24,28 +24,28 @@ public final class Encryptor: DataSinkType {
         self.sink = sink
         self.hmacSink = HMACSink(key: HMACKey)
         let tee = TeeSink(self.hmacSink, sink)
-        self.cryptor = Cryptor(operation: CCOperation(kCCEncrypt), key: encryptionKey, IV: IV, sink: tee)
+        self.cryptor = Cryptor(operation: .Encrypt, key: encryptionKey, IV: IV, sink: tee)
         self.pendingHeader = header
     }
 
     // Expose random numbers for testing
     internal convenience init(encryptionKey: [UInt8], HMACKey: [UInt8], IV: [UInt8], sink: DataSinkType) {
         var header = [UInt8]()
-        header.extend([Version, UInt8(0)])
+        header.extend([V3.version, UInt8(0)])
         header.extend(IV)
         self.init(encryptionKey: encryptionKey, HMACKey: HMACKey, IV: IV, header: header, sink: sink)
     }
 
     public convenience init(encryptionKey: [UInt8], HMACKey: [UInt8], sink: DataSinkType) {
-        self.init(encryptionKey: encryptionKey, HMACKey: HMACKey, IV: randomDataOfLength(IVSize), sink: sink)
+        self.init(encryptionKey: encryptionKey, HMACKey: HMACKey, IV: randomDataOfLength(V3.ivSize), sink: sink)
     }
 
     // Expose random numbers for testing
     internal convenience init(password: String, encryptionSalt: [UInt8], hmacSalt: [UInt8], iv: [UInt8], sink: DataSinkType) {
-        let encryptionKey = keyForPassword(password, salt: encryptionSalt)
-        let hmacKey = keyForPassword(password, salt: hmacSalt)
+        let encryptionKey = V3.keyForPassword(password, salt: encryptionSalt)
+        let hmacKey = V3.keyForPassword(password, salt: hmacSalt)
         var header = [UInt8]()
-        header.extend([Version, UInt8(1)])
+        header.extend([V3.version, UInt8(1)])
         header.extend(encryptionSalt)
         header.extend(hmacSalt)
         header.extend(iv)
@@ -55,9 +55,9 @@ public final class Encryptor: DataSinkType {
     public convenience init(password: String, sink: DataSinkType) {
         self.init(
             password: password,
-            encryptionSalt: randomDataOfLength(SaltSize),
-            hmacSalt:randomDataOfLength(SaltSize),
-            iv: randomDataOfLength(IVSize),
+            encryptionSalt: randomDataOfLength(V3.saltSize),
+            hmacSalt:randomDataOfLength(V3.saltSize),
+            iv: randomDataOfLength(V3.ivSize),
             sink: sink)
     }
 

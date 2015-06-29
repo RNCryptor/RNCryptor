@@ -65,15 +65,15 @@ class RNCryptorTests: XCTestCase {
     func testKDF() {
         let password = "a"
         let salt = "0102030405060708".dataFromHexString()
-        let key = keyForPassword(password, salt: salt)
+        let key = V3.keyForPassword(password, salt: salt)
         let expect = "fc632b0c a6b23eff 9a9dc3e0 e585167f 5a328916 ed19f835 58be3ba9 828797cd".dataFromHexString()
         XCTAssertEqual(key, expect)
     }
 
     func testCryptor() {
         let data = randomDataOfLength(1024)
-        let encryptKey = randomDataOfLength(RNCryptor.KeySize)
-        let iv = randomDataOfLength(RNCryptor.IVSize)
+        let encryptKey = randomDataOfLength(RNCryptor.V3.keySize)
+        let iv = randomDataOfLength(RNCryptor.V3.ivSize)
 
         let encrypted = DataSink()
         let encryptor = Cryptor(operation: CCOperation(kCCEncrypt), key: encryptKey, IV: iv, sink: encrypted)
