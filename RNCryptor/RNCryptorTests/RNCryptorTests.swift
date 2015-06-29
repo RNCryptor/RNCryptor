@@ -63,76 +63,74 @@ class RNCryptorTests: XCTestCase {
     }
 
     func testKDF() {
-        do {
-            let password = "a"
-
-            let salt = "0102030405060708".dataFromHexString()
-            let key = try keyForPassword(password, salt: salt)
-
-            let expect = "fc632b0c a6b23eff 9a9dc3e0 e585167f 5a328916 ed19f835 58be3ba9 828797cd".dataFromHexString()
-            XCTAssertEqual(key, expect)
-        } catch  {
-            XCTFail("Failed: \(error)")
-        }
+        let password = "a"
+        let salt = "0102030405060708".dataFromHexString()
+        let key = keyForPassword(password, salt: salt)
+        let expect = "fc632b0c a6b23eff 9a9dc3e0 e585167f 5a328916 ed19f835 58be3ba9 828797cd".dataFromHexString()
+        XCTAssertEqual(key, expect)
     }
 
     func testCryptor() {
-        do {
-            let data = randomDataOfLength(1024)
-            let encryptKey = randomDataOfLength(RNCryptor.KeySize)
-            let iv = randomDataOfLength(RNCryptor.IVSize)
+        let data = randomDataOfLength(1024)
+        let encryptKey = randomDataOfLength(RNCryptor.KeySize)
+        let iv = randomDataOfLength(RNCryptor.IVSize)
 
-            let encrypted = DataSink()
-            let encryptor = Cryptor(operation: CCOperation(kCCEncrypt), key: encryptKey, IV: iv, sink: encrypted)
-            try encryptor.put(data)
-            try encryptor.finish()
+        let encrypted = DataSink()
+        let encryptor = Cryptor(operation: CCOperation(kCCEncrypt), key: encryptKey, IV: iv, sink: encrypted)
+        try! encryptor.put(data)
+        try! encryptor.finish()
 
-            let decrypted = DataSink()
-            let decryptor = Cryptor(operation: CCOperation(kCCDecrypt), key: encryptKey, IV: iv, sink: decrypted)
-            try decryptor.put(encrypted.array)
-            try decryptor.finish()
+        let decrypted = DataSink()
+        let decryptor = Cryptor(operation: CCOperation(kCCDecrypt), key: encryptKey, IV: iv, sink: decrypted)
+        try! decryptor.put(encrypted.array)
+        try! decryptor.finish()
 
-            XCTAssertEqual(decrypted.array, data)
-        } catch {
-            XCTFail("\(error)")
-        }
+        XCTAssertEqual(decrypted.array, data)
     }
 
     func testKeyEncryptor() {
-        do {
-            let encryptKey = "000102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f".dataFromHexString()
-            let hmacKey = "0102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f00".dataFromHexString()
-            let iv = "02030405060708090a0b0c0d0e0f0001".dataFromHexString()
-            let plaintext = "01".dataFromHexString()
-            let ciphertext = "03000203 04050607 08090a0b 0c0d0e0f 0001981b 22e7a644 8118d695 bd654f72 e9d6ed75 ec14ae2a a067eed2 a98a56e0 993dfe22 ab5887b3 f6e3cdd4 0767f519 5eb5".dataFromHexString()
+        let encryptKey = "000102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f".dataFromHexString()
+        let hmacKey = "0102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f00".dataFromHexString()
+        let iv = "02030405060708090a0b0c0d0e0f0001".dataFromHexString()
+        let plaintext = "01".dataFromHexString()
+        let ciphertext = "03000203 04050607 08090a0b 0c0d0e0f 0001981b 22e7a644 8118d695 bd654f72 e9d6ed75 ec14ae2a a067eed2 a98a56e0 993dfe22 ab5887b3 f6e3cdd4 0767f519 5eb5".dataFromHexString()
 
-            let encrypted = DataSink()
-            let encryptor = Encryptor(encryptionKey: encryptKey, HMACKey: hmacKey, IV: iv, sink: encrypted)
-            try encryptor.put(plaintext)
-            try encryptor.finish()
+        let encrypted = DataSink()
+        let encryptor = Encryptor(encryptionKey: encryptKey, HMACKey: hmacKey, IV: iv, sink: encrypted)
+        try! encryptor.put(plaintext)
+        try! encryptor.finish()
 
-            XCTAssertEqual(encrypted.array, ciphertext)
-        } catch {
-            XCTFail("Failed: \(error)")
-        }
+        XCTAssertEqual(encrypted.array, ciphertext)
     }
 
     func testKeyDecryptor() {
-        do {
-            let encryptKey = "000102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f".dataFromHexString()
-            let hmacKey = "0102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f00".dataFromHexString()
-            let plaintext = "01".dataFromHexString()
-            let ciphertext = "03000203 04050607 08090a0b 0c0d0e0f 0001981b 22e7a644 8118d695 bd654f72 e9d6ed75 ec14ae2a a067eed2 a98a56e0 993dfe22 ab5887b3 f6e3cdd4 0767f519 5eb5".dataFromHexString()
+        let encryptKey = "000102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f".dataFromHexString()
+        let hmacKey = "0102030405060708090a0b0c0d0e0f000102030405060708090a0b0c0d0e0f00".dataFromHexString()
+        let plaintext = "01".dataFromHexString()
+        let ciphertext = "03000203 04050607 08090a0b 0c0d0e0f 0001981b 22e7a644 8118d695 bd654f72 e9d6ed75 ec14ae2a a067eed2 a98a56e0 993dfe22 ab5887b3 f6e3cdd4 0767f519 5eb5".dataFromHexString()
 
-            let decrypted = DataSink()
-            let decryptor = try KeyDecryptorV3(encryptionKey: encryptKey, hmacKey: hmacKey, sink: decrypted)
-            try decryptor.put(ciphertext)
-            try decryptor.finish()
-            
-            XCTAssertEqual(decrypted.array, plaintext)
-        } catch {
-            XCTFail("Failed: \(error)")
-        }
+        let decrypted = DataSink()
+        let decryptor = KeyDecryptorV3(encryptionKey: encryptKey, hmacKey: hmacKey, sink: decrypted)
+        try! decryptor.put(ciphertext)
+        try! decryptor.finish()
+
+        XCTAssertEqual(decrypted.array, plaintext)
     }
-    
+
+    func testPasswordEncryptor() {
+        let password = "thepassword"
+        let encryptionSalt = "0001020304050607".dataFromHexString()
+        let hmacSalt = "0102030405060708".dataFromHexString()
+        let iv = "02030405060708090a0b0c0d0e0f0001".dataFromHexString()
+        let plaintext = "01".dataFromHexString()
+        let ciphertext = "03010001 02030405 06070102 03040506 07080203 04050607 08090a0b 0c0d0e0f 0001a1f8 730e0bf4 80eb7b70 f690abf2 1e029514 164ad3c4 74a51b30 c7eaa1ca 545b7de3 de5b010a cbad0a9a 13857df6 96a8".dataFromHexString()
+
+        let encrypted = DataSink()
+        let encryptor = Encryptor(password: password, encryptionSalt: encryptionSalt, hmacSalt: hmacSalt, iv: iv, sink: encrypted)
+
+        try! encryptor.put(plaintext)
+        try! encryptor.finish()
+
+        XCTAssertEqual(encrypted.array, ciphertext)
+    }
 }

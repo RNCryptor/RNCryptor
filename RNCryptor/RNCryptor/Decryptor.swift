@@ -28,7 +28,10 @@ public final class KeyDecryptorV3: DataSinkType {
 
     private var header: [UInt8] = []
 
-    init(encryptionKey: [UInt8], hmacKey: [UInt8], sink: DataSinkType) throws {
+    init(encryptionKey: [UInt8], hmacKey: [UInt8], sink: DataSinkType) {
+        assert(encryptionKey.count == KeySize)
+        assert(hmacKey.count == KeySize)
+        
         self.encryptionKey = encryptionKey
         self.hmacKey = hmacKey
         self.sink = sink
