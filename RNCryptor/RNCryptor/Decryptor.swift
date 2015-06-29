@@ -16,17 +16,17 @@ public final class Decryptor: DataSinkType {
 
     private var decryptor: DecryptorType?
 
-    init(password: String, sink: DataSinkType) {
+    public init(password: String, sink: DataSinkType) {
         assert(password != "")
 
         self.decryptors = [
-            (PasswordDecryptorV3.headerLength, { PasswordDecryptorV3(password: password, header: $0, sink: sink) as DecryptorType? })
+            (DecryptorV3.passwordHeaderLength, { DecryptorV3(password: password, header: $0, sink: sink) as DecryptorType? })
         ]
     }
 
-    init(encryptionKey: [UInt8], hmacKey: [UInt8], sink: DataSinkType) {
+    public init(encryptionKey: [UInt8], hmacKey: [UInt8], sink: DataSinkType) {
         self.decryptors = [
-            (KeyDecryptorV3.headerLength, { KeyDecryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey, header: $0, sink: sink) as DecryptorType? })
+            (DecryptorV3.keyHeaderLength, { DecryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey, header: $0, sink: sink) as DecryptorType? })
         ]
     }
 
@@ -53,7 +53,7 @@ public final class Decryptor: DataSinkType {
             throw Error.UnknownHeader
         }
     }
-    func finish() throws {
+    public func finish() throws {
         try self.decryptor?.finish()
     }
 }
