@@ -152,4 +152,22 @@ class RNCryptorTests: XCTestCase {
 
         XCTAssertEqual(encrypted.array, ciphertext)
     }
+
+    func testPasswordDecryptor() {
+        let password = "thepassword"
+        let plaintext = "01".dataFromHexString()
+        let ciphertext = "03010001 02030405 06070102 03040506 07080203 04050607 08090a0b 0c0d0e0f 0001a1f8 730e0bf4 80eb7b70 f690abf2 1e029514 164ad3c4 74a51b30 c7eaa1ca 545b7de3 de5b010a cbad0a9a 13857df6 96a8".dataFromHexString()
+
+        let decrypted = DataSink()
+        let decryptor = Decryptor(password: password, sink: decrypted)
+
+        do {
+            try decryptor.put(ciphertext)
+            try decryptor.finish()
+        } catch {
+            XCTFail("Caught: \(error)")
+        }
+
+        XCTAssertEqual(decrypted.array, plaintext)
+    }
 }
