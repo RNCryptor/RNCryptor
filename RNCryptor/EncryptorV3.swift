@@ -21,24 +21,24 @@ public final class EncryptorV3: DataSinkType {
 
     private var pendingHeader: [UInt8]?
 
-    private init(encryptionKey: [UInt8], hmacKey: [UInt8], IV: [UInt8], header: [UInt8], sink: DataSinkType) {
+    private init(encryptionKey: [UInt8], hmacKey: [UInt8], iv: [UInt8], header: [UInt8], sink: DataSinkType) {
         self.sink = sink
         self.hmacSink = HMACSink(key: hmacKey)
         let tee = TeeSink(self.hmacSink, sink)
-        self.engine = Engine(operation: .Encrypt, key: encryptionKey, IV: IV, sink: tee)
+        self.engine = Engine(operation: .Encrypt, key: encryptionKey, iv: iv, sink: tee)
         self.pendingHeader = header
     }
 
     // Expose random numbers for testing
-    internal convenience init(encryptionKey: [UInt8], hmacKey: [UInt8], IV: [UInt8], sink: DataSinkType) {
+    internal convenience init(encryptionKey: [UInt8], hmacKey: [UInt8], iv: [UInt8], sink: DataSinkType) {
         var header = [UInt8]()
         header.extend([RNCryptorV3.version, UInt8(0)])
-        header.extend(IV)
-        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, IV: IV, header: header, sink: sink)
+        header.extend(iv)
+        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header, sink: sink)
     }
 
     public convenience init(encryptionKey: [UInt8], hmacKey: [UInt8], sink: DataSinkType) {
-        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, IV: randomDataOfLength(RNCryptorV3.ivSize), sink: sink)
+        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: randomDataOfLength(RNCryptorV3.ivSize), sink: sink)
     }
 
     // Expose random numbers for testing
@@ -50,7 +50,7 @@ public final class EncryptorV3: DataSinkType {
         header.extend(encryptionSalt)
         header.extend(hmacSalt)
         header.extend(iv)
-        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, IV: iv, header: header, sink: sink)
+        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header, sink: sink)
     }
 
     public convenience init(password: String, sink: DataSinkType) {

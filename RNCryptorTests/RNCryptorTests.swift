@@ -65,7 +65,7 @@ class RNCryptorTests: XCTestCase {
         let iv = randomDataOfLength(RNCryptorV3.ivSize)
 
         let encrypted = DataSink()
-        let encryptor = Engine(operation: .Encrypt, key: encryptKey, IV: iv, sink: encrypted)
+        let encryptor = Engine(operation: .Encrypt, key: encryptKey, iv: iv, sink: encrypted)
         do {
             try encryptor.put(data)
             try encryptor.finish()
@@ -74,7 +74,7 @@ class RNCryptorTests: XCTestCase {
         }
 
         let decrypted = DataSink()
-        let decryptor = Engine(operation: .Decrypt, key: encryptKey, IV: iv, sink: decrypted)
+        let decryptor = Engine(operation: .Decrypt, key: encryptKey, iv: iv, sink: decrypted)
         do {
             try decryptor.put(encrypted.array)
             try decryptor.finish()
@@ -93,7 +93,7 @@ class RNCryptorTests: XCTestCase {
         let ciphertext = "03000203 04050607 08090a0b 0c0d0e0f 0001981b 22e7a644 8118d695 bd654f72 e9d6ed75 ec14ae2a a067eed2 a98a56e0 993dfe22 ab5887b3 f6e3cdd4 0767f519 5eb5".dataFromHexString()
 
         let encrypted = DataSink()
-        let encryptor = Encryptor(encryptionKey: encryptKey, hmacKey: hmacKey, IV: iv, sink: encrypted)
+        let encryptor = Encryptor(encryptionKey: encryptKey, hmacKey: hmacKey, iv: iv, sink: encrypted)
         do {
             try encryptor.put(plaintext)
             try encryptor.finish()

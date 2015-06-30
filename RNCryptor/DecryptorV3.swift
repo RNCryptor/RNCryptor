@@ -21,7 +21,7 @@ final class DecryptorV3: DataSinkType, DecryptorType {
     private init(encryptionKey: [UInt8], hmacKey: [UInt8], iv: [UInt8], header: [UInt8], sink: DataSinkType) {
         self.pendingHeader = header
 
-        self.engine = Engine(operation: .Decrypt, key: encryptionKey, IV: iv, sink: sink)
+        self.engine = Engine(operation: .Decrypt, key: encryptionKey, iv: iv, sink: sink)
         self.hmacSink = HMACSink(key: hmacKey)
         let teeSink = TeeSink(self.engine, self.hmacSink)
         self.bufferSink = BufferSink(capacity: RNCryptorV3.hmacSize, sink: teeSink)

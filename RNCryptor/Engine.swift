@@ -20,7 +20,7 @@ internal class Engine: DataSinkType {
     private let cryptor: CCCryptorRef
     var error: NSError?
 
-    init(operation: CryptorOperation, key: [UInt8], IV: [UInt8], sink: DataSinkType) {
+    init(operation: CryptorOperation, key: [UInt8], iv: [UInt8], sink: DataSinkType) {
         self.sink = sink
 
         var cryptorOut = CCCryptorRef()
@@ -28,7 +28,7 @@ internal class Engine: DataSinkType {
             operation.rawValue,
             CCAlgorithm(kCCAlgorithmAES128), CCOptions(kCCOptionPKCS7Padding),
             key, key.count,
-            IV,
+            iv,
             &cryptorOut
         )
         self.cryptor = cryptorOut
