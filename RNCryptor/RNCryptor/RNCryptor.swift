@@ -12,6 +12,8 @@ import CommonCrypto
 
 public let CCErrorDomain = "com.apple.CommonCrypto"
 
+internal let FormatVersion = 3
+
 public enum Error: ErrorType {
     case HMACMismatch
     case UnknownHeader

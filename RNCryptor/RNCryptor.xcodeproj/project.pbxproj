@@ -11,6 +11,8 @@
 		FB30A1FF1B2B7BF300BE5429 /* RNCryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB30A1FE1B2B7BF300BE5429 /* RNCryptor.swift */; };
 		FB30A2081B2B86FD00BE5429 /* CommonCrypto.h in Headers */ = {isa = PBXBuildFile; fileRef = FB30A2071B2B86FD00BE5429 /* CommonCrypto.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FB30A2221B2B87C900BE5429 /* CommonCrypto.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB30A2051B2B86FD00BE5429 /* CommonCrypto.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		FB36507F1B41F3DE00F5273F /* RNCryptorGeneratedVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB36507E1B41F3DE00F5273F /* RNCryptorGeneratedVectorTests.swift */; };
+		FB3650811B41F49800F5273F /* VectorTestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB3650801B41F49800F5273F /* VectorTestHelpers.swift */; };
 		FB627FD21B2B7A1700C3A579 /* RNCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB627FD11B2B7A1700C3A579 /* RNCryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FB627FD91B2B7A1800C3A579 /* RNCryptor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB627FCE1B2B7A1700C3A579 /* RNCryptor.framework */; };
 		FB627FDE1B2B7A1800C3A579 /* RNCryptorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB627FDD1B2B7A1800C3A579 /* RNCryptorTests.swift */; };
@@ -54,6 +56,9 @@
 		FB30A21D1B2B876600BE5429 /* iphoneos.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = iphoneos.modulemap; sourceTree = "<group>"; };
 		FB30A21E1B2B878300BE5429 /* iphonesimulator.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = iphonesimulator.modulemap; sourceTree = "<group>"; };
 		FB30A21F1B2B879000BE5429 /* macosx.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = macosx.modulemap; sourceTree = "<group>"; };
+		FB364F5C1B41F0E100F5273F /* GenVectorTests */ = {isa = PBXFileReference; lastKnownFileType = text; path = GenVectorTests; sourceTree = "<group>"; };
+		FB36507E1B41F3DE00F5273F /* RNCryptorGeneratedVectorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNCryptorGeneratedVectorTests.swift; sourceTree = "<group>"; };
+		FB3650801B41F49800F5273F /* VectorTestHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VectorTestHelpers.swift; sourceTree = "<group>"; };
 		FB627FCE1B2B7A1700C3A579 /* RNCryptor.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RNCryptor.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB627FD11B2B7A1700C3A579 /* RNCryptor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNCryptor.h; sourceTree = "<group>"; };
 		FB627FD31B2B7A1700C3A579 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -113,6 +118,14 @@
 			path = CommonCrypto;
 			sourceTree = "<group>";
 		};
+		FB36501F1B41F3DE00F5273F /* Generated */ = {
+			isa = PBXGroup;
+			children = (
+				FB36507E1B41F3DE00F5273F /* RNCryptorGeneratedVectorTests.swift */,
+			);
+			path = Generated;
+			sourceTree = "<group>";
+		};
 		FB627FC41B2B7A1700C3A579 = {
 			isa = PBXGroup;
 			children = (
@@ -152,6 +165,9 @@
 		FB627FDC1B2B7A1800C3A579 /* RNCryptorTests */ = {
 			isa = PBXGroup;
 			children = (
+				FB3650801B41F49800F5273F /* VectorTestHelpers.swift */,
+				FB36501F1B41F3DE00F5273F /* Generated */,
+				FB364F5C1B41F0E100F5273F /* GenVectorTests */,
 				FB627FDD1B2B7A1800C3A579 /* RNCryptorTests.swift */,
 				FB627FDF1B2B7A1800C3A579 /* Info.plist */,
 				FBA08AB81B40589400F97862 /* BufferSinkTests.swift */,
@@ -360,8 +376,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FB3650811B41F49800F5273F /* VectorTestHelpers.swift in Sources */,
 				FBA08AB91B40589400F97862 /* BufferSinkTests.swift in Sources */,
 				FB627FDE1B2B7A1800C3A579 /* RNCryptorTests.swift in Sources */,
+				FB36507F1B41F3DE00F5273F /* RNCryptorGeneratedVectorTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
