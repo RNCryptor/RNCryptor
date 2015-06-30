@@ -12,11 +12,6 @@ final class DecryptorV3: DataSinkType, DecryptorType {
     // Buffer -> Tee -> HMAC
     //               -> Cryptor -> Sink
 
-    static let version = UInt8(3)
-
-    static let keyHeaderLength = 2 + V3.ivSize
-    static let passwordHeaderLength = 2 + V3.saltSize + V3.saltSize + V3.ivSize
-
     private let bufferSink: BufferSink
     private let hmacSink: HMACSink
     private let engine: Engine
@@ -29,13 +24,13 @@ final class DecryptorV3: DataSinkType, DecryptorType {
         self.engine = Engine(operation: .Decrypt, key: encryptionKey, IV: iv, sink: sink)
         self.hmacSink = HMACSink(key: hmacKey)
         let teeSink = TeeSink(self.engine, self.hmacSink)
-        self.bufferSink = BufferSink(capacity: V3.hmacSize, sink: teeSink)
+        self.bufferSink = BufferSink(capacity: RNCryptorV3.hmacSize, sink: teeSink)
     }
 
     convenience init?(password: String, header: [UInt8], sink: DataSinkType) {
         guard password != "" &&
-            header.count == DecryptorV3.passwordHeaderLength &&
-            header[0] == DecryptorV3.version &&
+            header.count == RNCryptorV3.passwordHeaderSize &&
+            header[0] == RNCryptorV3.version &&
             header[1] == 1
             else {
                 // Shouldn't have to set these, but Swift 2 requires it
@@ -47,17 +42,17 @@ final class DecryptorV3: DataSinkType, DecryptorType {
         let hmacSalt = Array(header[10...17])
         let iv = Array(header[18...33])
 
-        let encryptionKey = V3.keyForPassword(password, salt: encryptionSalt)
-        let hmacKey = V3.keyForPassword(password, salt: hmacSalt)
+        let encryptionKey = RNCryptorV3.keyForPassword(password, salt: encryptionSalt)
+        let hmacKey = RNCryptorV3.keyForPassword(password, salt: hmacSalt)
 
         self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header, sink: sink)
     }
 
     convenience init?(encryptionKey: [UInt8], hmacKey: [UInt8], header: [UInt8], sink: DataSinkType) {
-        guard encryptionKey.count == V3.keySize &&
-            hmacKey.count == V3.keySize &&
-            header.count == DecryptorV3.keyHeaderLength &&
-            header[0] == DecryptorV3.version &&
+        guard encryptionKey.count == RNCryptorV3.keySize &&
+            hmacKey.count == RNCryptorV3.keySize &&
+            header.count == RNCryptorV3.keyHeaderSize &&
+            header[0] == RNCryptorV3.version &&
             header[1] == 0
             else {
                 // Shouldn't have to set these, but Swift 2 requires it

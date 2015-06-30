@@ -22,7 +22,7 @@ func _verifyKDF(vector: [String:String], name:String) {
 //    assert(vector["salt_hex"] != nil);
 //    assert(vector["key_hex"] != nil);
 
-    let key = V3.keyForPassword(vector["password"]!,
+    let key = RNCryptorV3.keyForPassword(vector["password"]!,
         salt:vector["salt_hex"]!.dataFromHexString())
     verifyVector(vector, key:"key_hex", equals:key, name: name)
 }

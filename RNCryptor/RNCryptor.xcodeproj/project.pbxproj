@@ -126,6 +126,15 @@
 			path = Generated;
 			sourceTree = "<group>";
 		};
+		FB5E0E031B42DF500088476F /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				FB627FD31B2B7A1700C3A579 /* Info.plist */,
+				FB627FD11B2B7A1700C3A579 /* RNCryptor.h */,
+			);
+			name = Support;
+			sourceTree = "<group>";
+		};
 		FB627FC41B2B7A1700C3A579 = {
 			isa = PBXGroup;
 			children = (
@@ -149,14 +158,13 @@
 		FB627FD01B2B7A1700C3A579 /* RNCryptor */ = {
 			isa = PBXGroup;
 			children = (
-				FB627FD11B2B7A1700C3A579 /* RNCryptor.h */,
-				FB627FD31B2B7A1700C3A579 /* Info.plist */,
 				FB30A1FE1B2B7BF300BE5429 /* RNCryptor.swift */,
-				FBC514DF1B3EE76700DB99DE /* Engine.swift */,
 				FBA803DA1B41A3D400B8E4E9 /* Decryptor.swift */,
+				FBC514DF1B3EE76700DB99DE /* Engine.swift */,
 				FBF74C9E1B41C7460020DEC3 /* Sinks */,
 				FBF74CA01B41C79E0020DEC3 /* V3 */,
 				FBF74C9F1B41C7650020DEC3 /* Helpers */,
+				FB5E0E031B42DF500088476F /* Support */,
 			);
 			path = RNCryptor;
 			sourceTree = "<group>";

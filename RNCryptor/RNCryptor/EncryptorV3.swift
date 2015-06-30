@@ -32,21 +32,21 @@ public final class EncryptorV3: DataSinkType {
     // Expose random numbers for testing
     internal convenience init(encryptionKey: [UInt8], hmacKey: [UInt8], IV: [UInt8], sink: DataSinkType) {
         var header = [UInt8]()
-        header.extend([V3.version, UInt8(0)])
+        header.extend([RNCryptorV3.version, UInt8(0)])
         header.extend(IV)
         self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, IV: IV, header: header, sink: sink)
     }
 
     public convenience init(encryptionKey: [UInt8], hmacKey: [UInt8], sink: DataSinkType) {
-        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, IV: randomDataOfLength(V3.ivSize), sink: sink)
+        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, IV: randomDataOfLength(RNCryptorV3.ivSize), sink: sink)
     }
 
     // Expose random numbers for testing
     internal convenience init(password: String, encryptionSalt: [UInt8], hmacSalt: [UInt8], iv: [UInt8], sink: DataSinkType) {
-        let encryptionKey = V3.keyForPassword(password, salt: encryptionSalt)
-        let hmacKey = V3.keyForPassword(password, salt: hmacSalt)
+        let encryptionKey = RNCryptorV3.keyForPassword(password, salt: encryptionSalt)
+        let hmacKey = RNCryptorV3.keyForPassword(password, salt: hmacSalt)
         var header = [UInt8]()
-        header.extend([V3.version, UInt8(1)])
+        header.extend([RNCryptorV3.version, UInt8(1)])
         header.extend(encryptionSalt)
         header.extend(hmacSalt)
         header.extend(iv)
@@ -56,9 +56,9 @@ public final class EncryptorV3: DataSinkType {
     public convenience init(password: String, sink: DataSinkType) {
         self.init(
             password: password,
-            encryptionSalt: randomDataOfLength(V3.saltSize),
-            hmacSalt:randomDataOfLength(V3.saltSize),
-            iv: randomDataOfLength(V3.ivSize),
+            encryptionSalt: randomDataOfLength(RNCryptorV3.saltSize),
+            hmacSalt:randomDataOfLength(RNCryptorV3.saltSize),
+            iv: randomDataOfLength(RNCryptorV3.ivSize),
             sink: sink)
     }
 

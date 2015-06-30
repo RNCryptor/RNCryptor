@@ -20,13 +20,13 @@ public final class Decryptor: DataSinkType {
         assert(password != "")
 
         self.decryptors = [
-            (DecryptorV3.passwordHeaderLength, { DecryptorV3(password: password, header: $0, sink: sink) as DecryptorType? })
+            (RNCryptorV3.passwordHeaderSize, { DecryptorV3(password: password, header: $0, sink: sink) as DecryptorType? })
         ]
     }
 
     public init(encryptionKey: [UInt8], hmacKey: [UInt8], sink: DataSinkType) {
         self.decryptors = [
-            (DecryptorV3.keyHeaderLength, { DecryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey, header: $0, sink: sink) as DecryptorType? })
+            (RNCryptorV3.keyHeaderSize, { DecryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey, header: $0, sink: sink) as DecryptorType? })
         ]
     }
 

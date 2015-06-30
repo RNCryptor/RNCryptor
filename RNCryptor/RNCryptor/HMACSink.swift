@@ -25,7 +25,7 @@ internal final class HMACSink: DataSinkType {
     }
 
     func final() -> [UInt8] {
-        var hmac = Array<UInt8>(count: V3.hmacSize, repeatedValue: 0)
+        var hmac = Array<UInt8>(count: RNCryptorV3.hmacSize, repeatedValue: 0)
         CCHmacFinal(&self.context, &hmac)
         return hmac
     }

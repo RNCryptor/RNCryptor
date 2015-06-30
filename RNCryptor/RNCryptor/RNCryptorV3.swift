@@ -8,38 +8,40 @@
 
 import CommonCrypto
 
-let V3 = (
-    version: UInt8(3),
+public struct _RNCryptorV3 {
+    let version = UInt8(3)
 
-    keySize:  kCCKeySizeAES256,
-    ivSize:   kCCBlockSizeAES128,
-    hmacSize: Int(CC_SHA256_DIGEST_LENGTH),
-    saltSize: 8,
+    let keySize  = kCCKeySizeAES256
+    let ivSize   = kCCBlockSizeAES128
+    let hmacSize = Int(CC_SHA256_DIGEST_LENGTH)
+    let saltSize = 8
 
-    keyForPassword: keyForPasswordV3
-)
+    let keyHeaderSize = 1 + 1 + kCCBlockSizeAES128
+    let passwordHeaderSize = 1 + 1 + 8 + 8 + kCCBlockSizeAES128
 
-private func keyForPasswordV3(password: String, salt: [UInt8]) -> [UInt8] {
-    var derivedKey = [UInt8](count: V3.keySize, repeatedValue: 0)
+    func keyForPassword(password: String, salt: [UInt8]) -> [UInt8] {
+        var derivedKey = [UInt8](count: self.keySize, repeatedValue: 0)
 
-    let passwordData = [UInt8](password.utf8)
-    let passwordPtr  = UnsafePointer<Int8>(passwordData)
+        let passwordData = [UInt8](password.utf8)
+        let passwordPtr  = UnsafePointer<Int8>(passwordData)
 
-    // All the crazy casting because CommonCryptor hates Swift
-    let algorithm     = CCPBKDFAlgorithm(kCCPBKDF2)
-    let prf           = CCPseudoRandomAlgorithm(kCCPRFHmacAlgSHA1)
-    let pbkdf2Rounds  = UInt32(10000)
+        // All the crazy casting because CommonCryptor hates Swift
+        let algorithm     = CCPBKDFAlgorithm(kCCPBKDF2)
+        let prf           = CCPseudoRandomAlgorithm(kCCPRFHmacAlgSHA1)
+        let pbkdf2Rounds  = UInt32(10000)
 
+        let result = CCKeyDerivationPBKDF(
+            algorithm,
+            passwordPtr, passwordData.count,
+            salt,        salt.count,
+            prf,         pbkdf2Rounds,
+            &derivedKey, derivedKey.count)
 
-    let result = CCKeyDerivationPBKDF(
-        algorithm,
-        passwordPtr, passwordData.count,
-        salt,        salt.count,
-        prf,         pbkdf2Rounds,
-        &derivedKey, derivedKey.count)
-
-    guard result == CCCryptorStatus(kCCSuccess) else {
-        fatalError("SECURITY FAILURE: Could not derive secure password: \(result).")
+        guard result == CCCryptorStatus(kCCSuccess) else {
+            fatalError("SECURITY FAILURE: Could not derive secure password: \(result).")
+        }
+        return derivedKey
     }
-    return derivedKey
+    private init() {}
 }
+public let RNCryptorV3 = _RNCryptorV3()

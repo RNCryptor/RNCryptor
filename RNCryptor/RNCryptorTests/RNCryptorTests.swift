@@ -54,15 +54,15 @@ class RNCryptorTests: XCTestCase {
     func testKDF() {
         let password = "a"
         let salt = "0102030405060708".dataFromHexString()
-        let key = V3.keyForPassword(password, salt: salt)
+        let key = RNCryptorV3.keyForPassword(password, salt: salt)
         let expect = "fc632b0c a6b23eff 9a9dc3e0 e585167f 5a328916 ed19f835 58be3ba9 828797cd".dataFromHexString()
         XCTAssertEqual(key, expect)
     }
 
     func testCryptor() {
         let data = randomDataOfLength(1024)
-        let encryptKey = randomDataOfLength(V3.keySize)
-        let iv = randomDataOfLength(V3.ivSize)
+        let encryptKey = randomDataOfLength(RNCryptorV3.keySize)
+        let iv = randomDataOfLength(RNCryptorV3.ivSize)
 
         let encrypted = DataSink()
         let encryptor = Engine(operation: .Encrypt, key: encryptKey, IV: iv, sink: encrypted)
@@ -161,8 +161,8 @@ class RNCryptorTests: XCTestCase {
     }
 
     func testOneShotKey() {
-        let encryptionKey = randomDataOfLength(V3.keySize)
-        let hmacKey = randomDataOfLength(V3.keySize)
+        let encryptionKey = randomDataOfLength(RNCryptorV3.keySize)
+        let hmacKey = randomDataOfLength(RNCryptorV3.keySize)
         let data = randomDataOfLength(1024)
 
         let ciphertext: [UInt8]
