@@ -1,0 +1,3 @@
+[submodule "Spec"]
+	path = Spec
+	url = https://github.com/RNCryptor/RNCryptor-Spec.git
