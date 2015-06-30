@@ -8,23 +8,8 @@
 
 import CommonCrypto
 
-public func encrypt(data: [UInt8], password: String) throws -> [UInt8] {
-    let sink = DataSink()
-    let encryptor = Encryptor(password: password, sink: sink)
-    try encryptor.put(data)
-    try encryptor.finish()
-    return sink.array
-}
 
-public func encrypt(data: [UInt8], encryptionKey: [UInt8], hmacKey: [UInt8]) throws -> [UInt8] {
-    let sink = DataSink()
-    let encryptor = Encryptor(encryptionKey: encryptionKey, hmacKey: hmacKey, sink: sink)
-    try encryptor.put(data)
-    try encryptor.finish()
-    return sink.array
-}
-
-public final class Encryptor: DataSinkType {
+public final class EncryptorV3: DataSinkType {
     // Sink chain is Cryptor -> Tee -> HMAC
     //                              -> Sink
 
