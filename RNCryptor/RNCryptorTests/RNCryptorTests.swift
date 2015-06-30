@@ -42,17 +42,6 @@ extension String {
 }
 
 class RNCryptorTests: XCTestCase {
-
-    override func setUp() {
-        super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
-
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-        super.tearDown()
-    }
-
     func testRandomData() {
         let len = 1024
         let data = randomDataOfLength(len)
@@ -76,7 +65,7 @@ class RNCryptorTests: XCTestCase {
         let iv = randomDataOfLength(V3.ivSize)
 
         let encrypted = DataSink()
-        let encryptor = Cryptor(operation: .Encrypt, key: encryptKey, IV: iv, sink: encrypted)
+        let encryptor = Engine(operation: .Encrypt, key: encryptKey, IV: iv, sink: encrypted)
         do {
             try encryptor.put(data)
             try encryptor.finish()
@@ -85,7 +74,7 @@ class RNCryptorTests: XCTestCase {
         }
 
         let decrypted = DataSink()
-        let decryptor = Cryptor(operation: .Decrypt, key: encryptKey, IV: iv, sink: decrypted)
+        let decryptor = Engine(operation: .Decrypt, key: encryptKey, IV: iv, sink: decrypted)
         do {
             try decryptor.put(encrypted.array)
             try decryptor.finish()
@@ -104,7 +93,7 @@ class RNCryptorTests: XCTestCase {
         let ciphertext = "03000203 04050607 08090a0b 0c0d0e0f 0001981b 22e7a644 8118d695 bd654f72 e9d6ed75 ec14ae2a a067eed2 a98a56e0 993dfe22 ab5887b3 f6e3cdd4 0767f519 5eb5".dataFromHexString()
 
         let encrypted = DataSink()
-        let encryptor = Encryptor(encryptionKey: encryptKey, HMACKey: hmacKey, IV: iv, sink: encrypted)
+        let encryptor = Encryptor(encryptionKey: encryptKey, hmacKey: hmacKey, IV: iv, sink: encrypted)
         do {
             try encryptor.put(plaintext)
             try encryptor.finish()
@@ -169,5 +158,52 @@ class RNCryptorTests: XCTestCase {
         }
 
         XCTAssertEqual(decrypted.array, plaintext)
+    }
+
+    func testOneShotKey() {
+        let encryptionKey = randomDataOfLength(V3.keySize)
+        let hmacKey = randomDataOfLength(V3.keySize)
+        let data = randomDataOfLength(1024)
+
+        let ciphertext: [UInt8]
+        do {
+            ciphertext = try encrypt(data, encryptionKey: encryptionKey, hmacKey: hmacKey)
+        } catch {
+            ciphertext = []
+            XCTFail("Caught: \(error)")
+        }
+
+        let plaintext: [UInt8]
+        do {
+            plaintext = try decrypt(ciphertext, encryptionKey: encryptionKey, hmacKey: hmacKey)
+        } catch {
+            plaintext = [0]
+            XCTFail("Caught: \(error)")
+        }
+
+        XCTAssertEqual(plaintext, data)
+    }
+
+    func testOneShotPassword() {
+        let password = "thepassword"
+        let data = randomDataOfLength(1024)
+
+        let ciphertext: [UInt8]
+        do {
+            ciphertext = try encrypt(data, password: password)
+        } catch {
+            ciphertext = []
+            XCTFail("Caught: \(error)")
+        }
+
+        let plaintext: [UInt8]
+        do {
+            plaintext = try decrypt(ciphertext, password: password)
+        } catch {
+            plaintext = [0]
+            XCTFail("Caught: \(error)")
+        }
+        
+        XCTAssertEqual(plaintext, data)
     }
 }

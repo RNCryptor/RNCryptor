@@ -6,6 +6,22 @@
 //  Copyright © 2015 Rob Napier. All rights reserved.
 //
 
+public func decrypt(data: [UInt8], password: String) throws -> [UInt8] {
+    let sink = DataSink()
+    let decryptor = Decryptor(password: password, sink: sink)
+    try decryptor.put(data)
+    try decryptor.finish()
+    return sink.array
+}
+
+public func decrypt(data: [UInt8], encryptionKey: [UInt8], hmacKey: [UInt8]) throws -> [UInt8] {
+    let sink = DataSink()
+    let decryptor = Decryptor(encryptionKey: encryptionKey, hmacKey: hmacKey, sink: sink)
+    try decryptor.put(data)
+    try decryptor.finish()
+    return sink.array
+}
+
 protocol DecryptorType: DataSinkType {
     func finish() throws
 }

@@ -13,13 +13,13 @@ public enum CryptorOperation: CCOperation {
     case Decrypt = 1 // CCOperation(kCCDecrypt)
 }
 
-public class Cryptor: DataSinkType {
-    public var sink: DataSinkType
+internal class Engine: DataSinkType {
+    var sink: DataSinkType
 
     private let cryptor: CCCryptorRef
-    public var error: NSError?
+    var error: NSError?
 
-    public init(operation: CryptorOperation, key: [UInt8], IV: [UInt8], sink: DataSinkType) {
+    init(operation: CryptorOperation, key: [UInt8], IV: [UInt8], sink: DataSinkType) {
         self.sink = sink
 
         var cryptorOut = CCCryptorRef()
@@ -37,7 +37,7 @@ public class Cryptor: DataSinkType {
         }
     }
 
-    public func put(data: UnsafeBufferPointer<UInt8>) throws {
+    func put(data: UnsafeBufferPointer<UInt8>) throws {
         if let err = self.error {
             throw err
         }
@@ -58,7 +58,7 @@ public class Cryptor: DataSinkType {
         }
     }
 
-    public func finish() throws {
+    func finish() throws {
         let outputLength = CCCryptorGetOutputLength(self.cryptor, 0, true)
         var output = Array<UInt8>(count: outputLength, repeatedValue: 0) // FIXME: Reuse buffer
         var dataOutMoved: Int = 0

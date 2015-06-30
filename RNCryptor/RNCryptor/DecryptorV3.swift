@@ -19,16 +19,16 @@ final class DecryptorV3: DataSinkType, DecryptorType {
 
     private let bufferSink: BufferSink
     private let hmacSink: HMACSink
-    private let cryptor: Cryptor
+    private let engine: Engine
 
     private var pendingHeader: [UInt8]?
 
     private init(encryptionKey: [UInt8], hmacKey: [UInt8], iv: [UInt8], header: [UInt8], sink: DataSinkType) {
         self.pendingHeader = header
 
-        self.cryptor = Cryptor(operation: .Decrypt, key: encryptionKey, IV: iv, sink: sink)
+        self.engine = Engine(operation: .Decrypt, key: encryptionKey, IV: iv, sink: sink)
         self.hmacSink = HMACSink(key: hmacKey)
-        let teeSink = TeeSink(self.cryptor, self.hmacSink)
+        let teeSink = TeeSink(self.engine, self.hmacSink)
         self.bufferSink = BufferSink(capacity: V3.hmacSize, sink: teeSink)
     }
 
@@ -78,7 +78,7 @@ final class DecryptorV3: DataSinkType, DecryptorType {
     }
 
     func finish() throws {
-        try self.cryptor.finish()
+        try self.engine.finish()
         let hash = self.hmacSink.final()
         if hash != self.bufferSink.array {
             throw Error.HMACMismatch

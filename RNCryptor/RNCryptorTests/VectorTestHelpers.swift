@@ -90,7 +90,7 @@ func verify_v3_key(vector: [String: String]) {
         let ciphertext = DataSink()
         let encryptor = Encryptor(
             encryptionKey: vector["enc_key_hex"]!.dataFromHexString(),
-            HMACKey: vector["hmac_key_hex"]!.dataFromHexString(),
+            hmacKey: vector["hmac_key_hex"]!.dataFromHexString(),
             IV: vector["iv_hex"]!.dataFromHexString(),
             sink: ciphertext)
         do {
