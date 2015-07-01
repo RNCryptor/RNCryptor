@@ -12,7 +12,7 @@ import XCTest
 func verifyVector(vector: [String:String], key:String, equals actual:[UInt8], name:String) {
     let version = vector["version"]!
     let title = vector["title"]!
-    XCTAssertEqual(actual, vector[key]!.dataFromHexString(), "Failed \(name) test (v\(version)): \(title)")
+    XCTAssertEqual(actual, vector[key]!.bytesFromHexString()!, "Failed \(name) test (v\(version)): \(title)")
 }
 
 func _verifyKDF(vector: [String:String], name:String) {
@@ -23,7 +23,7 @@ func _verifyKDF(vector: [String:String], name:String) {
 //    assert(vector["key_hex"] != nil);
 
     let key = RNCryptorV3.keyForPassword(vector["password"]!,
-        salt:vector["salt_hex"]!.dataFromHexString())
+        salt:vector["salt_hex"]!.bytesFromHexString()!)
     verifyVector(vector, key:"key_hex", equals:key, name: name)
 }
 
@@ -46,12 +46,12 @@ func _verifyPassword(vector: [String:String]) {
     if Int(vector["version"]!) == FormatVersion {
         let ciphertext = DataSink()
         let encryptor = Encryptor(password: vector["password"]!,
-            encryptionSalt: vector["enc_salt_hex"]!.dataFromHexString(),
-            hmacSalt: vector["hmac_salt_hex"]!.dataFromHexString(),
-            iv: vector["iv_hex"]!.dataFromHexString(),
+            encryptionSalt: vector["enc_salt_hex"]!.bytesFromHexString()!,
+            hmacSalt: vector["hmac_salt_hex"]!.bytesFromHexString()!,
+            iv: vector["iv_hex"]!.bytesFromHexString()!,
             sink: ciphertext)
         do {
-            try encryptor.put(vector["plaintext_hex"]!.dataFromHexString())
+            try encryptor.put(vector["plaintext_hex"]!.bytesFromHexString()!)
             try encryptor.finish()
         } catch {
             XCTFail("\(error)")
@@ -63,7 +63,7 @@ func _verifyPassword(vector: [String:String]) {
     let decryptor = Decryptor(password: vector["password"]!,
         sink: plaintext)
     do {
-        try decryptor.put(vector["ciphertext_hex"]!.dataFromHexString())
+        try decryptor.put(vector["ciphertext_hex"]!.bytesFromHexString()!)
         try decryptor.finish()
     } catch {
         XCTFail("\(error)")
@@ -89,12 +89,12 @@ func verify_v3_key(vector: [String: String]) {
     if Int(vector["version"]!) == FormatVersion {
         let ciphertext = DataSink()
         let encryptor = Encryptor(
-            encryptionKey: vector["enc_key_hex"]!.dataFromHexString(),
-            hmacKey: vector["hmac_key_hex"]!.dataFromHexString(),
-            iv: vector["iv_hex"]!.dataFromHexString(),
+            encryptionKey: vector["enc_key_hex"]!.bytesFromHexString()!,
+            hmacKey: vector["hmac_key_hex"]!.bytesFromHexString()!,
+            iv: vector["iv_hex"]!.bytesFromHexString()!,
             sink: ciphertext)
         do {
-            try encryptor.put(vector["plaintext_hex"]!.dataFromHexString())
+            try encryptor.put(vector["plaintext_hex"]!.bytesFromHexString()!)
             try encryptor.finish()
         } catch {
             XCTFail("\(error)")
@@ -104,11 +104,11 @@ func verify_v3_key(vector: [String: String]) {
 
     let plaintext = DataSink()
     let decryptor = Decryptor(
-        encryptionKey: vector["enc_key_hex"]!.dataFromHexString(),
-        hmacKey: vector["hmac_key_hex"]!.dataFromHexString(),
+        encryptionKey: vector["enc_key_hex"]!.bytesFromHexString()!,
+        hmacKey: vector["hmac_key_hex"]!.bytesFromHexString()!,
         sink: plaintext)
     do {
-        try decryptor.put(vector["ciphertext_hex"]!.dataFromHexString())
+        try decryptor.put(vector["ciphertext_hex"]!.bytesFromHexString()!)
         try decryptor.finish()
     } catch {
         XCTFail("\(error)")

@@ -41,7 +41,9 @@
 		FBCF48FC1B4329D500DCFB19 /* RNCryptor-OSX.h in Headers */ = {isa = PBXBuildFile; fileRef = FBCF48FB1B4329D500DCFB19 /* RNCryptor-OSX.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FBCF49011B432A8000DCFB19 /* CommonCrypto.h in Headers */ = {isa = PBXBuildFile; fileRef = FB30A2071B2B86FD00BE5429 /* CommonCrypto.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FBCF490A1B432AA600DCFB19 /* CommonCrypto.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBCF49061B432A8000DCFB19 /* CommonCrypto.framework */; };
-		FBCF49621B441B0600DCFB19 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBCF49611B441B0600DCFB19 /* String.swift */; };
+		FBCF49621B441B0600DCFB19 /* ByteString.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBCF49611B441B0600DCFB19 /* ByteString.swift */; };
+		FBCF49671B44358100DCFB19 /* ByteString.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBCF49611B441B0600DCFB19 /* ByteString.swift */; };
+		FBCF49681B44358200DCFB19 /* ByteString.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBCF49611B441B0600DCFB19 /* ByteString.swift */; };
 		FBD227601B3DF5F00064EFBB /* UnsafeBufferPointerRethrows.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD2275F1B3DF5F00064EFBB /* UnsafeBufferPointerRethrows.swift */; };
 		FBD227781B3EE5330064EFBB /* DataSink.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD227771B3EE5330064EFBB /* DataSink.swift */; };
 		FBD2277A1B3EE5760064EFBB /* HMACSink.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD227791B3EE5760064EFBB /* HMACSink.swift */; };
@@ -112,7 +114,7 @@
 		FBCF48E41B43286D00DCFB19 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FBCF48FB1B4329D500DCFB19 /* RNCryptor-OSX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RNCryptor-OSX.h"; sourceTree = "<group>"; };
 		FBCF49061B432A8000DCFB19 /* CommonCrypto.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CommonCrypto.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		FBCF49611B441B0600DCFB19 /* String.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
+		FBCF49611B441B0600DCFB19 /* ByteString.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ByteString.swift; sourceTree = "<group>"; };
 		FBD2275F1B3DF5F00064EFBB /* UnsafeBufferPointerRethrows.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnsafeBufferPointerRethrows.swift; sourceTree = "<group>"; };
 		FBD227771B3EE5330064EFBB /* DataSink.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataSink.swift; sourceTree = "<group>"; };
 		FBD227791B3EE5760064EFBB /* HMACSink.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HMACSink.swift; sourceTree = "<group>"; };
@@ -284,7 +286,7 @@
 			children = (
 				FBA08AB01B3F450F00F97862 /* Sliceable.swift */,
 				FBD2275F1B3DF5F00064EFBB /* UnsafeBufferPointerRethrows.swift */,
-				FBCF49611B441B0600DCFB19 /* String.swift */,
+				FBCF49611B441B0600DCFB19 /* ByteString.swift */,
 			);
 			name = Helpers;
 			sourceTree = "<group>";
@@ -554,7 +556,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FB30A1FF1B2B7BF300BE5429 /* RNCryptor.swift in Sources */,
-				FBCF49621B441B0600DCFB19 /* String.swift in Sources */,
+				FBCF49621B441B0600DCFB19 /* ByteString.swift in Sources */,
 				FBA803DB1B41A3D400B8E4E9 /* Decryptor.swift in Sources */,
 				FBD227601B3DF5F00064EFBB /* UnsafeBufferPointerRethrows.swift in Sources */,
 				FBA08AB51B3F480700F97862 /* BufferSink.swift in Sources */,
@@ -577,6 +579,7 @@
 				FBA08AB91B40589400F97862 /* BufferSinkTests.swift in Sources */,
 				FB627FDE1B2B7A1800C3A579 /* RNCryptorTests.swift in Sources */,
 				FB36507F1B41F3DE00F5273F /* RNCryptorGeneratedVectorTests.swift in Sources */,
+				FBCF49671B44358100DCFB19 /* ByteString.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -594,6 +597,7 @@
 				FBCF48F41B43293400DCFB19 /* RNCryptorV3.swift in Sources */,
 				FBCF48F51B43293400DCFB19 /* DecryptorV3.swift in Sources */,
 				FBCF48F61B43293400DCFB19 /* EncryptorV3.swift in Sources */,
+				FBCF49681B44358200DCFB19 /* ByteString.swift in Sources */,
 				FBCF48F71B43293400DCFB19 /* Sliceable.swift in Sources */,
 				FBCF48F81B43293400DCFB19 /* UnsafeBufferPointerRethrows.swift in Sources */,
 			);

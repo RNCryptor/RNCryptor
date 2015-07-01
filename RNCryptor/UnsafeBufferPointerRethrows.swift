@@ -27,7 +27,7 @@ private enum Result<T> {
     }
 }
 
-public extension Array {
+internal extension Array {
     func withUnsafeBufferPointer<R>(@noescape body: (UnsafeBufferPointer<T>) throws -> R) throws -> R {
         return try self.withUnsafeBufferPointer { buf in
             return Result{ try body(buf) }}.value()
@@ -39,7 +39,7 @@ public extension Array {
     }
 }
 
-public extension ArraySlice {
+internal extension ArraySlice {
     func withUnsafeBufferPointer<R>(@noescape body: (UnsafeBufferPointer<T>) throws -> R) throws -> R {
         return try self.withUnsafeBufferPointer { buf in
             return Result{ try body(buf) }}.value()
