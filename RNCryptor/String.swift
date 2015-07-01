@@ -10,6 +10,6 @@ import Foundation
 
 extension String {
     init?(UTF8String: UnsafePointer<UInt8>) {
-        self.init(UnsafePointer<Int8>(UTF8String))
+        self.init(UTF8String: UnsafePointer<Int8>(UTF8String))
     }
 }
