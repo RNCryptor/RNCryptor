@@ -35,14 +35,13 @@ public extension String {
         self.init(bytes: UTF8Bytes, length: UTF8Bytes.count, encoding: NSUTF8StringEncoding)
     }
 
-    public func byteArrayFromHexString() -> [UInt8]? {
-        var data = [UInt8]()
-
+    public var byteArrayFromHexEncoding: [UInt8]? {
         let strip = [Character]([" ", "<", ">", "\n", "\t"])
         let input = self.characters.filter { c in !strip.contains(c)}
 
         guard input.count % 2 == 0 else { return nil }
 
+        var data = [UInt8]()
         for i in stride(from: 0, to: input.count, by: 2) {
             guard let value = UInt8(String(input[i...i+1]), radix: 16) else { return nil }
             data.append(value)
@@ -51,7 +50,7 @@ public extension String {
         return data
     }
 
-    public func bytesArrayFromBase64EncodedString() -> [UInt8]? {
+    public var byteArrayFromBase64Encoding: [UInt8]? {
         return NSData(base64EncodedString: self, options: NSDataBase64DecodingOptions())?.byteArray
     }
 }
@@ -62,7 +61,7 @@ extension Int8: ByteLike {}
 
 public extension Array where T: ByteLike {
     public var hexString: String {
-        return "".join(self.map { byte in String(format:"%02x", byte.toIntMax()) })
+        return "".join(self.map { String(format:"%02x", $0.toIntMax()) })
     }
 
     public var base64EncodedString: String {
