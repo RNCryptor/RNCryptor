@@ -11,22 +11,14 @@ import Foundation
 // With thanks to https://github.com/krzyzanowskim/CryptoSwift/blob/master/CryptoSwift/NSDataExtension.swift
 public extension NSData {
     public var hexString : String {
-        let count = self.length
-        var bytesArray = [UInt8](count: count, repeatedValue: 0)
-        self.getBytes(&bytesArray, length:count)
-
-        var s = "";
-        for byte in bytesArray {
-            s.extend(String(format:"%02X", byte))
-        }
-        return s
+        return self.byteArray.hexString
     }
 
     public var base64EncodedString: String {
         return self.base64EncodedStringWithOptions(NSDataBase64EncodingOptions())
     }
 
-    public var arrayOfBytes: [UInt8] {
+    public var byteArray: [UInt8] {
         let count = self.length
         var bytesArray = [UInt8](count: count, repeatedValue: 0)
         self.getBytes(&bytesArray, length:count)
@@ -43,8 +35,7 @@ public extension String {
         self.init(bytes: UTF8Bytes, length: UTF8Bytes.count, encoding: NSUTF8StringEncoding)
     }
 
-    public func bytesFromHexString() -> [UInt8]? {
-        // Based on: http://stackoverflow.com/a/2505561/313633
+    public func byteArrayFromHexString() -> [UInt8]? {
         var data = [UInt8]()
 
         let strip = [Character]([" ", "<", ">", "\n", "\t"])
@@ -60,8 +51,8 @@ public extension String {
         return data
     }
 
-    public func bytesFromBase64EncodedString() -> [UInt8]? {
-        return NSData(base64EncodedString: self, options: NSDataBase64DecodingOptions())?.arrayOfBytes
+    public func bytesArrayFromBase64EncodedString() -> [UInt8]? {
+        return NSData(base64EncodedString: self, options: NSDataBase64DecodingOptions())?.byteArray
     }
 }
 
@@ -71,7 +62,7 @@ extension Int8: ByteLike {}
 
 public extension Array where T: ByteLike {
     public var hexString: String {
-        return self.data.hexString
+        return "".join(self.map { byte in String(format:"%02x", byte.toIntMax()) })
     }
 
     public var base64EncodedString: String {
@@ -79,7 +70,8 @@ public extension Array where T: ByteLike {
     }
 
     public var data: NSData {
-        return NSData(bytes: self, length: self.count)
+        return self.withUnsafeBufferPointer { bytes in
+            return NSData(bytes: bytes.baseAddress, length: bytes.count)
+        }
     }
 }
-
