@@ -1,5 +1,5 @@
 //
-//  BufferSink.swift
+//  BufferWriter.swift
 //  RNCryptor
 //
 //  Created by Rob Napier on 6/28/15.
@@ -21,13 +21,13 @@ class BufferSinkTests: XCTestCase {
         super.tearDown()
     }
 
-    // When a BufferSink receives less than its capacity, it outputs nothing and holds everything
+    // When a BufferWriter receives less than its capacity, it outputs nothing and holds everything
     func testShort() {
-        let out = DataSink()
-        let buffer = BufferSink(capacity: 4, sink: out)
+        let out = ArrayWriter()
+        let buffer = BufferWriter(capacity: 4, sink: out)
         let data: [UInt8] = [1,2,3]
         do {
-            try buffer.put(data)
+            try buffer.write(data)
         } catch {
             XCTFail()
         }
@@ -35,13 +35,13 @@ class BufferSinkTests: XCTestCase {
         XCTAssertEqual(buffer.array, [1,2,3])
     }
 
-    // When a BufferSink receives exactly its capacity, it outputs nothing and holds everything
+    // When a BufferWriter receives exactly its capacity, it outputs nothing and holds everything
     func testExactly() {
-        let out = DataSink()
-        let buffer = BufferSink(capacity: 4, sink: out)
+        let out = ArrayWriter()
+        let buffer = BufferWriter(capacity: 4, sink: out)
         let data: [UInt8] = [1,2,3,4]
         do {
-            try buffer.put(data)
+            try buffer.write(data)
         } catch {
             XCTFail()
         }
@@ -49,13 +49,13 @@ class BufferSinkTests: XCTestCase {
         XCTAssertEqual(buffer.array, [1,2,3,4])
     }
 
-    // When a BufferSink receives more than its capacity, it outputs the earliest bytes and holds the rest
+    // When a BufferWriter receives more than its capacity, it outputs the earliest bytes and holds the rest
     func testOverflow() {
-        let out = DataSink()
-        let buffer = BufferSink(capacity: 4, sink: out)
+        let out = ArrayWriter()
+        let buffer = BufferWriter(capacity: 4, sink: out)
         let data: [UInt8] = [1,2,3,4,5]
         do {
-            try buffer.put(data)
+            try buffer.write(data)
         } catch {
             XCTFail()
         }
@@ -63,13 +63,13 @@ class BufferSinkTests: XCTestCase {
         XCTAssertEqual(buffer.array, [2,3,4,5])
     }
 
-    // When a BufferSink receives less than its capacity in multiple writes, it outputs nothing and holds everything
+    // When a BufferWriter receives less than its capacity in multiple writes, it outputs nothing and holds everything
     func testMultiShort() {
-        let out = DataSink()
-        let buffer = BufferSink(capacity: 4, sink: out)
+        let out = ArrayWriter()
+        let buffer = BufferWriter(capacity: 4, sink: out)
         do {
-            try buffer.put([1])
-            try buffer.put([2,3])
+            try buffer.write([1])
+            try buffer.write([2,3])
         } catch {
             XCTFail()
         }
@@ -77,13 +77,13 @@ class BufferSinkTests: XCTestCase {
         XCTAssertEqual(buffer.array, [1,2,3])
     }
 
-    // When a BufferSink receives more than its capacity in multiple writes, it outputs the earliest bytes and holds the rest
+    // When a BufferWriter receives more than its capacity in multiple writes, it outputs the earliest bytes and holds the rest
     func testMultiOverflow() {
-        let out = DataSink()
-        let buffer = BufferSink(capacity: 4, sink: out)
+        let out = ArrayWriter()
+        let buffer = BufferWriter(capacity: 4, sink: out)
         do {
-            try buffer.put([1,2,3])
-            try buffer.put([4,5,6])
+            try buffer.write([1,2,3])
+            try buffer.write([4,5,6])
         } catch {
             XCTFail()
         }
@@ -91,13 +91,13 @@ class BufferSinkTests: XCTestCase {
         XCTAssertEqual(buffer.array, [3,4,5,6])
     }
 
-    // When a BufferSink receives more than its capacity when it already had elements, it outputs the earliest bytes and holds the rest
+    // When a BufferWriter receives more than its capacity when it already had elements, it outputs the earliest bytes and holds the rest
     func testMultiMegaOverflow() {
-        let out = DataSink()
-        let buffer = BufferSink(capacity: 4, sink: out)
+        let out = ArrayWriter()
+        let buffer = BufferWriter(capacity: 4, sink: out)
         do {
-            try buffer.put([1,2,3])
-            try buffer.put([4,5,6,7,8,9])
+            try buffer.write([1,2,3])
+            try buffer.write([4,5,6,7,8,9])
         } catch {
             XCTFail()
         }

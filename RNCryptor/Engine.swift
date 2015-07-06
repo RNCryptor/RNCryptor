@@ -14,13 +14,13 @@ public enum CryptorOperation: CCOperation {
     case Decrypt = 1 // CCOperation(kCCDecrypt)
 }
 
-internal class Engine: DataSinkType {
-    var sink: DataSinkType
+internal class Engine: Writable {
+    var sink: Writable
 
     private let cryptor: CCCryptorRef
     var error: NSError?
 
-    init(operation: CryptorOperation, key: [UInt8], iv: [UInt8], sink: DataSinkType) {
+    init(operation: CryptorOperation, key: [UInt8], iv: [UInt8], sink: Writable) {
         self.sink = sink
 
         var cryptorOut = CCCryptorRef()
@@ -38,7 +38,7 @@ internal class Engine: DataSinkType {
         }
     }
 
-    func put(data: UnsafeBufferPointer<UInt8>) throws {
+    func write(data: UnsafeBufferPointer<UInt8>) throws {
         if let err = self.error {
             throw err
         }
@@ -54,7 +54,7 @@ internal class Engine: DataSinkType {
 
         if dataOutMoved > 0 {
             try output.withUnsafeBufferPointer { buf -> Void in
-                try self.sink.put(buf[0..<dataOutMoved])
+                try self.sink.write(buf[0..<dataOutMoved])
             }
         }
     }
@@ -73,7 +73,7 @@ internal class Engine: DataSinkType {
 
         if dataOutMoved > 0 {
             try output.withUnsafeBufferPointer {
-                try self.sink.put($0[0..<dataOutMoved])
+                try self.sink.write($0[0..<dataOutMoved])
             }
         }
     }

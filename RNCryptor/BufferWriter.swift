@@ -1,5 +1,5 @@
 //
-//  BufferSink.swift
+//  BufferWriter.swift
 //  RNCryptor
 //
 //  Created by Rob Napier on 6/27/15.
@@ -8,18 +8,18 @@
 
 import Foundation
 
-public class BufferSink: DataSinkType {
+public class BufferWriter: Writable {
     public var array: [UInt8] = []
 
     let capacity: Int
-    let sink: DataSinkType
-    public init(capacity: Int, sink: DataSinkType) {
+    let sink: Writable
+    public init(capacity: Int, sink: Writable) {
         self.capacity = capacity
         self.sink = sink
     }
 
     // FIXME: Can probably merge much of this
-    public func put(data: UnsafeBufferPointer<UInt8>) throws {
+    public func write(data: UnsafeBufferPointer<UInt8>) throws {
         if data.count >= capacity {
             try sendAllArray(data)
         } else if array.count + data.count <= capacity {
@@ -33,10 +33,10 @@ public class BufferSink: DataSinkType {
         let (send, keep) = data.splitAt(data.count - capacity)
         assert(keep.count == capacity)
         if array.count > 0 { // Send the whole current array
-            try sink.put(array)
+            try sink.write(array)
         }
         if send.count > 0 { // Send what needs sending of data
-            try sink.put(send)
+            try sink.write(send)
         }
         array = Array(keep) // Keep the rest
     }
@@ -47,7 +47,7 @@ public class BufferSink: DataSinkType {
         assert(toSend < array.count) // If we would have sent everything, replaceBuffer should have been called
 
         let (send, keep) = array.splitAt(toSend)
-        try sink.put(send)
+        try sink.write(send)
         array = Array(keep)
         array.extend(data)
     }

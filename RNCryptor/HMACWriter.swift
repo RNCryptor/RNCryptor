@@ -8,7 +8,7 @@
 
 import CommonCrypto
 
-internal final class HMACSink: DataSinkType {
+internal final class HMACWriter: Writable {
     var context: CCHmacContext = CCHmacContext()
 
     init(key: [UInt8]) {
@@ -20,7 +20,7 @@ internal final class HMACSink: DataSinkType {
         )
     }
 
-    func put(data: UnsafeBufferPointer<UInt8>) throws {
+    func write(data: UnsafeBufferPointer<UInt8>) throws {
         CCHmacUpdate(&self.context, data.baseAddress, data.count)
     }
 

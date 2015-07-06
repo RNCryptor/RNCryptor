@@ -34,19 +34,19 @@ class RNCryptorTests: XCTestCase {
         let encryptKey = randomDataOfLength(RNCryptorV3.keySize)
         let iv = randomDataOfLength(RNCryptorV3.ivSize)
 
-        let encrypted = DataSink()
+        let encrypted = ArrayWriter()
         let encryptor = Engine(operation: .Encrypt, key: encryptKey, iv: iv, sink: encrypted)
         do {
-            try encryptor.put(data)
+            try encryptor.write(data)
             try encryptor.finish()
         } catch {
             XCTFail("Caught: \(error)")
         }
 
-        let decrypted = DataSink()
+        let decrypted = ArrayWriter()
         let decryptor = Engine(operation: .Decrypt, key: encryptKey, iv: iv, sink: decrypted)
         do {
-            try decryptor.put(encrypted.array)
+            try decryptor.write(encrypted.array)
             try decryptor.finish()
         } catch {
             XCTFail("Caught: \(error)")
@@ -62,10 +62,10 @@ class RNCryptorTests: XCTestCase {
         let plaintext = "01".byteArrayFromHexEncoding!
         let ciphertext = "03000203 04050607 08090a0b 0c0d0e0f 0001981b 22e7a644 8118d695 bd654f72 e9d6ed75 ec14ae2a a067eed2 a98a56e0 993dfe22 ab5887b3 f6e3cdd4 0767f519 5eb5".byteArrayFromHexEncoding!
 
-        let encrypted = DataSink()
+        let encrypted = ArrayWriter()
         let encryptor = Encryptor(encryptionKey: encryptKey, hmacKey: hmacKey, iv: iv, sink: encrypted)
         do {
-            try encryptor.put(plaintext)
+            try encryptor.write(plaintext)
             try encryptor.finish()
         } catch {
             XCTFail("Caught: \(error)")
@@ -79,10 +79,10 @@ class RNCryptorTests: XCTestCase {
         let plaintext = "01".byteArrayFromHexEncoding!
         let ciphertext = "03000203 04050607 08090a0b 0c0d0e0f 0001981b 22e7a644 8118d695 bd654f72 e9d6ed75 ec14ae2a a067eed2 a98a56e0 993dfe22 ab5887b3 f6e3cdd4 0767f519 5eb5".byteArrayFromHexEncoding!
 
-        let decrypted = DataSink()
+        let decrypted = ArrayWriter()
         let decryptor = Decryptor(encryptionKey: encryptKey, hmacKey: hmacKey, sink: decrypted)
         do {
-            try decryptor.put(ciphertext)
+            try decryptor.write(ciphertext)
             try decryptor.finish()
         } catch {
             XCTFail("Caught: \(error)")
@@ -99,11 +99,11 @@ class RNCryptorTests: XCTestCase {
         let plaintext = "01".byteArrayFromHexEncoding!
         let ciphertext = "03010001 02030405 06070102 03040506 07080203 04050607 08090a0b 0c0d0e0f 0001a1f8 730e0bf4 80eb7b70 f690abf2 1e029514 164ad3c4 74a51b30 c7eaa1ca 545b7de3 de5b010a cbad0a9a 13857df6 96a8".byteArrayFromHexEncoding!
 
-        let encrypted = DataSink()
+        let encrypted = ArrayWriter()
         let encryptor = Encryptor(password: password, encryptionSalt: encryptionSalt, hmacSalt: hmacSalt, iv: iv, sink: encrypted)
 
         do {
-            try encryptor.put(plaintext)
+            try encryptor.write(plaintext)
             try encryptor.finish()
         } catch {
             XCTFail("Caught: \(error)")
@@ -117,11 +117,11 @@ class RNCryptorTests: XCTestCase {
         let plaintext = "01".byteArrayFromHexEncoding!
         let ciphertext = "03010001 02030405 06070102 03040506 07080203 04050607 08090a0b 0c0d0e0f 0001a1f8 730e0bf4 80eb7b70 f690abf2 1e029514 164ad3c4 74a51b30 c7eaa1ca 545b7de3 de5b010a cbad0a9a 13857df6 96a8".byteArrayFromHexEncoding!
 
-        let decrypted = DataSink()
+        let decrypted = ArrayWriter()
         let decryptor = Decryptor(password: password, sink: decrypted)
 
         do {
-            try decryptor.put(ciphertext)
+            try decryptor.write(ciphertext)
             try decryptor.finish()
         } catch {
             XCTFail("Caught: \(error)")

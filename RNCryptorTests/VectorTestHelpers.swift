@@ -16,12 +16,6 @@ func verifyVector(vector: [String:String], key:String, equals actual:[UInt8], na
 }
 
 func _verifyKDF(vector: [String:String], name:String) {
-//    assert(vector["title"] != nil);
-//    assert(vector["version"] != nil);
-//    assert(vector["password"] != nil);
-//    assert(vector["salt_hex"] != nil);
-//    assert(vector["key_hex"] != nil);
-
     let key = RNCryptorV3.keyForPassword(vector["password"]!,
         salt:vector["salt_hex"]!.byteArrayFromHexEncoding!)
     verifyVector(vector, key:"key_hex", equals:key, name: name)
@@ -34,24 +28,15 @@ func verify_v3_kdf(vector: [String:String]) {
 
 
 func _verifyPassword(vector: [String:String]) {
-//    NSCParameterAssert(vector[@"title"]);
-//    NSCParameterAssert(vector[@"version"]);
-//    NSCParameterAssert(vector[@"password"]);
-//    NSCParameterAssert(vector[@"iv_hex"]);
-//    NSCParameterAssert(vector[@"enc_salt_hex"]);
-//    NSCParameterAssert(vector[@"hmac_salt_hex"]);
-//    NSCParameterAssert(vector[@"plaintext_hex"]);
-//    NSCParameterAssert(vector[@"ciphertext_hex"]);
-
     if Int(vector["version"]!) == FormatVersion {
-        let ciphertext = DataSink()
+        let ciphertext = ArrayWriter()
         let encryptor = Encryptor(password: vector["password"]!,
             encryptionSalt: vector["enc_salt_hex"]!.byteArrayFromHexEncoding!,
             hmacSalt: vector["hmac_salt_hex"]!.byteArrayFromHexEncoding!,
             iv: vector["iv_hex"]!.byteArrayFromHexEncoding!,
             sink: ciphertext)
         do {
-            try encryptor.put(vector["plaintext_hex"]!.byteArrayFromHexEncoding!)
+            try encryptor.write(vector["plaintext_hex"]!.byteArrayFromHexEncoding!)
             try encryptor.finish()
         } catch {
             XCTFail("\(error)")
@@ -59,11 +44,11 @@ func _verifyPassword(vector: [String:String]) {
         verifyVector(vector, key:"ciphertext_hex", equals:ciphertext.array, name:"password encrypt")
     }
 
-    let plaintext = DataSink()
+    let plaintext = ArrayWriter()
     let decryptor = Decryptor(password: vector["password"]!,
         sink: plaintext)
     do {
-        try decryptor.put(vector["ciphertext_hex"]!.byteArrayFromHexEncoding!)
+        try decryptor.write(vector["ciphertext_hex"]!.byteArrayFromHexEncoding!)
         try decryptor.finish()
     } catch {
         XCTFail("\(error)")
@@ -76,25 +61,15 @@ func verify_v3_password(vector: [String: String]) {
 }
 
 func verify_v3_key(vector: [String: String]) {
-//    NSCParameterAssert(vector[@"title"]);
-//    NSCParameterAssert(vector[@"version"]);
-//    NSCParameterAssert(vector[@"enc_key_hex"]);
-//    NSCParameterAssert(vector[@"hmac_key_hex"]);
-//    NSCParameterAssert(vector[@"iv_hex"]);
-//    NSCParameterAssert(vector[@"plaintext_hex"]);
-//    NSCParameterAssert(vector[@"ciphertext_hex"]);
-
-//    NSError *error;
-
     if Int(vector["version"]!) == FormatVersion {
-        let ciphertext = DataSink()
+        let ciphertext = ArrayWriter()
         let encryptor = Encryptor(
             encryptionKey: vector["enc_key_hex"]!.byteArrayFromHexEncoding!,
             hmacKey: vector["hmac_key_hex"]!.byteArrayFromHexEncoding!,
             iv: vector["iv_hex"]!.byteArrayFromHexEncoding!,
             sink: ciphertext)
         do {
-            try encryptor.put(vector["plaintext_hex"]!.byteArrayFromHexEncoding!)
+            try encryptor.write(vector["plaintext_hex"]!.byteArrayFromHexEncoding!)
             try encryptor.finish()
         } catch {
             XCTFail("\(error)")
@@ -102,13 +77,13 @@ func verify_v3_key(vector: [String: String]) {
         verifyVector(vector, key:"ciphertext_hex", equals:ciphertext.array, name:"key encrypt")
     }
 
-    let plaintext = DataSink()
+    let plaintext = ArrayWriter()
     let decryptor = Decryptor(
         encryptionKey: vector["enc_key_hex"]!.byteArrayFromHexEncoding!,
         hmacKey: vector["hmac_key_hex"]!.byteArrayFromHexEncoding!,
         sink: plaintext)
     do {
-        try decryptor.put(vector["ciphertext_hex"]!.byteArrayFromHexEncoding!)
+        try decryptor.write(vector["ciphertext_hex"]!.byteArrayFromHexEncoding!)
         try decryptor.finish()
     } catch {
         XCTFail("\(error)")

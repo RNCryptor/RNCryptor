@@ -6,28 +6,26 @@
 //  Copyright © 2015 Rob Napier. All rights reserved.
 //
 
-import CommonCrypto
-
-final class DecryptorV3: DataSinkType, DecryptorType {
+final class DecryptorV3: Writable, DecryptorType {
     // Buffer -> Tee -> HMAC
     //               -> Cryptor -> Sink
 
-    private let bufferSink: BufferSink
-    private let hmacSink: HMACSink
+    private let bufferSink: BufferWriter
+    private let hmacSink: HMACWriter
     private let engine: Engine
 
     private var pendingHeader: [UInt8]?
 
-    private init(encryptionKey: [UInt8], hmacKey: [UInt8], iv: [UInt8], header: [UInt8], sink: DataSinkType) {
+    private init(encryptionKey: [UInt8], hmacKey: [UInt8], iv: [UInt8], header: [UInt8], sink: Writable) {
         self.pendingHeader = header
 
         self.engine = Engine(operation: .Decrypt, key: encryptionKey, iv: iv, sink: sink)
-        self.hmacSink = HMACSink(key: hmacKey)
-        let teeSink = TeeSink(self.engine, self.hmacSink)
-        self.bufferSink = BufferSink(capacity: RNCryptorV3.hmacSize, sink: teeSink)
+        self.hmacSink = HMACWriter(key: hmacKey)
+        let teeSink = TeeWriter(self.engine, self.hmacSink)
+        self.bufferSink = BufferWriter(capacity: RNCryptorV3.hmacSize, sink: teeSink)
     }
 
-    convenience init?(password: String, header: [UInt8], sink: DataSinkType) {
+    convenience init?(password: String, header: [UInt8], sink: Writable) {
         guard password != "" &&
             header.count == RNCryptorV3.passwordHeaderSize &&
             header[0] == RNCryptorV3.version &&
@@ -48,7 +46,7 @@ final class DecryptorV3: DataSinkType, DecryptorType {
         self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header, sink: sink)
     }
 
-    convenience init?(encryptionKey: [UInt8], hmacKey: [UInt8], header: [UInt8], sink: DataSinkType) {
+    convenience init?(encryptionKey: [UInt8], hmacKey: [UInt8], header: [UInt8], sink: Writable) {
         guard encryptionKey.count == RNCryptorV3.keySize &&
             hmacKey.count == RNCryptorV3.keySize &&
             header.count == RNCryptorV3.keyHeaderSize &&
@@ -64,12 +62,12 @@ final class DecryptorV3: DataSinkType, DecryptorType {
         self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header, sink: sink)
     }
 
-    func put(data: UnsafeBufferPointer<UInt8>) throws {
+    func write(data: UnsafeBufferPointer<UInt8>) throws {
         if let pendingHeader = self.pendingHeader {
-            try self.hmacSink.put(pendingHeader)
+            try self.hmacSink.write(pendingHeader)
             self.pendingHeader = nil
         }
-        try bufferSink.put(data) // Cryptor -> HMAC -> sink
+        try bufferSink.write(data) // Cryptor -> HMAC -> sink
     }
 
     func finish() throws {

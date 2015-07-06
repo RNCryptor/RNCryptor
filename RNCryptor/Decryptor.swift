@@ -6,17 +6,17 @@
 //  Copyright © 2015 Rob Napier. All rights reserved.
 //
 
-protocol DecryptorType: DataSinkType {
+protocol DecryptorType: Writable {
     func finish() throws
 }
 
-public final class Decryptor: DataSinkType {
+public final class Decryptor: Writable {
     private let decryptors: [(headerLength: Int, builder: ([UInt8]) -> DecryptorType?)]
     private var buffer: [UInt8] = []
 
     private var decryptor: DecryptorType?
 
-    public init(password: String, sink: DataSinkType) {
+    public init(password: String, sink: Writable) {
         assert(password != "")
 
         self.decryptors = [
@@ -24,15 +24,15 @@ public final class Decryptor: DataSinkType {
         ]
     }
 
-    public init(encryptionKey: [UInt8], hmacKey: [UInt8], sink: DataSinkType) {
+    public init(encryptionKey: [UInt8], hmacKey: [UInt8], sink: Writable) {
         self.decryptors = [
             (RNCryptorV3.keyHeaderSize, { DecryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey, header: $0, sink: sink) as DecryptorType? })
         ]
     }
 
-    public func put(data: UnsafeBufferPointer<UInt8>) throws {
+    public func write(data: UnsafeBufferPointer<UInt8>) throws {
         if let decryptor = self.decryptor {
-            try decryptor.put(data)
+            try decryptor.write(data)
         } else {
             let maxHeaderLength = decryptors.reduce(0) { max($0, $1.headerLength) }
             guard self.buffer.count + data.count >= maxHeaderLength else {
@@ -46,7 +46,7 @@ public final class Decryptor: DataSinkType {
                 if let decryptor = decryptorType.builder(header) {
                     self.decryptor = decryptor
                     self.buffer.removeAll()
-                    try self.decryptor?.put(content)
+                    try self.decryptor?.write(content)
                     return
                 }
             }
