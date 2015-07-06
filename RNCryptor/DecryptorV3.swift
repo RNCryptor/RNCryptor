@@ -6,7 +6,7 @@
 //  Copyright © 2015 Rob Napier. All rights reserved.
 //
 
-final class DecryptorV3: Writable, DecryptorType {
+final class DecryptorV3: CryptorType, Writable {
     // Buffer -> Tee -> HMAC
     //               -> Cryptor -> Sink
 
