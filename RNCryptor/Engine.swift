@@ -16,9 +16,8 @@ public enum CryptorOperation: CCOperation {
 
 internal class Engine {
     private let cryptor: CCCryptorRef
-    var error: NSError?
 
-    init(operation: CryptorOperation, key: [UInt8], iv: [UInt8]) {
+    init(operation: CryptorOperation, key: [UInt8], iv: [UInt8]) throws {
         var cryptorOut = CCCryptorRef()
         let result = CCCryptorCreate(
             operation.rawValue,
@@ -30,9 +29,9 @@ internal class Engine {
         self.cryptor = cryptorOut
         if result != CCCryptorStatus(kCCSuccess) {
             assertionFailure("Failed to create CCCryptor")
-            self.error = NSError(domain: CCErrorDomain, code: Int(result), userInfo: nil)
         }
     }
+
     deinit {
         if self.cryptor != CCCryptorRef() {
             CCCryptorRelease(self.cryptor)
@@ -41,10 +40,6 @@ internal class Engine {
 
     @warn_unused_result
     func update(data: [UInt8]) throws -> [UInt8] {
-        if let err = self.error {
-            throw err
-        }
-
         let outputLength = CCCryptorGetOutputLength(self.cryptor, data.count, false)
         var output = Array<UInt8>(count: outputLength, repeatedValue: 0)
         var dataOutMoved: Int = 0

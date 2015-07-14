@@ -7,9 +7,6 @@
 //
 
 final class DecryptorV3: DecryptorType {
-    // Buffer -> Tee -> HMAC
-    //               -> Cryptor -> Sink
-
     private let bufferSink: TruncatingBuffer
     private let hmacSink: HMACWriter
     private let engine: Engine
@@ -17,9 +14,12 @@ final class DecryptorV3: DecryptorType {
     private var pendingHeader: [UInt8]?
 
     private init(encryptionKey: RNCryptorV3Key, hmacKey: RNCryptorV3Key, iv: [UInt8], header: [UInt8]) {
+        guard iv.count == RNCryptorV3.ivSize else {
+            fatalError("Internal error: IV incorrect size")
+        }
         self.pendingHeader = header
 
-        self.engine = Engine(operation: .Decrypt, key: encryptionKey.bytes, iv: iv)
+        self.engine = try! Engine(operation: .Decrypt, key: encryptionKey.bytes, iv: iv) // It is a programming error for this to fail
         self.hmacSink = HMACWriter(key: hmacKey.bytes)
         self.bufferSink = TruncatingBuffer(capacity: RNCryptorV3.hmacSize)
     }
@@ -30,8 +30,6 @@ final class DecryptorV3: DecryptorType {
             header[0] == RNCryptorV3.version &&
             header[1] == 1
             else {
-                // Shouldn't have to set these, but Swift 2 requires it
-//                self.init(encryptionKey: [], hmacKey: [], iv: [], header: [])
                 return nil
         }
 
@@ -51,8 +49,6 @@ final class DecryptorV3: DecryptorType {
             header[0] == RNCryptorV3.version &&
             header[1] == 0
             else {
-                // Shouldn't have to set these, but Swift 2 requires it
-//                self.init(encryptionKey: [], hmacKey: [], iv: [], header: [])
                 return nil
         }
 

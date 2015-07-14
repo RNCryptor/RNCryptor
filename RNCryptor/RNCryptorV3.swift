@@ -54,13 +54,27 @@ public func ==(lhs: _RNCryptorV3, rhs: _RNCryptorV3) -> Bool {
     return true // It's constant
 }
 
-public struct RNCryptorV3Key: Equatable {
-    let bytes: [UInt8]
-    init?(_ bytes: [UInt8]) {
-        guard bytes.count == RNCryptorV3.keySize else { return nil }
+public protocol FixedSizeByteArray: Equatable {
+    var bytes: [UInt8] { get set }
+}
+public func ==<T: FixedSizeByteArray>(lhs: T, rhs: T) -> Bool {
+    return lhs.bytes == rhs.bytes
+}
+
+public struct RNCryptorV3Key: FixedSizeByteArray {
+    public var bytes: [UInt8]
+    public init?(_ bytes: [UInt8]) {
+        guard bytes.count == RNCryptorV3.keySize
+            else { return nil }
         self.bytes = bytes
     }
 }
-public func ==(lhs: RNCryptorV3Key, rhs: RNCryptorV3Key) -> Bool {
-    return lhs.bytes == rhs.bytes
+
+internal struct RNCryptorV3IV: FixedSizeByteArray {
+    var bytes: [UInt8]
+     init?(_ bytes: [UInt8]) {
+        guard bytes.count == RNCryptorV3.ivSize
+            else { return nil }
+        self.bytes = bytes
+    }
 }

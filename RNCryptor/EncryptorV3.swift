@@ -16,27 +16,27 @@ public final class EncryptorV3 {
 
     private var pendingHeader: [UInt8]?
 
-    private init(encryptionKey: RNCryptorV3Key, hmacKey: RNCryptorV3Key, iv: [UInt8], header: [UInt8]) {
+    private init(encryptionKey: RNCryptorV3Key, hmacKey: RNCryptorV3Key, iv: RNCryptorV3IV, header: [UInt8]) {
         self.hmacSink = HMACWriter(key: hmacKey.bytes)
-        self.engine = Engine(operation: .Encrypt, key: encryptionKey.bytes, iv: iv)
+        self.engine = try! Engine(operation: .Encrypt, key: encryptionKey.bytes, iv: iv.bytes) // It is an internal error for this to fail
         self.pendingHeader = header
     }
 
     // Expose random numbers for testing
-    internal convenience init(encryptionKey: RNCryptorV3Key, hmacKey: RNCryptorV3Key, iv: [UInt8]) {
-        let header = [UInt8]([RNCryptorV3.version, UInt8(0)]) + iv
+    internal convenience init(encryptionKey: RNCryptorV3Key, hmacKey: RNCryptorV3Key, iv: RNCryptorV3IV) {
+        let header = [UInt8]([RNCryptorV3.version, UInt8(0)]) + iv.bytes
         self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
     }
 
     public convenience init(encryptionKey: RNCryptorV3Key, hmacKey: RNCryptorV3Key) {
-        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: randomDataOfLength(RNCryptorV3.ivSize))
+        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: RNCryptorV3IV(randomDataOfLength(RNCryptorV3.ivSize))!)
     }
 
     // Expose random numbers for testing
-    internal convenience init(password: String, encryptionSalt: [UInt8], hmacSalt: [UInt8], iv: [UInt8]) {
+    internal convenience init(password: String, encryptionSalt: [UInt8], hmacSalt: [UInt8], iv: RNCryptorV3IV) {
         let encryptionKey = RNCryptorV3.keyForPassword(password, salt: encryptionSalt)
         let hmacKey = RNCryptorV3.keyForPassword(password, salt: hmacSalt)
-        let header = [UInt8]([RNCryptorV3.version, UInt8(1)]) + encryptionSalt + hmacSalt + iv
+        let header = [UInt8]([RNCryptorV3.version, UInt8(1)]) + encryptionSalt + hmacSalt + iv.bytes
         self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
     }
 
@@ -45,7 +45,7 @@ public final class EncryptorV3 {
             password: password,
             encryptionSalt: randomDataOfLength(RNCryptorV3.saltSize),
             hmacSalt:randomDataOfLength(RNCryptorV3.saltSize),
-            iv: randomDataOfLength(RNCryptorV3.ivSize))
+            iv: RNCryptorV3IV(randomDataOfLength(RNCryptorV3.ivSize))!)
     }
 
     @warn_unused_result
