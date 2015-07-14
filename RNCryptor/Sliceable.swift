@@ -11,9 +11,3 @@ extension Sliceable {
         return (self[startIndex..<index], self[index..<endIndex])
     }
 }
-
-extension UnsafeBufferPointer: Sliceable {
-    public subscript (bounds: Range<Index>) -> UnsafeBufferPointer<Element> {
-        return(UnsafeBufferPointer(start: self.baseAddress + bounds.startIndex, count: bounds.count))
-    }
-}

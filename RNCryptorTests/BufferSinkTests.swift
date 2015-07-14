@@ -1,5 +1,5 @@
 //
-//  BufferWriter.swift
+//  TruncatingBuffer.swift
 //  RNCryptor
 //
 //  Created by Rob Napier on 6/28/15.
@@ -21,54 +21,54 @@ class BufferSinkTests: XCTestCase {
         super.tearDown()
     }
 
-    // When a BufferWriter receives less than its capacity, it outputs nothing and holds everything
+    // When a TruncatingBuffer receives less than its capacity, it outputs nothing and holds everything
     func testShort() {
-        let buffer = BufferWriter(capacity: 4)
+        let buffer = TruncatingBuffer(capacity: 4)
         let data: [UInt8] = [1,2,3]
         let out = buffer.update(data)
         XCTAssert(out.isEmpty)
-        XCTAssertEqual(buffer.array, [1,2,3])
+        XCTAssertEqual(buffer.final(), [1,2,3])
     }
 
-    // When a BufferWriter receives exactly its capacity, it outputs nothing and holds everything
+    // When a TruncatingBuffer receives exactly its capacity, it outputs nothing and holds everything
     func testExactly() {
-        let buffer = BufferWriter(capacity: 4)
+        let buffer = TruncatingBuffer(capacity: 4)
         let data: [UInt8] = [1,2,3,4]
         let out = buffer.update(data)
         XCTAssert(out.isEmpty)
-        XCTAssertEqual(buffer.array, [1,2,3,4])
+        XCTAssertEqual(buffer.final(), [1,2,3,4])
     }
 
-    // When a BufferWriter receives more than its capacity, it outputs the earliest bytes and holds the rest
+    // When a TruncatingBuffer receives more than its capacity, it outputs the earliest bytes and holds the rest
     func testOverflow() {
-        let buffer = BufferWriter(capacity: 4)
+        let buffer = TruncatingBuffer(capacity: 4)
         let data: [UInt8] = [1,2,3,4,5]
         let out = buffer.update(data)
         XCTAssertEqual(out, [1])
-        XCTAssertEqual(buffer.array, [2,3,4,5])
+        XCTAssertEqual(buffer.final(), [2,3,4,5])
     }
 
-    // When a BufferWriter receives less than its capacity in multiple writes, it outputs nothing and holds everything
+    // When a TruncatingBuffer receives less than its capacity in multiple writes, it outputs nothing and holds everything
     func testMultiShort() {
-        let buffer = BufferWriter(capacity: 4)
+        let buffer = TruncatingBuffer(capacity: 4)
         let out = buffer.update([1]) + buffer.update([2,3])
         XCTAssert(out.isEmpty)
-        XCTAssertEqual(buffer.array, [1,2,3])
+        XCTAssertEqual(buffer.final(), [1,2,3])
     }
 
-    // When a BufferWriter receives more than its capacity in multiple writes, it outputs the earliest bytes and holds the rest
+    // When a TruncatingBuffer receives more than its capacity in multiple writes, it outputs the earliest bytes and holds the rest
     func testMultiOverflow() {
-        let buffer = BufferWriter(capacity: 4)
+        let buffer = TruncatingBuffer(capacity: 4)
         let out = buffer.update([1,2,3]) + buffer.update([4,5,6])
         XCTAssertEqual(out, [1,2])
-        XCTAssertEqual(buffer.array, [3,4,5,6])
+        XCTAssertEqual(buffer.final(), [3,4,5,6])
     }
 
-    // When a BufferWriter receives more than its capacity when it already had elements, it outputs the earliest bytes and holds the rest
+    // When a TruncatingBuffer receives more than its capacity when it already had elements, it outputs the earliest bytes and holds the rest
     func testMultiMegaOverflow() {
-        let buffer = BufferWriter(capacity: 4)
+        let buffer = TruncatingBuffer(capacity: 4)
         let out = buffer.update([1,2,3]) + buffer.update([4,5,6,7,8,9])
         XCTAssertEqual(out, [1,2,3,4,5])
-        XCTAssertEqual(buffer.array, [6,7,8,9])
+        XCTAssertEqual(buffer.final(), [6,7,8,9])
     }
 }

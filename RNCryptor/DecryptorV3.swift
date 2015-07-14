@@ -10,7 +10,7 @@ final class DecryptorV3: DecryptorType {
     // Buffer -> Tee -> HMAC
     //               -> Cryptor -> Sink
 
-    private let bufferSink: BufferWriter
+    private let bufferSink: TruncatingBuffer
     private let hmacSink: HMACWriter
     private let engine: Engine
 
@@ -21,7 +21,7 @@ final class DecryptorV3: DecryptorType {
 
         self.engine = Engine(operation: .Decrypt, key: encryptionKey, iv: iv)
         self.hmacSink = HMACWriter(key: hmacKey)
-        self.bufferSink = BufferWriter(capacity: RNCryptorV3.hmacSize)
+        self.bufferSink = TruncatingBuffer(capacity: RNCryptorV3.hmacSize)
     }
 
     convenience init?(password: String, header: [UInt8]) {
@@ -76,7 +76,7 @@ final class DecryptorV3: DecryptorType {
     func final() throws -> [UInt8] {
         let data = try self.engine.final()
         let hash = self.hmacSink.final()
-        if hash != self.bufferSink.array {
+        if hash != self.bufferSink.final() {
             throw Error.HMACMismatch
         }
         return data

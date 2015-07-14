@@ -1,5 +1,5 @@
 //
-//  BufferWriter.swift
+//  TruncatingBuffer.swift
 //  RNCryptor
 //
 //  Created by Rob Napier on 6/27/15.
@@ -8,15 +8,14 @@
 
 import Foundation
 
-public class BufferWriter {
-    public var array: [UInt8] = []
+public class TruncatingBuffer {
+    private var array: [UInt8] = []
+    public let capacity: Int
 
-    let capacity: Int
     public init(capacity: Int) {
         self.capacity = capacity
     }
 
-    // FIXME: Can probably merge much of this
     @warn_unused_result
     public func update(data: [UInt8]) -> [UInt8] {
         if data.count >= capacity {
@@ -27,6 +26,10 @@ public class BufferWriter {
         } else {
             return sendSomeArray(data)
         }
+    }
+
+    public func final() -> [UInt8] {
+        return array
     }
 
     private func sendAllArray(data: [UInt8]) -> [UInt8] {
