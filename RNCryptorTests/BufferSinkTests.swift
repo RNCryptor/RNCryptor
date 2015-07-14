@@ -7,7 +7,7 @@
 //
 
 import XCTest
-import RNCryptor
+@testable import RNCryptor
 
 class BufferSinkTests: XCTestCase {
 

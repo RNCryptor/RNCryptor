@@ -8,16 +8,16 @@
 
 import Foundation
 
-public class TruncatingBuffer {
+internal class TruncatingBuffer {
     private var array: [UInt8] = []
-    public let capacity: Int
+    let capacity: Int
 
-    public init(capacity: Int) {
+    init(capacity: Int) {
         self.capacity = capacity
     }
 
     @warn_unused_result
-    public func update(data: [UInt8]) -> [UInt8] {
+    func update(data: [UInt8]) -> [UInt8] {
         if data.count >= capacity {
             return sendAllArray(data)
         } else if array.count + data.count <= capacity {
@@ -28,7 +28,7 @@ public class TruncatingBuffer {
         }
     }
 
-    public func final() -> [UInt8] {
+    func final() -> [UInt8] {
         return array
     }
 
