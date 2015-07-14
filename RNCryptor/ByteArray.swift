@@ -59,7 +59,7 @@ public protocol ByteLike: IntegerType {}
 extension UInt8: ByteLike {}
 extension Int8: ByteLike {}
 
-public extension Array where T: ByteLike {
+public extension Array where Element: ByteLike {
     public var hexString: String {
         return "".join(self.map { String(format:"%02x", $0.toIntMax()) })
     }

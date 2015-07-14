@@ -38,6 +38,13 @@ internal class Engine: Writable {
         }
     }
 
+    deinit {
+        if self.cryptor != CCCryptorRef() {
+            CCCryptorRelease(self.cryptor)
+        }
+
+    }
+
     func write(data: UnsafeBufferPointer<UInt8>) throws {
         if let err = self.error {
             throw err
