@@ -21,13 +21,13 @@ public final class Decryptor {
         assert(password != "")
 
         self.decryptors = [
-            (RNCryptorV3.passwordHeaderSize, { DecryptorV3(password: password, header: $0) as DecryptorType? })
+            (V3.passwordHeaderSize, { DecryptorV3(password: password, header: $0) as DecryptorType? })
         ]
     }
 
     public init(encryptionKey: RNCryptorV3Key, hmacKey: RNCryptorV3Key) {
         self.decryptors = [
-            (RNCryptorV3.keyHeaderSize, { DecryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey, header: $0) as DecryptorType? })
+            (V3.keyHeaderSize, { DecryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey, header: $0) as DecryptorType? })
         ]
     }
 

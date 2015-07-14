@@ -39,7 +39,6 @@ internal func checkResult(result: CCCryptorStatus) throws {
 }
 
 public typealias Encryptor = EncryptorV3
-public typealias Key = RNCryptorV3Key
 
 public func encrypt(data: [UInt8], password: String) throws -> [UInt8] {
     let encryptor = Encryptor(password: password)
