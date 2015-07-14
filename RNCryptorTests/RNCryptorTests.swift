@@ -115,7 +115,6 @@ class RNCryptorTests: XCTestCase {
         } catch {
             XCTFail("Caught: \(error)")
         }
-
     }
 
     func testOneShotKey() {

@@ -33,6 +33,11 @@ internal class Engine {
             self.error = NSError(domain: CCErrorDomain, code: Int(result), userInfo: nil)
         }
     }
+    deinit {
+        if self.cryptor != CCCryptorRef() {
+            CCCryptorRelease(self.cryptor)
+        }
+    }
 
     @warn_unused_result
     func update(data: [UInt8]) throws -> [UInt8] {
