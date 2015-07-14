@@ -16,19 +16,19 @@ public final class EncryptorV3 {
 
     private var pendingHeader: [UInt8]?
 
-    private init(encryptionKey: [UInt8], hmacKey: [UInt8], iv: [UInt8], header: [UInt8]) {
-        self.hmacSink = HMACWriter(key: hmacKey)
-        self.engine = Engine(operation: .Encrypt, key: encryptionKey, iv: iv)
+    private init(encryptionKey: RNCryptorV3Key, hmacKey: RNCryptorV3Key, iv: [UInt8], header: [UInt8]) {
+        self.hmacSink = HMACWriter(key: hmacKey.bytes)
+        self.engine = Engine(operation: .Encrypt, key: encryptionKey.bytes, iv: iv)
         self.pendingHeader = header
     }
 
     // Expose random numbers for testing
-    internal convenience init(encryptionKey: [UInt8], hmacKey: [UInt8], iv: [UInt8]) {
+    internal convenience init(encryptionKey: RNCryptorV3Key, hmacKey: RNCryptorV3Key, iv: [UInt8]) {
         let header = [UInt8]([RNCryptorV3.version, UInt8(0)]) + iv
         self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
     }
 
-    public convenience init(encryptionKey: [UInt8], hmacKey: [UInt8]) {
+    public convenience init(encryptionKey: RNCryptorV3Key, hmacKey: RNCryptorV3Key) {
         self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: randomDataOfLength(RNCryptorV3.ivSize))
     }
 

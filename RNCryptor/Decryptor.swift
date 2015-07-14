@@ -25,7 +25,7 @@ public final class Decryptor {
         ]
     }
 
-    public init(encryptionKey: [UInt8], hmacKey: [UInt8]) {
+    public init(encryptionKey: RNCryptorV3Key, hmacKey: RNCryptorV3Key) {
         self.decryptors = [
             (RNCryptorV3.keyHeaderSize, { DecryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey, header: $0) as DecryptorType? })
         ]

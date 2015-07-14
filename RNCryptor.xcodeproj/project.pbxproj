@@ -286,8 +286,8 @@
 			isa = PBXGroup;
 			children = (
 				FB07CE061B41BCE7003AF727 /* RNCryptorV3.swift */,
-				FBA803D81B419DBB00B8E4E9 /* DecryptorV3.swift */,
 				FBC514E11B3EEC9D00DB99DE /* EncryptorV3.swift */,
+				FBA803D81B419DBB00B8E4E9 /* DecryptorV3.swift */,
 			);
 			name = V3;
 			sourceTree = "<group>";

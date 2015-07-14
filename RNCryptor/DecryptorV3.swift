@@ -16,11 +16,11 @@ final class DecryptorV3: DecryptorType {
 
     private var pendingHeader: [UInt8]?
 
-    private init(encryptionKey: [UInt8], hmacKey: [UInt8], iv: [UInt8], header: [UInt8]) {
+    private init(encryptionKey: RNCryptorV3Key, hmacKey: RNCryptorV3Key, iv: [UInt8], header: [UInt8]) {
         self.pendingHeader = header
 
-        self.engine = Engine(operation: .Decrypt, key: encryptionKey, iv: iv)
-        self.hmacSink = HMACWriter(key: hmacKey)
+        self.engine = Engine(operation: .Decrypt, key: encryptionKey.bytes, iv: iv)
+        self.hmacSink = HMACWriter(key: hmacKey.bytes)
         self.bufferSink = TruncatingBuffer(capacity: RNCryptorV3.hmacSize)
     }
 
@@ -31,7 +31,7 @@ final class DecryptorV3: DecryptorType {
             header[1] == 1
             else {
                 // Shouldn't have to set these, but Swift 2 requires it
-                self.init(encryptionKey: [], hmacKey: [], iv: [], header: [])
+//                self.init(encryptionKey: [], hmacKey: [], iv: [], header: [])
                 return nil
         }
 
@@ -45,15 +45,14 @@ final class DecryptorV3: DecryptorType {
         self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
     }
 
-    convenience init?(encryptionKey: [UInt8], hmacKey: [UInt8], header: [UInt8]) {
-        guard encryptionKey.count == RNCryptorV3.keySize &&
-            hmacKey.count == RNCryptorV3.keySize &&
+    convenience init?(encryptionKey: RNCryptorV3Key, hmacKey: RNCryptorV3Key, header: [UInt8]) {
+        guard 
             header.count == RNCryptorV3.keyHeaderSize &&
             header[0] == RNCryptorV3.version &&
             header[1] == 0
             else {
                 // Shouldn't have to set these, but Swift 2 requires it
-                self.init(encryptionKey: [], hmacKey: [], iv: [], header: [])
+//                self.init(encryptionKey: [], hmacKey: [], iv: [], header: [])
                 return nil
         }
 
