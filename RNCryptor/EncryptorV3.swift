@@ -33,18 +33,18 @@ public final class EncryptorV3 {
     }
 
     // Expose random numbers for testing
-    internal convenience init(password: String, encryptionSalt: [UInt8], hmacSalt: [UInt8], iv: RNCryptorV3IV) {
+    internal convenience init(password: String, encryptionSalt: RNCryptorV3Salt, hmacSalt: RNCryptorV3Salt, iv: RNCryptorV3IV) {
         let encryptionKey = RNCryptorV3.keyForPassword(password, salt: encryptionSalt)
         let hmacKey = RNCryptorV3.keyForPassword(password, salt: hmacSalt)
-        let header = [UInt8]([RNCryptorV3.version, UInt8(1)]) + encryptionSalt + hmacSalt + iv.bytes
+        let header = [UInt8]([RNCryptorV3.version, UInt8(1)]) + encryptionSalt.bytes + hmacSalt.bytes + iv.bytes
         self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
     }
 
     public convenience init(password: String) {
         self.init(
             password: password,
-            encryptionSalt: randomDataOfLength(RNCryptorV3.saltSize),
-            hmacSalt:randomDataOfLength(RNCryptorV3.saltSize),
+            encryptionSalt: RNCryptorV3Salt(randomDataOfLength(RNCryptorV3.saltSize))!,
+            hmacSalt:RNCryptorV3Salt(randomDataOfLength(RNCryptorV3.saltSize))!,
             iv: RNCryptorV3IV(randomDataOfLength(RNCryptorV3.ivSize))!)
     }
 

@@ -23,7 +23,7 @@ class RNCryptorTests: XCTestCase {
 
     func testKDF() {
         let password = "a"
-        let salt = "0102030405060708".byteArrayFromHexEncoding!
+        let salt = RNCryptorV3Salt("0102030405060708".byteArrayFromHexEncoding!)!
         let key = RNCryptorV3.keyForPassword(password, salt: salt)
         let expect = "fc632b0c a6b23eff 9a9dc3e0 e585167f 5a328916 ed19f835 58be3ba9 828797cd".byteArrayFromHexEncoding!
         XCTAssertEqual(key.bytes, expect)
@@ -85,8 +85,8 @@ class RNCryptorTests: XCTestCase {
 
     func testPasswordEncryptor() {
         let password = "thepassword"
-        let encryptionSalt = "0001020304050607".byteArrayFromHexEncoding!
-        let hmacSalt = "0102030405060708".byteArrayFromHexEncoding!
+        let encryptionSalt = RNCryptorV3Salt("0001020304050607".byteArrayFromHexEncoding!)!
+        let hmacSalt = RNCryptorV3Salt("0102030405060708".byteArrayFromHexEncoding!)!
         let iv = RNCryptorV3IV("02030405060708090a0b0c0d0e0f0001".byteArrayFromHexEncoding!)!
         let plaintext = "01".byteArrayFromHexEncoding!
         let ciphertext = "03010001 02030405 06070102 03040506 07080203 04050607 08090a0b 0c0d0e0f 0001a1f8 730e0bf4 80eb7b70 f690abf2 1e029514 164ad3c4 74a51b30 c7eaa1ca 545b7de3 de5b010a cbad0a9a 13857df6 96a8".byteArrayFromHexEncoding!

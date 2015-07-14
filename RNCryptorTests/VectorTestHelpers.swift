@@ -17,7 +17,7 @@ func verifyVector(vector: [String:String], key:String, equals actual:[UInt8], na
 
 func _verifyKDF(vector: [String:String], name:String) {
     let key = RNCryptorV3.keyForPassword(vector["password"]!,
-        salt:vector["salt_hex"]!.byteArrayFromHexEncoding!)
+        salt:RNCryptorV3Salt(vector["salt_hex"]!.byteArrayFromHexEncoding!)!)
     verifyVector(vector, key:"key_hex", equals:key.bytes, name: name)
 }
 
@@ -30,8 +30,8 @@ func verify_v3_kdf(vector: [String:String]) {
 func _verifyPassword(vector: [String:String]) {
     if Int(vector["version"]!) == FormatVersion {
         let encryptor = Encryptor(password: vector["password"]!,
-            encryptionSalt: vector["enc_salt_hex"]!.byteArrayFromHexEncoding!,
-            hmacSalt: vector["hmac_salt_hex"]!.byteArrayFromHexEncoding!,
+            encryptionSalt: RNCryptorV3Salt(vector["enc_salt_hex"]!.byteArrayFromHexEncoding!)!,
+            hmacSalt: RNCryptorV3Salt(vector["hmac_salt_hex"]!.byteArrayFromHexEncoding!)!,
             iv: RNCryptorV3IV(vector["iv_hex"]!.byteArrayFromHexEncoding!)!)
         do {
             let ciphertext = try encryptor.update(vector["plaintext_hex"]!.byteArrayFromHexEncoding!) + encryptor.final()

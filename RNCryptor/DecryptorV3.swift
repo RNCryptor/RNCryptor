@@ -13,13 +13,10 @@ final class DecryptorV3: DecryptorType {
 
     private var pendingHeader: [UInt8]?
 
-    private init(encryptionKey: RNCryptorV3Key, hmacKey: RNCryptorV3Key, iv: [UInt8], header: [UInt8]) {
-        guard iv.count == RNCryptorV3.ivSize else {
-            fatalError("Internal error: IV incorrect size")
-        }
+    private init(encryptionKey: RNCryptorV3Key, hmacKey: RNCryptorV3Key, iv: RNCryptorV3IV, header: [UInt8]) {
         self.pendingHeader = header
 
-        self.engine = try! Engine(operation: .Decrypt, key: encryptionKey.bytes, iv: iv) // It is a programming error for this to fail
+        self.engine = try! Engine(operation: .Decrypt, key: encryptionKey.bytes, iv: iv.bytes) // It is a programming error for this to fail
         self.hmacSink = HMACWriter(key: hmacKey.bytes)
         self.bufferSink = TruncatingBuffer(capacity: RNCryptorV3.hmacSize)
     }
@@ -33,9 +30,9 @@ final class DecryptorV3: DecryptorType {
                 return nil
         }
 
-        let encryptionSalt = Array(header[2...9])
-        let hmacSalt = Array(header[10...17])
-        let iv = Array(header[18...33])
+        let encryptionSalt = RNCryptorV3Salt(Array(header[2...9]))!
+        let hmacSalt = RNCryptorV3Salt(Array(header[10...17]))!
+        let iv = RNCryptorV3IV(Array(header[18...33]))!
 
         let encryptionKey = RNCryptorV3.keyForPassword(password, salt: encryptionSalt)
         let hmacKey = RNCryptorV3.keyForPassword(password, salt: hmacSalt)
@@ -52,7 +49,7 @@ final class DecryptorV3: DecryptorType {
                 return nil
         }
 
-        let iv = Array(header[2..<18])
+        let iv = RNCryptorV3IV(Array(header[2..<18]))!
         self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
     }
 

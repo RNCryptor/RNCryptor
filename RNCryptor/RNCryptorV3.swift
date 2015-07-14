@@ -19,7 +19,7 @@ public struct _RNCryptorV3: Equatable {
     let keyHeaderSize = 1 + 1 + kCCBlockSizeAES128
     let passwordHeaderSize = 1 + 1 + 8 + 8 + kCCBlockSizeAES128
 
-    public func keyForPassword(password: String, salt: [UInt8]) -> RNCryptorV3Key {
+    public func keyForPassword(password: String, salt: RNCryptorV3Salt) -> RNCryptorV3Key {
         var derivedKey = [UInt8](count: self.keySize, repeatedValue: 0)
 
         // utf8 returns [UInt8], but CCKeyDerivationPBKDF takes [Int8]
@@ -34,7 +34,7 @@ public struct _RNCryptorV3: Equatable {
         let result = CCKeyDerivationPBKDF(
             algorithm,
             passwordPtr, passwordData.count,
-            salt,        salt.count,
+            salt.bytes,  salt.bytes.count,
             prf,         pbkdf2Rounds,
             &derivedKey, derivedKey.count)
 
@@ -74,6 +74,15 @@ internal struct RNCryptorV3IV: FixedSizeByteArray {
     var bytes: [UInt8]
      init?(_ bytes: [UInt8]) {
         guard bytes.count == RNCryptorV3.ivSize
+            else { return nil }
+        self.bytes = bytes
+    }
+}
+
+public struct RNCryptorV3Salt: FixedSizeByteArray {
+    public var bytes: [UInt8]
+    public init?(_ bytes: [UInt8]) {
+        guard bytes.count == RNCryptorV3.saltSize
             else { return nil }
         self.bytes = bytes
     }
