@@ -34,25 +34,22 @@ class RNCryptorTests: XCTestCase {
         let encryptKey = randomDataOfLength(RNCryptorV3.keySize)
         let iv = randomDataOfLength(RNCryptorV3.ivSize)
 
-        let encrypted = ArrayWriter()
-        let encryptor = Engine(operation: .Encrypt, key: encryptKey, iv: iv, sink: encrypted)
+        var encrypted = [UInt8]()
+        let encryptor = Engine(operation: .Encrypt, key: encryptKey, iv: iv)
         do {
-            try encryptor.write(data)
-            try encryptor.finish()
+            encrypted = try encryptor.update(data) + encryptor.final()
         } catch {
             XCTFail("Caught: \(error)")
         }
 
-        let decrypted = ArrayWriter()
-        let decryptor = Engine(operation: .Decrypt, key: encryptKey, iv: iv, sink: decrypted)
+        let decryptor = Engine(operation: .Decrypt, key: encryptKey, iv: iv)
         do {
-            try decryptor.write(encrypted.array)
-            try decryptor.finish()
+            let decrypted = try decryptor.update(encrypted) + decryptor.final() // FIXME: Is this efficient?
+            XCTAssertEqual(decrypted, data)
         } catch {
             XCTFail("Caught: \(error)")
         }
 
-        XCTAssertEqual(decrypted.array, data)
     }
 
     func testKeyEncryptor() {
@@ -62,15 +59,13 @@ class RNCryptorTests: XCTestCase {
         let plaintext = "01".byteArrayFromHexEncoding!
         let ciphertext = "03000203 04050607 08090a0b 0c0d0e0f 0001981b 22e7a644 8118d695 bd654f72 e9d6ed75 ec14ae2a a067eed2 a98a56e0 993dfe22 ab5887b3 f6e3cdd4 0767f519 5eb5".byteArrayFromHexEncoding!
 
-        let encrypted = ArrayWriter()
-        let encryptor = Encryptor(encryptionKey: encryptKey, hmacKey: hmacKey, iv: iv, sink: encrypted)
+        let encryptor = Encryptor(encryptionKey: encryptKey, hmacKey: hmacKey, iv: iv)
         do {
-            try encryptor.write(plaintext)
-            try encryptor.finish()
+            let encrypted = try encryptor.update(plaintext) + encryptor.final()
+            XCTAssertEqual(encrypted, ciphertext)
         } catch {
             XCTFail("Caught: \(error)")
         }
-        XCTAssertEqual(encrypted.array, ciphertext)
     }
 
     func testKeyDecryptor() {
@@ -79,16 +74,13 @@ class RNCryptorTests: XCTestCase {
         let plaintext = "01".byteArrayFromHexEncoding!
         let ciphertext = "03000203 04050607 08090a0b 0c0d0e0f 0001981b 22e7a644 8118d695 bd654f72 e9d6ed75 ec14ae2a a067eed2 a98a56e0 993dfe22 ab5887b3 f6e3cdd4 0767f519 5eb5".byteArrayFromHexEncoding!
 
-        let decrypted = ArrayWriter()
-        let decryptor = Decryptor(encryptionKey: encryptKey, hmacKey: hmacKey, sink: decrypted)
+        let decryptor = Decryptor(encryptionKey: encryptKey, hmacKey: hmacKey)
         do {
-            try decryptor.write(ciphertext)
-            try decryptor.finish()
+            let decrypted = try decryptor.update(ciphertext) + decryptor.final()
+            XCTAssertEqual(decrypted, plaintext)
         } catch {
             XCTFail("Caught: \(error)")
         }
-
-        XCTAssertEqual(decrypted.array, plaintext)
     }
 
     func testPasswordEncryptor() {
@@ -99,17 +91,15 @@ class RNCryptorTests: XCTestCase {
         let plaintext = "01".byteArrayFromHexEncoding!
         let ciphertext = "03010001 02030405 06070102 03040506 07080203 04050607 08090a0b 0c0d0e0f 0001a1f8 730e0bf4 80eb7b70 f690abf2 1e029514 164ad3c4 74a51b30 c7eaa1ca 545b7de3 de5b010a cbad0a9a 13857df6 96a8".byteArrayFromHexEncoding!
 
-        let encrypted = ArrayWriter()
-        let encryptor = Encryptor(password: password, encryptionSalt: encryptionSalt, hmacSalt: hmacSalt, iv: iv, sink: encrypted)
+        let encryptor = Encryptor(password: password, encryptionSalt: encryptionSalt, hmacSalt: hmacSalt, iv: iv)
 
         do {
-            try encryptor.write(plaintext)
-            try encryptor.finish()
+            let encrypted = try encryptor.update(plaintext) + encryptor.final()
+            XCTAssertEqual(encrypted, ciphertext)
         } catch {
             XCTFail("Caught: \(error)")
         }
 
-        XCTAssertEqual(encrypted.array, ciphertext)
     }
 
     func testPasswordDecryptor() {
@@ -117,17 +107,15 @@ class RNCryptorTests: XCTestCase {
         let plaintext = "01".byteArrayFromHexEncoding!
         let ciphertext = "03010001 02030405 06070102 03040506 07080203 04050607 08090a0b 0c0d0e0f 0001a1f8 730e0bf4 80eb7b70 f690abf2 1e029514 164ad3c4 74a51b30 c7eaa1ca 545b7de3 de5b010a cbad0a9a 13857df6 96a8".byteArrayFromHexEncoding!
 
-        let decrypted = ArrayWriter()
-        let decryptor = Decryptor(password: password, sink: decrypted)
+        let decryptor = Decryptor(password: password)
 
         do {
-            try decryptor.write(ciphertext)
-            try decryptor.finish()
+            let decrypted = try decryptor.update(ciphertext) + decryptor.final()
+            XCTAssertEqual(decrypted, plaintext)
         } catch {
             XCTFail("Caught: \(error)")
         }
 
-        XCTAssertEqual(decrypted.array, plaintext)
     }
 
     func testOneShotKey() {
@@ -147,7 +135,7 @@ class RNCryptorTests: XCTestCase {
         do {
             plaintext = try decrypt(ciphertext, encryptionKey: encryptionKey, hmacKey: hmacKey)
         } catch {
-            plaintext = [0]
+            plaintext = [0xaa]
             XCTFail("Caught: \(error)")
         }
 

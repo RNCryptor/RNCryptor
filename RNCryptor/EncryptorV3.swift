@@ -9,73 +9,63 @@
 import CommonCrypto
 
 
-public final class EncryptorV3: Writable {
-    // Sink chain is Cryptor -> Tee -> HMAC
-    //                              -> Sink
-
-    private let sink: Writable
-
+public final class EncryptorV3 {
     // There is no default value for these, they have to be var! in order to throw in init()
     private var engine: Engine
     private var hmacSink: HMACWriter
 
     private var pendingHeader: [UInt8]?
 
-    private init(encryptionKey: [UInt8], hmacKey: [UInt8], iv: [UInt8], header: [UInt8], sink: Writable) {
-        self.sink = sink
+    private init(encryptionKey: [UInt8], hmacKey: [UInt8], iv: [UInt8], header: [UInt8]) {
         self.hmacSink = HMACWriter(key: hmacKey)
-        let tee = TeeWriter(self.hmacSink, sink)
-        self.engine = Engine(operation: .Encrypt, key: encryptionKey, iv: iv, sink: tee)
+        self.engine = Engine(operation: .Encrypt, key: encryptionKey, iv: iv)
         self.pendingHeader = header
     }
 
     // Expose random numbers for testing
-    internal convenience init(encryptionKey: [UInt8], hmacKey: [UInt8], iv: [UInt8], sink: Writable) {
-        var header = [UInt8]()
-        header.extend([RNCryptorV3.version, UInt8(0)])
-        header.extend(iv)
-        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header, sink: sink)
+    internal convenience init(encryptionKey: [UInt8], hmacKey: [UInt8], iv: [UInt8]) {
+        let header = [UInt8]([RNCryptorV3.version, UInt8(0)]) + iv
+        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
     }
 
-    public convenience init(encryptionKey: [UInt8], hmacKey: [UInt8], sink: Writable) {
-        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: randomDataOfLength(RNCryptorV3.ivSize), sink: sink)
+    public convenience init(encryptionKey: [UInt8], hmacKey: [UInt8]) {
+        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: randomDataOfLength(RNCryptorV3.ivSize))
     }
 
     // Expose random numbers for testing
-    internal convenience init(password: String, encryptionSalt: [UInt8], hmacSalt: [UInt8], iv: [UInt8], sink: Writable) {
+    internal convenience init(password: String, encryptionSalt: [UInt8], hmacSalt: [UInt8], iv: [UInt8]) {
         let encryptionKey = RNCryptorV3.keyForPassword(password, salt: encryptionSalt)
         let hmacKey = RNCryptorV3.keyForPassword(password, salt: hmacSalt)
-        var header = [UInt8]()
-        header.extend([RNCryptorV3.version, UInt8(1)])
-        header.extend(encryptionSalt)
-        header.extend(hmacSalt)
-        header.extend(iv)
-        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header, sink: sink)
+        let header = [UInt8]([RNCryptorV3.version, UInt8(1)]) + encryptionSalt + hmacSalt + iv
+        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
     }
 
-    public convenience init(password: String, sink: Writable) {
+    public convenience init(password: String) {
         self.init(
             password: password,
             encryptionSalt: randomDataOfLength(RNCryptorV3.saltSize),
             hmacSalt:randomDataOfLength(RNCryptorV3.saltSize),
-            iv: randomDataOfLength(RNCryptorV3.ivSize),
-            sink: sink)
+            iv: randomDataOfLength(RNCryptorV3.ivSize))
     }
 
-    public func write(data: UnsafeBufferPointer<UInt8>) throws {
+    @warn_unused_result
+    public func update(data: [UInt8]) throws -> [UInt8] {
+        var result = [UInt8]()
         if let header = self.pendingHeader {
-            try header.withUnsafeBufferPointer { buf -> Void in
-                try self.sink.write(buf)
-                try self.hmacSink.write(buf)
-            }
+            result = header
             self.pendingHeader = nil
         }
 
-        try self.engine.write(data) // Cryptor -> HMAC -> sink
+        result += try self.engine.update(data)
+        self.hmacSink.update(result)
+        return result
     }
 
-    public func finish() throws {
-        try self.engine.finish()
-        try self.sink.write(self.hmacSink.final())
+    @warn_unused_result
+    public func final() throws -> [UInt8] {
+        var result = try self.engine.final()
+        self.hmacSink.update(result)
+        result += self.hmacSink.final()
+        return result
     }
 }

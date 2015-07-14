@@ -41,33 +41,21 @@ internal func checkResult(result: CCCryptorStatus) throws {
 public typealias Encryptor = EncryptorV3
 
 public func encrypt(data: [UInt8], password: String) throws -> [UInt8] {
-    let sink = ArrayWriter()
-    let encryptor = Encryptor(password: password, sink: sink)
-    try encryptor.write(data)
-    try encryptor.finish()
-    return sink.array
+    let encryptor = Encryptor(password: password)
+    return try encryptor.update(data) + encryptor.final()
 }
 
 public func encrypt(data: [UInt8], encryptionKey: [UInt8], hmacKey: [UInt8]) throws -> [UInt8] {
-    let sink = ArrayWriter()
-    let encryptor = Encryptor(encryptionKey: encryptionKey, hmacKey: hmacKey, sink: sink)
-    try encryptor.write(data)
-    try encryptor.finish()
-    return sink.array
+    let encryptor = Encryptor(encryptionKey: encryptionKey, hmacKey: hmacKey)
+    return try encryptor.update(data) + encryptor.final()
 }
 
 public func decrypt(data: [UInt8], password: String) throws -> [UInt8] {
-    let sink = ArrayWriter()
-    let decryptor = Decryptor(password: password, sink: sink)
-    try decryptor.write(data)
-    try decryptor.finish()
-    return sink.array
+    let decryptor = Decryptor(password: password)
+    return try decryptor.update(data) + decryptor.final()
 }
 
 public func decrypt(data: [UInt8], encryptionKey: [UInt8], hmacKey: [UInt8]) throws -> [UInt8] {
-    let sink = ArrayWriter()
-    let decryptor = Decryptor(encryptionKey: encryptionKey, hmacKey: hmacKey, sink: sink)
-    try decryptor.write(data)
-    try decryptor.finish()
-    return sink.array
+    let decryptor = Decryptor(encryptionKey: encryptionKey, hmacKey: hmacKey)
+    return try decryptor.update(data) + decryptor.final()
 }

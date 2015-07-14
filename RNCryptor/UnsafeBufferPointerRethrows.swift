@@ -28,25 +28,25 @@ private enum Result<T> {
 }
 
 internal extension Array {
-    func withUnsafeBufferPointer<R>(@noescape body: (UnsafeBufferPointer<T>) throws -> R) throws -> R {
+    func withUnsafeBufferPointer<R>(@noescape body: (UnsafeBufferPointer<Element>) throws -> R) throws -> R {
         return try self.withUnsafeBufferPointer { buf in
             return Result{ try body(buf) }}.value()
     }
 
-    mutating func withUnsafeMutableBufferPointer<R>(@noescape body: (inout UnsafeMutableBufferPointer<T>) throws -> R) throws-> R {
-        return try self.withUnsafeMutableBufferPointer { (inout buf: UnsafeMutableBufferPointer<T>) in
+    mutating func withUnsafeMutableBufferPointer<R>(@noescape body: (inout UnsafeMutableBufferPointer<Element>) throws -> R) throws-> R {
+        return try self.withUnsafeMutableBufferPointer { (inout buf: UnsafeMutableBufferPointer<Element>) in
             return Result{try body(&buf)}}.value()
     }
 }
 
 internal extension ArraySlice {
-    func withUnsafeBufferPointer<R>(@noescape body: (UnsafeBufferPointer<T>) throws -> R) throws -> R {
+    func withUnsafeBufferPointer<R>(@noescape body: (UnsafeBufferPointer<Element>) throws -> R) throws -> R {
         return try self.withUnsafeBufferPointer { buf in
             return Result{ try body(buf) }}.value()
     }
 
-    mutating func withUnsafeMutableBufferPointer<R>(@noescape body: (inout UnsafeMutableBufferPointer<T>) throws -> R) throws-> R {
-        return try self.withUnsafeMutableBufferPointer { (inout buf: UnsafeMutableBufferPointer<T>) in
+    mutating func withUnsafeMutableBufferPointer<R>(@noescape body: (inout UnsafeMutableBufferPointer<Element>) throws -> R) throws-> R {
+        return try self.withUnsafeMutableBufferPointer { (inout buf: UnsafeMutableBufferPointer<Element>) in
             return Result{try body(&buf)}}.value()
     }
 }

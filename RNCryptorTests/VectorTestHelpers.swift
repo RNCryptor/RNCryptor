@@ -29,31 +29,25 @@ func verify_v3_kdf(vector: [String:String]) {
 
 func _verifyPassword(vector: [String:String]) {
     if Int(vector["version"]!) == FormatVersion {
-        let ciphertext = ArrayWriter()
         let encryptor = Encryptor(password: vector["password"]!,
             encryptionSalt: vector["enc_salt_hex"]!.byteArrayFromHexEncoding!,
             hmacSalt: vector["hmac_salt_hex"]!.byteArrayFromHexEncoding!,
-            iv: vector["iv_hex"]!.byteArrayFromHexEncoding!,
-            sink: ciphertext)
+            iv: vector["iv_hex"]!.byteArrayFromHexEncoding!)
         do {
-            try encryptor.write(vector["plaintext_hex"]!.byteArrayFromHexEncoding!)
-            try encryptor.finish()
+            let ciphertext = try encryptor.update(vector["plaintext_hex"]!.byteArrayFromHexEncoding!) + encryptor.final()
+            verifyVector(vector, key:"ciphertext_hex", equals:ciphertext, name:"password encrypt")
         } catch {
             XCTFail("\(error)")
         }
-        verifyVector(vector, key:"ciphertext_hex", equals:ciphertext.array, name:"password encrypt")
     }
 
-    let plaintext = ArrayWriter()
-    let decryptor = Decryptor(password: vector["password"]!,
-        sink: plaintext)
+    let decryptor = Decryptor(password: vector["password"]!)
     do {
-        try decryptor.write(vector["ciphertext_hex"]!.byteArrayFromHexEncoding!)
-        try decryptor.finish()
+        let plaintext = try decryptor.update(vector["ciphertext_hex"]!.byteArrayFromHexEncoding!) + decryptor.final()
+        verifyVector(vector, key:"plaintext_hex", equals:plaintext, name:"password decrypt")
     } catch {
         XCTFail("\(error)")
     }
-    verifyVector(vector, key:"plaintext_hex", equals:plaintext.array, name:"password decrypt")
 }
 
 func verify_v3_password(vector: [String: String]) {
@@ -62,31 +56,25 @@ func verify_v3_password(vector: [String: String]) {
 
 func verify_v3_key(vector: [String: String]) {
     if Int(vector["version"]!) == FormatVersion {
-        let ciphertext = ArrayWriter()
         let encryptor = Encryptor(
             encryptionKey: vector["enc_key_hex"]!.byteArrayFromHexEncoding!,
             hmacKey: vector["hmac_key_hex"]!.byteArrayFromHexEncoding!,
-            iv: vector["iv_hex"]!.byteArrayFromHexEncoding!,
-            sink: ciphertext)
+            iv: vector["iv_hex"]!.byteArrayFromHexEncoding!)
         do {
-            try encryptor.write(vector["plaintext_hex"]!.byteArrayFromHexEncoding!)
-            try encryptor.finish()
+            let ciphertext = try encryptor.update(vector["plaintext_hex"]!.byteArrayFromHexEncoding!) + encryptor.final()
+            verifyVector(vector, key:"ciphertext_hex", equals:ciphertext, name:"key encrypt")
         } catch {
             XCTFail("\(error)")
         }
-        verifyVector(vector, key:"ciphertext_hex", equals:ciphertext.array, name:"key encrypt")
     }
 
-    let plaintext = ArrayWriter()
     let decryptor = Decryptor(
         encryptionKey: vector["enc_key_hex"]!.byteArrayFromHexEncoding!,
-        hmacKey: vector["hmac_key_hex"]!.byteArrayFromHexEncoding!,
-        sink: plaintext)
+        hmacKey: vector["hmac_key_hex"]!.byteArrayFromHexEncoding!)
     do {
-        try decryptor.write(vector["ciphertext_hex"]!.byteArrayFromHexEncoding!)
-        try decryptor.finish()
+        let plaintext = try decryptor.update(vector["ciphertext_hex"]!.byteArrayFromHexEncoding!) + decryptor.final()
+        verifyVector(vector, key:"plaintext_hex", equals:plaintext, name:"key decrypt")
     } catch {
         XCTFail("\(error)")
     }
-    verifyVector(vector, key:"plaintext_hex", equals:plaintext.array, name:"key decrypt")
 }

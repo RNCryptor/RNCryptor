@@ -8,7 +8,7 @@
 
 import CommonCrypto
 
-internal final class HMACWriter: Writable {
+internal final class HMACWriter {
     var context: CCHmacContext = CCHmacContext()
 
     init(key: [UInt8]) {
@@ -20,8 +20,10 @@ internal final class HMACWriter: Writable {
         )
     }
 
-    func write(data: UnsafeBufferPointer<UInt8>) throws {
-        CCHmacUpdate(&self.context, data.baseAddress, data.count)
+    func update(data: [UInt8]) {
+        data.withUnsafeBufferPointer { buf in
+            CCHmacUpdate(&self.context, buf.baseAddress, buf.count)
+        }
     }
 
     func final() -> [UInt8] {

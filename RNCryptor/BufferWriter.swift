@@ -8,47 +8,48 @@
 
 import Foundation
 
-public class BufferWriter: Writable {
+public class BufferWriter {
     public var array: [UInt8] = []
 
     let capacity: Int
-    let sink: Writable
-    public init(capacity: Int, sink: Writable) {
+    public init(capacity: Int) {
         self.capacity = capacity
-        self.sink = sink
     }
 
     // FIXME: Can probably merge much of this
-    public func write(data: UnsafeBufferPointer<UInt8>) throws {
+    @warn_unused_result
+    public func update(data: [UInt8]) -> [UInt8] {
         if data.count >= capacity {
-            try sendAllArray(data)
+            return sendAllArray(data)
         } else if array.count + data.count <= capacity {
-            array.extend(data)
+            array += data
+            return []
         } else {
-            try sendSomeArray(data)
+            return sendSomeArray(data)
         }
     }
 
-    private func sendAllArray(data: UnsafeBufferPointer<UInt8>) throws {
+    private func sendAllArray(data: [UInt8]) -> [UInt8] {
         let (send, keep) = data.splitAt(data.count - capacity)
+        var result = [UInt8]()
         assert(keep.count == capacity)
         if array.count > 0 { // Send the whole current array
-            try sink.write(array)
+            result += array
         }
         if send.count > 0 { // Send what needs sending of data
-            try sink.write(send)
+            result += send
         }
         array = Array(keep) // Keep the rest
+        return result
     }
 
-    private func sendSomeArray(data: UnsafeBufferPointer<UInt8>) throws {
+    private func sendSomeArray(data: [UInt8]) -> [UInt8] {
         let toSend = (array.count + data.count) - capacity
         assert(toSend > 0) // If it were <= 0, we would have extended the array
         assert(toSend < array.count) // If we would have sent everything, replaceBuffer should have been called
 
         let (send, keep) = array.splitAt(toSend)
-        try sink.write(send)
-        array = Array(keep)
-        array.extend(data)
+        array = keep + data
+        return Array(send)
     }
 }

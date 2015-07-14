@@ -14,15 +14,11 @@ public enum CryptorOperation: CCOperation {
     case Decrypt = 1 // CCOperation(kCCDecrypt)
 }
 
-internal class Engine: Writable {
-    var sink: Writable
-
+internal class Engine {
     private let cryptor: CCCryptorRef
     var error: NSError?
 
-    init(operation: CryptorOperation, key: [UInt8], iv: [UInt8], sink: Writable) {
-        self.sink = sink
-
+    init(operation: CryptorOperation, key: [UInt8], iv: [UInt8]) {
         var cryptorOut = CCCryptorRef()
         let result = CCCryptorCreate(
             operation.rawValue,
@@ -38,30 +34,34 @@ internal class Engine: Writable {
         }
     }
 
-    func write(data: UnsafeBufferPointer<UInt8>) throws {
+    @warn_unused_result
+    func update(data: [UInt8]) throws -> [UInt8] {
         if let err = self.error {
             throw err
         }
 
         let outputLength = CCCryptorGetOutputLength(self.cryptor, data.count, false)
-        var output = Array<UInt8>(count: outputLength, repeatedValue: 0)  // FIXME: Reuse buffer
+        var output = Array<UInt8>(count: outputLength, repeatedValue: 0)
         var dataOutMoved: Int = 0
-        try checkResult(CCCryptorUpdate(
-            self.cryptor,
-            data.baseAddress, data.count,
-            &output, outputLength,
-            &dataOutMoved))
 
-        if dataOutMoved > 0 {
-            try output.withUnsafeBufferPointer { buf -> Void in
-                try self.sink.write(buf[0..<dataOutMoved])
-            }
+        var result: CCCryptorStatus = CCCryptorStatus(kCCUnimplemented)
+
+        data.withUnsafeBufferPointer { buf in
+         result = CCCryptorUpdate(
+            self.cryptor,
+            buf.baseAddress, buf.count,
+            &output, outputLength,
+            &dataOutMoved)
         }
+        try checkResult(result)
+        output.replaceRange(dataOutMoved..<output.endIndex, with:[])
+        return output
     }
 
-    func finish() throws {
+    @warn_unused_result
+    func final() throws -> [UInt8] {
         let outputLength = CCCryptorGetOutputLength(self.cryptor, 0, true)
-        var output = Array<UInt8>(count: outputLength, repeatedValue: 0) // FIXME: Reuse buffer
+        var output = Array<UInt8>(count: outputLength, repeatedValue: 0)
         var dataOutMoved: Int = 0
         try checkResult(
             CCCryptorFinal(
@@ -71,10 +71,7 @@ internal class Engine: Writable {
             )
         )
 
-        if dataOutMoved > 0 {
-            try output.withUnsafeBufferPointer {
-                try self.sink.write($0[0..<dataOutMoved])
-            }
-        }
+        output.replaceRange(dataOutMoved..<output.endIndex, with:[])
+        return output
     }
 }

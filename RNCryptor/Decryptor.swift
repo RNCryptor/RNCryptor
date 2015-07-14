@@ -6,38 +6,40 @@
 //  Copyright © 2015 Rob Napier. All rights reserved.
 //
 
-protocol DecryptorType: Writable {
-    func finish() throws
+protocol DecryptorType {
+    func update(data: [UInt8]) throws -> [UInt8]
+    func final() throws -> [UInt8]
 }
 
-public final class Decryptor: Writable {
+public final class Decryptor {
     private let decryptors: [(headerLength: Int, builder: ([UInt8]) -> DecryptorType?)]
     private var buffer: [UInt8] = []
 
     private var decryptor: DecryptorType?
 
-    public init(password: String, sink: Writable) {
+    public init(password: String) {
         assert(password != "")
 
         self.decryptors = [
-            (RNCryptorV3.passwordHeaderSize, { DecryptorV3(password: password, header: $0, sink: sink) as DecryptorType? })
+            (RNCryptorV3.passwordHeaderSize, { DecryptorV3(password: password, header: $0) as DecryptorType? })
         ]
     }
 
-    public init(encryptionKey: [UInt8], hmacKey: [UInt8], sink: Writable) {
+    public init(encryptionKey: [UInt8], hmacKey: [UInt8]) {
         self.decryptors = [
-            (RNCryptorV3.keyHeaderSize, { DecryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey, header: $0, sink: sink) as DecryptorType? })
+            (RNCryptorV3.keyHeaderSize, { DecryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey, header: $0) as DecryptorType? })
         ]
     }
 
-    public func write(data: UnsafeBufferPointer<UInt8>) throws {
+    @warn_unused_result
+    public func update(data: [UInt8]) throws -> [UInt8] {
         if let decryptor = self.decryptor {
-            try decryptor.write(data)
+            return try decryptor.update(data)
         } else {
             let maxHeaderLength = decryptors.reduce(0) { max($0, $1.headerLength) }
             guard self.buffer.count + data.count >= maxHeaderLength else {
-                self.buffer.extend(data)
-                return
+                self.buffer += data
+                return []
             }
 
             for decryptorType in self.decryptors {
@@ -46,15 +48,14 @@ public final class Decryptor: Writable {
                 if let decryptor = decryptorType.builder(header) {
                     self.decryptor = decryptor
                     self.buffer.removeAll()
-                    try self.decryptor?.write(content)
-                    return
+                    return try decryptor.update(Array(content)) // FIXME: Copy
                 }
             }
             throw Error.UnknownHeader
         }
     }
     
-    public func finish() throws {
-        try self.decryptor?.finish()
+    public func final() throws -> [UInt8] {
+        return try self.decryptor?.final() ?? []
     }
 }
