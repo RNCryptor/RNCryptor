@@ -48,7 +48,7 @@ class RNCryptorTests: XCTestCase {
 
         do {
             let decryptor = try Engine(operation: .Decrypt, key: encryptKey, iv: iv)
-            let decrypted = try decryptor.update(encrypted) + decryptor.final() // FIXME: Is this efficient?
+            let decrypted = try decryptor.update(encrypted) + decryptor.final()
             XCTAssertEqual(decrypted, data)
         } catch {
             XCTFail("Caught: \(error)")

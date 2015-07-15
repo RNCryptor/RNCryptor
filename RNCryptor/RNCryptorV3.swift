@@ -44,7 +44,7 @@ public struct _RNCryptorV3: Equatable {
 
         guard
             result == CCCryptorStatus(kCCSuccess),
-            let key = RNCryptorV3Key(derivedKey) else {
+            let key = Key(derivedKey) else {
                 fatalError("SECURITY FAILURE: Could not derive secure password (\(result)): \(derivedKey).")
         }
         return key
@@ -74,6 +74,9 @@ extension FixedSizeByteArray {
 
 extension FixedSizeByteArray {
     public var description: String { return self.bytes.description }
+    init?<Seq: SequenceType where Seq.Generator.Element == UInt8>(_ bytes: Seq) {
+        self.init(Array(bytes))
+    }
 }
 
 public func ==<T: FixedSizeByteArray>(lhs: T, rhs: T) -> Bool {
@@ -111,7 +114,6 @@ public struct RNCryptorV3Salt: FixedSizeByteArray {
 }
 
 public final class EncryptorV3 {
-    // There is no default value for these, they have to be var! in order to throw in init()
     private var engine: Engine
     private var hmac: HMACV3
 
@@ -137,7 +139,7 @@ public final class EncryptorV3 {
     internal convenience init(password: String, encryptionSalt: RNCryptorV3Salt, hmacSalt: RNCryptorV3Salt, iv: RNCryptorV3IV) {
         let encryptionKey = V3.keyForPassword(password, salt: encryptionSalt)
         let hmacKey = V3.keyForPassword(password, salt: hmacSalt)
-        let header = [UInt8]([V3.version, UInt8(1)]) + encryptionSalt.bytes + hmacSalt.bytes + iv.bytes
+        let header = [V3.version, UInt8(1)] + encryptionSalt.bytes + hmacSalt.bytes + iv.bytes
         self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
     }
 
@@ -195,9 +197,9 @@ final class DecryptorV3: DecryptorType {
                 return nil
         }
 
-        let encryptionSalt = Salt(Array(header[2...9]))!
-        let hmacSalt = Salt(Array(header[10...17]))!
-        let iv = IV(Array(header[18...33]))!
+        let encryptionSalt = Salt(header[2...9])!
+        let hmacSalt = Salt(header[10...17])!
+        let iv = IV(header[18...33])!
 
         let encryptionKey = V3.keyForPassword(password, salt: encryptionSalt)
         let hmacKey = V3.keyForPassword(password, salt: hmacSalt)
@@ -214,7 +216,7 @@ final class DecryptorV3: DecryptorType {
                 return nil
         }
 
-        let iv = IV(Array(header[2..<18]))!
+        let iv = IV(header[2..<18])!
         self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
     }
 
@@ -259,7 +261,7 @@ private final class HMACV3 {
     }
 
     func final() -> [UInt8] {
-        var hmac = Array<UInt8>(count: V3.hmacSize, repeatedValue: 0)
+        var hmac = [UInt8](count: V3.hmacSize, repeatedValue: 0)
         CCHmacFinal(&self.context, &hmac)
         return hmac
     }
