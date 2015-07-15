@@ -45,7 +45,7 @@ public func encrypt(data: [UInt8], password: String) throws -> [UInt8] {
     return try encryptor.update(data) + encryptor.final()
 }
 
-public func encrypt(data: [UInt8], encryptionKey: RNCryptorV3Key, hmacKey: RNCryptorV3Key) throws -> [UInt8] {
+public func encrypt(data: [UInt8], encryptionKey: [UInt8], hmacKey: [UInt8]) throws -> [UInt8] {
     let encryptor = Encryptor(encryptionKey: encryptionKey, hmacKey: hmacKey)
     return try encryptor.update(data) + encryptor.final()
 }
@@ -55,7 +55,7 @@ public func decrypt(data: [UInt8], password: String) throws -> [UInt8] {
     return try decryptor.update(data) + decryptor.final()
 }
 
-public func decrypt(data: [UInt8], encryptionKey: RNCryptorV3Key, hmacKey: RNCryptorV3Key) throws -> [UInt8] {
+public func decrypt(data: [UInt8], encryptionKey: [UInt8], hmacKey: [UInt8]) throws -> [UInt8] {
     let decryptor = Decryptor(encryptionKey: encryptionKey, hmacKey: hmacKey)
     return try decryptor.update(data) + decryptor.final()
 }
