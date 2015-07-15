@@ -11,7 +11,7 @@ import CommonCrypto
 public struct _RNCryptorV3: Equatable {
     public let version = UInt8(3)
 
-    public let keySize  = kCCKeySizeAES256
+    public let keySize = kCCKeySizeAES256
     let ivSize   = kCCBlockSizeAES128
     let hmacSize = Int(CC_SHA256_DIGEST_LENGTH)
     let saltSize = 8
@@ -60,14 +60,17 @@ public final class EncryptorV3 {
     private var pendingHeader: [UInt8]?
 
     private init(encryptionKey: [UInt8], hmacKey: [UInt8], iv: [UInt8], header: [UInt8]) {
+        precondition(encryptionKey.count == V3.keySize)
+        precondition(hmacKey.count == V3.keySize)
+        precondition(iv.count == V3.ivSize)
         self.hmac = HMACV3(key: hmacKey)
-        self.engine = try! Engine(operation: .Encrypt, key: encryptionKey, iv: iv) // It is an internal error for this to fail
+        self.engine = try! Engine(operation: .Encrypt, key: encryptionKey, iv: iv) // It is a programming error for this to fail
         self.pendingHeader = header
     }
 
     // Expose random numbers for testing
     internal convenience init(encryptionKey: [UInt8], hmacKey: [UInt8], iv: [UInt8]) {
-        let header = [UInt8]([V3.version, UInt8(0)]) + iv
+        let header = [V3.version, UInt8(0)] + iv
         self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
     }
 
@@ -79,7 +82,15 @@ public final class EncryptorV3 {
     internal convenience init(password: String, encryptionSalt: [UInt8], hmacSalt: [UInt8], iv: [UInt8]) {
         let encryptionKey = V3.keyForPassword(password, salt: encryptionSalt)
         let hmacKey = V3.keyForPassword(password, salt: hmacSalt)
-        let header = [V3.version, UInt8(1)] + encryptionSalt + hmacSalt + iv
+
+        // TODO: This chained-+ is very slow to compile in Swift 2b3 (http://www.openradar.me/21842206)
+
+        // let header = [V3.version, UInt8(1)] + encryptionSalt + hmacSalt + iv
+        var header = [V3.version, UInt8(1)]
+        header += encryptionSalt
+        header += hmacSalt
+        header += iv
+
         self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
     }
 
@@ -118,21 +129,28 @@ final class DecryptorV3: DecryptorType {
     private let hmac: HMACV3
     private let engine: Engine
 
-    private var pendingHeader: [UInt8]?
+    private init(encryptionKey: [UInt8], hmacKey: [UInt8], iv: [UInt8], header: [UInt8]) throws {
+        precondition(encryptionKey.count == V3.keySize)
+        precondition(hmacKey.count == V3.hmacSize)
+        precondition(iv.count == V3.ivSize)
 
-    private init(encryptionKey: [UInt8], hmacKey: [UInt8], iv: [UInt8], header: [UInt8]) {
-        self.pendingHeader = header
-
-        self.engine = try! Engine(operation: .Decrypt, key: encryptionKey, iv: iv) // It is a programming error for this to fail
         self.hmac = HMACV3(key: hmacKey)
+        self.hmac.update(header)
         self.buffer = TruncatingBuffer(capacity: V3.hmacSize)
+        do {
+            self.engine = try Engine(operation: .Decrypt, key: encryptionKey, iv: iv)
+        } catch {
+            self.engine = Engine() // Shouldn't really be needed, but we have to initialze everything
+            throw error
+        }
     }
 
     convenience init?(password: String, header: [UInt8]) {
-        guard password != "" &&
-            header.count == V3.passwordHeaderSize &&
-            header[0] == V3.version &&
-            header[1] == 1
+        guard
+            password != "" &&
+                header.count == V3.passwordHeaderSize &&
+                header[0] == V3.version &&
+                header[1] == 1
             else {
                 return nil
         }
@@ -144,7 +162,11 @@ final class DecryptorV3: DecryptorType {
         let encryptionKey = V3.keyForPassword(password, salt: encryptionSalt)
         let hmacKey = V3.keyForPassword(password, salt: hmacSalt)
 
-        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
+        do {
+            try self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
+        } catch {
+            return nil
+        }
     }
 
     convenience init?(encryptionKey: [UInt8], hmacKey: [UInt8], header: [UInt8]) {
@@ -157,17 +179,17 @@ final class DecryptorV3: DecryptorType {
         }
 
         let iv = Array(header[2..<18])
-        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
+        do {
+            try self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
+        } catch {
+            return nil
+        }
     }
 
-    func update(data: [UInt8]) throws -> [UInt8] {
-        if let pendingHeader = self.pendingHeader {
-            self.hmac.update(pendingHeader)
-            self.pendingHeader = nil
-        }
+    func update(data: [UInt8]) -> [UInt8] {
         let overflow = buffer.update(data)
         self.hmac.update(overflow)
-        let decrypted = try self.engine.update(overflow)
+        let decrypted = try! self.engine.update(overflow) // It is a programming error for this to fail
 
         return decrypted
     }
@@ -175,7 +197,7 @@ final class DecryptorV3: DecryptorType {
     func final() throws -> [UInt8] {
         let data = try self.engine.final()
         let hash = self.hmac.final()
-        if hash != self.buffer.final() {
+        if !isEqualInConsistentTime(trusted: hash, untrusted: self.buffer.final()) {
             throw Error.HMACMismatch
         }
         return data
@@ -199,7 +221,7 @@ private final class HMACV3 {
             CCHmacUpdate(&self.context, buf.baseAddress, buf.count)
         }
     }
-
+    
     func final() -> [UInt8] {
         var hmac = [UInt8](count: V3.hmacSize, repeatedValue: 0)
         CCHmacFinal(&self.context, &hmac)

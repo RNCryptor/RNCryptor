@@ -14,8 +14,11 @@ public enum CryptorOperation: CCOperation {
     case Decrypt = 1 // CCOperation(kCCDecrypt)
 }
 
-internal class Engine {
+internal final class Engine {
     private let cryptor: CCCryptorRef
+    init() {
+        self.cryptor = CCCryptorRef()
+    }
 
     init(operation: CryptorOperation, key: [UInt8], iv: [UInt8]) throws {
         var cryptorOut = CCCryptorRef()

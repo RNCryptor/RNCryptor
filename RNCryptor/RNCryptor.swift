@@ -59,3 +59,4 @@ public func decrypt(data: [UInt8], encryptionKey: [UInt8], hmacKey: [UInt8]) thr
     let decryptor = Decryptor(encryptionKey: encryptionKey, hmacKey: hmacKey)
     return try decryptor.update(data) + decryptor.final()
 }
+
