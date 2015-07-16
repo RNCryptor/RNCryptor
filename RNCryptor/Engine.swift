@@ -16,6 +16,7 @@ public enum CryptorOperation: CCOperation {
 
 internal final class Engine {
     private let cryptor: CCCryptorRef
+    // A zero value for failing intializers who may need it. This is not useful and will crash if update is called.
     init() {
         self.cryptor = CCCryptorRef()
     }
@@ -30,9 +31,7 @@ internal final class Engine {
             &cryptorOut
         )
         self.cryptor = cryptorOut
-        if result != CCCryptorStatus(kCCSuccess) {
-            assertionFailure("Failed to create CCCryptor")
-        }
+        try checkResult(result)
     }
 
     deinit {

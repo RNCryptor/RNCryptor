@@ -173,7 +173,9 @@ final class DecryptorV3: DecryptorType {
         guard
             header.count == V3.keyHeaderSize &&
                 header[0] == V3.version &&
-                header[1] == 0
+                header[1] == 0 &&
+                encryptionKey.count == V3.keySize &&
+                hmacKey.count == V3.keySize
             else {
                 return nil
         }
@@ -186,12 +188,10 @@ final class DecryptorV3: DecryptorType {
         }
     }
 
-    func update(data: [UInt8]) -> [UInt8] {
+    func update(data: [UInt8]) throws -> [UInt8] {
         let overflow = buffer.update(data)
         self.hmac.update(overflow)
-        let decrypted = try! self.engine.update(overflow) // It is a programming error for this to fail
-
-        return decrypted
+        return try self.engine.update(overflow)
     }
 
     func final() throws -> [UInt8] {
