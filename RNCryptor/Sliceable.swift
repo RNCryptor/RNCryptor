@@ -6,8 +6,8 @@
 //  Copyright © 2015 Rob Napier. All rights reserved.
 //
 
-extension Sliceable {
-    func splitAt(index: Index) -> (SubSlice, SubSlice) {
+extension CollectionType {
+    func splitAt(index: Index) -> (SubSequence, SubSequence) {
         return (self[startIndex..<index], self[index..<endIndex])
     }
 }
