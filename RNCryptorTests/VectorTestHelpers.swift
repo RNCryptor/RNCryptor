@@ -34,7 +34,7 @@ func _verifyPassword(vector: [String:String]) {
             hmacSalt: vector["hmac_salt_hex"]!.byteArrayFromHexEncoding!,
             iv: vector["iv_hex"]!.byteArrayFromHexEncoding!)
         do {
-            let ciphertext = try encryptor.update(vector["plaintext_hex"]!.byteArrayFromHexEncoding!) + encryptor.final()
+            let ciphertext = try encryptor.encrypt(vector["plaintext_hex"]!.byteArrayFromHexEncoding!)
             verifyVector(vector, key:"ciphertext_hex", equals:ciphertext, name:"password encrypt")
         } catch {
             XCTFail("\(error)")
@@ -43,7 +43,7 @@ func _verifyPassword(vector: [String:String]) {
 
     let decryptor = Decryptor(password: vector["password"]!)
     do {
-        let plaintext = try decryptor.update(vector["ciphertext_hex"]!.byteArrayFromHexEncoding!) + decryptor.final()
+        let plaintext = try decryptor.decrypt(vector["ciphertext_hex"]!.byteArrayFromHexEncoding!)
         verifyVector(vector, key:"plaintext_hex", equals:plaintext, name:"password decrypt")
     } catch {
         XCTFail("\(error)")
@@ -61,7 +61,7 @@ func verify_v3_key(vector: [String: String]) {
             hmacKey: vector["hmac_key_hex"]!.byteArrayFromHexEncoding!,
             iv: vector["iv_hex"]!.byteArrayFromHexEncoding!)
         do {
-            let ciphertext = try encryptor.update(vector["plaintext_hex"]!.byteArrayFromHexEncoding!) + encryptor.final()
+            let ciphertext = try encryptor.encrypt(vector["plaintext_hex"]!.byteArrayFromHexEncoding!)
             verifyVector(vector, key:"ciphertext_hex", equals:ciphertext, name:"key encrypt")
         } catch {
             XCTFail("\(error)")
@@ -72,7 +72,7 @@ func verify_v3_key(vector: [String: String]) {
         encryptionKey: vector["enc_key_hex"]!.byteArrayFromHexEncoding!,
         hmacKey: vector["hmac_key_hex"]!.byteArrayFromHexEncoding!)
     do {
-        let plaintext = try decryptor.update(vector["ciphertext_hex"]!.byteArrayFromHexEncoding!) + decryptor.final()
+        let plaintext = try decryptor.decrypt(vector["ciphertext_hex"]!.byteArrayFromHexEncoding!)
         verifyVector(vector, key:"plaintext_hex", equals:plaintext, name:"key decrypt")
     } catch {
         XCTFail("\(error)")

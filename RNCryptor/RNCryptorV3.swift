@@ -53,7 +53,7 @@ public func ==(lhs: _RNCryptorV3, rhs: _RNCryptorV3) -> Bool {
     return true // It's constant
 }
 
-public final class EncryptorV3 {
+public final class EncryptorV3 : CryptorType {
     private var engine: Engine
     private var hmac: HMACV3
 
@@ -101,29 +101,36 @@ public final class EncryptorV3 {
             iv: randomDataOfLength(V3.ivSize))
     }
 
-    @warn_unused_result
-    public func update(data: [UInt8]) -> [UInt8] {
-        var result = [UInt8]()
+    public func encrypt(data: [UInt8]) throws -> [UInt8] {
+        return try process(self, data: data)
+    }
+
+    public func update(data: [UInt8], body: (UnsafeBufferPointer<UInt8>) throws -> Void) rethrows {
         if let header = self.pendingHeader {
-            result = header
+            self.hmac.update(header)
+            try body(UnsafeBufferPointer(start: header, count: header.count))
             self.pendingHeader = nil
         }
 
-        result += self.engine.update(data)
-        self.hmac.update(result)
-        return result
+        try self.engine.update(data) { result in
+            self.hmac.update(result)
+            try body(result)
+        }
     }
 
-    @warn_unused_result
-    public func final() throws -> [UInt8] {
-        var result = try self.engine.final()
+    public func final(body: (UnsafeBufferPointer<UInt8>) throws -> Void) throws {
+        var result = self.pendingHeader ?? []
+
+        try self.engine.final{result.extend($0)}
         self.hmac.update(result)
+
         result += self.hmac.final()
-        return result
+
+        try body(UnsafeBufferPointer(start: result, count: result.count))
     }
 }
 
-final class DecryptorV3: DecryptorType {
+final class DecryptorV3: CryptorType {
     private let buffer: TruncatingBuffer
     private let hmac: HMACV3
     private let engine: Engine
@@ -174,19 +181,20 @@ final class DecryptorV3: DecryptorType {
         self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
     }
 
-    func update(data: [UInt8]) throws -> [UInt8] {
+    func update(data: [UInt8], body: (UnsafeBufferPointer<UInt8>) throws -> Void) rethrows {
         let overflow = buffer.update(data)
         self.hmac.update(overflow)
-        return self.engine.update(overflow)
+        try self.engine.update(overflow, body: body)
     }
 
-    func final() throws -> [UInt8] {
-        let data = try self.engine.final()
-        let hash = self.hmac.final()
-        if !isEqualInConsistentTime(trusted: hash, untrusted: self.buffer.final()) {
-            throw Error.HMACMismatch
+    func final(body: (UnsafeBufferPointer<UInt8>) throws -> Void) throws {
+        try self.engine.final {
+            let hash = self.hmac.final()
+            if !isEqualInConsistentTime(trusted: hash, untrusted: self.buffer.final()) {
+                throw Error.HMACMismatch
+            }
+            try body($0)
         }
-        return data
     }
 }
 
@@ -203,9 +211,11 @@ private final class HMACV3 {
     }
 
     func update(data: [UInt8]) {
-        data.withUnsafeBufferPointer { buf in
-            CCHmacUpdate(&self.context, buf.baseAddress, buf.count)
-        }
+        data.withUnsafeBufferPointer(self.update)
+    }
+
+    func update(data: UnsafeBufferPointer<UInt8>) {
+        CCHmacUpdate(&self.context, data.baseAddress, data.count)
     }
     
     func final() -> [UInt8] {

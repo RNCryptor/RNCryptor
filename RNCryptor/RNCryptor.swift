@@ -32,31 +32,19 @@ public func randomDataOfLength(length: Int) -> [UInt8] {
     return data
 }
 
-internal func checkResult(result: CCCryptorStatus) throws {
-    guard result == CCCryptorStatus(kCCSuccess) else {
-        throw NSError(domain: CCErrorDomain, code: Int(result), userInfo: nil)
+internal protocol CryptorType {
+    func update(data: [UInt8], body: (UnsafeBufferPointer<UInt8>) throws -> Void) throws
+    func final(body: (UnsafeBufferPointer<UInt8>) throws -> Void) throws
+}
+
+internal extension CryptorType {
+    internal func process(cryptor: CryptorType, data: [UInt8]) throws -> [UInt8] {
+        var result = [UInt8]()
+        try cryptor.update(data) { result += $0 }
+        try cryptor.final() { result += $0 }
+        return result
     }
 }
 
 public typealias Encryptor = EncryptorV3
-
-public func encrypt(data: [UInt8], password: String) throws -> [UInt8] {
-    let encryptor = Encryptor(password: password)
-    return try encryptor.update(data) + encryptor.final()
-}
-
-public func encrypt(data: [UInt8], encryptionKey: [UInt8], hmacKey: [UInt8]) throws -> [UInt8] {
-    let encryptor = Encryptor(encryptionKey: encryptionKey, hmacKey: hmacKey)
-    return try encryptor.update(data) + encryptor.final()
-}
-
-public func decrypt(data: [UInt8], password: String) throws -> [UInt8] {
-    let decryptor = Decryptor(password: password)
-    return try decryptor.update(data) + decryptor.final()
-}
-
-public func decrypt(data: [UInt8], encryptionKey: [UInt8], hmacKey: [UInt8]) throws -> [UInt8] {
-    let decryptor = Decryptor(encryptionKey: encryptionKey, hmacKey: hmacKey)
-    return try decryptor.update(data) + decryptor.final()
-}
 
