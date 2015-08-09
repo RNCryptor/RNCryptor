@@ -64,7 +64,7 @@ public final class EncryptorV3 {
         precondition(hmacKey.count == V3.keySize)
         precondition(iv.count == V3.ivSize)
         self.hmac = HMACV3(key: hmacKey)
-        self.engine = try! Engine(operation: .Encrypt, key: encryptionKey, iv: iv) // It is a programming error for this to fail
+        self.engine = Engine(operation: .Encrypt, key: encryptionKey, iv: iv)
         self.pendingHeader = header
     }
 
@@ -83,8 +83,7 @@ public final class EncryptorV3 {
         let encryptionKey = V3.keyForPassword(password, salt: encryptionSalt)
         let hmacKey = V3.keyForPassword(password, salt: hmacSalt)
 
-        // TODO: This chained-+ is very slow to compile in Swift 2b3 (http://www.openradar.me/21842206)
-
+        // TODO: This chained-+ is very slow to compile in Swift 2b5 (http://www.openradar.me/21842206)
         // let header = [V3.version, UInt8(1)] + encryptionSalt + hmacSalt + iv
         var header = [V3.version, UInt8(1)]
         header += encryptionSalt
@@ -103,14 +102,14 @@ public final class EncryptorV3 {
     }
 
     @warn_unused_result
-    public func update(data: [UInt8]) throws -> [UInt8] {
+    public func update(data: [UInt8]) -> [UInt8] {
         var result = [UInt8]()
         if let header = self.pendingHeader {
             result = header
             self.pendingHeader = nil
         }
 
-        result += try self.engine.update(data)
+        result += self.engine.update(data)
         self.hmac.update(result)
         return result
     }
@@ -129,7 +128,7 @@ final class DecryptorV3: DecryptorType {
     private let hmac: HMACV3
     private let engine: Engine
 
-    private init(encryptionKey: [UInt8], hmacKey: [UInt8], iv: [UInt8], header: [UInt8]) throws {
+    private init(encryptionKey: [UInt8], hmacKey: [UInt8], iv: [UInt8], header: [UInt8]) {
         precondition(encryptionKey.count == V3.keySize)
         precondition(hmacKey.count == V3.hmacSize)
         precondition(iv.count == V3.ivSize)
@@ -137,15 +136,10 @@ final class DecryptorV3: DecryptorType {
         self.hmac = HMACV3(key: hmacKey)
         self.hmac.update(header)
         self.buffer = TruncatingBuffer(capacity: V3.hmacSize)
-        do {
-            self.engine = try Engine(operation: .Decrypt, key: encryptionKey, iv: iv)
-        } catch {
-            self.engine = Engine() // Shouldn't really be needed, but we have to initialze everything
-            throw error
-        }
+        self.engine = Engine(operation: .Decrypt, key: encryptionKey, iv: iv)
     }
 
-    convenience init?(password: String, header: [UInt8]) {
+    convenience internal init?(password: String, header: [UInt8]) {
         guard
             password != "" &&
                 header.count == V3.passwordHeaderSize &&
@@ -162,14 +156,10 @@ final class DecryptorV3: DecryptorType {
         let encryptionKey = V3.keyForPassword(password, salt: encryptionSalt)
         let hmacKey = V3.keyForPassword(password, salt: hmacSalt)
 
-        do {
-            try self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
-        } catch {
-            return nil
-        }
+        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
     }
 
-    convenience init?(encryptionKey: [UInt8], hmacKey: [UInt8], header: [UInt8]) {
+    convenience internal init?(encryptionKey: [UInt8], hmacKey: [UInt8], header: [UInt8]) {
         guard
             header.count == V3.keyHeaderSize &&
                 header[0] == V3.version &&
@@ -181,17 +171,13 @@ final class DecryptorV3: DecryptorType {
         }
 
         let iv = Array(header[2..<18])
-        do {
-            try self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
-        } catch {
-            return nil
-        }
+        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
     }
 
     func update(data: [UInt8]) throws -> [UInt8] {
         let overflow = buffer.update(data)
         self.hmac.update(overflow)
-        return try self.engine.update(overflow)
+        return self.engine.update(overflow)
     }
 
     func final() throws -> [UInt8] {

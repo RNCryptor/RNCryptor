@@ -16,12 +16,8 @@ public enum CryptorOperation: CCOperation {
 
 internal final class Engine {
     private let cryptor: CCCryptorRef
-    // A zero value for failing intializers who may need it. This is not useful and will crash if update is called.
-    init() {
-        self.cryptor = CCCryptorRef()
-    }
 
-    init(operation: CryptorOperation, key: [UInt8], iv: [UInt8]) throws {
+    init(operation: CryptorOperation, key: [UInt8], iv: [UInt8]) {
         var cryptorOut = CCCryptorRef()
         let result = CCCryptorCreate(
             operation.rawValue,
@@ -31,7 +27,11 @@ internal final class Engine {
             &cryptorOut
         )
         self.cryptor = cryptorOut
-        try checkResult(result)
+
+        // It is a programming error to create us with illegal values
+        // This is an internal class, so we can constrain what is sent to us.
+        // If this is ever made public, it should throw instead of asserting.
+        assert(result == CCCryptorStatus(kCCSuccess))
     }
 
     deinit {
@@ -40,8 +40,10 @@ internal final class Engine {
         }
     }
 
+    // FIXME: Convert to "withUnsafeBufferPointer" style. Take a closure that handles the result.
+    //        That way we can keep using the same buffer, and don't have to return anything.
     @warn_unused_result
-    func update(data: [UInt8]) throws -> [UInt8] {
+    func update(data: [UInt8]) -> [UInt8] {
         let outputLength = CCCryptorGetOutputLength(self.cryptor, data.count, false)
         var output = Array<UInt8>(count: outputLength, repeatedValue: 0)
         var dataOutMoved: Int = 0
@@ -55,7 +57,10 @@ internal final class Engine {
             &output, outputLength,
             &dataOutMoved)
         }
-        try checkResult(result)
+
+        // The only error returned by CCCryptorUpdate is kCCBufferTooSmall, which would be a programming error
+        assert(result == CCCryptorStatus(kCCSuccess))
+
         output.replaceRange(dataOutMoved..<output.endIndex, with:[])
         return output
     }
