@@ -105,7 +105,7 @@ public final class EncryptorV3 : CryptorType {
         return try process(self, data: data)
     }
 
-    public func update(data: [UInt8], body: (UnsafeBufferPointer<UInt8>) throws -> Void) rethrows {
+    public func update(data: [UInt8], body: (UnsafeBufferPointer<UInt8>) throws -> Void) throws {
         if let header = self.pendingHeader {
             self.hmac.update(header)
             try body(UnsafeBufferPointer(start: header, count: header.count))
@@ -181,7 +181,7 @@ final class DecryptorV3: CryptorType {
         self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
     }
 
-    func update(data: [UInt8], body: (UnsafeBufferPointer<UInt8>) throws -> Void) rethrows {
+    func update(data: [UInt8], body: (UnsafeBufferPointer<UInt8>) throws -> Void) throws {
         let overflow = buffer.update(data)
         self.hmac.update(overflow)
         try self.engine.update(overflow, body: body)

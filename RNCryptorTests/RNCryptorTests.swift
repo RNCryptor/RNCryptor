@@ -37,7 +37,7 @@ class RNCryptorTests: XCTestCase {
         var encrypted = [UInt8]()
         do {
             let encryptor = Engine(operation: .Encrypt, key: encryptKey, iv: iv)
-            encryptor.update(data) { encrypted += $0 }
+            try encryptor.update(data) { encrypted += $0 }
             try encryptor.final { encrypted += $0 }
         } catch {
             XCTFail("Caught: \(error)")
@@ -46,7 +46,7 @@ class RNCryptorTests: XCTestCase {
         do {
             let decryptor = Engine(operation: .Decrypt, key: encryptKey, iv: iv)
             var decrypted = [UInt8]()
-            decryptor.update(encrypted) { decrypted += $0 }
+            try decryptor.update(encrypted) { decrypted += $0 }
             try decryptor.final { decrypted += $0 }
             XCTAssertEqual(decrypted, data)
         } catch {
