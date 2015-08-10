@@ -108,7 +108,7 @@ public final class EncryptorV3 : CryptorType {
     public func update(data: [UInt8], body: (UnsafeBufferPointer<UInt8>) throws -> Void) throws {
         if let header = self.pendingHeader {
             self.hmac.update(header)
-            try body(UnsafeBufferPointer(start: header, count: header.count))
+            try header.withUnsafeBufferPointer(body)
             self.pendingHeader = nil
         }
 
@@ -126,7 +126,7 @@ public final class EncryptorV3 : CryptorType {
 
         result += self.hmac.final()
 
-        try body(UnsafeBufferPointer(start: result, count: result.count))
+        try result.withUnsafeBufferPointer(body)
     }
 }
 

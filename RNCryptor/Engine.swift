@@ -86,6 +86,6 @@ internal final class Engine {
             throw NSError(domain: CCErrorDomain, code: Int(result), userInfo: nil)
         }
 
-        try body(UnsafeBufferPointer(start: buffer, count: dataOutMoved))
+        try buffer[0..<dataOutMoved].withUnsafeBufferPointer(body)
     }
 }
