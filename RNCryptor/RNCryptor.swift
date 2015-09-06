@@ -33,15 +33,14 @@ internal func randomDataOfLength(length: Int) -> [UInt8] {
 }
 
 internal protocol CryptorType {
-    func update(data: [UInt8], body: ([UInt8]) throws -> Void) throws
-    func final(body: ([UInt8]) throws -> Void) throws
+    func update(data: [UInt8]) throws -> [UInt8]
+    func final() throws -> [UInt8]
 }
 
 internal extension CryptorType {
     internal func process(cryptor: CryptorType, data: [UInt8]) throws -> [UInt8] {
-        var result = [UInt8]()
-        try cryptor.update(data) { result += $0 }
-        try cryptor.final() { result += $0 }
+        var result = try cryptor.update(data)
+        result += try cryptor.final()
         return result
     }
 }

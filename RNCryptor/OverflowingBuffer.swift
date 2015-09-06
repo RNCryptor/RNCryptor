@@ -1,5 +1,5 @@
 //
-//  TruncatingBuffer.swift
+//  OverflowingBuffer.swift
 //  RNCryptor
 //
 //  Created by Rob Napier on 6/27/15.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-internal class TruncatingBuffer {
+internal class OverflowingBuffer {
     private var array: [UInt8] = []
     let capacity: Int
 

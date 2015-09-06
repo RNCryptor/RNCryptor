@@ -33,12 +33,8 @@ func _verifyPassword(vector: [String:String]) {
             encryptionSalt: vector["enc_salt_hex"]!.byteArrayFromHexEncoding!,
             hmacSalt: vector["hmac_salt_hex"]!.byteArrayFromHexEncoding!,
             iv: vector["iv_hex"]!.byteArrayFromHexEncoding!)
-        do {
-            let ciphertext = try encryptor.encrypt(vector["plaintext_hex"]!.byteArrayFromHexEncoding!)
-            verifyVector(vector, key:"ciphertext_hex", equals:ciphertext, name:"password encrypt")
-        } catch {
-            XCTFail("\(error)")
-        }
+        let ciphertext = encryptor.encrypt(vector["plaintext_hex"]!.byteArrayFromHexEncoding!)
+        verifyVector(vector, key:"ciphertext_hex", equals:ciphertext, name:"password encrypt")
     }
 
     let decryptor = Decryptor(password: vector["password"]!)
@@ -60,12 +56,8 @@ func verify_v3_key(vector: [String: String]) {
             encryptionKey: vector["enc_key_hex"]!.byteArrayFromHexEncoding!,
             hmacKey: vector["hmac_key_hex"]!.byteArrayFromHexEncoding!,
             iv: vector["iv_hex"]!.byteArrayFromHexEncoding!)
-        do {
-            let ciphertext = try encryptor.encrypt(vector["plaintext_hex"]!.byteArrayFromHexEncoding!)
-            verifyVector(vector, key:"ciphertext_hex", equals:ciphertext, name:"key encrypt")
-        } catch {
-            XCTFail("\(error)")
-        }
+        let ciphertext = encryptor.encrypt(vector["plaintext_hex"]!.byteArrayFromHexEncoding!)
+        verifyVector(vector, key:"ciphertext_hex", equals:ciphertext, name:"key encrypt")
     }
 
     let decryptor = Decryptor(

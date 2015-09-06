@@ -30,16 +30,15 @@ public final class Decryptor : CryptorType {
         return try process(self, data: data)
     }
 
-    func update(data: [UInt8], body: ([UInt8]) throws -> Void) throws {
+    func update(data: [UInt8]) throws -> [UInt8] {
         if let decryptor = self.decryptor {
-            try decryptor.update(data, body: body)
-            return
+            return try decryptor.update(data)
         }
 
         let maxHeaderLength = decryptors.reduce(0) { max($0, $1.headerLength) }
         guard self.buffer.count + data.count >= maxHeaderLength else {
             self.buffer += data
-            return
+            return []
         }
 
         for decryptorType in self.decryptors {
@@ -48,14 +47,13 @@ public final class Decryptor : CryptorType {
             if let decryptor = decryptorType.builder(header) {
                 self.decryptor = decryptor
                 self.buffer.removeAll()
-                try decryptor.update(Array(content), body: body) // FIXME: Copy
-                return
+                return try decryptor.update(Array(content)) // FIXME: Remove copy
             }
         }
         throw Error.UnknownHeader
     }
 
-    func final(body: ([UInt8]) throws -> Void) throws {
-        try self.decryptor?.final(body)
+    func final() throws -> [UInt8] {
+        return try self.decryptor?.final() ?? []
     }
 }

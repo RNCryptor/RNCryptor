@@ -101,37 +101,36 @@ public final class EncryptorV3 : CryptorType {
             iv: randomDataOfLength(V3.ivSize))
     }
 
-    public func encrypt(data: [UInt8]) throws -> [UInt8] {
-        return try process(self, data: data)
+    public func encrypt(data: [UInt8]) -> [UInt8] {
+        return try! process(self, data: data)
     }
 
-    public func update(data: [UInt8], body: ([UInt8]) throws -> Void) throws {
-        if let header = self.pendingHeader {
-            self.hmac.update(header)
-            try body(header)
-            self.pendingHeader = nil
+    private func handle(data: [UInt8]) -> [UInt8] {
+        var result: [UInt8]
+        if let ph = pendingHeader {
+            result = ph
+            pendingHeader = nil
+            result += data
+        } else {
+            result = data
         }
-
-        try self.engine.update(data) { result in
-            self.hmac.update(result)
-            try body(result)
-        }
+        hmac.update(result)
+        return result
     }
 
-    public func final(body: ([UInt8]) throws -> Void) throws {
-        var result = self.pendingHeader ?? []
+    public func update(data: [UInt8]) -> [UInt8] {
+        return try! handle(engine.update(data))
+    }
 
-        try self.engine.final{result.appendContentsOf($0)}
-        self.hmac.update(result)
-
+    public func final() -> [UInt8] {
+        var result = try! handle(engine.final())
         result += self.hmac.final()
-
-        try body(result)
+        return result
     }
 }
 
 final class DecryptorV3: CryptorType {
-    private let buffer: TruncatingBuffer
+    private let buffer: OverflowingBuffer
     private let hmac: HMACV3
     private let engine: Engine
 
@@ -142,7 +141,7 @@ final class DecryptorV3: CryptorType {
 
         self.hmac = HMACV3(key: hmacKey)
         self.hmac.update(header)
-        self.buffer = TruncatingBuffer(capacity: V3.hmacSize)
+        self.buffer = OverflowingBuffer(capacity: V3.hmacSize)
         self.engine = Engine(operation: .Decrypt, key: encryptionKey, iv: iv)
     }
 
@@ -181,20 +180,19 @@ final class DecryptorV3: CryptorType {
         self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
     }
 
-    func update(data: [UInt8], body: ([UInt8]) throws -> Void) throws {
-        let overflow = buffer.update(data)
-        self.hmac.update(overflow)
-        try self.engine.update(overflow, body: body)
+    func update(data: [UInt8]) throws -> [UInt8] {
+        let result = buffer.update(data)
+        self.hmac.update(result)
+        return try self.engine.update(result)
     }
 
-    func final(body: ([UInt8]) throws -> Void) throws {
-        try self.engine.final {
-            let hash = self.hmac.final()
-            if !isEqualInConsistentTime(trusted: hash, untrusted: self.buffer.final()) {
-                throw Error.HMACMismatch
-            }
-            try body($0)
+    func final() throws -> [UInt8] {
+        let result = try self.engine.final()
+        let hash = self.hmac.final()
+        if !isEqualInConsistentTime(trusted: hash, untrusted: self.buffer.final()) {
+            throw Error.HMACMismatch
         }
+        return result
     }
 }
 

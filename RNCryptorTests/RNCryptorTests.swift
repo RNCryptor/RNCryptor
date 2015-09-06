@@ -37,17 +37,14 @@ class RNCryptorTests: XCTestCase {
         var encrypted = [UInt8]()
         do {
             let encryptor = Engine(operation: .Encrypt, key: encryptKey, iv: iv)
-            try encryptor.update(data) { encrypted += $0 }
-            try encryptor.final { encrypted += $0 }
+            encrypted = try encryptor.update(data) + encryptor.final()
         } catch {
             XCTFail("Caught: \(error)")
         }
 
         do {
             let decryptor = Engine(operation: .Decrypt, key: encryptKey, iv: iv)
-            var decrypted = [UInt8]()
-            try decryptor.update(encrypted) { decrypted += $0 }
-            try decryptor.final { decrypted += $0 }
+            let decrypted = try decryptor.update(encrypted) + decryptor.final()
             XCTAssertEqual(decrypted, data)
         } catch {
             XCTFail("Caught: \(error)")
@@ -62,12 +59,8 @@ class RNCryptorTests: XCTestCase {
         let ciphertext = "03000203 04050607 08090a0b 0c0d0e0f 0001981b 22e7a644 8118d695 bd654f72 e9d6ed75 ec14ae2a a067eed2 a98a56e0 993dfe22 ab5887b3 f6e3cdd4 0767f519 5eb5".byteArrayFromHexEncoding!
 
         let encryptor = Encryptor(encryptionKey: encryptKey, hmacKey: hmacKey, iv: iv)
-        do {
-            let encrypted = try encryptor.encrypt(plaintext)
-            XCTAssertEqual(encrypted, ciphertext)
-        } catch {
-            XCTFail("Caught: \(error)")
-        }
+        let encrypted = encryptor.encrypt(plaintext)
+        XCTAssertEqual(encrypted, ciphertext)
     }
 
     func testKeyDecryptor() {
@@ -95,13 +88,8 @@ class RNCryptorTests: XCTestCase {
 
         let encryptor = Encryptor(password: password, encryptionSalt: encryptionSalt, hmacSalt: hmacSalt, iv: iv)
 
-        do {
-            let encrypted = try encryptor.encrypt(plaintext)
-            XCTAssertEqual(encrypted, ciphertext)
-        } catch {
-            XCTFail("Caught: \(error)")
-        }
-
+        let encrypted = encryptor.encrypt(plaintext)
+        XCTAssertEqual(encrypted, ciphertext)
     }
 
     func testPasswordDecryptor() {
@@ -116,7 +104,7 @@ class RNCryptorTests: XCTestCase {
             XCTAssertEqual(decrypted, plaintext)
         } catch {
             XCTFail("Caught: \(error)")
-        }
+        }xc
     }
 
     func testOneShotKey() {
@@ -124,13 +112,7 @@ class RNCryptorTests: XCTestCase {
         let hmacKey = randomDataOfLength(V3.keySize)
         let data = randomDataOfLength(1024)
 
-        let ciphertext: [UInt8]
-        do {
-            ciphertext = try Encryptor(encryptionKey: encryptionKey, hmacKey: hmacKey).encrypt(data)
-        } catch {
-            ciphertext = []
-            XCTFail("Caught: \(error)")
-        }
+        let ciphertext = Encryptor(encryptionKey: encryptionKey, hmacKey: hmacKey).encrypt(data)
 
         let plaintext: [UInt8]
         do {
@@ -147,13 +129,7 @@ class RNCryptorTests: XCTestCase {
         let password = "thepassword"
         let data = randomDataOfLength(1024)
 
-        let ciphertext: [UInt8]
-        do {
-            ciphertext = try Encryptor(password: password).encrypt(data)
-        } catch {
-            ciphertext = []
-            XCTFail("Caught: \(error)")
-        }
+        let ciphertext = Encryptor(password: password).encrypt(data)
 
         let plaintext: [UInt8]
         do {

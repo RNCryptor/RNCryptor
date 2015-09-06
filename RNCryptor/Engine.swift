@@ -50,9 +50,7 @@ internal final class Engine {
         return size
     }
 
-    // FIXME: Convert to "withUnsafeBufferPointer" style. Take a closure that handles the result.
-    //        That way we can keep using the same buffer, and don't have to return anything.
-    func update(data: [UInt8], body: ([UInt8]) throws -> Void) throws {
+    func update(data: [UInt8]) throws -> [UInt8] {
         let outputLength = sizeBufferForDataOfLength(data.count)
         var dataOutMoved: Int = 0
 
@@ -70,10 +68,10 @@ internal final class Engine {
         assert(result == CCCryptorStatus(kCCSuccess))
 
         buffer.removeRange(dataOutMoved..<buffer.endIndex)
-        try body(buffer)
+        return buffer
     }
 
-    func final(body: ([UInt8]) throws -> Void) throws {
+    func final() throws -> [UInt8] {
         let outputLength = sizeBufferForDataOfLength(0)
         var dataOutMoved: Int = 0
 
@@ -88,6 +86,6 @@ internal final class Engine {
         }
 
         buffer.removeRange(dataOutMoved..<buffer.endIndex)
-        try body(buffer)
+        return buffer
     }
 }
