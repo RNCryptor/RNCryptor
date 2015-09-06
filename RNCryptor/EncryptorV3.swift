@@ -9,7 +9,7 @@
 import CommonCrypto
 
 
-public final class EncryptorV3: Writable {
+public final class EncryptorV3: CryptorType, Writable {
     // Sink chain is Cryptor -> Tee -> HMAC
     //                              -> Sink
 

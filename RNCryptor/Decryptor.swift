@@ -6,27 +6,23 @@
 //  Copyright © 2015 Rob Napier. All rights reserved.
 //
 
-protocol DecryptorType: Writable {
-    func finish() throws
-}
-
-public final class Decryptor: Writable {
-    private let decryptors: [(headerLength: Int, builder: ([UInt8]) -> DecryptorType?)]
+public final class Decryptor: CryptorType, Writable {
+    private let decryptors: [(headerLength: Int, builder: ([UInt8]) -> CryptorType?)]
     private var buffer: [UInt8] = []
 
-    private var decryptor: DecryptorType?
+    private var decryptor: CryptorType?
 
     public init(password: String, sink: Writable) {
         assert(password != "")
 
         self.decryptors = [
-            (RNCryptorV3.passwordHeaderSize, { DecryptorV3(password: password, header: $0, sink: sink) as DecryptorType? })
+            (RNCryptorV3.passwordHeaderSize, { DecryptorV3(password: password, header: $0, sink: sink) as CryptorType? })
         ]
     }
 
     public init(encryptionKey: [UInt8], hmacKey: [UInt8], sink: Writable) {
         self.decryptors = [
-            (RNCryptorV3.keyHeaderSize, { DecryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey, header: $0, sink: sink) as DecryptorType? })
+            (RNCryptorV3.keyHeaderSize, { DecryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey, header: $0, sink: sink) as CryptorType? })
         ]
     }
 
