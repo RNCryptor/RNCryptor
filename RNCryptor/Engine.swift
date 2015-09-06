@@ -52,7 +52,7 @@ internal final class Engine {
 
     // FIXME: Convert to "withUnsafeBufferPointer" style. Take a closure that handles the result.
     //        That way we can keep using the same buffer, and don't have to return anything.
-    func update(data: [UInt8], body: (UnsafeBufferPointer<UInt8>) throws -> Void) throws {
+    func update(data: [UInt8], body: ([UInt8]) throws -> Void) throws {
         let outputLength = sizeBufferForDataOfLength(data.count)
         var dataOutMoved: Int = 0
 
@@ -69,10 +69,11 @@ internal final class Engine {
         // The only error returned by CCCryptorUpdate is kCCBufferTooSmall, which would be a programming error
         assert(result == CCCryptorStatus(kCCSuccess))
 
-        try buffer[0..<dataOutMoved].withUnsafeBufferPointer(body)
+        buffer.removeRange(dataOutMoved..<buffer.endIndex)
+        try body(buffer)
     }
 
-    func final(body: (UnsafeBufferPointer<UInt8>) throws -> Void) throws {
+    func final(body: ([UInt8]) throws -> Void) throws {
         let outputLength = sizeBufferForDataOfLength(0)
         var dataOutMoved: Int = 0
 
@@ -86,6 +87,7 @@ internal final class Engine {
             throw NSError(domain: CCErrorDomain, code: Int(result), userInfo: nil)
         }
 
-        try buffer[0..<dataOutMoved].withUnsafeBufferPointer(body)
+        buffer.removeRange(dataOutMoved..<buffer.endIndex)
+        try body(buffer)
     }
 }

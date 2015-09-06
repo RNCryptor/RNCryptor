@@ -33,8 +33,8 @@ public func randomDataOfLength(length: Int) -> [UInt8] {
 }
 
 internal protocol CryptorType {
-    func update(data: [UInt8], body: (UnsafeBufferPointer<UInt8>) throws -> Void) throws
-    func final(body: (UnsafeBufferPointer<UInt8>) throws -> Void) throws
+    func update(data: [UInt8], body: ([UInt8]) throws -> Void) throws
+    func final(body: ([UInt8]) throws -> Void) throws
 }
 
 internal extension CryptorType {

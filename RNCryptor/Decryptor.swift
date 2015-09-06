@@ -30,7 +30,7 @@ public final class Decryptor : CryptorType {
         return try process(self, data: data)
     }
 
-    func update(data: [UInt8], body: (UnsafeBufferPointer<UInt8>) throws -> Void) throws {
+    func update(data: [UInt8], body: ([UInt8]) throws -> Void) throws {
         if let decryptor = self.decryptor {
             try decryptor.update(data, body: body)
             return
@@ -55,7 +55,7 @@ public final class Decryptor : CryptorType {
         throw Error.UnknownHeader
     }
 
-    func final(body: (UnsafeBufferPointer<UInt8>) throws -> Void) throws {
+    func final(body: ([UInt8]) throws -> Void) throws {
         try self.decryptor?.final(body)
     }
 }
