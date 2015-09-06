@@ -104,7 +104,7 @@ class RNCryptorTests: XCTestCase {
             XCTAssertEqual(decrypted, plaintext)
         } catch {
             XCTFail("Caught: \(error)")
-        }xc
+        }
     }
 
     func testOneShotKey() {
