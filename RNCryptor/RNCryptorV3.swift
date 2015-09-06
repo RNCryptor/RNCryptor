@@ -121,7 +121,7 @@ public final class EncryptorV3 : CryptorType {
     public func final(body: ([UInt8]) throws -> Void) throws {
         var result = self.pendingHeader ?? []
 
-        try self.engine.final{result.extend($0)}
+        try self.engine.final{result.appendContentsOf($0)}
         self.hmac.update(result)
 
         result += self.hmac.final()

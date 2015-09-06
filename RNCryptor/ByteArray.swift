@@ -11,17 +11,16 @@ import Foundation
 // With thanks to https://github.com/krzyzanowskim/CryptoSwift/blob/master/CryptoSwift/NSDataExtension.swift
 public extension NSData {
     public var hexString : String {
-        return self.byteArray.hexString
+        return byteArray.hexString
     }
 
     public var base64EncodedString: String {
-        return self.base64EncodedStringWithOptions(NSDataBase64EncodingOptions())
+        return base64EncodedStringWithOptions(NSDataBase64EncodingOptions())
     }
 
     public var byteArray: [UInt8] {
-        let count = self.length
-        var bytesArray = [UInt8](count: count, repeatedValue: 0)
-        self.getBytes(&bytesArray, length:count)
+        var bytesArray = [UInt8](count: length, repeatedValue: 0)
+        getBytes(&bytesArray, length:length)
         return bytesArray
     }
 
@@ -37,12 +36,12 @@ public extension String {
 
     public var byteArrayFromHexEncoding: [UInt8]? {
         let strip = [Character]([" ", "<", ">", "\n", "\t"])
-        let input = self.characters.filter { c in !strip.contains(c)}
+        let input = characters.filter { c in !strip.contains(c)}
 
         guard input.count % 2 == 0 else { return nil }
 
         var data = [UInt8]()
-        for i in stride(from: 0, to: input.count, by: 2) {
+        for i in 0.stride(to: input.count, by: 2) {
             guard let value = UInt8(String(input[i...i+1]), radix: 16) else { return nil }
             data.append(value)
         }
@@ -61,15 +60,15 @@ extension Int8: ByteLike {}
 
 public extension Array where Element: ByteLike {
     public var hexString: String {
-        return "".join(self.map { String(format:"%02x", $0.toIntMax()) })
+        return map { String(format:"%02x", $0.toIntMax()) }.joinWithSeparator("")
     }
 
     public var base64EncodedString: String {
-        return self.data.base64EncodedString
+        return data.base64EncodedString
     }
 
     public var data: NSData {
-        return self.withUnsafeBufferPointer { bytes in
+        return withUnsafeBufferPointer { bytes in
             return NSData(bytes: bytes.baseAddress, length: bytes.count)
         }
     }

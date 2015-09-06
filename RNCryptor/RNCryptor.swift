@@ -22,7 +22,7 @@ public enum Error: ErrorType {
     case ParameterError
 }
 
-public func randomDataOfLength(length: Int) -> [UInt8] {
+internal func randomDataOfLength(length: Int) -> [UInt8] {
     var data = [UInt8](count: length, repeatedValue: 0)
     let result = SecRandomCopyBytes(kSecRandomDefault, length, &data)
     guard result == errSecSuccess else {
