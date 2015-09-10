@@ -17,25 +17,27 @@
 		FB627FD21B2B7A1700C3A579 /* RNCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB627FD11B2B7A1700C3A579 /* RNCryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FB627FD91B2B7A1800C3A579 /* RNCryptor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB627FCE1B2B7A1700C3A579 /* RNCryptor.framework */; };
 		FB627FDE1B2B7A1800C3A579 /* RNCryptorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB627FDD1B2B7A1800C3A579 /* RNCryptorTests.swift */; };
+		FB7174D71BA1CD030026EC7F /* VectorTestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB3650801B41F49800F5273F /* VectorTestHelpers.swift */; };
+		FB7174D81BA1CD030026EC7F /* RNCryptorGeneratedVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB36507E1B41F3DE00F5273F /* RNCryptorGeneratedVectorTests.swift */; };
+		FB7174D91BA1CD030026EC7F /* RNCryptorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB627FDD1B2B7A1800C3A579 /* RNCryptorTests.swift */; };
+		FB7174DA1BA1CD030026EC7F /* BufferSinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA08AB81B40589400F97862 /* BufferSinkTests.swift */; };
+		FB7174DB1BA1CD030026EC7F /* ByteStringTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB0B82C91B44565D00B0FEA2 /* ByteStringTests.swift */; };
+		FB7174DC1BA1CDAA0026EC7F /* ByteArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBCF49611B441B0600DCFB19 /* ByteArray.swift */; settings = {ASSET_TAGS = (); }; };
 		FBA08AB11B3F450F00F97862 /* Sliceable.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA08AB01B3F450F00F97862 /* Sliceable.swift */; };
 		FBA08AB51B3F480700F97862 /* OverflowingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA08AB41B3F480700F97862 /* OverflowingBuffer.swift */; };
 		FBA08AB91B40589400F97862 /* BufferSinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA08AB81B40589400F97862 /* BufferSinkTests.swift */; };
 		FBA803DB1B41A3D400B8E4E9 /* Decryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA803DA1B41A3D400B8E4E9 /* Decryptor.swift */; };
 		FBC514E01B3EE76700DB99DE /* Engine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBC514DF1B3EE76700DB99DE /* Engine.swift */; };
 		FBCF48DE1B43286D00DCFB19 /* RNCryptor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBCF48D41B43286D00DCFB19 /* RNCryptor.framework */; };
-		FBCF48E31B43286D00DCFB19 /* RNCryptor_OSXTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBCF48E21B43286D00DCFB19 /* RNCryptor_OSXTests.swift */; };
 		FBCF48ED1B43293400DCFB19 /* RNCryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB30A1FE1B2B7BF300BE5429 /* RNCryptor.swift */; };
 		FBCF48EE1B43293400DCFB19 /* Decryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA803DA1B41A3D400B8E4E9 /* Decryptor.swift */; };
 		FBCF48EF1B43293400DCFB19 /* Engine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBC514DF1B3EE76700DB99DE /* Engine.swift */; };
 		FBCF48F01B43293400DCFB19 /* OverflowingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA08AB41B3F480700F97862 /* OverflowingBuffer.swift */; };
 		FBCF48F41B43293400DCFB19 /* RNCryptorV3.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB07CE061B41BCE7003AF727 /* RNCryptorV3.swift */; };
 		FBCF48F71B43293400DCFB19 /* Sliceable.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA08AB01B3F450F00F97862 /* Sliceable.swift */; };
-		FBCF48FC1B4329D500DCFB19 /* RNCryptor-OSX.h in Headers */ = {isa = PBXBuildFile; fileRef = FBCF48FB1B4329D500DCFB19 /* RNCryptor-OSX.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FBCF49011B432A8000DCFB19 /* CommonCrypto.h in Headers */ = {isa = PBXBuildFile; fileRef = FB30A2071B2B86FD00BE5429 /* CommonCrypto.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FBCF490A1B432AA600DCFB19 /* CommonCrypto.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBCF49061B432A8000DCFB19 /* CommonCrypto.framework */; };
-		FBCF49621B441B0600DCFB19 /* ByteArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBCF49611B441B0600DCFB19 /* ByteArray.swift */; };
 		FBCF49671B44358100DCFB19 /* ByteArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBCF49611B441B0600DCFB19 /* ByteArray.swift */; };
-		FBCF49681B44358200DCFB19 /* ByteArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBCF49611B441B0600DCFB19 /* ByteArray.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -95,11 +97,7 @@
 		FBA803DA1B41A3D400B8E4E9 /* Decryptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Decryptor.swift; sourceTree = "<group>"; };
 		FBC514DF1B3EE76700DB99DE /* Engine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Engine.swift; sourceTree = "<group>"; };
 		FBCF48D41B43286D00DCFB19 /* RNCryptor.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RNCryptor.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		FBCF48D81B43286D00DCFB19 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FBCF48DD1B43286D00DCFB19 /* RNCryptor-OSXTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "RNCryptor-OSXTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		FBCF48E21B43286D00DCFB19 /* RNCryptor_OSXTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNCryptor_OSXTests.swift; sourceTree = "<group>"; };
-		FBCF48E41B43286D00DCFB19 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		FBCF48FB1B4329D500DCFB19 /* RNCryptor-OSX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RNCryptor-OSX.h"; sourceTree = "<group>"; };
 		FBCF49061B432A8000DCFB19 /* CommonCrypto.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CommonCrypto.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBCF49611B441B0600DCFB19 /* ByteArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ByteArray.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -190,8 +188,6 @@
 				FB627FD01B2B7A1700C3A579 /* RNCryptor */,
 				FB627FDC1B2B7A1800C3A579 /* RNCryptorTests */,
 				FB30A2061B2B86FD00BE5429 /* CommonCrypto */,
-				FBCF48D51B43286D00DCFB19 /* RNCryptor-OSX */,
-				FBCF48E11B43286D00DCFB19 /* RNCryptor-OSXTests */,
 				FB627FCF1B2B7A1700C3A579 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -225,6 +221,7 @@
 		FB627FDC1B2B7A1800C3A579 /* RNCryptorTests */ = {
 			isa = PBXGroup;
 			children = (
+				FBCF49611B441B0600DCFB19 /* ByteArray.swift */,
 				FB3650801B41F49800F5273F /* VectorTestHelpers.swift */,
 				FB36501F1B41F3DE00F5273F /* Generated */,
 				FB364F5C1B41F0E100F5273F /* GenVectorTests */,
@@ -236,30 +233,11 @@
 			path = RNCryptorTests;
 			sourceTree = "<group>";
 		};
-		FBCF48D51B43286D00DCFB19 /* RNCryptor-OSX */ = {
-			isa = PBXGroup;
-			children = (
-				FBCF48D81B43286D00DCFB19 /* Info.plist */,
-				FBCF48FB1B4329D500DCFB19 /* RNCryptor-OSX.h */,
-			);
-			path = "RNCryptor-OSX";
-			sourceTree = "<group>";
-		};
-		FBCF48E11B43286D00DCFB19 /* RNCryptor-OSXTests */ = {
-			isa = PBXGroup;
-			children = (
-				FBCF48E21B43286D00DCFB19 /* RNCryptor_OSXTests.swift */,
-				FBCF48E41B43286D00DCFB19 /* Info.plist */,
-			);
-			path = "RNCryptor-OSXTests";
-			sourceTree = "<group>";
-		};
 		FBF74C9F1B41C7650020DEC3 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
 				FBA08AB41B3F480700F97862 /* OverflowingBuffer.swift */,
 				FBA08AB01B3F450F00F97862 /* Sliceable.swift */,
-				FBCF49611B441B0600DCFB19 /* ByteArray.swift */,
 			);
 			name = Helpers;
 			sourceTree = "<group>";
@@ -295,7 +273,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FBCF48FC1B4329D500DCFB19 /* RNCryptor-OSX.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -527,7 +504,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				FB30A1FF1B2B7BF300BE5429 /* RNCryptor.swift in Sources */,
-				FBCF49621B441B0600DCFB19 /* ByteArray.swift in Sources */,
 				FBA803DB1B41A3D400B8E4E9 /* Decryptor.swift in Sources */,
 				FBA08AB51B3F480700F97862 /* OverflowingBuffer.swift in Sources */,
 				FBC514E01B3EE76700DB99DE /* Engine.swift in Sources */,
@@ -558,7 +534,6 @@
 				FBCF48EF1B43293400DCFB19 /* Engine.swift in Sources */,
 				FBCF48F01B43293400DCFB19 /* OverflowingBuffer.swift in Sources */,
 				FBCF48F41B43293400DCFB19 /* RNCryptorV3.swift in Sources */,
-				FBCF49681B44358200DCFB19 /* ByteArray.swift in Sources */,
 				FBCF48F71B43293400DCFB19 /* Sliceable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -567,7 +542,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FBCF48E31B43286D00DCFB19 /* RNCryptor_OSXTests.swift in Sources */,
+				FB7174D71BA1CD030026EC7F /* VectorTestHelpers.swift in Sources */,
+				FB7174D81BA1CD030026EC7F /* RNCryptorGeneratedVectorTests.swift in Sources */,
+				FB7174D91BA1CD030026EC7F /* RNCryptorTests.swift in Sources */,
+				FB7174DA1BA1CD030026EC7F /* BufferSinkTests.swift in Sources */,
+				FB7174DB1BA1CD030026EC7F /* ByteStringTests.swift in Sources */,
+				FB7174DC1BA1CDAA0026EC7F /* ByteArray.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -793,7 +773,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
-				INFOPLIST_FILE = CommonCrypto/Info.plist;
+				INFOPLIST_FILE = RNCryptor/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
@@ -813,7 +793,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
-				INFOPLIST_FILE = CommonCrypto/Info.plist;
+				INFOPLIST_FILE = RNCryptor/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
@@ -828,7 +808,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
-				INFOPLIST_FILE = "RNCryptor-OSXTests/Info.plist";
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
+				INFOPLIST_FILE = RNCryptorTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_BUNDLE_IDENTIFIER = "net.robnapier.RNCryptor-OSXTests";
@@ -841,7 +822,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
-				INFOPLIST_FILE = "RNCryptor-OSXTests/Info.plist";
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
+				INFOPLIST_FILE = RNCryptorTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_BUNDLE_IDENTIFIER = "net.robnapier.RNCryptor-OSXTests";

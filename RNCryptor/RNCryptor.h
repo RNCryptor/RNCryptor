@@ -6,7 +6,7 @@
 //  Copyright © 2015 Rob Napier. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+@import Foundation;
 
 //! Project version number for RNCryptor.
 FOUNDATION_EXPORT double RNCryptorVersionNumber;
