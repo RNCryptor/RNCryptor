@@ -9,8 +9,6 @@
 import CommonCrypto
 
 public struct _RNCryptorV3: Equatable {
-    public let version = UInt8(3)
-
     public let keySize = kCCKeySizeAES256
     let ivSize   = kCCBlockSizeAES128
     let hmacSize = Int(CC_SHA256_DIGEST_LENGTH)
@@ -18,6 +16,12 @@ public struct _RNCryptorV3: Equatable {
 
     let keyHeaderSize = 1 + 1 + kCCBlockSizeAES128
     let passwordHeaderSize = 1 + 1 + 8 + 8 + kCCBlockSizeAES128
+
+    // FIXME: I'd rather this be the first thing in the struct for readability,
+    // but as of Xcode 7 7A218, there is a crashing bug in the compiler that 
+    // prevents that: http://www.openradar.me/22702745
+    // When this is fixed, move this up.
+    public let version = UInt8(3)
 
     public func keyForPassword(password: String, salt: [UInt8]) -> [UInt8] {
         var derivedKey = [UInt8](count: self.keySize, repeatedValue: 0)

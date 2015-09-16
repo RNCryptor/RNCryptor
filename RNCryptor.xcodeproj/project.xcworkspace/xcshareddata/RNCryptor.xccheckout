@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>CF2260EC-9B90-4F14-BED5-A3759CE0EADF</string>
+	<key>IDESourceControlProjectName</key>
+	<string>RNCryptor</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>DEDD58F0BAF28034A74179391A23AC2E0219CDC3</key>
+		<string>github.com:RNCryptor/RNCryptor.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>RNCryptor.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>DEDD58F0BAF28034A74179391A23AC2E0219CDC3</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>github.com:RNCryptor/RNCryptor.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>DEDD58F0BAF28034A74179391A23AC2E0219CDC3</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>DEDD58F0BAF28034A74179391A23AC2E0219CDC3</string>
+			<key>IDESourceControlWCCName</key>
+			<string>RNCryptor</string>
+		</dict>
+	</array>
+</dict>
+</plist>
