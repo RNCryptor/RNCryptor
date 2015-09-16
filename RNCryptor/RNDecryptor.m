@@ -24,9 +24,11 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-#import "RNCryptor+Private.h"
 #import "RNDecryptor.h"
+#import "RNCryptor+Private.h"
 #import "RNCryptorEngine.h"
+
+#import <CommonCrypto/CommonHMAC.h>
 
 static const NSUInteger kPreambleSize = 2;
 
@@ -53,9 +55,6 @@ static const NSUInteger kPreambleSize = 2;
 @implementation NSData (RNCryptor_ConstantCompare)
 
 - (BOOL)rnc_isEqualInConsistentTime:(NSData *)otherData {
-  if (!otherData) {
-    return NO;
-  }
   // The point of this routine is XOR the bytes of each data and accumulate the results with OR.
   // If any bytes are different, then the OR will accumulate some non-0 value.
 
@@ -123,7 +122,7 @@ static const NSUInteger kPreambleSize = 2;
   return [self synchronousResultForCryptor:cryptor data:theCipherText error:anError];
 }
 
-+ (NSData *)decryptData:(NSData *)theCipherText withEncryptionKey:(NSData *)encryptionKey HMACKey:(NSData *)HMACKey error:(NSError **)anError
++ (NSData *)decryptData:(NSData *)theCipherText withEncryptionKey:(NSData *)encryptionKey HMACKey:(NSData *)HMACKey error:(NSError **)anError;
 {
   RNDecryptor *cryptor = [[self alloc] initWithEncryptionKey:encryptionKey
                                                      HMACKey:HMACKey
@@ -167,7 +166,7 @@ static const NSUInteger kPreambleSize = 2;
 {
   dispatch_async(self.queue, ^{
     if (self.hasHMAC) {
-      CCHmacUpdate(&self->_HMACContext, data.bytes, data.length);
+      CCHmacUpdate(&_HMACContext, data.bytes, data.length);
     }
 
     NSError *error = nil;
@@ -201,19 +200,13 @@ static const NSUInteger kPreambleSize = 2;
     NSUInteger HMACLength = self.HMACLength;
     if (self.inData.length > HMACLength) {
       NSData *data = [self.inData _RNConsumeToIndex:self.inData.length - HMACLength];
-      if (data) {
-        [self decryptData:data];
-      }
+      [self decryptData:data];
     }
   }
 }
 
 - (BOOL)updateOptionsForPreamble:(NSData *)preamble
 {
-  if (!preamble) {
-    return NO;
-  }
-    
   const uint8_t *bytes = [preamble bytes];
 
   // See http://robnapier.net/blog/rncryptor-hmac-vulnerability-827 for information on the v1 bad HMAC
@@ -320,7 +313,7 @@ static const NSUInteger kPreambleSize = 2;
 
     if (self.hasHMAC) {
       NSMutableData *HMACData = [NSMutableData dataWithLength:self.HMACLength];
-      CCHmacFinal(&self->_HMACContext, [HMACData mutableBytes]);
+      CCHmacFinal(&_HMACContext, [HMACData mutableBytes]);
 
       if (![HMACData rnc_isEqualInConsistentTime:self.inData]) {
         [self cleanupAndNotifyWithError:[NSError errorWithDomain:kRNCryptorErrorDomain

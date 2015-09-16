@@ -25,15 +25,9 @@
 //
 
 #import <Foundation/Foundation.h>
-
-// Swift doesn't like to import these. See https://github.com/RNCryptor/RNCryptor/issues/147
-// When RNCryptor is ported to Swift, we can bring these back. For now, everything we need
-// has been copied into RNCryptor+Swift.h
-//#import <CommonCrypto/CommonCryptor.h>
-//#import <CommonCrypto/CommonKeyDerivation.h>
-#import "RNCryptor+Swift.h"
-
 #import <Security/Security.h>
+
+// NOTE: No CommonCrypto types may be used in this file. Swift can't handle them.
 
 extern NSString *const kRNCryptorErrorDomain;
 extern const uint8_t kRNCryptorFileVersion;
@@ -42,48 +36,25 @@ typedef struct _RNCryptorKeyDerivationSettings
 {
   size_t keySize;
   size_t saltSize;
-  CCPBKDFAlgorithm PBKDFAlgorithm;
-  CCPseudoRandomAlgorithm PRF;
+  /* CCPBKDFAlgorithm */ uint32_t PBKDFAlgorithm;
+  /* CCPseudoRandomAlgorithm */ uint32_t PRF;
   uint rounds;
   BOOL hasV2Password; // See Issue #77. V2 incorrectly handled multi-byte characters.
 } RNCryptorKeyDerivationSettings;
 
 typedef struct _RNCryptorSettings
 {
-  CCAlgorithm algorithm;
+  /* CCAlgorithm */ uint32_t algorithm;
   size_t blockSize;
   size_t IVSize;
-  CCOptions options;
-  CCHmacAlgorithm HMACAlgorithm;
+  /* CCOptions */ uint32_t options;
+  /* CCHmacAlgorithm */ uint32_t HMACAlgorithm;
   size_t HMACLength;
   RNCryptorKeyDerivationSettings keySettings;
   RNCryptorKeyDerivationSettings HMACKeySettings;
 } RNCryptorSettings;
 
-static const RNCryptorSettings kRNCryptorAES256Settings = {
-  .algorithm = kCCAlgorithmAES128,
-  .blockSize = kCCBlockSizeAES128,
-  .IVSize = kCCBlockSizeAES128,
-  .options = kCCOptionPKCS7Padding,
-  .HMACAlgorithm = kCCHmacAlgSHA256,
-  .HMACLength = CC_SHA256_DIGEST_LENGTH,
-
-  .keySettings = {
-    .keySize = kCCKeySizeAES256,
-    .saltSize = 8,
-    .PBKDFAlgorithm = kCCPBKDF2,
-    .PRF = kCCPRFHmacAlgSHA1,
-    .rounds = 10000
-  },
-
-  .HMACKeySettings = {
-    .keySize = kCCKeySizeAES256,
-    .saltSize = 8,
-    .PBKDFAlgorithm = kCCPBKDF2,
-    .PRF = kCCPRFHmacAlgSHA1,
-    .rounds = 10000
-  }
-};
+extern const RNCryptorSettings kRNCryptorAES256Settings;
 
 enum _RNCryptorOptions
 {
