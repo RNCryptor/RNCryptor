@@ -20,6 +20,7 @@ LIC
   s.homepage = 'https://github.com/rnapier/RNCryptor'
   s.source_files = 'RNCryptor/*.{h,m}'
   s.public_header_files = 'RNCryptor/*.h'
+  s.private_header_files = "RNCryptor/RNCryptorEngine.h", "RNCryptor/RNCryptor+Private.h"
   s.requires_arc = true
   s.frameworks = 'Security'
   s.ios.deployment_target = '5.0'
