@@ -46,9 +46,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "659134F21B14262C00B82A96"
-               BuildableName = "RNCryptor iOSTests.xctest"
-               BlueprintName = "RNCryptor iOSTests"
+               BlueprintIdentifier = "FB7564FF1512D3C4007B806B"
+               BuildableName = "RNCryptorTests.xctest"
+               BlueprintName = "RNCryptorTests"
                ReferencedContainer = "container:RNCryptor.xcodeproj">
             </BuildableReference>
          </TestableReference>

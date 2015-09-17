@@ -37,11 +37,6 @@
                BlueprintName = "RNCryptorTests"
                ReferencedContainer = "container:RNCryptor.xcodeproj">
             </BuildableReference>
-            <SkippedTests>
-               <Test
-                  Identifier = "RNCryptorTests">
-               </Test>
-            </SkippedTests>
          </TestableReference>
       </Testables>
    </TestAction>
@@ -54,6 +49,15 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "FB7564EF1512D3C4007B806B"
+            BuildableName = "libRNCryptor.a"
+            BlueprintName = "RNCryptor"
+            ReferencedContainer = "container:RNCryptor.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>

@@ -101,13 +101,11 @@ NSString *const kBadPassword = @"NotThePassword";
       else {
         [buffer setLength:bytesRead];
         [decryptor addData:buffer];
-        NSLog(@"Sent %ld bytes to decryptor", (unsigned long)bytesRead);
       }
     }
   };
 
   decryptor = [[RNDecryptor alloc] initWithPassword:kGoodPassword handler:^(RNCryptor *cryptor, NSData *data) {
-    NSLog(@"Received %lu bytes", (unsigned long)data.length);
     [outputStream write:data.bytes maxLength:data.length];
     if (cryptor.isFinished) {
       [outputStream close];
@@ -154,19 +152,16 @@ NSString *const kBadPassword = @"NotThePassword";
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
-  NSLog(@"didReciveData");
   [self.encryptor addData:data];
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-  NSLog(@"didFailWithError:%@", error);
   self.isTestRunning = NO;
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-  NSLog(@"didFinishLoading");
   [self.encryptor finish];
 }
 
@@ -179,7 +174,7 @@ NSString *const kBadPassword = @"NotThePassword";
 
   NSURLRequest *request = [NSURLRequest requestWithURL:testURL];
   NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
-  NSLog(@"Started connection:%@", connection);
+  [connection start];
 
   self.isTestRunning = YES;
   __block NSMutableData *encryptedData = [NSMutableData data];
@@ -187,7 +182,6 @@ NSString *const kBadPassword = @"NotThePassword";
   self.encryptor = [[RNEncryptor alloc] initWithSettings:kRNCryptorAES256Settings
                                                 password:kGoodPassword
                                                  handler:^(RNCryptor *cryptor, NSData *data) {
-                                                   NSLog(@"handler");
                                                    [encryptedData appendData:data];
                                                    if (cryptor.isFinished) {
                                                      encryptionError = cryptor.error;
