@@ -9,17 +9,7 @@
 import XCTest
 @testable import RNCryptor
 
-class BufferSinkTests: XCTestCase {
-
-    override func setUp() {
-        super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
-
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-        super.tearDown()
-    }
+class OverflowingBufferTest: XCTestCase {
 
     // When a OverflowingBuffer receives less than its capacity, it outputs nothing and holds everything
     func testShort() {
