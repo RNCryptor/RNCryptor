@@ -462,7 +462,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = RN;
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = "Rob Napier";
 				TargetAttributes = {
 					659134E81B14262B00B82A96 = {
@@ -682,6 +682,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MODULEMAP_FILE = "${SRCROOT}/RNCryptor iOS/module.modulemap";
 				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "net.robnapier.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = RNCryptor;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -728,6 +729,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MODULEMAP_FILE = "${SRCROOT}/RNCryptor iOS/module.modulemap";
 				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = "net.robnapier.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = RNCryptor;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -756,6 +758,7 @@
 				INFOPLIST_FILE = "RNCryptor OS X/RNCryptor OS X-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "net.robnapier.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = RNCryptor;
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = framework;
@@ -782,6 +785,7 @@
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				INFOPLIST_FILE = "RNCryptor OS X/RNCryptor OS X-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				PRODUCT_BUNDLE_IDENTIFIER = "net.robnapier.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = RNCryptor;
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = framework;
@@ -837,6 +841,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
 				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -917,6 +922,7 @@
 				GCC_PREFIX_HEADER = "RNCryptor/RNCryptor-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				INFOPLIST_FILE = "RNCryptorTests/RNCryptorTests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "net.robnapier.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = RNCryptorTests;
 			};
 			name = Debug;
@@ -932,6 +938,7 @@
 				GCC_PREFIX_HEADER = "RNCryptor/RNCryptor-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
 				INFOPLIST_FILE = "RNCryptorTests/RNCryptorTests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "net.robnapier.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = RNCryptorTests;
 			};
 			name = Release;
