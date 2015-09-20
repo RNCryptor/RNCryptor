@@ -60,7 +60,7 @@ func verify_v3_key(vector: [String: String]) {
         verifyVector(vector, key:"ciphertext_hex", equals:ciphertext, name:"key encrypt")
     }
 
-    let decryptor = Decryptor(
+    let decryptor = DecryptorV3(
         encryptionKey: vector["enc_key_hex"]!.byteArrayFromHexEncoding!,
         hmacKey: vector["hmac_key_hex"]!.byteArrayFromHexEncoding!)
     do {

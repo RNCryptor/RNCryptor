@@ -8,6 +8,11 @@
 
 import CommonCrypto
 
+private enum Credential {
+    case Password(String)
+    case Keys(encryptionKey: [UInt8], hmacKey: [UInt8])
+}
+
 public struct _RNCryptorV3: Equatable {
     public let keySize = kCCKeySizeAES256
     let ivSize   = kCCBlockSizeAES128
@@ -106,7 +111,7 @@ public final class EncryptorV3 : CryptorType {
     }
 
     public func encrypt(data: [UInt8]) -> [UInt8] {
-        return try! process(self, data: data)
+        return try! oneshot(data)
     }
 
     private func handle(data: [UInt8]) -> [UInt8] {
@@ -133,66 +138,124 @@ public final class EncryptorV3 : CryptorType {
     }
 }
 
-final class DecryptorV3: CryptorType {
-    private let buffer: OverflowingBuffer
-    private let hmac: HMACV3
-    private let engine: Engine
-
-    private init(encryptionKey: [UInt8], hmacKey: [UInt8], iv: [UInt8], header: [UInt8]) {
-        precondition(encryptionKey.count == V3.keySize)
-        precondition(hmacKey.count == V3.hmacSize)
-        precondition(iv.count == V3.ivSize)
-
-        self.hmac = HMACV3(key: hmacKey)
-        self.hmac.update(header)
-        self.buffer = OverflowingBuffer(capacity: V3.hmacSize)
-        self.engine = Engine(operation: .Decrypt, key: encryptionKey, iv: iv)
+public final class DecryptorV3: PasswordDecryptorType {
+    static let preambleSize = 1
+    static func canDecrypt(preamble: ArraySlice<UInt8>) -> Bool {
+        assert(preamble.count == 1)
+        return preamble[0] == 3
     }
 
-    convenience internal init?(password: String, header: [UInt8]) {
-        guard
-            password != "" &&
-                header.count == V3.passwordHeaderSize &&
-                header[0] == V3.version &&
-                header[1] == 1
-            else {
-                return nil
+    var requiredHeaderSize: Int {
+        switch credential {
+        case .Password(_): return V3.passwordHeaderSize
+        case .Keys(_, _): return V3.keyHeaderSize
+        }
+    }
+    
+    private var buffer = [UInt8]()
+    private var decryptorEngine: DecryptorEngineV3?
+    private let credential: Credential
+
+    public init(password: String) {
+        credential = .Password(password)
+    }
+
+    public init(encryptionKey: [UInt8], hmacKey: [UInt8]) {
+        precondition(encryptionKey.count == V3.keySize)
+        precondition(hmacKey.count == V3.hmacSize)
+        credential = .Keys(encryptionKey: encryptionKey, hmacKey: hmacKey)
+    }
+
+    public func decrypt(data: [UInt8]) throws -> [UInt8] {
+        return try oneshot(data)
+    }
+
+    public func update(data: [UInt8]) throws -> [UInt8] {
+        if let e = decryptorEngine {
+            return try e.update(data)
+        }
+
+        buffer += data
+        guard buffer.count >= requiredHeaderSize else {
+            return []
+        }
+
+        let e = try createEngineWithCredential(credential, header: buffer[0..<requiredHeaderSize])
+        decryptorEngine = e
+        return try e.update(Array(buffer[requiredHeaderSize..<buffer.endIndex])) // FIXME: Remove copy
+    }
+
+    private func createEngineWithCredential(credential: Credential, header: ArraySlice<UInt8>) throws -> DecryptorEngineV3 {
+        switch credential {
+        case let .Password(password):
+            return try createEngineWithPassword(password, header: header)
+        case let .Keys(encryptionKey, hmacKey):
+            return try createEngineWithKeys(encryptionKey: encryptionKey, hmacKey: hmacKey, header: header)
+        }
+    }
+
+    private func createEngineWithPassword(password: String, header: ArraySlice<UInt8>) throws -> DecryptorEngineV3 {
+        assert(password != "")
+        precondition(header.count == V3.passwordHeaderSize)
+        precondition(header[0] == V3.version)
+
+        guard header[1] == 1 else {
+            throw Error.InvalidCredentialType
         }
 
         let encryptionSalt = Array(header[2...9])
         let hmacSalt = Array(header[10...17])
         let iv = Array(header[18...33])
-
+        
         let encryptionKey = V3.keyForPassword(password, salt: encryptionSalt)
         let hmacKey = V3.keyForPassword(password, salt: hmacSalt)
-
-        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
+        
+        return DecryptorEngineV3(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
     }
 
-    convenience internal init?(encryptionKey: [UInt8], hmacKey: [UInt8], header: [UInt8]) {
-        guard
-            header.count == V3.keyHeaderSize &&
-                header[0] == V3.version &&
-                header[1] == 0 &&
-                encryptionKey.count == V3.keySize &&
-                hmacKey.count == V3.keySize
-            else {
-                return nil
-        }
+    private func createEngineWithKeys(encryptionKey encryptionKey: [UInt8], hmacKey: [UInt8], header: ArraySlice<UInt8>) throws -> DecryptorEngineV3 {
+        precondition(header.count == V3.keyHeaderSize)
+        precondition(header[0] == V3.version)
+        precondition(encryptionKey.count == V3.keySize)
+        precondition(hmacKey.count == V3.keySize)
 
         let iv = Array(header[2..<18])
-        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
+        return DecryptorEngineV3(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
+    }
+
+
+    func final() throws -> [UInt8] {
+        guard let result = try decryptorEngine?.final() else {
+            throw Error.MessageTooShort
+        }
+        return result
+    }
+}
+
+private final class DecryptorEngineV3 {
+    private let buffer = OverflowingBuffer(capacity: V3.hmacSize)
+    private var hmac: HMACV3
+    private var engine: Engine
+
+    init(encryptionKey: [UInt8], hmacKey: [UInt8], iv: [UInt8], header: ArraySlice<UInt8>) {
+        precondition(encryptionKey.count == V3.keySize)
+        precondition(hmacKey.count == V3.hmacSize)
+        precondition(iv.count == V3.ivSize)
+
+        hmac = HMACV3(key: hmacKey)
+        hmac.update(header)
+        engine = Engine(operation: .Decrypt, key: encryptionKey, iv: iv)
     }
 
     func update(data: [UInt8]) throws -> [UInt8] {
-        let result = buffer.update(data)
-        self.hmac.update(result)
-        return try self.engine.update(result)
+        let overflow = buffer.update(data)
+        self.hmac.update(overflow)
+        return try engine.update(overflow)
     }
 
     func final() throws -> [UInt8] {
-        let result = try self.engine.final()
-        let hash = self.hmac.final()
+        let result = try engine.final()
+        let hash = hmac.final()
         if !isEqualInConsistentTime(trusted: hash, untrusted: self.buffer.final()) {
             throw Error.HMACMismatch
         }
@@ -212,7 +275,12 @@ private final class HMACV3 {
         )
     }
 
+    // FIXME: Hoist this repetion to Buffer type
     func update(data: [UInt8]) {
+        data.withUnsafeBufferPointer(self.update)
+    }
+
+    func update(data: ArraySlice<UInt8>) {
         data.withUnsafeBufferPointer(self.update)
     }
 

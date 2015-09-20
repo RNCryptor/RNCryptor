@@ -6,54 +6,57 @@
 //  Copyright © 2015 Rob Napier. All rights reserved.
 //
 
-public final class Decryptor : CryptorType {
-    private let decryptors: [(headerLength: Int, builder: ([UInt8]) -> CryptorType?)]
-    private var buffer: [UInt8] = []
+protocol PasswordDecryptorType: CryptorType {
+    static var preambleSize: Int { get }
+    static func canDecrypt(preamble: ArraySlice<UInt8>) -> Bool
+    init(password: String)
+}
 
+public final class Decryptor : CryptorType {
+    private let decryptors: [PasswordDecryptorType.Type] = [DecryptorV3.self]
+    private var buffer: [UInt8] = []
     private var decryptor: CryptorType?
+    private let password: String
 
     public init(password: String) {
         assert(password != "")
-
-        self.decryptors = [
-            (V3.passwordHeaderSize, { DecryptorV3(password: password, header: $0) as CryptorType? })
-        ]
-    }
-
-    public init(encryptionKey: [UInt8], hmacKey: [UInt8]) {
-        self.decryptors = [
-            (V3.keyHeaderSize, { DecryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey, header: $0) as CryptorType? })
-        ]
+        self.password = password
     }
 
     public func decrypt(data: [UInt8]) throws -> [UInt8] {
-        return try process(self, data: data)
+        return try oneshot(data)
     }
 
     func update(data: [UInt8]) throws -> [UInt8] {
-        if let decryptor = self.decryptor {
-            return try decryptor.update(data)
+        if let d = decryptor {
+            return try d.update(data)
         }
 
-        let maxHeaderLength = decryptors.reduce(0) { max($0, $1.headerLength) }
-        guard self.buffer.count + data.count >= maxHeaderLength else {
-            self.buffer += data
+        buffer += data
+
+        // FIXME: This assumes that the largest preamble is smaller than the smallest possible total message.
+        // Change to test decryptors as soon as we know they're large enough.
+        let maxHeaderLength = decryptors.reduce(0) { max($0, $1.preambleSize) }
+        guard buffer.count >= maxHeaderLength else {
             return []
         }
 
         for decryptorType in self.decryptors {
-            let (dataHeader, content) = data.splitAt(decryptorType.headerLength - self.buffer.count)
-            let header = self.buffer + dataHeader
-            if let decryptor = decryptorType.builder(header) {
-                self.decryptor = decryptor
-                self.buffer.removeAll()
-                return try decryptor.update(Array(content)) // FIXME: Remove copy
+            if decryptorType.canDecrypt(buffer[0..<decryptorType.preambleSize]) {
+                let d = decryptorType.init(password: password)
+                decryptor = d
+                let result = try d.update(buffer)
+                buffer.removeAll()
+                return result
             }
         }
         throw Error.UnknownHeader
     }
 
     func final() throws -> [UInt8] {
-        return try self.decryptor?.final() ?? []
+        guard let d = decryptor else {
+            throw Error.UnknownHeader
+        }
+        return try d.final()
     }
 }

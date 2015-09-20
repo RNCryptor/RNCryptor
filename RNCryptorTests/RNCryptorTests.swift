@@ -69,7 +69,7 @@ class RNCryptorTests: XCTestCase {
         let plaintext = "01".byteArrayFromHexEncoding!
         let ciphertext = "03000203 04050607 08090a0b 0c0d0e0f 0001981b 22e7a644 8118d695 bd654f72 e9d6ed75 ec14ae2a a067eed2 a98a56e0 993dfe22 ab5887b3 f6e3cdd4 0767f519 5eb5".byteArrayFromHexEncoding!
 
-        let decryptor = Decryptor(encryptionKey: encryptKey, hmacKey: hmacKey)
+        let decryptor = DecryptorV3(encryptionKey: encryptKey, hmacKey: hmacKey)
         do {
             let decrypted = try decryptor.decrypt(ciphertext)
             XCTAssertEqual(decrypted, plaintext)
@@ -116,7 +116,7 @@ class RNCryptorTests: XCTestCase {
 
         let plaintext: [UInt8]
         do {
-            plaintext = try Decryptor(encryptionKey: encryptionKey, hmacKey: hmacKey).decrypt(ciphertext)
+            plaintext = try DecryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey).decrypt(ciphertext)
         } catch {
             plaintext = [0xaa]
             XCTFail("Caught: \(error)")

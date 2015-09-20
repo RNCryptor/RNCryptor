@@ -20,6 +20,7 @@ public enum Error: ErrorType {
     case MessageTooShort
     case MemoryFailure
     case ParameterError
+    case InvalidCredentialType
 }
 
 internal func randomDataOfLength(length: Int) -> [UInt8] {
@@ -38,9 +39,9 @@ internal protocol CryptorType {
 }
 
 internal extension CryptorType {
-    internal func process(cryptor: CryptorType, data: [UInt8]) throws -> [UInt8] {
-        var result = try cryptor.update(data)
-        result += try cryptor.final()
+    internal func oneshot(data: [UInt8]) throws -> [UInt8] {
+        var result = try update(data)
+        result += try final()
         return result
     }
 }
