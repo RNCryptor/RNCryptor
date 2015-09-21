@@ -13,22 +13,18 @@ private enum Credential {
     case Keys(encryptionKey: [UInt8], hmacKey: [UInt8])
 }
 
-public struct _RNCryptorV3: Equatable {
-    public let keySize = kCCKeySizeAES256
-    let ivSize   = kCCBlockSizeAES128
-    let hmacSize = Int(CC_SHA256_DIGEST_LENGTH)
-    let saltSize = 8
+public struct RNCryptorV3 {
+    static public let version = UInt8(3)
+    static public let keySize = kCCKeySizeAES256
 
-    let keyHeaderSize = 1 + 1 + kCCBlockSizeAES128
-    let passwordHeaderSize = 1 + 1 + 8 + 8 + kCCBlockSizeAES128
+    static let ivSize   = kCCBlockSizeAES128
+    static let hmacSize = Int(CC_SHA256_DIGEST_LENGTH)
+    static let saltSize = 8
 
-    // FIXME: I'd rather this be the first thing in the struct for readability,
-    // but as of Xcode 7 7A218, there is a crashing bug in the compiler that 
-    // prevents that: http://www.openradar.me/22702745
-    // When this is fixed, move this up.
-    public let version = UInt8(3)
+    static let keyHeaderSize = 1 + 1 + kCCBlockSizeAES128
+    static let passwordHeaderSize = 1 + 1 + 8 + 8 + kCCBlockSizeAES128
 
-    public func keyForPassword(password: String, salt: [UInt8]) -> [UInt8] {
+    static public func keyForPassword(password: String, salt: [UInt8]) -> [UInt8] {
         var derivedKey = [UInt8](count: self.keySize, repeatedValue: 0)
 
         // utf8 returns [UInt8], but CCKeyDerivationPBKDF takes [Int8]
@@ -52,15 +48,9 @@ public struct _RNCryptorV3: Equatable {
         }
         return derivedKey
     }
-    private init() {} // no one else may create one
 }
 
-public let RNCryptorV3 = _RNCryptorV3()
-internal let V3 = RNCryptorV3
-
-public func ==(lhs: _RNCryptorV3, rhs: _RNCryptorV3) -> Bool {
-    return true // It's constant
-}
+internal typealias V3 = RNCryptorV3
 
 public final class EncryptorV3 : CryptorType {
     private var engine: Engine
