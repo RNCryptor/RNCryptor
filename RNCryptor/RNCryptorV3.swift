@@ -118,7 +118,10 @@ public final class EncryptorV3 : CryptorType {
     }
 
     public func update(data: [UInt8]) -> [UInt8] {
-        return try! handle(engine.update(data))
+        return data.withUnsafeBufferPointer {
+            // It should not be possible for this to fail during encryption
+            return try! handle(engine.update($0))
+        }
     }
 
     public func final() -> [UInt8] {
@@ -141,7 +144,7 @@ public final class DecryptorV3: PasswordDecryptorType {
         case .Keys(_, _): return V3.keyHeaderSize
         }
     }
-    
+
     private var buffer = [UInt8]()
     private var decryptorEngine: DecryptorEngineV3?
     private let credential: Credential
@@ -172,7 +175,9 @@ public final class DecryptorV3: PasswordDecryptorType {
 
         let e = try createEngineWithCredential(credential, header: buffer[0..<requiredHeaderSize])
         decryptorEngine = e
-        return try e.update(Array(buffer[requiredHeaderSize..<buffer.endIndex])) // FIXME: Remove copy
+        let body = buffer[requiredHeaderSize..<buffer.endIndex]
+        buffer = []
+        return try body.withUnsafeBufferPointer(e.update)
     }
 
     private func createEngineWithCredential(credential: Credential, header: ArraySlice<UInt8>) throws -> DecryptorEngineV3 {
@@ -196,10 +201,10 @@ public final class DecryptorV3: PasswordDecryptorType {
         let encryptionSalt = Array(header[2...9])
         let hmacSalt = Array(header[10...17])
         let iv = Array(header[18...33])
-        
+
         let encryptionKey = V3.keyForPassword(password, salt: encryptionSalt)
         let hmacKey = V3.keyForPassword(password, salt: hmacSalt)
-        
+
         return DecryptorEngineV3(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
     }
 
@@ -238,9 +243,15 @@ private final class DecryptorEngineV3 {
     }
 
     func update(data: [UInt8]) throws -> [UInt8] {
+        return try data.withUnsafeBufferPointer(update)
+    }
+
+    func update(data: UnsafeBufferPointer<UInt8>) throws -> [UInt8] {
         let overflow = buffer.update(data)
         self.hmac.update(overflow)
-        return try engine.update(overflow)
+        return try overflow.withUnsafeBufferPointer {
+            try engine.update($0)
+        }
     }
 
     func final() throws -> [UInt8] {
@@ -265,13 +276,13 @@ private final class HMACV3 {
         )
     }
 
-    // FIXME: Hoist this repetion to Buffer type
+    // FIXME: Hoist this repetion to Buffer type?
     func update(data: [UInt8]) {
-        data.withUnsafeBufferPointer(self.update)
+        data.withUnsafeBufferPointer(update)
     }
 
     func update(data: ArraySlice<UInt8>) {
-        data.withUnsafeBufferPointer(self.update)
+        data.withUnsafeBufferPointer(update)
     }
 
     func update(data: UnsafeBufferPointer<UInt8>) {

@@ -18,6 +18,11 @@ internal class OverflowingBuffer {
 
     @warn_unused_result
     func update(data: [UInt8]) -> [UInt8] {
+        return data.withUnsafeBufferPointer(update)
+    }
+
+    @warn_unused_result
+    func update(data: UnsafeBufferPointer<UInt8>) -> [UInt8] {
         if data.count >= capacity {
             return sendAllArray(data)
         } else if array.count + data.count <= capacity {
@@ -32,7 +37,7 @@ internal class OverflowingBuffer {
         return array
     }
 
-    private func sendAllArray(data: [UInt8]) -> [UInt8] {
+    private func sendAllArray(data: UnsafeBufferPointer<UInt8>) -> [UInt8] {
         let toSend = data.count - capacity
         assert(toSend >= 0)
 
@@ -41,13 +46,14 @@ internal class OverflowingBuffer {
         return result
     }
 
-    private func sendSomeArray(data: [UInt8]) -> [UInt8] {
+    private func sendSomeArray(data: UnsafeBufferPointer<UInt8>) -> [UInt8] {
         let toSend = (array.count + data.count) - capacity
         assert(toSend > 0) // If it were <= 0, we would have extended the array
         assert(toSend < array.count) // If we would have sent everything, replaceBuffer should have been called
 
         let result = Array(array.prefixUpTo(toSend))
-        array = array.dropFirst(toSend) + data
+        array.removeFirst(toSend)
+        array += data
         return result
     }
 }

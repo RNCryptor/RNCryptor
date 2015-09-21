@@ -51,18 +51,20 @@ internal final class Engine {
     }
 
     func update(data: [UInt8]) throws -> [UInt8] {
+        return try data.withUnsafeBufferPointer(update)
+    }
+
+    func update(data: UnsafeBufferPointer<UInt8>) throws -> [UInt8] {
         let outputLength = sizeBufferForDataOfLength(data.count)
         var dataOutMoved: Int = 0
 
         var result: CCCryptorStatus = CCCryptorStatus(kCCUnimplemented)
 
-        data.withUnsafeBufferPointer { buf in
-            result = CCCryptorUpdate(
-                self.cryptor,
-                buf.baseAddress, buf.count,
-                &buffer, outputLength,
-                &dataOutMoved)
-        }
+        result = CCCryptorUpdate(
+            self.cryptor,
+            data.baseAddress, data.count,
+            &buffer, outputLength,
+            &dataOutMoved)
 
         // The only error returned by CCCryptorUpdate is kCCBufferTooSmall, which would be a programming error
         assert(result == CCCryptorStatus(kCCSuccess))
