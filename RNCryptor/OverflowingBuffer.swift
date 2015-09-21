@@ -33,16 +33,11 @@ internal class OverflowingBuffer {
     }
 
     private func sendAllArray(data: [UInt8]) -> [UInt8] {
-        let (send, keep) = data.splitAt(data.count - capacity)
-        var result = [UInt8]()
-        assert(keep.count == capacity)
-        if array.count > 0 { // Send the whole current array
-            result += array
-        }
-        if send.count > 0 { // Send what needs sending of data
-            result += send
-        }
-        array = Array(keep) // Keep the rest
+        let toSend = data.count - capacity
+        assert(toSend >= 0)
+
+        let result = array + data.prefixUpTo(toSend)
+        array = Array(data.dropFirst(toSend))
         return result
     }
 
@@ -51,8 +46,8 @@ internal class OverflowingBuffer {
         assert(toSend > 0) // If it were <= 0, we would have extended the array
         assert(toSend < array.count) // If we would have sent everything, replaceBuffer should have been called
 
-        let (send, keep) = array.splitAt(toSend)
-        array = keep + data
-        return Array(send)
+        let result = Array(array.prefixUpTo(toSend))
+        array = array.dropFirst(toSend) + data
+        return result
     }
 }

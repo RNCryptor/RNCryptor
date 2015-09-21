@@ -21,7 +21,6 @@
 		FB7174D91BA1CD030026EC7F /* RNCryptorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB627FDD1B2B7A1800C3A579 /* RNCryptorTests.swift */; };
 		FB7174DA1BA1CD030026EC7F /* OverfowingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA08AB81B40589400F97862 /* OverfowingBuffer.swift */; };
 		FB7174DC1BA1CDAA0026EC7F /* ByteArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBCF49611B441B0600DCFB19 /* ByteArray.swift */; settings = {ASSET_TAGS = (); }; };
-		FBA08AB11B3F450F00F97862 /* Sliceable.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA08AB01B3F450F00F97862 /* Sliceable.swift */; };
 		FBA08AB51B3F480700F97862 /* OverflowingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA08AB41B3F480700F97862 /* OverflowingBuffer.swift */; };
 		FBA08AB91B40589400F97862 /* OverfowingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA08AB81B40589400F97862 /* OverfowingBuffer.swift */; };
 		FBA803DB1B41A3D400B8E4E9 /* Decryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA803DA1B41A3D400B8E4E9 /* Decryptor.swift */; };
@@ -32,7 +31,6 @@
 		FBCF48EF1B43293400DCFB19 /* Engine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBC514DF1B3EE76700DB99DE /* Engine.swift */; };
 		FBCF48F01B43293400DCFB19 /* OverflowingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA08AB41B3F480700F97862 /* OverflowingBuffer.swift */; };
 		FBCF48F41B43293400DCFB19 /* RNCryptorV3.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB07CE061B41BCE7003AF727 /* RNCryptorV3.swift */; };
-		FBCF48F71B43293400DCFB19 /* Sliceable.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA08AB01B3F450F00F97862 /* Sliceable.swift */; };
 		FBCF49011B432A8000DCFB19 /* CommonCrypto.h in Headers */ = {isa = PBXBuildFile; fileRef = FB30A2071B2B86FD00BE5429 /* CommonCrypto.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FBCF490A1B432AA600DCFB19 /* CommonCrypto.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBCF49061B432A8000DCFB19 /* CommonCrypto.framework */; };
 		FBCF49671B44358100DCFB19 /* ByteArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBCF49611B441B0600DCFB19 /* ByteArray.swift */; };
@@ -88,7 +86,6 @@
 		FB627FD81B2B7A1800C3A579 /* RNCryptorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RNCryptorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB627FDD1B2B7A1800C3A579 /* RNCryptorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNCryptorTests.swift; sourceTree = "<group>"; };
 		FB627FDF1B2B7A1800C3A579 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		FBA08AB01B3F450F00F97862 /* Sliceable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sliceable.swift; sourceTree = "<group>"; };
 		FBA08AB41B3F480700F97862 /* OverflowingBuffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OverflowingBuffer.swift; sourceTree = "<group>"; };
 		FBA08AB81B40589400F97862 /* OverfowingBuffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OverfowingBuffer.swift; sourceTree = "<group>"; };
 		FBA803DA1B41A3D400B8E4E9 /* Decryptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Decryptor.swift; sourceTree = "<group>"; };
@@ -233,7 +230,6 @@
 			isa = PBXGroup;
 			children = (
 				FBA08AB41B3F480700F97862 /* OverflowingBuffer.swift */,
-				FBA08AB01B3F450F00F97862 /* Sliceable.swift */,
 			);
 			name = Helpers;
 			sourceTree = "<group>";
@@ -504,7 +500,6 @@
 				FBA08AB51B3F480700F97862 /* OverflowingBuffer.swift in Sources */,
 				FBC514E01B3EE76700DB99DE /* Engine.swift in Sources */,
 				FB07CE071B41BCE7003AF727 /* RNCryptorV3.swift in Sources */,
-				FBA08AB11B3F450F00F97862 /* Sliceable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -529,7 +524,6 @@
 				FBCF48EF1B43293400DCFB19 /* Engine.swift in Sources */,
 				FBCF48F01B43293400DCFB19 /* OverflowingBuffer.swift in Sources */,
 				FBCF48F41B43293400DCFB19 /* RNCryptorV3.swift in Sources */,
-				FBCF48F71B43293400DCFB19 /* Sliceable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
