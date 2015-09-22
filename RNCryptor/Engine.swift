@@ -14,7 +14,7 @@ public enum CryptorOperation: CCOperation {
     case Decrypt = 1 // CCOperation(kCCDecrypt)
 }
 
-internal final class Engine: Updater {
+internal final class Engine: CryptorType {
     private let cryptor: CCCryptorRef
     private var buffer = [UInt8]()
 

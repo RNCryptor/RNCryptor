@@ -34,17 +34,21 @@ internal func randomDataOfLength(length: Int) -> [UInt8] {
 }
 
 internal protocol CryptorType {
-    func update(data: [UInt8]) throws -> [UInt8]
+    func update(data: UnsafeBufferPointer<UInt8>) throws -> [UInt8]
     func final() throws -> [UInt8]
 }
 
 internal extension CryptorType {
+    func update(data: [UInt8]) throws -> [UInt8] {
+        return try data.withUnsafeBufferPointer(update)
+    }
     internal func oneshot(data: [UInt8]) throws -> [UInt8] {
         var result = try update(data)
         result += try final()
         return result
     }
 }
+
 
 public typealias Encryptor = EncryptorV3
 
@@ -72,12 +76,3 @@ func isEqualInConsistentTime(trusted trusted: [UInt8], untrusted: [UInt8]) -> Bo
     
 }
 
-protocol Updater {
-    func update(data: UnsafeBufferPointer<UInt8>) throws -> [UInt8]
-}
-
-extension Updater {
-    func update(data: [UInt8]) throws -> [UInt8] {
-        return try data.withUnsafeBufferPointer(update)
-    }
-}

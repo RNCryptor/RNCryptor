@@ -27,7 +27,7 @@ public final class Decryptor : CryptorType {
         return try oneshot(data)
     }
 
-    func update(data: [UInt8]) throws -> [UInt8] {
+    func update(data: UnsafeBufferPointer<UInt8>) throws -> [UInt8] {
         if let d = decryptor {
             return try d.update(data)
         }
