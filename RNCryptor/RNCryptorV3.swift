@@ -117,7 +117,7 @@ public final class EncryptorV3 : CryptorType {
         return result
     }
 
-    func update(data: UnsafeBufferPointer<UInt8>) throws -> [UInt8] {
+    public func update(data: UnsafeBufferPointer<UInt8>) throws -> [UInt8] {
         // It should not be possible for this to fail during encryption
         return try! handle(engine.update(data))
     }
@@ -161,7 +161,7 @@ public final class DecryptorV3: PasswordDecryptorType {
         return try oneshot(data)
     }
 
-    func update(data: UnsafeBufferPointer<UInt8>) throws -> [UInt8] {
+    public func update(data: UnsafeBufferPointer<UInt8>) throws -> [UInt8] {
         if let e = decryptorEngine {
             return try e.update(data)
         }
@@ -216,8 +216,7 @@ public final class DecryptorV3: PasswordDecryptorType {
         return DecryptorEngineV3(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
     }
 
-
-    func final() throws -> [UInt8] {
+    public func final() throws -> [UInt8] {
         guard let result = try decryptorEngine?.final() else {
             throw Error.MessageTooShort
         }

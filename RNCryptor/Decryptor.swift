@@ -27,7 +27,7 @@ public final class Decryptor : CryptorType {
         return try oneshot(data)
     }
 
-    func update(data: UnsafeBufferPointer<UInt8>) throws -> [UInt8] {
+    public func update(data: UnsafeBufferPointer<UInt8>) throws -> [UInt8] {
         if let d = decryptor {
             return try d.update(data)
         }
@@ -53,7 +53,7 @@ public final class Decryptor : CryptorType {
         throw Error.UnknownHeader
     }
 
-    func final() throws -> [UInt8] {
+    public func final() throws -> [UInt8] {
         guard let d = decryptor else {
             throw Error.UnknownHeader
         }
