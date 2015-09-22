@@ -71,3 +71,13 @@ func isEqualInConsistentTime(trusted trusted: [UInt8], untrusted: [UInt8]) -> Bo
     return result == 0
     
 }
+
+protocol Updater {
+    func update(data: UnsafeBufferPointer<UInt8>) throws -> [UInt8]
+}
+
+extension Updater {
+    func update(data: [UInt8]) throws -> [UInt8] {
+        return try data.withUnsafeBufferPointer(update)
+    }
+}

@@ -227,7 +227,7 @@ public final class DecryptorV3: PasswordDecryptorType {
     }
 }
 
-private final class DecryptorEngineV3 {
+private final class DecryptorEngineV3: Updater {
     private let buffer = OverflowingBuffer(capacity: V3.hmacSize)
     private var hmac: HMACV3
     private var engine: Engine
@@ -240,10 +240,6 @@ private final class DecryptorEngineV3 {
         hmac = HMACV3(key: hmacKey)
         hmac.update(header)
         engine = Engine(operation: .Decrypt, key: encryptionKey, iv: iv)
-    }
-
-    func update(data: [UInt8]) throws -> [UInt8] {
-        return try data.withUnsafeBufferPointer(update)
     }
 
     func update(data: UnsafeBufferPointer<UInt8>) throws -> [UInt8] {

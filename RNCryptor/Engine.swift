@@ -14,7 +14,7 @@ public enum CryptorOperation: CCOperation {
     case Decrypt = 1 // CCOperation(kCCDecrypt)
 }
 
-internal final class Engine {
+internal final class Engine: Updater {
     private let cryptor: CCCryptorRef
     private var buffer = [UInt8]()
 
@@ -48,10 +48,6 @@ internal final class Engine {
             buffer += [UInt8](count: delta, repeatedValue:0)
         }
         return size
-    }
-
-    func update(data: [UInt8]) throws -> [UInt8] {
-        return try data.withUnsafeBufferPointer(update)
     }
 
     func update(data: UnsafeBufferPointer<UInt8>) throws -> [UInt8] {
