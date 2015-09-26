@@ -12,8 +12,24 @@ protocol PasswordDecryptorType: CryptorType {
     init(password: String)
 }
 
+private extension CollectionType {
+    func splitPassFail(pred: Generator.Element -> Bool) -> ([Generator.Element], [Generator.Element]) {
+        var pass: [Generator.Element] = []
+        var fail: [Generator.Element] = []
+        for e in self {
+            if pred(e) {
+                pass.append(e)
+            } else {
+                fail.append(e)
+            }
+        }
+        return (pass, fail)
+    }
+}
+
 public final class Decryptor : CryptorType {
-    private let decryptors: [PasswordDecryptorType.Type] = [DecryptorV3.self]
+    private var decryptors: [PasswordDecryptorType.Type] = [DecryptorV3.self]
+
     private var buffer: [UInt8] = []
     private var decryptor: CryptorType?
     private let password: String
@@ -34,14 +50,10 @@ public final class Decryptor : CryptorType {
 
         buffer += data
 
-        // FIXME: This assumes that the largest preamble is smaller than the smallest possible total message.
-        // Change to test decryptors as soon as we know they're large enough.
-        let maxHeaderLength = decryptors.reduce(0) { max($0, $1.preambleSize) }
-        guard buffer.count >= maxHeaderLength else {
-            return []
-        }
+        let toCheck:[PasswordDecryptorType.Type]
+        (toCheck, decryptors) = decryptors.splitPassFail{ self.buffer.count >= $0.preambleSize }
 
-        for decryptorType in self.decryptors {
+        for decryptorType in toCheck {
             if decryptorType.canDecrypt(buffer[0..<decryptorType.preambleSize]) {
                 let d = decryptorType.init(password: password)
                 decryptor = d
@@ -50,7 +62,9 @@ public final class Decryptor : CryptorType {
                 return result
             }
         }
-        throw Error.UnknownHeader
+
+        guard !decryptors.isEmpty else { throw Error.UnknownHeader }
+        return []
     }
 
     public func final() throws -> [UInt8] {
