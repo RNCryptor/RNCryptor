@@ -12,8 +12,6 @@ import CommonCrypto
 
 public let CCErrorDomain = "com.apple.CommonCrypto"
 
-internal let FormatVersion = 3
-
 public enum Error: ErrorType {
     case HMACMismatch
     case UnknownHeader
@@ -39,7 +37,7 @@ public protocol CryptorType {
 }
 
 public extension CryptorType {
-    func update(data: [UInt8]) throws -> [UInt8] {
+    public func update(data: [UInt8]) throws -> [UInt8] {
         return try data.withUnsafeBufferPointer(update)
     }
     internal func oneshot(data: [UInt8]) throws -> [UInt8] {
@@ -48,7 +46,6 @@ public extension CryptorType {
         return result
     }
 }
-
 
 public typealias Encryptor = EncryptorV3
 
@@ -73,6 +70,5 @@ func isEqualInConsistentTime(trusted trusted: [UInt8], untrusted: [UInt8]) -> Bo
     }
 
     return result == 0
-    
 }
 
