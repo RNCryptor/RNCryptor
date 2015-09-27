@@ -36,14 +36,38 @@ public protocol CryptorType {
     func final() throws -> [UInt8]
 }
 
+internal extension NSData {
+    var unsafeBufferPointer: UnsafeBufferPointer<UInt8> {
+        return UnsafeBufferPointer(start: UnsafePointer<UInt8>(self.bytes), count: self.length)
+    }
+    convenience init(bytes: [UInt8]) {
+        self.init(bytes: bytes, length: bytes.count)
+    }
+}
+
 public extension CryptorType {
     public func update(data: [UInt8]) throws -> [UInt8] {
         return try data.withUnsafeBufferPointer(update)
     }
+    public func updateData(data: NSData) throws -> NSData {
+        return NSData(bytes: try update(data.unsafeBufferPointer))
+    }
+    public func finalData() throws -> NSData {
+        return NSData(bytes: try final())
+    }
+
     internal func oneshot(data: [UInt8]) throws -> [UInt8] {
+        return try data.withUnsafeBufferPointer(oneshot)
+    }
+
+    internal func oneshot(data: UnsafeBufferPointer<UInt8>) throws -> [UInt8] {
         var result = try update(data)
         result += try final()
         return result
+    }
+
+    internal func oneshotData(data: NSData) throws -> NSData {
+        return NSData(bytes: try oneshot(data.unsafeBufferPointer))
     }
 }
 

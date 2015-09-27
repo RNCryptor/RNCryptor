@@ -43,6 +43,10 @@ public final class Decryptor : CryptorType {
         return try oneshot(data)
     }
 
+    public func decryptData(data: NSData) throws -> NSData {
+        return try oneshotData(data)
+    }
+
     public func update(data: UnsafeBufferPointer<UInt8>) throws -> [UInt8] {
         if let d = decryptor {
             return try d.update(data)

@@ -104,6 +104,10 @@ public final class EncryptorV3 : CryptorType {
         return try! oneshot(data)
     }
 
+    public func encryptData(data: NSData) -> NSData {
+        return try! oneshotData(data)
+    }
+
     private func handle(data: [UInt8]) -> [UInt8] {
         var result: [UInt8]
         if let ph = pendingHeader {
