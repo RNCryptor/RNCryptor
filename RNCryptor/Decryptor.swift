@@ -6,6 +6,8 @@
 //  Copyright © 2015 Rob Napier. All rights reserved.
 //
 
+import Foundation
+
 protocol PasswordDecryptorType: CryptorType {
     static var preambleSize: Int { get }
     static func canDecrypt(preamble: NSData) -> Bool

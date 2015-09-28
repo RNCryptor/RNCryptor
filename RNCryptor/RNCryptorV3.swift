@@ -6,6 +6,7 @@
 //  Copyright © 2015 Rob Napier. All rights reserved.
 //
 
+import Foundation
 import CommonCrypto
 
 private enum Credential {
