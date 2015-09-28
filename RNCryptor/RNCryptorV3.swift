@@ -124,7 +124,7 @@ public final class EncryptorV3 : CryptorType {
         return result
     }
 
-    public func update(data: NSData) throws -> NSData {
+    public func update(data: NSData) -> NSData {
         // It should not be possible for this to fail during encryption
         return try! handle(engine.update(data))
     }

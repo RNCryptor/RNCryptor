@@ -37,9 +37,6 @@ public protocol CryptorType {
 }
 
 public extension CryptorType {
-    public func update(data: NSData) throws -> NSData {
-        return try update(data)
-    }
     internal func oneshot(data: NSData) throws -> NSData {
         let result = NSMutableData(data: try update(data))
         result.appendData(try final())
