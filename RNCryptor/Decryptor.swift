@@ -54,7 +54,7 @@ public final class Decryptor : CryptorType {
         (toCheck, decryptors) = decryptors.splitPassFail{ self.buffer.length >= $0.preambleSize }
 
         for decryptorType in toCheck {
-            if decryptorType.canDecrypt(buffer.subdataWithRange(NSRange(0..<decryptorType.preambleSize))) {
+            if decryptorType.canDecrypt(buffer.bytesView[0..<decryptorType.preambleSize]) {
                 let d = decryptorType.init(password: password)
                 decryptor = d
                 let result = try d.update(buffer)

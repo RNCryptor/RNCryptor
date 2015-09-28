@@ -33,7 +33,6 @@ public struct RNCryptorV3 {
 
         let saltPtr = UnsafePointer<UInt8>(salt.bytes)
 
-
         // All the crazy casting because CommonCryptor hates Swift
         let algorithm     = CCPBKDFAlgorithm(kCCPBKDF2)
         let prf           = CCPseudoRandomAlgorithm(kCCPRFHmacAlgSHA1)
@@ -140,7 +139,7 @@ public final class DecryptorV3: PasswordDecryptorType {
     static let preambleSize = 1
     static func canDecrypt(preamble: NSData) -> Bool {
         assert(preamble.length == 1)
-        return UnsafePointer<UInt8>(preamble.bytes)[0] == 3
+        return preamble.bytesView[0] == 3
     }
 
     var requiredHeaderSize: Int {
@@ -178,9 +177,9 @@ public final class DecryptorV3: PasswordDecryptorType {
             return NSData()
         }
 
-        let e = try createEngineWithCredential(credential, header: buffer.subdataWithRange(NSRange(0..<requiredHeaderSize)))
+        let e = try createEngineWithCredential(credential, header: buffer.bytesView[0..<requiredHeaderSize])
         decryptorEngine = e
-        let body = buffer.subdataWithRange(NSRange(requiredHeaderSize..<buffer.length))
+        let body = buffer.bytesView[requiredHeaderSize..<buffer.length]
         buffer.length = 0
         return try e.update(body)
     }
@@ -197,15 +196,15 @@ public final class DecryptorV3: PasswordDecryptorType {
     private func createEngineWithPassword(password: String, header: NSData) throws -> DecryptorEngineV3 {
         assert(password != "")
         precondition(header.length == V3.passwordHeaderSize)
-        precondition(UnsafePointer<UInt8>(header.bytes)[0] == V3.version)
+        precondition(header.bytesView[0] == V3.version)
 
-        guard UnsafePointer<UInt8>(header.bytes)[1] == 1 else {
+        guard header.bytesView[1] == 1 else {
             throw Error.InvalidCredentialType
         }
 
-        let encryptionSalt = header.subdataWithRange(NSRange(2...9))
-        let hmacSalt = header.subdataWithRange(NSRange(10...17))
-        let iv = header.subdataWithRange(NSRange(18...33))
+        let encryptionSalt = header.bytesView[2...9]
+        let hmacSalt = header.bytesView[10...17]
+        let iv = header.bytesView[18...33]
 
         let encryptionKey = V3.keyForPassword(password, salt: encryptionSalt)
         let hmacKey = V3.keyForPassword(password, salt: hmacSalt)
@@ -215,11 +214,11 @@ public final class DecryptorV3: PasswordDecryptorType {
 
     private func createEngineWithKeys(encryptionKey encryptionKey: NSData, hmacKey: NSData, header: NSData) throws -> DecryptorEngineV3 {
         precondition(header.length == V3.keyHeaderSize)
-        precondition(UnsafePointer<UInt8>(header.bytes)[0] == V3.version)
+        precondition(header.bytesView[0] == V3.version)
         precondition(encryptionKey.length == V3.keySize)
         precondition(hmacKey.length == V3.keySize)
 
-        let iv = header.subdataWithRange(NSRange(2..<18))
+        let iv = header.bytesView[2..<18]
         return DecryptorEngineV3(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
     }
 

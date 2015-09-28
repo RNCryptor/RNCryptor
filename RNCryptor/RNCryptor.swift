@@ -62,18 +62,12 @@ func isEqualInConsistentTime(trusted trusted: NSData, untrusted: NSData) -> Bool
     // The point of this routine is XOR the bytes of each data and accumulate the results with OR.
     // If any bytes are different, then the OR will accumulate some non-0 value.
 
-    let trustedBytes = UnsafePointer<UInt8>(trusted.bytes)
-    let trustedLength = trusted.length
-    let untrustedBytes = UnsafePointer<UInt8>(untrusted.bytes)
-    let untrustedLength = untrusted.length
-
-    var result: UInt8 = (untrustedLength == trustedLength) ? 0 : 1  // Start with 0 (equal) only if our lengths are equal
-
-    for i in 0..<untrustedLength {
+    var result: UInt8 = untrusted.length == trusted.length ? 0 : 1  // Start with 0 (equal) only if our lengths are equal
+    for (i, untrustedByte) in untrusted.bytesView.enumerate() {
         // Use mod to wrap around ourselves if they are longer than we are.
         // Remember, we already broke equality if our lengths are different.
-        result |= trustedBytes[i % trustedLength] ^ untrustedBytes[i]
+        result |= trusted.bytesView[i % trusted.length] ^ untrustedByte
     }
-    
+
     return result == 0
 }

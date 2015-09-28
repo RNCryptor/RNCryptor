@@ -40,9 +40,9 @@ internal class OverflowingBuffer {
         assert(data.length - toSend <= capacity)
 
         let result = NSMutableData(data: buffer)
-        result.appendData(data.subdataWithRange(NSRange(0..<toSend)))
+        result.appendData(data.bytesView[0..<toSend])
         buffer.length = 0
-        buffer.appendData(data.subdataWithRange(NSRange(toSend..<data.length)))
+        buffer.appendData(data.bytesView[toSend..<data.length])
         return result
     }
 
@@ -51,7 +51,7 @@ internal class OverflowingBuffer {
         assert(toSend > 0) // If it were <= 0, we would have extended the array
         assert(toSend < buffer.length) // If we would have sent everything, replaceBuffer should have been called
 
-        let result = buffer.subdataWithRange(NSRange(0..<toSend))
+        let result = buffer.bytesView[0..<toSend]
         buffer.replaceBytesInRange(NSRange(0..<toSend), withBytes: nil, length: 0)
         buffer.appendData(data)
         return result

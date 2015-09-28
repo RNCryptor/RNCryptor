@@ -34,6 +34,7 @@
 		FBCF49011B432A8000DCFB19 /* CommonCrypto.h in Headers */ = {isa = PBXBuildFile; fileRef = FB30A2071B2B86FD00BE5429 /* CommonCrypto.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FBCF490A1B432AA600DCFB19 /* CommonCrypto.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBCF49061B432A8000DCFB19 /* CommonCrypto.framework */; };
 		FBCF49671B44358100DCFB19 /* ByteArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBCF49611B441B0600DCFB19 /* ByteArray.swift */; };
+		FBE066A31BB998F600B1FAC8 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE066A21BB998F600B1FAC8 /* Data.swift */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -94,6 +95,7 @@
 		FBCF48DD1B43286D00DCFB19 /* RNCryptor-OSXTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "RNCryptor-OSXTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBCF49061B432A8000DCFB19 /* CommonCrypto.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CommonCrypto.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBCF49611B441B0600DCFB19 /* ByteArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ByteArray.swift; sourceTree = "<group>"; };
+		FBE066A21BB998F600B1FAC8 /* Data.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -230,6 +232,7 @@
 			isa = PBXGroup;
 			children = (
 				FBA08AB41B3F480700F97862 /* OverflowingBuffer.swift */,
+				FBE066A21BB998F600B1FAC8 /* Data.swift */,
 			);
 			name = Helpers;
 			sourceTree = "<group>";
@@ -496,6 +499,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FB30A1FF1B2B7BF300BE5429 /* RNCryptor.swift in Sources */,
+				FBE066A31BB998F600B1FAC8 /* Data.swift in Sources */,
 				FBA803DB1B41A3D400B8E4E9 /* Decryptor.swift in Sources */,
 				FBA08AB51B3F480700F97862 /* OverflowingBuffer.swift in Sources */,
 				FBC514E01B3EE76700DB99DE /* Engine.swift in Sources */,
