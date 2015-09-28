@@ -52,6 +52,9 @@ public extension String {
     public var byteArrayFromBase64Encoding: [UInt8]? {
         return NSData(base64EncodedString: self, options: NSDataBase64DecodingOptions())?.byteArray
     }
+    public var dataFromHexEncoding: NSData? {
+        return self.byteArrayFromHexEncoding.map(NSData.init)
+    }
 }
 
 public protocol ByteLike: IntegerType {}

@@ -9,7 +9,7 @@
 import Foundation
 
 internal class OverflowingBuffer {
-    private var array: [UInt8] = []
+    private var buffer = NSMutableData()
     let capacity: Int
 
     init(capacity: Int) {
@@ -17,43 +17,43 @@ internal class OverflowingBuffer {
     }
 
     @warn_unused_result
-    func update(data: [UInt8]) -> [UInt8] {
-        return data.withUnsafeBufferPointer(update)
-    }
-
-    @warn_unused_result
-    func update(data: UnsafeBufferPointer<UInt8>) -> [UInt8] {
-        if data.count >= capacity {
+    func update(data: NSData) -> NSData {
+        if data.length >= capacity {
             return sendAllArray(data)
-        } else if array.count + data.count <= capacity {
-            array += data
-            return []
+        } else if buffer.length + data.length <= capacity {
+            buffer.appendData(data)
+            return NSData()
         } else {
             return sendSomeArray(data)
         }
     }
 
-    func final() -> [UInt8] {
-        return array
-    }
-
-    private func sendAllArray(data: UnsafeBufferPointer<UInt8>) -> [UInt8] {
-        let toSend = data.count - capacity
-        assert(toSend >= 0)
-
-        let result = array + data.prefixUpTo(toSend)
-        array = Array(data.dropFirst(toSend))
+    func final() -> NSData {
+        let result = buffer
+        buffer = NSMutableData() // Data belongs to caller now.
         return result
     }
 
-    private func sendSomeArray(data: UnsafeBufferPointer<UInt8>) -> [UInt8] {
-        let toSend = (array.count + data.count) - capacity
-        assert(toSend > 0) // If it were <= 0, we would have extended the array
-        assert(toSend < array.count) // If we would have sent everything, replaceBuffer should have been called
+    private func sendAllArray(data: NSData) -> NSData {
+        let toSend = data.length - capacity
+        assert(toSend >= 0)
+        assert(data.length - toSend <= capacity)
 
-        let result = Array(array.prefixUpTo(toSend))
-        array.removeFirst(toSend)
-        array += data
+        let result = NSMutableData(data: buffer)
+        result.appendData(data.subdataWithRange(NSRange(0..<toSend)))
+        buffer.length = 0
+        buffer.appendData(data.subdataWithRange(NSRange(toSend..<data.length)))
+        return result
+    }
+
+    private func sendSomeArray(data: NSData) -> NSData {
+        let toSend = (buffer.length + data.length) - capacity
+        assert(toSend > 0) // If it were <= 0, we would have extended the array
+        assert(toSend < buffer.length) // If we would have sent everything, replaceBuffer should have been called
+
+        let result = buffer.subdataWithRange(NSRange(0..<toSend))
+        buffer.replaceBytesInRange(NSRange(0..<toSend), withBytes: nil, length: 0)
+        buffer.appendData(data)
         return result
     }
 }

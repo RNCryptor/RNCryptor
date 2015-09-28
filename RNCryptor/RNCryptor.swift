@@ -21,9 +21,9 @@ public enum Error: ErrorType {
     case InvalidCredentialType
 }
 
-internal func randomDataOfLength(length: Int) -> [UInt8] {
-    var data = [UInt8](count: length, repeatedValue: 0)
-    let result = SecRandomCopyBytes(kSecRandomDefault, length, &data)
+internal func randomDataOfLength(length: Int) -> NSData {
+    let data = NSMutableData(length: length)!
+    let result = SecRandomCopyBytes(kSecRandomDefault, length, UnsafeMutablePointer<UInt8>(data.mutableBytes))
     guard result == errSecSuccess else {
         fatalError("SECURITY FAILURE: Could not generate secure random numbers: \(result).")
     }
@@ -32,48 +32,24 @@ internal func randomDataOfLength(length: Int) -> [UInt8] {
 }
 
 public protocol CryptorType {
-    func update(data: UnsafeBufferPointer<UInt8>) throws -> [UInt8]
-    func final() throws -> [UInt8]
-}
-
-internal extension NSData {
-    var unsafeBufferPointer: UnsafeBufferPointer<UInt8> {
-        return UnsafeBufferPointer(start: UnsafePointer<UInt8>(self.bytes), count: self.length)
-    }
-    convenience init(bytes: [UInt8]) {
-        self.init(bytes: bytes, length: bytes.count)
-    }
+    func update(data: NSData) throws -> NSData
+    func final() throws -> NSData
 }
 
 public extension CryptorType {
-    public func update(data: [UInt8]) throws -> [UInt8] {
-        return try data.withUnsafeBufferPointer(update)
+    public func update(data: NSData) throws -> NSData {
+        return try update(data)
     }
-    public func updateData(data: NSData) throws -> NSData {
-        return NSData(bytes: try update(data.unsafeBufferPointer))
-    }
-    public func finalData() throws -> NSData {
-        return NSData(bytes: try final())
-    }
-
-    internal func oneshot(data: [UInt8]) throws -> [UInt8] {
-        return try data.withUnsafeBufferPointer(oneshot)
-    }
-
-    internal func oneshot(data: UnsafeBufferPointer<UInt8>) throws -> [UInt8] {
-        var result = try update(data)
-        result += try final()
+    internal func oneshot(data: NSData) throws -> NSData {
+        let result = NSMutableData(data: try update(data))
+        result.appendData(try final())
         return result
-    }
-
-    internal func oneshotData(data: NSData) throws -> NSData {
-        return NSData(bytes: try oneshot(data.unsafeBufferPointer))
     }
 }
 
 public typealias Encryptor = EncryptorV3
 
-/** Compare two [UInt8] in time proportional to the untrusted data
+/** Compare two NSData in time proportional to the untrusted data
 
 Equatable-based comparisons genreally stop comparing at the first difference.
 This can be used by attackers, in some situations,
@@ -82,17 +58,22 @@ to determine a secret value by considering the time required to compare the valu
 We enumerate over the untrusted values so that the time is proportaional to the attacker's data,
 which provides the attack no informatoin about the length of the secret.
 */
-func isEqualInConsistentTime(trusted trusted: [UInt8], untrusted: [UInt8]) -> Bool {
+func isEqualInConsistentTime(trusted trusted: NSData, untrusted: NSData) -> Bool {
     // The point of this routine is XOR the bytes of each data and accumulate the results with OR.
     // If any bytes are different, then the OR will accumulate some non-0 value.
 
-    var result: UInt8 = untrusted.count == trusted.count ? 0 : 1  // Start with 0 (equal) only if our lengths are equal
-    for (i, untrustedByte) in untrusted.enumerate() {
+    let trustedBytes = UnsafePointer<UInt8>(trusted.bytes)
+    let trustedLength = trusted.length
+    let untrustedBytes = UnsafePointer<UInt8>(untrusted.bytes)
+    let untrustedLength = untrusted.length
+
+    var result: UInt8 = (untrustedLength == trustedLength) ? 0 : 1  // Start with 0 (equal) only if our lengths are equal
+
+    for i in 0..<untrustedLength {
         // Use mod to wrap around ourselves if they are longer than we are.
         // Remember, we already broke equality if our lengths are different.
-        result |= trusted[i % trusted.count] ^ untrustedByte
+        result |= trustedBytes[i % trustedLength] ^ untrustedBytes[i]
     }
-
+    
     return result == 0
 }
-

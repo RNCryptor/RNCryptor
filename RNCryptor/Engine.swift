@@ -16,15 +16,15 @@ public enum CryptorOperation: CCOperation {
 
 internal final class Engine: CryptorType {
     private let cryptor: CCCryptorRef
-    private var buffer = [UInt8]()
+    private var buffer = NSMutableData()
 
-    init(operation: CryptorOperation, key: [UInt8], iv: [UInt8]) {
+    init(operation: CryptorOperation, key: NSData, iv: NSData) {
         var cryptorOut = CCCryptorRef()
         let result = CCCryptorCreate(
             operation.rawValue,
             CCAlgorithm(kCCAlgorithmAES128), CCOptions(kCCOptionPKCS7Padding),
-            key, key.count,
-            iv,
+            key.bytes, key.length,
+            iv.bytes,
             &cryptorOut
         )
         self.cryptor = cryptorOut
@@ -43,39 +43,36 @@ internal final class Engine: CryptorType {
 
     func sizeBufferForDataOfLength(length: Int) -> Int {
         let size = CCCryptorGetOutputLength(cryptor, length, true)
-        let delta = size - buffer.count
-        if delta > 0 {
-            buffer += [UInt8](count: delta, repeatedValue:0)
-        }
+        buffer.length = size
         return size
     }
 
-    func update(data: UnsafeBufferPointer<UInt8>) throws -> [UInt8] {
-        let outputLength = sizeBufferForDataOfLength(data.count)
+    func update(data: NSData) throws -> NSData {
+        let outputLength = sizeBufferForDataOfLength(data.length)
         var dataOutMoved: Int = 0
 
         var result: CCCryptorStatus = CCCryptorStatus(kCCUnimplemented)
 
         result = CCCryptorUpdate(
             self.cryptor,
-            data.baseAddress, data.count,
-            &buffer, outputLength,
+            data.bytes, data.length,
+            buffer.mutableBytes, outputLength,
             &dataOutMoved)
 
         // The only error returned by CCCryptorUpdate is kCCBufferTooSmall, which would be a programming error
         assert(result == CCCryptorStatus(kCCSuccess))
 
-        buffer.removeRange(dataOutMoved..<buffer.endIndex)
+        buffer.length = dataOutMoved
         return buffer
     }
 
-    func final() throws -> [UInt8] {
+    func final() throws -> NSData {
         let outputLength = sizeBufferForDataOfLength(0)
         var dataOutMoved: Int = 0
 
         let result = CCCryptorFinal(
             self.cryptor,
-            &buffer, outputLength,
+            buffer.mutableBytes, outputLength,
             &dataOutMoved
         )
         
@@ -83,7 +80,7 @@ internal final class Engine: CryptorType {
             throw NSError(domain: CCErrorDomain, code: Int(result), userInfo: nil)
         }
 
-        buffer.removeRange(dataOutMoved..<buffer.endIndex)
+        buffer.length = dataOutMoved
         return buffer
     }
 }

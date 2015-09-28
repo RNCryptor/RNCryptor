@@ -8,7 +8,7 @@
 
 protocol PasswordDecryptorType: CryptorType {
     static var preambleSize: Int { get }
-    static func canDecrypt(preamble: ArraySlice<UInt8>) -> Bool
+    static func canDecrypt(preamble: NSData) -> Bool
     init(password: String)
 }
 
@@ -30,7 +30,7 @@ private extension CollectionType {
 public final class Decryptor : CryptorType {
     private var decryptors: [PasswordDecryptorType.Type] = [DecryptorV3.self]
 
-    private var buffer: [UInt8] = []
+    private var buffer = NSMutableData()
     private var decryptor: CryptorType?
     private let password: String
 
@@ -39,39 +39,35 @@ public final class Decryptor : CryptorType {
         self.password = password
     }
 
-    public func decrypt(data: [UInt8]) throws -> [UInt8] {
+    public func decrypt(data: NSData) throws -> NSData {
         return try oneshot(data)
     }
 
-    public func decryptData(data: NSData) throws -> NSData {
-        return try oneshotData(data)
-    }
-
-    public func update(data: UnsafeBufferPointer<UInt8>) throws -> [UInt8] {
+    public func update(data: NSData) throws -> NSData {
         if let d = decryptor {
             return try d.update(data)
         }
 
-        buffer += data
+        buffer.appendData(data)
 
         let toCheck:[PasswordDecryptorType.Type]
-        (toCheck, decryptors) = decryptors.splitPassFail{ self.buffer.count >= $0.preambleSize }
+        (toCheck, decryptors) = decryptors.splitPassFail{ self.buffer.length >= $0.preambleSize }
 
         for decryptorType in toCheck {
-            if decryptorType.canDecrypt(buffer[0..<decryptorType.preambleSize]) {
+            if decryptorType.canDecrypt(buffer.subdataWithRange(NSRange(0..<decryptorType.preambleSize))) {
                 let d = decryptorType.init(password: password)
                 decryptor = d
                 let result = try d.update(buffer)
-                buffer.removeAll()
+                buffer.length = 0
                 return result
             }
         }
 
         guard !decryptors.isEmpty else { throw Error.UnknownHeader }
-        return []
+        return NSData()
     }
 
-    public func final() throws -> [UInt8] {
+    public func final() throws -> NSData {
         guard let d = decryptor else {
             throw Error.UnknownHeader
         }
