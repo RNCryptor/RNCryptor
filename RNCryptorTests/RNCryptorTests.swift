@@ -143,6 +143,26 @@ class RNCryptorTests: XCTestCase {
         
         XCTAssertEqual(plaintext, data)
     }
+
+    func testMultipleUpdate() {
+        let password = "thepassword"
+        let datas = (0..<10).map{ _ in randomDataOfLength(1024) }
+        let fullData = datas.reduce(NSMutableData()) { $0.appendData($1); return $0 }
+
+        let encryptor = Encryptor(password: password)
+        let ciphertext = NSMutableData()
+        for data in datas {
+            ciphertext.appendData(encryptor.update(data))
+        }
+        ciphertext.appendData(encryptor.final())
+
+        do {
+            let decrypted = try Decryptor(password: password).decrypt(ciphertext)
+            XCTAssertEqual(fullData, decrypted)
+        } catch {
+            XCTFail("Caught: \(error)")
+        }
+    }
 }
 
 // FIXME: Add test (and vector) for empty input
