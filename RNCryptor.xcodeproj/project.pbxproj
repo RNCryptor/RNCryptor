@@ -35,6 +35,7 @@
 		FBCF490A1B432AA600DCFB19 /* CommonCrypto.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBCF49061B432A8000DCFB19 /* CommonCrypto.framework */; };
 		FBCF49671B44358100DCFB19 /* ByteArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBCF49611B441B0600DCFB19 /* ByteArray.swift */; };
 		FBE066A31BB998F600B1FAC8 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE066A21BB998F600B1FAC8 /* Data.swift */; settings = {ASSET_TAGS = (); }; };
+		FBE066A41BB9AA4F00B1FAC8 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE066A21BB998F600B1FAC8 /* Data.swift */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -524,6 +525,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FBCF48ED1B43293400DCFB19 /* RNCryptor.swift in Sources */,
+				FBE066A41BB9AA4F00B1FAC8 /* Data.swift in Sources */,
 				FBCF48EE1B43293400DCFB19 /* Decryptor.swift in Sources */,
 				FBCF48EF1B43293400DCFB19 /* Engine.swift in Sources */,
 				FBCF48F01B43293400DCFB19 /* OverflowingBuffer.swift in Sources */,
