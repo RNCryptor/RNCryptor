@@ -64,4 +64,30 @@ NSData *randomDataOfLength(NSInteger length) {
 }
 
 
+- (void)testUpdatesPassword {
+    NSString *password = @"PASSWORD";
+    NSData *data = randomDataOfLength(1024);
+
+    RNEncryptor *cryptor = [[RNEncryptor alloc] initWithPassword:password];
+    XCTAssertNotNil(cryptor);
+
+    NSMutableData *ciphertext = [NSMutableData new];
+    [ciphertext appendData:[cryptor update:data]];
+    [ciphertext appendData:[cryptor final]];
+    XCTAssertGreaterThan(ciphertext.length, data.length);
+
+
+    NSError *error = nil;
+    RNDecryptor *decryptor = [[RNDecryptor alloc] initWithPassword:password];
+    XCTAssertNotNil(decryptor);
+
+    NSMutableData *plaintext = [NSMutableData new];
+    [plaintext appendData:[decryptor update:ciphertext error:&error]];
+    XCTAssertNil(error);
+    [plaintext appendData:[decryptor finalAndReturnError:&error]];
+    XCTAssertNil(error);
+
+    XCTAssertEqualObjects(plaintext, data);
+}
+
 @end
