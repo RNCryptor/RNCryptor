@@ -201,11 +201,11 @@ public final class DecryptorV3: NSObject, PasswordDecryptorType {
         precondition(header.length == V3.passwordHeaderSize)
 
         guard DecryptorV3.canDecrypt(header) else {
-            throw Error.UnknownHeader
+            throw CryptorError.UnknownHeader
         }
 
         guard header.bytesView[1] == 1 else {
-            throw Error.InvalidCredentialType
+            throw CryptorError.InvalidCredentialType
         }
 
         let encryptionSalt = header.bytesView[2...9]
@@ -224,11 +224,11 @@ public final class DecryptorV3: NSObject, PasswordDecryptorType {
         precondition(hmacKey.length == V3.keySize)
 
         guard DecryptorV3.canDecrypt(header) else {
-            throw Error.UnknownHeader
+            throw CryptorError.UnknownHeader
         }
 
         guard header.bytesView[1] == 0 else {
-            throw Error.InvalidCredentialType
+            throw CryptorError.InvalidCredentialType
         }
 
         let iv = header.bytesView[2..<18]
@@ -237,7 +237,7 @@ public final class DecryptorV3: NSObject, PasswordDecryptorType {
 
     public func final() throws -> NSData {
         guard let result = try decryptorEngine?.final() else {
-            throw Error.MessageTooShort
+            throw CryptorError.MessageTooShort
         }
         return result
     }
@@ -268,7 +268,7 @@ private final class DecryptorEngineV3: CryptorType {
         let result = try engine.final()
         let hash = hmac.final()
         if !isEqualInConsistentTime(trusted: hash, untrusted: self.buffer.final()) {
-            throw Error.HMACMismatch
+            throw CryptorError.HMACMismatch
         }
         return result
     }

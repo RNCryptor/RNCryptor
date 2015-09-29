@@ -66,13 +66,13 @@ public final class Decryptor : NSObject, CryptorType {
             }
         }
 
-        guard !decryptors.isEmpty else { throw Error.UnknownHeader }
+        guard !decryptors.isEmpty else { throw CryptorError.UnknownHeader }
         return NSData()
     }
 
     public func final() throws -> NSData {
         guard let d = decryptor else {
-            throw Error.UnknownHeader
+            throw CryptorError.UnknownHeader
         }
         return try d.final()
     }
