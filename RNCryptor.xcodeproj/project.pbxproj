@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		FB07CE071B41BCE7003AF727 /* RNCryptorV3.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB07CE061B41BCE7003AF727 /* RNCryptorV3.swift */; };
+		FB1E41131BBABEB10009A47D /* ObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = FB1E41121BBABEB10009A47D /* ObjC.m */; settings = {ASSET_TAGS = (); }; };
+		FB1E41141BBABEB10009A47D /* ObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = FB1E41121BBABEB10009A47D /* ObjC.m */; settings = {ASSET_TAGS = (); }; };
 		FB30A1FF1B2B7BF300BE5429 /* RNCryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB30A1FE1B2B7BF300BE5429 /* RNCryptor.swift */; };
 		FB30A2081B2B86FD00BE5429 /* CommonCrypto.h in Headers */ = {isa = PBXBuildFile; fileRef = FB30A2071B2B86FD00BE5429 /* CommonCrypto.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FB30A2221B2B87C900BE5429 /* CommonCrypto.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB30A2051B2B86FD00BE5429 /* CommonCrypto.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -71,6 +73,7 @@
 
 /* Begin PBXFileReference section */
 		FB07CE061B41BCE7003AF727 /* RNCryptorV3.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNCryptorV3.swift; sourceTree = "<group>"; };
+		FB1E41121BBABEB10009A47D /* ObjC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjC.m; sourceTree = "<group>"; };
 		FB30A1FE1B2B7BF300BE5429 /* RNCryptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNCryptor.swift; sourceTree = "<group>"; };
 		FB30A2051B2B86FD00BE5429 /* CommonCrypto.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CommonCrypto.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB30A2071B2B86FD00BE5429 /* CommonCrypto.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommonCrypto.h; sourceTree = "<group>"; };
@@ -225,6 +228,7 @@
 				FB627FDD1B2B7A1800C3A579 /* RNCryptorTests.swift */,
 				FB627FDF1B2B7A1800C3A579 /* Info.plist */,
 				FBA08AB81B40589400F97862 /* OverfowingBuffer.swift */,
+				FB1E41121BBABEB10009A47D /* ObjC.m */,
 			);
 			path = RNCryptorTests;
 			sourceTree = "<group>";
@@ -517,6 +521,7 @@
 				FB627FDE1B2B7A1800C3A579 /* RNCryptorTests.swift in Sources */,
 				FB36507F1B41F3DE00F5273F /* RNCryptorGeneratedVectorTests.swift in Sources */,
 				FBCF49671B44358100DCFB19 /* ByteArray.swift in Sources */,
+				FB1E41131BBABEB10009A47D /* ObjC.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -542,6 +547,7 @@
 				FB7174D91BA1CD030026EC7F /* RNCryptorTests.swift in Sources */,
 				FB7174DA1BA1CD030026EC7F /* OverfowingBuffer.swift in Sources */,
 				FB7174DC1BA1CDAA0026EC7F /* ByteArray.swift in Sources */,
+				FB1E41141BBABEB10009A47D /* ObjC.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -741,16 +747,19 @@
 		FB627FE61B2B7A1800C3A579 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = RNCryptorTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = net.robnapier.RNCryptorTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		FB627FE71B2B7A1800C3A579 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = RNCryptorTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = net.robnapier.RNCryptorTests;
@@ -801,6 +810,7 @@
 		FBCF48E71B43286D00DCFB19 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				INFOPLIST_FILE = RNCryptorTests/Info.plist;
@@ -809,12 +819,14 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "net.robnapier.RNCryptor-OSXTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		FBCF48E81B43286D00DCFB19 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				INFOPLIST_FILE = RNCryptorTests/Info.plist;

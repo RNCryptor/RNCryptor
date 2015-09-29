@@ -55,7 +55,7 @@ public struct RNCryptorV3 {
 
 internal typealias V3 = RNCryptorV3
 
-@objc(RNEncryptor)
+@objc(RNEncryptorV3)
 public final class EncryptorV3 : NSObject, CryptorType {
     private var engine: Engine
     private var hmac: HMACV3
@@ -137,10 +137,11 @@ public final class EncryptorV3 : NSObject, CryptorType {
     }
 }
 
-public final class DecryptorV3: PasswordDecryptorType {
+@objc(RNDecryptorV3)
+public final class DecryptorV3: NSObject, PasswordDecryptorType {
     static let preambleSize = 1
     static func canDecrypt(preamble: NSData) -> Bool {
-        assert(preamble.length == 1)
+        assert(preamble.length >= 1)
         return preamble.bytesView[0] == 3
     }
 
@@ -198,7 +199,10 @@ public final class DecryptorV3: PasswordDecryptorType {
     private func createEngineWithPassword(password: String, header: NSData) throws -> DecryptorEngineV3 {
         assert(password != "")
         precondition(header.length == V3.passwordHeaderSize)
-        precondition(header.bytesView[0] == V3.version)
+
+        guard DecryptorV3.canDecrypt(header) else {
+            throw Error.UnknownHeader
+        }
 
         guard header.bytesView[1] == 1 else {
             throw Error.InvalidCredentialType
@@ -216,9 +220,16 @@ public final class DecryptorV3: PasswordDecryptorType {
 
     private func createEngineWithKeys(encryptionKey encryptionKey: NSData, hmacKey: NSData, header: NSData) throws -> DecryptorEngineV3 {
         precondition(header.length == V3.keyHeaderSize)
-        precondition(header.bytesView[0] == V3.version)
         precondition(encryptionKey.length == V3.keySize)
         precondition(hmacKey.length == V3.keySize)
+
+        guard DecryptorV3.canDecrypt(header) else {
+            throw Error.UnknownHeader
+        }
+
+        guard header.bytesView[1] == 0 else {
+            throw Error.InvalidCredentialType
+        }
 
         let iv = header.bytesView[2..<18]
         return DecryptorEngineV3(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)

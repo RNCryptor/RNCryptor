@@ -12,13 +12,13 @@ import CommonCrypto
 
 public let CCErrorDomain = "com.apple.CommonCrypto"
 
-public enum Error: ErrorType {
-    case HMACMismatch
-    case UnknownHeader
-    case MessageTooShort
-    case MemoryFailure
-    case ParameterError
-    case InvalidCredentialType
+public enum Error: Int, ErrorType {
+    case HMACMismatch = -1
+    case UnknownHeader = -2
+    case MessageTooShort = -3
+    case MemoryFailure = -4
+    case ParameterError = -5
+    case InvalidCredentialType = -6
 }
 
 internal func randomDataOfLength(length: Int) -> NSData {

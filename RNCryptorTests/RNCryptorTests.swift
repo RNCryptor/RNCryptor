@@ -163,6 +163,28 @@ class RNCryptorTests: XCTestCase {
             XCTFail("Caught: \(error)")
         }
     }
-}
 
-// FIXME: Add test (and vector) for empty input
+    func testBadFormat() {
+        let data = NSMutableData(length: 1024)!
+        do {
+            try Decryptor(password: "password").decrypt(data)
+            XCTFail("Should not thrown")
+        } catch let error as Error {
+            XCTAssertEqual(error, Error.UnknownHeader)
+        } catch {
+            XCTFail("Threw wrong thing \(error)")
+        }
+    }
+
+    func testBadFormatV3() {
+        let data = NSMutableData(length: 1024)!
+        do {
+            try DecryptorV3(password: "password").decrypt(data)
+            XCTFail("Should not thrown")
+        } catch let error as Error {
+            XCTAssertEqual(error, Error.UnknownHeader)
+        } catch {
+            XCTFail("Threw wrong thing \(error)")
+        }
+    }
+}

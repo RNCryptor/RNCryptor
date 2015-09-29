@@ -17,3 +17,5 @@ FOUNDATION_EXPORT const unsigned char RNCryptorVersionString[];
 // In this header, you should import all the public headers of your framework using statements like #import <RNCryptor/PublicHeader.h>
 
 
+//typedef RNEncryptorV3 RNEncryptor;
+//#define RNEncryptor RNEncryptorV3
