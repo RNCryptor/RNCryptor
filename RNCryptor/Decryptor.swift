@@ -29,7 +29,8 @@ private extension CollectionType {
     }
 }
 
-public final class Decryptor : CryptorType {
+@objc(RNDecryptor)
+public final class Decryptor : NSObject, CryptorType {
     private var decryptors: [PasswordDecryptorType.Type] = [DecryptorV3.self]
 
     private var buffer = NSMutableData()

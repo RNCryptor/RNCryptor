@@ -55,7 +55,8 @@ public struct RNCryptorV3 {
 
 internal typealias V3 = RNCryptorV3
 
-public final class EncryptorV3 : CryptorType {
+@objc(RNEncryptor)
+public final class EncryptorV3 : NSObject, CryptorType {
     private var engine: Engine
     private var hmac: HMACV3
 
