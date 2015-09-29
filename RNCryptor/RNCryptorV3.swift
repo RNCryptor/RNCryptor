@@ -107,7 +107,7 @@ public final class EncryptorV3 : NSObject, CryptorType {
             iv: randomDataOfLength(V3.ivSize))
     }
 
-    public func encrypt(data: NSData) -> NSData {
+    public func encryptData(data: NSData) -> NSData {
         return try! oneshot(data)
     }
 
@@ -121,18 +121,18 @@ public final class EncryptorV3 : NSObject, CryptorType {
         } else {
             result = data
         }
-        hmac.update(result)
+        hmac.updateWithData(result)
         return result
     }
 
-    public func update(data: NSData) -> NSData {
+    public func updateWithData(data: NSData) -> NSData {
         // It should not be possible for this to fail during encryption
-        return try! handle(engine.update(data))
+        return try! handle(engine.updateWithData(data))
     }
 
-    public func final() -> NSData {
-        let result = NSMutableData(data: try! handle(engine.final()))
-        result.appendData(self.hmac.final())
+    public func finalData() -> NSData {
+        let result = NSMutableData(data: try! handle(engine.finalData()))
+        result.appendData(self.hmac.finalData())
         return result
     }
 }
@@ -166,13 +166,13 @@ public final class DecryptorV3: NSObject, PasswordDecryptorType {
         credential = .Keys(encryptionKey: encryptionKey, hmacKey: hmacKey)
     }
 
-    public func decrypt(data: NSData) throws -> NSData {
+    public func decryptData(data: NSData) throws -> NSData {
         return try oneshot(data)
     }
 
-    public func update(data: NSData) throws -> NSData {
+    public func updateWithData(data: NSData) throws -> NSData {
         if let e = decryptorEngine {
-            return try e.update(data)
+            return try e.updateWithData(data)
         }
 
         buffer.appendData(data)
@@ -184,7 +184,7 @@ public final class DecryptorV3: NSObject, PasswordDecryptorType {
         decryptorEngine = e
         let body = buffer.bytesView[requiredHeaderSize..<buffer.length]
         buffer.length = 0
-        return try e.update(body)
+        return try e.updateWithData(body)
     }
 
     private func createEngineWithCredential(credential: Credential, header: NSData) throws -> DecryptorEngineV3 {
@@ -235,8 +235,8 @@ public final class DecryptorV3: NSObject, PasswordDecryptorType {
         return DecryptorEngineV3(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
     }
 
-    public func final() throws -> NSData {
-        guard let result = try decryptorEngine?.final() else {
+    public func finalData() throws -> NSData {
+        guard let result = try decryptorEngine?.finalData() else {
             throw CryptorError.MessageTooShort
         }
         return result
@@ -254,20 +254,20 @@ private final class DecryptorEngineV3: CryptorType {
         precondition(iv.length == V3.ivSize)
 
         hmac = HMACV3(key: hmacKey)
-        hmac.update(header)
+        hmac.updateWithData(header)
         engine = Engine(operation: .Decrypt, key: encryptionKey, iv: iv)
     }
 
-    func update(data: NSData) throws -> NSData {
-        let overflow = buffer.update(data)
-        self.hmac.update(overflow)
-        return try engine.update(overflow)
+    func updateWithData(data: NSData) throws -> NSData {
+        let overflow = buffer.updateWithData(data)
+        self.hmac.updateWithData(overflow)
+        return try engine.updateWithData(overflow)
     }
 
-    func final() throws -> NSData {
-        let result = try engine.final()
-        let hash = hmac.final()
-        if !isEqualInConsistentTime(trusted: hash, untrusted: self.buffer.final()) {
+    func finalData() throws -> NSData {
+        let result = try engine.finalData()
+        let hash = hmac.finalData()
+        if !isEqualInConsistentTime(trusted: hash, untrusted: self.buffer.finalData()) {
             throw CryptorError.HMACMismatch
         }
         return result
@@ -286,11 +286,11 @@ private final class HMACV3 {
         )
     }
 
-    func update(data: NSData) {
+    func updateWithData(data: NSData) {
         CCHmacUpdate(&self.context, data.bytes, data.length)
     }
     
-    func final() -> NSData {
+    func finalData() -> NSData {
         let hmac = NSMutableData(length: V3.hmacSize)!
         CCHmacFinal(&self.context, hmac.mutableBytes)
         return hmac

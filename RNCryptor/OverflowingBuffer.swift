@@ -17,7 +17,7 @@ internal class OverflowingBuffer {
     }
 
     @warn_unused_result
-    func update(data: NSData) -> NSData {
+    func updateWithData(data: NSData) -> NSData {
         if data.length >= capacity {
             return sendAllArray(data)
         } else if buffer.length + data.length <= capacity {
@@ -28,7 +28,7 @@ internal class OverflowingBuffer {
         }
     }
 
-    func final() -> NSData {
+    func finalData() -> NSData {
         let result = buffer
         buffer = NSMutableData() // Data belongs to caller now.
         return result

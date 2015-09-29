@@ -42,13 +42,13 @@ public final class Decryptor : NSObject, CryptorType {
         self.password = password
     }
 
-    public func decrypt(data: NSData) throws -> NSData {
+    public func decryptData(data: NSData) throws -> NSData {
         return try oneshot(data)
     }
 
-    public func update(data: NSData) throws -> NSData {
+    public func updateWithData(data: NSData) throws -> NSData {
         if let d = decryptor {
-            return try d.update(data)
+            return try d.updateWithData(data)
         }
 
         buffer.appendData(data)
@@ -60,7 +60,7 @@ public final class Decryptor : NSObject, CryptorType {
             if decryptorType.canDecrypt(buffer.bytesView[0..<decryptorType.preambleSize]) {
                 let d = decryptorType.init(password: password)
                 decryptor = d
-                let result = try d.update(buffer)
+                let result = try d.updateWithData(buffer)
                 buffer.length = 0
                 return result
             }
@@ -70,10 +70,10 @@ public final class Decryptor : NSObject, CryptorType {
         return NSData()
     }
 
-    public func final() throws -> NSData {
+    public func finalData() throws -> NSData {
         guard let d = decryptor else {
             throw CryptorError.UnknownHeader
         }
-        return try d.final()
+        return try d.finalData()
     }
 }

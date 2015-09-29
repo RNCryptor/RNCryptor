@@ -33,13 +33,13 @@ func _verifyPassword(vector: [String:String]) {
             encryptionSalt: vector["enc_salt_hex"]!.dataFromHexEncoding!,
             hmacSalt: vector["hmac_salt_hex"]!.dataFromHexEncoding!,
             iv: vector["iv_hex"]!.dataFromHexEncoding!)
-        let ciphertext = encryptor.encrypt(vector["plaintext_hex"]!.dataFromHexEncoding!)
+        let ciphertext = encryptor.encryptData(vector["plaintext_hex"]!.dataFromHexEncoding!)
         verifyVector(vector, key:"ciphertext_hex", equals:ciphertext, name:"password encrypt")
     }
 
     let decryptor = Decryptor(password: vector["password"]!)
     do {
-        let plaintext = try decryptor.decrypt(vector["ciphertext_hex"]!.dataFromHexEncoding!)
+        let plaintext = try decryptor.decryptData(vector["ciphertext_hex"]!.dataFromHexEncoding!)
         verifyVector(vector, key:"plaintext_hex", equals:plaintext, name:"password decrypt")
     } catch {
         XCTFail("\(error)")
@@ -56,7 +56,7 @@ func verify_v3_key(vector: [String: String]) {
             encryptionKey: vector["enc_key_hex"]!.dataFromHexEncoding!,
             hmacKey: vector["hmac_key_hex"]!.dataFromHexEncoding!,
             iv: vector["iv_hex"]!.dataFromHexEncoding!)
-        let ciphertext = encryptor.encrypt(vector["plaintext_hex"]!.dataFromHexEncoding!)
+        let ciphertext = encryptor.encryptData(vector["plaintext_hex"]!.dataFromHexEncoding!)
         verifyVector(vector, key:"ciphertext_hex", equals:ciphertext, name:"key encrypt")
     }
 
@@ -64,7 +64,7 @@ func verify_v3_key(vector: [String: String]) {
         encryptionKey: vector["enc_key_hex"]!.dataFromHexEncoding!,
         hmacKey: vector["hmac_key_hex"]!.dataFromHexEncoding!)
     do {
-        let plaintext = try decryptor.decrypt(vector["ciphertext_hex"]!.dataFromHexEncoding!)
+        let plaintext = try decryptor.decryptData(vector["ciphertext_hex"]!.dataFromHexEncoding!)
         verifyVector(vector, key:"plaintext_hex", equals:plaintext, name:"key decrypt")
     } catch {
         XCTFail("\(error)")

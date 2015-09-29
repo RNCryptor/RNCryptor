@@ -28,11 +28,11 @@ NSData *randomDataOfLength(NSInteger length) {
     NSData *hmacKey = randomDataOfLength(kCCKeySizeAES256);
     NSData *data = randomDataOfLength(1024);
 
-    NSData *ciphertext = [[[RNEncryptorV3 alloc] initWithEncryptionKey:encryptionKey hmacKey:hmacKey] encrypt:data];
+    NSData *ciphertext = [[[RNEncryptorV3 alloc] initWithEncryptionKey:encryptionKey hmacKey:hmacKey] encryptData:data];
     XCTAssertNotNil(ciphertext);
 
     NSError *error = nil;
-    NSData *plaintext = [[[RNDecryptorV3 alloc] initWithEncryptionKey:encryptionKey hmacKey:hmacKey] decrypt:ciphertext error:&error];
+    NSData *plaintext = [[[RNDecryptorV3 alloc] initWithEncryptionKey:encryptionKey hmacKey:hmacKey] decryptData:ciphertext error:&error];
     XCTAssertNil(error);
     XCTAssertEqualObjects(plaintext, data);
 }
@@ -41,11 +41,11 @@ NSData *randomDataOfLength(NSInteger length) {
     NSString *password = @"PASSWORD";
     NSData *data = randomDataOfLength(1024);
 
-    NSData *ciphertext = [[[RNEncryptor alloc] initWithPassword:password] encrypt:data];
+    NSData *ciphertext = [[[RNEncryptor alloc] initWithPassword:password] encryptData:data];
     XCTAssertNotNil(ciphertext);
 
     NSError *error = nil;
-    NSData *plaintext = [[[RNDecryptor alloc] initWithPassword:password] decrypt:ciphertext error:&error];
+    NSData *plaintext = [[[RNDecryptor alloc] initWithPassword:password] decryptData:ciphertext error:&error];
     XCTAssertNil(error);
     XCTAssertEqualObjects(plaintext, data);
 }
@@ -54,11 +54,11 @@ NSData *randomDataOfLength(NSInteger length) {
     NSString *password = @"PASSWORD";
     NSData *data = randomDataOfLength(1024);
 
-    NSData *ciphertext = [[[RNEncryptorV3 alloc] initWithPassword:password] encrypt:data];
+    NSData *ciphertext = [[[RNEncryptorV3 alloc] initWithPassword:password] encryptData:data];
     XCTAssertNotNil(ciphertext);
 
     NSError *error = nil;
-    NSData *plaintext = [[[RNDecryptorV3 alloc] initWithPassword:password] decrypt:ciphertext error:&error];
+    NSData *plaintext = [[[RNDecryptorV3 alloc] initWithPassword:password] decryptData:ciphertext error:&error];
     XCTAssertNil(error);
     XCTAssertEqualObjects(plaintext, data);
 }
@@ -72,8 +72,8 @@ NSData *randomDataOfLength(NSInteger length) {
     XCTAssertNotNil(cryptor);
 
     NSMutableData *ciphertext = [NSMutableData new];
-    [ciphertext appendData:[cryptor update:data]];
-    [ciphertext appendData:[cryptor final]];
+    [ciphertext appendData:[cryptor updateWithData:data]];
+    [ciphertext appendData:[cryptor finalData]];
     XCTAssertGreaterThan(ciphertext.length, data.length);
 
 
@@ -82,9 +82,9 @@ NSData *randomDataOfLength(NSInteger length) {
     XCTAssertNotNil(decryptor);
 
     NSMutableData *plaintext = [NSMutableData new];
-    [plaintext appendData:[decryptor update:ciphertext error:&error]];
+    [plaintext appendData:[decryptor updateWithData:ciphertext error:&error]];
     XCTAssertNil(error);
-    [plaintext appendData:[decryptor finalAndReturnError:&error]];
+    [plaintext appendData:[decryptor finalDataAndReturnError:&error]];
     XCTAssertNil(error);
 
     XCTAssertEqualObjects(plaintext, data);

@@ -9,7 +9,9 @@
 import Foundation
 import CommonCrypto
 
-public enum CryptorOperation: CCOperation {
+private let CCErrorDomain = "com.apple.CommonCrypto"
+
+internal enum CryptorOperation: CCOperation {
     case Encrypt = 0 // CCOperation(kCCEncrypt)
     case Decrypt = 1 // CCOperation(kCCDecrypt)
 }
@@ -47,7 +49,7 @@ internal final class Engine: CryptorType {
         return size
     }
 
-    func update(data: NSData) throws -> NSData {
+    func updateWithData(data: NSData) throws -> NSData {
         let outputLength = sizeBufferForDataOfLength(data.length)
         var dataOutMoved: Int = 0
 
@@ -66,7 +68,7 @@ internal final class Engine: CryptorType {
         return buffer
     }
 
-    func final() throws -> NSData {
+    func finalData() throws -> NSData {
         let outputLength = sizeBufferForDataOfLength(0)
         var dataOutMoved: Int = 0
 

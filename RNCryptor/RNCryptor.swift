@@ -10,8 +10,6 @@ import Foundation
 import Security
 import CommonCrypto
 
-public let CCErrorDomain = "com.apple.CommonCrypto"
-
 public enum CryptorError: Int, ErrorType {
     case HMACMismatch = 1
     case UnknownHeader
@@ -32,14 +30,14 @@ internal func randomDataOfLength(length: Int) -> NSData {
 }
 
 public protocol CryptorType {
-    func update(data: NSData) throws -> NSData
-    func final() throws -> NSData
+    func updateWithData(data: NSData) throws -> NSData
+    func finalData() throws -> NSData
 }
 
 public extension CryptorType {
     internal func oneshot(data: NSData) throws -> NSData {
-        let result = NSMutableData(data: try update(data))
-        result.appendData(try final())
+        let result = NSMutableData(data: try updateWithData(data))
+        result.appendData(try finalData())
         return result
     }
 }

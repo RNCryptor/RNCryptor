@@ -37,16 +37,16 @@ class RNCryptorTests: XCTestCase {
         let encrypted = NSMutableData()
         do {
             let encryptor = Engine(operation: .Encrypt, key: encryptKey, iv: iv)
-            encrypted.appendData(try encryptor.update(data))
-            encrypted.appendData(try encryptor.final())
+            encrypted.appendData(try encryptor.updateWithData(data))
+            encrypted.appendData(try encryptor.finalData())
         } catch {
             XCTFail("Caught: \(error)")
         }
 
         do {
             let decryptor = Engine(operation: .Decrypt, key: encryptKey, iv: iv)
-            let decrypted = NSMutableData(data:try decryptor.update(encrypted))
-            decrypted.appendData(try decryptor.final())
+            let decrypted = NSMutableData(data:try decryptor.updateWithData(encrypted))
+            decrypted.appendData(try decryptor.finalData())
             XCTAssertEqual(decrypted, data)
         } catch {
             XCTFail("Caught: \(error)")
@@ -61,7 +61,7 @@ class RNCryptorTests: XCTestCase {
         let ciphertext = "03000203 04050607 08090a0b 0c0d0e0f 0001981b 22e7a644 8118d695 bd654f72 e9d6ed75 ec14ae2a a067eed2 a98a56e0 993dfe22 ab5887b3 f6e3cdd4 0767f519 5eb5".dataFromHexEncoding!
 
         let encryptor = Encryptor(encryptionKey: encryptKey, hmacKey: hmacKey, iv: iv)
-        let encrypted = encryptor.encrypt(plaintext)
+        let encrypted = encryptor.encryptData(plaintext)
         XCTAssertEqual(encrypted, ciphertext)
     }
 
@@ -73,7 +73,7 @@ class RNCryptorTests: XCTestCase {
 
         let decryptor = DecryptorV3(encryptionKey: encryptKey, hmacKey: hmacKey)
         do {
-            let decrypted = try decryptor.decrypt(ciphertext)
+            let decrypted = try decryptor.decryptData(ciphertext)
             XCTAssertEqual(decrypted, plaintext)
         } catch {
             XCTFail("Caught: \(error)")
@@ -90,7 +90,7 @@ class RNCryptorTests: XCTestCase {
 
         let encryptor = Encryptor(password: password, encryptionSalt: encryptionSalt, hmacSalt: hmacSalt, iv: iv)
 
-        let encrypted = encryptor.encrypt(plaintext)
+        let encrypted = encryptor.encryptData(plaintext)
         XCTAssertEqual(encrypted, ciphertext)
     }
 
@@ -102,7 +102,7 @@ class RNCryptorTests: XCTestCase {
         let decryptor = Decryptor(password: password)
 
         do {
-            let decrypted = try decryptor.decrypt(ciphertext)
+            let decrypted = try decryptor.decryptData(ciphertext)
             XCTAssertEqual(decrypted, plaintext)
         } catch {
             XCTFail("Caught: \(error)")
@@ -114,11 +114,11 @@ class RNCryptorTests: XCTestCase {
         let hmacKey = randomDataOfLength(V3.keySize)
         let data = randomDataOfLength(1024)
 
-        let ciphertext = Encryptor(encryptionKey: encryptionKey, hmacKey: hmacKey).encrypt(data)
+        let ciphertext = Encryptor(encryptionKey: encryptionKey, hmacKey: hmacKey).encryptData(data)
 
         let plaintext: NSData
         do {
-            plaintext = try DecryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey).decrypt(ciphertext)
+            plaintext = try DecryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey).decryptData(ciphertext)
         } catch {
             plaintext = NSData(bytes: [0xaa])
             XCTFail("Caught: \(error)")
@@ -131,11 +131,11 @@ class RNCryptorTests: XCTestCase {
         let password = "thepassword"
         let data = randomDataOfLength(1024)
 
-        let ciphertext = Encryptor(password: password).encrypt(data)
+        let ciphertext = Encryptor(password: password).encryptData(data)
 
         let plaintext: NSData
         do {
-            plaintext = try Decryptor(password: password).decrypt(ciphertext)
+            plaintext = try Decryptor(password: password).decryptData(ciphertext)
         } catch {
             plaintext = NSData(bytes: [0])
             XCTFail("Caught: \(error)")
@@ -144,7 +144,7 @@ class RNCryptorTests: XCTestCase {
         XCTAssertEqual(plaintext, data)
     }
 
-    func testMultipleUpdate() {
+    func testMultipleupdateWithData() {
         let password = "thepassword"
         let datas = (0..<10).map{ _ in randomDataOfLength(1024) }
         let fullData = datas.reduce(NSMutableData()) { $0.appendData($1); return $0 }
@@ -152,12 +152,12 @@ class RNCryptorTests: XCTestCase {
         let encryptor = Encryptor(password: password)
         let ciphertext = NSMutableData()
         for data in datas {
-            ciphertext.appendData(encryptor.update(data))
+            ciphertext.appendData(encryptor.updateWithData(data))
         }
-        ciphertext.appendData(encryptor.final())
+        ciphertext.appendData(encryptor.finalData())
 
         do {
-            let decrypted = try Decryptor(password: password).decrypt(ciphertext)
+            let decrypted = try Decryptor(password: password).decryptData(ciphertext)
             XCTAssertEqual(fullData, decrypted)
         } catch {
             XCTFail("Caught: \(error)")
@@ -167,7 +167,7 @@ class RNCryptorTests: XCTestCase {
     func testBadFormat() {
         let data = NSMutableData(length: 1024)!
         do {
-            try Decryptor(password: "password").decrypt(data)
+            try Decryptor(password: "password").decryptData(data)
             XCTFail("Should not thrown")
         } catch let error as CryptorError {
             XCTAssertEqual(error, CryptorError.UnknownHeader)
@@ -179,7 +179,7 @@ class RNCryptorTests: XCTestCase {
     func testBadFormatV3() {
         let data = NSMutableData(length: 1024)!
         do {
-            try DecryptorV3(password: "password").decrypt(data)
+            try DecryptorV3(password: "password").decryptData(data)
             XCTFail("Should not thrown")
         } catch let error as CryptorError {
             XCTAssertEqual(error, CryptorError.UnknownHeader)
