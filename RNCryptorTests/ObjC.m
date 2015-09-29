@@ -41,6 +41,19 @@ NSData *randomDataOfLength(NSInteger length) {
     NSString *password = @"PASSWORD";
     NSData *data = randomDataOfLength(1024);
 
+    NSData *ciphertext = [[[RNEncryptor alloc] initWithPassword:password] encrypt:data];
+    XCTAssertNotNil(ciphertext);
+
+    NSError *error = nil;
+    NSData *plaintext = [[[RNDecryptor alloc] initWithPassword:password] decrypt:ciphertext error:&error];
+    XCTAssertNil(error);
+    XCTAssertEqualObjects(plaintext, data);
+}
+
+- (void)testOneShotPasswordV3 {
+    NSString *password = @"PASSWORD";
+    NSData *data = randomDataOfLength(1024);
+
     NSData *ciphertext = [[[RNEncryptorV3 alloc] initWithPassword:password] encrypt:data];
     XCTAssertNotNil(ciphertext);
 
