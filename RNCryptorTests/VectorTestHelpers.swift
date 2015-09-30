@@ -32,7 +32,7 @@ func verifyVector(vector: [String:String], key:String, equals actual:NSData, nam
 }
 
 func _verifyKDF(vector: [String:String], name:String) {
-    let key = RNCryptorV3.keyForPassword(vector["password"]!,
+    let key = FormatV3.keyForPassword(vector["password"]!,
         salt:vector["salt_hex"]!.dataFromHexEncoding!)
     verifyVector(vector, key:"key_hex", equals:key, name: name)
 }
@@ -45,7 +45,7 @@ func verify_v3_kdf(vector: [String:String]) {
 
 func _verifyPassword(vector: [String:String]) {
     if Int(vector["version"]!) == Int(V3.version) {
-        let encryptor = Encryptor(password: vector["password"]!,
+        let encryptor = EncryptorV3(password: vector["password"]!,
             encryptionSalt: vector["enc_salt_hex"]!.dataFromHexEncoding!,
             hmacSalt: vector["hmac_salt_hex"]!.dataFromHexEncoding!,
             iv: vector["iv_hex"]!.dataFromHexEncoding!)
@@ -68,7 +68,7 @@ func verify_v3_password(vector: [String: String]) {
 
 func verify_v3_key(vector: [String: String]) {
     if Int(vector["version"]!) == Int(V3.version) {
-        let encryptor = Encryptor(
+        let encryptor = EncryptorV3(
             encryptionKey: vector["enc_key_hex"]!.dataFromHexEncoding!,
             hmacKey: vector["hmac_key_hex"]!.dataFromHexEncoding!,
             iv: vector["iv_hex"]!.dataFromHexEncoding!)

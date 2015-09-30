@@ -76,7 +76,7 @@ class RNCryptorTests: XCTestCase {
         let plaintext = "01".dataFromHexEncoding!
         let ciphertext = "03000203 04050607 08090a0b 0c0d0e0f 0001981b 22e7a644 8118d695 bd654f72 e9d6ed75 ec14ae2a a067eed2 a98a56e0 993dfe22 ab5887b3 f6e3cdd4 0767f519 5eb5".dataFromHexEncoding!
 
-        let encryptor = Encryptor(encryptionKey: encryptKey, hmacKey: hmacKey, iv: iv)
+        let encryptor = EncryptorV3(encryptionKey: encryptKey, hmacKey: hmacKey, iv: iv)
         let encrypted = encryptor.encryptData(plaintext)
         XCTAssertEqual(encrypted, ciphertext)
     }
@@ -104,7 +104,7 @@ class RNCryptorTests: XCTestCase {
         let plaintext = "01".dataFromHexEncoding!
         let ciphertext = "03010001 02030405 06070102 03040506 07080203 04050607 08090a0b 0c0d0e0f 0001a1f8 730e0bf4 80eb7b70 f690abf2 1e029514 164ad3c4 74a51b30 c7eaa1ca 545b7de3 de5b010a cbad0a9a 13857df6 96a8".dataFromHexEncoding!
 
-        let encryptor = Encryptor(password: password, encryptionSalt: encryptionSalt, hmacSalt: hmacSalt, iv: iv)
+        let encryptor = EncryptorV3(password: password, encryptionSalt: encryptionSalt, hmacSalt: hmacSalt, iv: iv)
 
         let encrypted = encryptor.encryptData(plaintext)
         XCTAssertEqual(encrypted, ciphertext)
@@ -130,7 +130,7 @@ class RNCryptorTests: XCTestCase {
         let hmacKey = randomDataOfLength(V3.keySize)
         let data = randomDataOfLength(1024)
 
-        let ciphertext = Encryptor(encryptionKey: encryptionKey, hmacKey: hmacKey).encryptData(data)
+        let ciphertext = EncryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey).encryptData(data)
 
         let plaintext: NSData
         do {
@@ -185,8 +185,8 @@ class RNCryptorTests: XCTestCase {
         do {
             try Decryptor(password: "password").decryptData(data)
             XCTFail("Should not thrown")
-        } catch let error as CryptorError {
-            XCTAssertEqual(error, CryptorError.UnknownHeader)
+        } catch let error as RNCryptorError {
+            XCTAssertEqual(error, RNCryptorError.UnknownHeader)
         } catch {
             XCTFail("Threw wrong thing \(error)")
         }
@@ -197,8 +197,8 @@ class RNCryptorTests: XCTestCase {
         do {
             try DecryptorV3(password: "password").decryptData(data)
             XCTFail("Should not thrown")
-        } catch let error as CryptorError {
-            XCTAssertEqual(error, CryptorError.UnknownHeader)
+        } catch let error as RNCryptorError {
+            XCTAssertEqual(error, RNCryptorError.UnknownHeader)
         } catch {
             XCTFail("Threw wrong thing \(error)")
         }

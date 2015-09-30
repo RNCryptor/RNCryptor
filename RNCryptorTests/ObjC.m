@@ -113,7 +113,7 @@ NSData *randomDataOfLength(NSInteger length) {
     NSError *error = nil;
     NSData *plaintext = [RNCryptor decryptData:data password:password error:&error];
     XCTAssertNil(plaintext);
-    XCTAssertEqual(error.code, RNCryptorUnknownHeaderError);
+    XCTAssertEqual(error.code, RNCryptorErrorUnknownHeader);
 }
 
 @end
