@@ -1,5 +1,5 @@
 //
-//  ByteArray.swift
+//  Random.swift
 //
 //  Copyright © 2015 Rob Napier. All rights reserved.
 //
@@ -25,26 +25,14 @@
 //
 
 import Foundation
+import CommonCrypto
 
-internal extension NSData {
-    convenience init(bytes: [UInt8]) {
-        self.init(bytes: bytes, length: bytes.count)
+internal func randomDataOfLength(length: Int) -> NSData {
+    let data = NSMutableData(length: length)!
+    let result = SecRandomCopyBytes(kSecRandomDefault, length, UnsafeMutablePointer<UInt8>(data.mutableBytes))
+    guard result == errSecSuccess else {
+        fatalError("SECURITY FAILURE: Could not generate secure random numbers: \(result).")
     }
-}
 
-internal extension String {
-    var dataFromHexEncoding: NSData? {
-        let strip = [Character]([" ", "<", ">", "\n", "\t"])
-        let input = characters.filter { c in !strip.contains(c)}
-
-        guard input.count % 2 == 0 else { return nil }
-
-        let data = NSMutableData()
-        for i in 0.stride(to: input.count, by: 2) {
-            guard var value = UInt8(String(input[i...i+1]), radix: 16) else { return nil }
-            data.appendBytes(&value, length:1)
-        }
-
-        return data
-    }
+    return data
 }

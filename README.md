@@ -29,17 +29,35 @@ it includes:
 * Random IV
 * Encrypt-then-hash HMAC
 
-## Basic Objective-C Usage
+## Basic Swift Password Usage
 
-The most common in-memory use case is as follows:
+``` swift
+// Encryption
+let data: NSData = ...
+let password = "Secret password"
+let ciphertext = Cryptor.encryptData(data, password: password)
+
+// Decryption
+do {
+    let originalData = try Cryptor.decryptData(ciphertext, password: password)
+    // ...
+} catch {
+    print(error)
+}
+
+```
+
+## Basic ObjC Password Usage
 
 ``` objc
-NSData *data = [@"Data" dataUsingEncoding:NSUTF8StringEncoding];
-NSError *error;
-NSData *encryptedData = [RNEncryptor encryptData:data
-                                   	withSettings:kRNCryptorAES256Settings
-                                          password:aPassword
-                                             error:&error];
+// Encryption
+NSData *data = ...
+NSString *password = "Secret password";
+NSData *ciphertext = [[[RNEncryptor alloc] initWithPassword:password] encryptData:data];
+
+// Decryption
+
+NSData *plaintext = 
 ```
 
 This generates an `NSData` including a header, encryption salt, HMAC salt, IV,
