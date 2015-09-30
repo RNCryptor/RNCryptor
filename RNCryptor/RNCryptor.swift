@@ -125,14 +125,14 @@ public final class Encryptor: NSObject, CryptorType {
     }
 
     /// Simplified, generic interface to `CryptorType`. Takes a data,
-    /// returns a processed data. Generally you should use
-    /// `Decryptor.decrypt`,
+    /// returns a processed data, and invalidates the cryptor.
     /// - throws: `RNCryptorError`
     public func encryptData(data: NSData) -> NSData {
         return encryptor.encryptData(data)
     }
 }
 
+/// One-shot convenience functions.
 @objc(RNCryptor)
 public class Cryptor: NSObject {
     public static func encryptData(data: NSData, password: String) -> NSData {
