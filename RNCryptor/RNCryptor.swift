@@ -234,7 +234,7 @@ internal final class Engine {
             iv.bytes,
             &cryptorOut
         )
-        self.cryptor = cryptorOut
+        cryptor = cryptorOut
 
         // It is a programming error to create us with illegal values
         // This is an internal class, so we can constrain what is sent to us.
@@ -243,8 +243,8 @@ internal final class Engine {
     }
 
     deinit {
-        if self.cryptor != CCCryptorRef() {
-            CCCryptorRelease(self.cryptor)
+        if cryptor != CCCryptorRef() {
+            CCCryptorRelease(cryptor)
         }
     }
 
@@ -261,7 +261,7 @@ internal final class Engine {
         var result: CCCryptorStatus = CCCryptorStatus(kCCUnimplemented)
 
         result = CCCryptorUpdate(
-            self.cryptor,
+            cryptor,
             data.bytes, data.length,
             buffer.mutableBytes, outputLength,
             &dataOutMoved)
@@ -278,7 +278,7 @@ internal final class Engine {
         var dataOutMoved: Int = 0
 
         let result = CCCryptorFinal(
-            self.cryptor,
+            cryptor,
             buffer.mutableBytes, outputLength,
             &dataOutMoved
         )
@@ -304,7 +304,7 @@ public struct FormatV3 {
     static let passwordHeaderSize = 1 + 1 + 8 + 8 + kCCBlockSizeAES128
 
     static public func keyForPassword(password: String, salt: NSData) -> NSData {
-        let derivedKey = NSMutableData(length: self.keySize)!
+        let derivedKey = NSMutableData(length: keySize)!
         let derivedKeyPtr = UnsafeMutablePointer<UInt8>(derivedKey.mutableBytes)
 
         let passwordData = password.dataUsingEncoding(NSUTF8StringEncoding)!
@@ -344,9 +344,9 @@ public final class EncryptorV3 : NSObject, CryptorType {
         precondition(encryptionKey.length == V3.keySize)
         precondition(hmacKey.length == V3.keySize)
         precondition(iv.length == V3.ivSize)
-        self.hmac = HMACV3(key: hmacKey)
-        self.engine = Engine(operation: .Encrypt, key: encryptionKey, iv: iv)
-        self.pendingHeader = header
+        hmac = HMACV3(key: hmacKey)
+        engine = Engine(operation: .Encrypt, key: encryptionKey, iv: iv)
+        pendingHeader = header
     }
 
     // Expose random numbers for testing
@@ -410,7 +410,7 @@ public final class EncryptorV3 : NSObject, CryptorType {
 
     public func finalData() -> NSData {
         let result = NSMutableData(data: try! handle(engine.finalData()))
-        result.appendData(self.hmac.finalData())
+        result.appendData(hmac.finalData())
         return result
     }
 }
@@ -544,14 +544,14 @@ private final class DecryptorEngineV3 {
 
     func updateWithData(data: NSData) throws -> NSData {
         let overflow = buffer.updateWithData(data)
-        self.hmac.updateWithData(overflow)
+        hmac.updateWithData(overflow)
         return try engine.updateWithData(overflow)
     }
 
     func finalData() throws -> NSData {
         let result = try engine.finalData()
         let hash = hmac.finalData()
-        if !isEqualInConsistentTime(trusted: hash, untrusted: self.buffer.finalData()) {
+        if !isEqualInConsistentTime(trusted: hash, untrusted: buffer.finalData()) {
             throw RNCryptorError.HMACMismatch
         }
         return result
@@ -563,7 +563,7 @@ private final class HMACV3 {
 
     init(key: NSData) {
         CCHmacInit(
-            &self.context,
+            &context,
             CCHmacAlgorithm(kCCHmacAlgSHA256),
             key.bytes,
             key.length
@@ -571,12 +571,12 @@ private final class HMACV3 {
     }
 
     func updateWithData(data: NSData) {
-        CCHmacUpdate(&self.context, data.bytes, data.length)
+        CCHmacUpdate(&context, data.bytes, data.length)
     }
     
     func finalData() -> NSData {
         let hmac = NSMutableData(length: V3.hmacSize)!
-        CCHmacFinal(&self.context, hmac.mutableBytes)
+        CCHmacFinal(&context, hmac.mutableBytes)
         return hmac
     }
 }
