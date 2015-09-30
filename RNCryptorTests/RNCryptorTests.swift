@@ -30,10 +30,10 @@ import CommonCrypto
 class RNCryptorTests: XCTestCase {
     func testRandomData() {
         let len = 1024
-        let data = randomDataOfLength(len)
+        let data = RNCryptor.randomDataOfLength(len)
         XCTAssertEqual(data.length, len)
 
-        let secondData = randomDataOfLength(len)
+        let secondData = RNCryptor.randomDataOfLength(len)
         XCTAssertNotEqual(data, secondData, "Random data this long should never be equal")
     }
 
@@ -46,9 +46,9 @@ class RNCryptorTests: XCTestCase {
     }
 
     func testEngine() {
-        let data = randomDataOfLength(1024)
-        let encryptKey = randomDataOfLength(V3.keySize)
-        let iv = randomDataOfLength(V3.ivSize)
+        let data = RNCryptor.randomDataOfLength(1024)
+        let encryptKey = RNCryptor.randomDataOfLength(V3.keySize)
+        let iv = RNCryptor.randomDataOfLength(V3.ivSize)
 
         let encrypted = NSMutableData()
         do {
@@ -126,9 +126,9 @@ class RNCryptorTests: XCTestCase {
     }
 
     func testOneShotKey() {
-        let encryptionKey = randomDataOfLength(V3.keySize)
-        let hmacKey = randomDataOfLength(V3.keySize)
-        let data = randomDataOfLength(1024)
+        let encryptionKey = RNCryptor.randomDataOfLength(V3.keySize)
+        let hmacKey = RNCryptor.randomDataOfLength(V3.keySize)
+        let data = RNCryptor.randomDataOfLength(1024)
 
         let ciphertext = EncryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey).encryptData(data)
 
@@ -145,7 +145,7 @@ class RNCryptorTests: XCTestCase {
 
     func testOneShotPassword() {
         let password = "thepassword"
-        let data = randomDataOfLength(1024)
+        let data = RNCryptor.randomDataOfLength(1024)
 
         let ciphertext = Encryptor(password: password).encryptData(data)
 
@@ -162,7 +162,7 @@ class RNCryptorTests: XCTestCase {
 
     func testMultipleUpdateWithData() {
         let password = "thepassword"
-        let datas = (0..<10).map{ _ in randomDataOfLength(1024) }
+        let datas = (0..<10).map{ _ in RNCryptor.randomDataOfLength(1024) }
         let fullData = datas.reduce(NSMutableData()) { $0.appendData($1); return $0 }
 
         let encryptor = Encryptor(password: password)

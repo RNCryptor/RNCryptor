@@ -35,11 +35,11 @@ it includes:
 // Encryption
 let data: NSData = ...
 let password = "Secret password"
-let ciphertext = Cryptor.encryptData(data, password: password)
+let ciphertext = RNCryptor.encryptData(data, password: password)
 
 // Decryption
 do {
-    let originalData = try Cryptor.decryptData(ciphertext, password: password)
+    let originalData = try RNCryptor.decryptData(ciphertext, password: password)
     // ...
 } catch {
     print(error)

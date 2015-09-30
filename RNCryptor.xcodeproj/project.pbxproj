@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		FB1E41131BBABEB10009A47D /* ObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = FB1E41121BBABEB10009A47D /* ObjC.m */; settings = {ASSET_TAGS = (); }; };
 		FB1E41141BBABEB10009A47D /* ObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = FB1E41121BBABEB10009A47D /* ObjC.m */; settings = {ASSET_TAGS = (); }; };
-		FB1E41181BBACE8E0009A47D /* Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB1E41171BBACE8E0009A47D /* Random.swift */; settings = {ASSET_TAGS = (); }; };
 		FB30A1FF1B2B7BF300BE5429 /* RNCryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB30A1FE1B2B7BF300BE5429 /* RNCryptor.swift */; };
 		FB30A2081B2B86FD00BE5429 /* CommonCrypto.h in Headers */ = {isa = PBXBuildFile; fileRef = FB30A2071B2B86FD00BE5429 /* CommonCrypto.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FB30A2221B2B87C900BE5429 /* CommonCrypto.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB30A2051B2B86FD00BE5429 /* CommonCrypto.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -68,7 +67,6 @@
 
 /* Begin PBXFileReference section */
 		FB1E41121BBABEB10009A47D /* ObjC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjC.m; sourceTree = "<group>"; };
-		FB1E41171BBACE8E0009A47D /* Random.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Random.swift; sourceTree = "<group>"; };
 		FB30A1FE1B2B7BF300BE5429 /* RNCryptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNCryptor.swift; sourceTree = "<group>"; };
 		FB30A2051B2B86FD00BE5429 /* CommonCrypto.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CommonCrypto.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB30A2071B2B86FD00BE5429 /* CommonCrypto.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommonCrypto.h; sourceTree = "<group>"; };
@@ -230,7 +228,6 @@
 			children = (
 				FBA08AB41B3F480700F97862 /* OverflowingBuffer.swift */,
 				FBE066A21BB998F600B1FAC8 /* Data.swift */,
-				FB1E41171BBACE8E0009A47D /* Random.swift */,
 			);
 			name = Helpers;
 			sourceTree = "<group>";
@@ -491,7 +488,6 @@
 				FB30A1FF1B2B7BF300BE5429 /* RNCryptor.swift in Sources */,
 				FBE066A31BB998F600B1FAC8 /* Data.swift in Sources */,
 				FBA08AB51B3F480700F97862 /* OverflowingBuffer.swift in Sources */,
-				FB1E41181BBACE8E0009A47D /* Random.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

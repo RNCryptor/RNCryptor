@@ -65,13 +65,66 @@ public protocol CryptorType {
 public extension CryptorType {
     /// Simplified, generic interface to `CryptorType`. Takes a data,
     /// returns a processed data. Generally you should use
-    /// `Decryptor.decrypt`,
+    /// `RNCryptor.encryptData(password:)`, or 
+    /// `RNCryptor.decryptData(password:)` instead, but this is useful
+    /// for code that is neutral on whether it is encrypting or decrypting.
+    ///
     /// - throws: `RNCryptorError`
     public func oneshot(data: NSData) throws -> NSData {
         let result = NSMutableData(data: try updateWithData(data))
         result.appendData(try finalData())
         return result
     }
+}
+
+/// V3 format settings
+@objc(RNCryptorFormatV3)
+public final class FormatV3: NSObject {
+    /// Size of AES and HMAC keys
+    public static let keySize = kCCKeySizeAES256
+
+    /// Size of PBKDF2 salt
+    public static let saltSize = 8
+
+    /// Generate a key from a password and salt
+    /// - parameters:
+    ///     - password: Password to convert
+    ///     - salt: Salt. Generally constructed with RNCryptor.randomDataOfLength(FormatV3.saltSize)
+    /// - returns: Key of length FormatV3.keySize
+    public static func keyForPassword(password: String, salt: NSData) -> NSData {
+        let derivedKey = NSMutableData(length: keySize)!
+        let derivedKeyPtr = UnsafeMutablePointer<UInt8>(derivedKey.mutableBytes)
+
+        let passwordData = password.dataUsingEncoding(NSUTF8StringEncoding)!
+        let passwordPtr = UnsafePointer<Int8>(passwordData.bytes)
+
+        let saltPtr = UnsafePointer<UInt8>(salt.bytes)
+
+        // All the crazy casting because CommonCryptor hates Swift
+        let algorithm     = CCPBKDFAlgorithm(kCCPBKDF2)
+        let prf           = CCPseudoRandomAlgorithm(kCCPRFHmacAlgSHA1)
+        let pbkdf2Rounds  = UInt32(10000)
+
+        let result = CCKeyDerivationPBKDF(
+            algorithm,
+            passwordPtr,   passwordData.length,
+            saltPtr,       salt.length,
+            prf,           pbkdf2Rounds,
+            derivedKeyPtr, derivedKey.length)
+
+        guard result == CCCryptorStatus(kCCSuccess) else {
+            fatalError("SECURITY FAILURE: Could not derive secure password (\(result)): \(derivedKey).")
+        }
+        return derivedKey
+    }
+
+    static let formatVersion = UInt8(3)
+    static let ivSize = kCCBlockSizeAES128
+    static let hmacSize = Int(CC_SHA256_DIGEST_LENGTH)
+    static let keyHeaderSize = 1 + 1 + kCCBlockSizeAES128
+    static let passwordHeaderSize = 1 + 1 + 8 + 8 + kCCBlockSizeAES128
+
+
 }
 
 /// Errors thrown by `CryptorType`
@@ -96,6 +149,7 @@ public extension CryptorType {
 /// A encryptor for the latest data format. If compatibility with other RNCryptor
 /// implementations is required, you may wish to use the specific encryptor version rather
 /// than accepting "latest."
+///
 @objc(RNEncryptor)
 public final class Encryptor: NSObject, CryptorType {
     private let encryptor: EncryptorV3
@@ -104,13 +158,13 @@ public final class Encryptor: NSObject, CryptorType {
     ///
     /// - parameter password: Non-empty password string. This will be interpretted as UTF-8.
     public init(password: String) {
+        precondition(password != "")
         encryptor = EncryptorV3(password: password)
     }
 
     /// Updates cryptor with data and returns processed data.
     ///
     /// - parameter data: Data to process. May be empty.
-    /// - throws: `RNCryptorError`
     /// - returns: Processed data. May be empty.
     public func updateWithData(data: NSData) -> NSData {
         return encryptor.updateWithData(data)
@@ -118,7 +172,6 @@ public final class Encryptor: NSObject, CryptorType {
 
     /// Returns trailing data and invalidates the cryptor.
     ///
-    /// - throws: `RNCryptorError`
     /// - returns: Trailing data
     public func finalData() -> NSData {
         return encryptor.finalData()
@@ -126,31 +179,47 @@ public final class Encryptor: NSObject, CryptorType {
 
     /// Simplified, generic interface to `CryptorType`. Takes a data,
     /// returns a processed data, and invalidates the cryptor.
-    /// - throws: `RNCryptorError`
     public func encryptData(data: NSData) -> NSData {
         return encryptor.encryptData(data)
     }
 }
 
-/// One-shot convenience functions.
-@objc(RNCryptor)
-public class Cryptor: NSObject {
+/// Class to expose global functions to Objective-C
+public class RNCryptor: NSObject {
+    /// Encrypt data using password and return encrypted data.
     public static func encryptData(data: NSData, password: String) -> NSData {
         return Encryptor(password: password).encryptData(data)
     }
 
+    /// Decrypt data using password and return decrypted data. Throws if
+    /// password is incorrect or ciphertext is in the wrong format.
+    /// - throws `RNCryptorError`
     public static func decryptData(data: NSData, password: String) throws -> NSData {
         return try Decryptor(password: password).decryptData(data)
     }
+
+    /// Generates random NSData of given length
+    /// Crashes if `length` is larger than allocatable memory, or if the system random number generator is not available.
+    public static func randomDataOfLength(length: Int) -> NSData {
+        let data = NSMutableData(length: length)!
+        let result = SecRandomCopyBytes(kSecRandomDefault, length, UnsafeMutablePointer<UInt8>(data.mutableBytes))
+        guard result == errSecSuccess else {
+            fatalError("SECURITY FAILURE: Could not generate secure random numbers: \(result).")
+        }
+        
+        return data
+    }
 }
 
-protocol PasswordDecryptorType: CryptorType {
+// Internal protocol for version-specific decryptors.
+internal protocol VersionedDecryptorType: CryptorType {
     static var preambleSize: Int { get }
     static func canDecrypt(preamble: NSData) -> Bool
     init(password: String)
 }
 
 private extension CollectionType {
+    // Split collection into ([pass], [fail]) based on predicate.
     func splitPassFail(pred: Generator.Element -> Bool) -> ([Generator.Element], [Generator.Element]) {
         var pass: [Generator.Element] = []
         var fail: [Generator.Element] = []
@@ -165,23 +234,35 @@ private extension CollectionType {
     }
 }
 
+/// Password-based decryptor that can handle any supported format.
 @objc(RNDecryptor)
 public final class Decryptor : NSObject, CryptorType {
-    private var decryptors: [PasswordDecryptorType.Type] = [DecryptorV3.self]
+    private var decryptors: [VersionedDecryptorType.Type] = [DecryptorV3.self]
 
     private var buffer = NSMutableData()
     private var decryptor: CryptorType?
     private let password: String
 
+    /// Creates and returns a cryptor.
+    ///
+    /// - parameter password: Non-empty password string. This will be interpretted as UTF-8.
     public init(password: String) {
         assert(password != "")
         self.password = password
     }
 
+    /// Decrypt data using password and return decrypted data, invalidating decryptor. Throws if
+    /// password is incorrect or ciphertext is in the wrong format.
+    /// - throws `RNCryptorError`
     public func decryptData(data: NSData) throws -> NSData {
         return try oneshot(data)
     }
 
+    /// Updates cryptor with data and returns processed data.
+    ///
+    /// - parameter data: Data to process. May be empty.
+    /// - throws: `RNCryptorError`
+    /// - returns: Processed data. May be empty.
     public func updateWithData(data: NSData) throws -> NSData {
         if let d = decryptor {
             return try d.updateWithData(data)
@@ -189,7 +270,7 @@ public final class Decryptor : NSObject, CryptorType {
 
         buffer.appendData(data)
 
-        let toCheck:[PasswordDecryptorType.Type]
+        let toCheck:[VersionedDecryptorType.Type]
         (toCheck, decryptors) = decryptors.splitPassFail{ self.buffer.length >= $0.preambleSize }
 
         for decryptorType in toCheck {
@@ -206,6 +287,10 @@ public final class Decryptor : NSObject, CryptorType {
         return NSData()
     }
 
+    /// Returns trailing data and invalidates the cryptor.
+    ///
+    /// - throws: `RNCryptorError`
+    /// - returns: Trailing data
     public func finalData() throws -> NSData {
         guard let d = decryptor else {
             throw RNCryptorError.UnknownHeader
@@ -292,45 +377,6 @@ internal final class Engine {
     }
 }
 
-public struct FormatV3 {
-    static public let version = UInt8(3)
-    static public let keySize = kCCKeySizeAES256
-
-    static let ivSize   = kCCBlockSizeAES128
-    static let hmacSize = Int(CC_SHA256_DIGEST_LENGTH)
-    static let saltSize = 8
-
-    static let keyHeaderSize = 1 + 1 + kCCBlockSizeAES128
-    static let passwordHeaderSize = 1 + 1 + 8 + 8 + kCCBlockSizeAES128
-
-    static public func keyForPassword(password: String, salt: NSData) -> NSData {
-        let derivedKey = NSMutableData(length: keySize)!
-        let derivedKeyPtr = UnsafeMutablePointer<UInt8>(derivedKey.mutableBytes)
-
-        let passwordData = password.dataUsingEncoding(NSUTF8StringEncoding)!
-        let passwordPtr = UnsafePointer<Int8>(passwordData.bytes)
-
-        let saltPtr = UnsafePointer<UInt8>(salt.bytes)
-
-        // All the crazy casting because CommonCryptor hates Swift
-        let algorithm     = CCPBKDFAlgorithm(kCCPBKDF2)
-        let prf           = CCPseudoRandomAlgorithm(kCCPRFHmacAlgSHA1)
-        let pbkdf2Rounds  = UInt32(10000)
-
-        let result = CCKeyDerivationPBKDF(
-            algorithm,
-            passwordPtr,   passwordData.length,
-            saltPtr,       salt.length,
-            prf,           pbkdf2Rounds,
-            derivedKeyPtr, derivedKey.length)
-
-        guard result == CCCryptorStatus(kCCSuccess) else {
-            fatalError("SECURITY FAILURE: Could not derive secure password (\(result)): \(derivedKey).")
-        }
-        return derivedKey
-    }
-}
-
 internal typealias V3 = FormatV3
 
 @objc(RNEncryptorV3)
@@ -351,14 +397,14 @@ public final class EncryptorV3 : NSObject, CryptorType {
 
     // Expose random numbers for testing
     internal convenience init(encryptionKey: NSData, hmacKey: NSData, iv: NSData) {
-        let preamble = [V3.version, UInt8(0)]
+        let preamble = [V3.formatVersion, UInt8(0)]
         let header = NSMutableData(bytes: preamble, length: preamble.count)
         header.appendData(iv)
         self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
     }
 
     public convenience init(encryptionKey: NSData, hmacKey: NSData) {
-        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: randomDataOfLength(V3.ivSize))
+        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: RNCryptor.randomDataOfLength(V3.ivSize))
     }
 
     // Expose random numbers for testing
@@ -368,7 +414,7 @@ public final class EncryptorV3 : NSObject, CryptorType {
 
         // TODO: This chained-+ is very slow to compile in Swift 2b5 (http://www.openradar.me/21842206)
         // let header = [V3.version, UInt8(1)] + encryptionSalt + hmacSalt + iv
-        let preamble = [V3.version, UInt8(1)]
+        let preamble = [V3.formatVersion, UInt8(1)]
         let header = NSMutableData(bytes: preamble, length: preamble.count)
         header.appendData(encryptionSalt)
         header.appendData(hmacSalt)
@@ -380,9 +426,9 @@ public final class EncryptorV3 : NSObject, CryptorType {
     public convenience init(password: String) {
         self.init(
             password: password,
-            encryptionSalt: randomDataOfLength(V3.saltSize),
-            hmacSalt: randomDataOfLength(V3.saltSize),
-            iv: randomDataOfLength(V3.ivSize))
+            encryptionSalt: RNCryptor.randomDataOfLength(V3.saltSize),
+            hmacSalt: RNCryptor.randomDataOfLength(V3.saltSize),
+            iv: RNCryptor.randomDataOfLength(V3.ivSize))
     }
 
     public func encryptData(data: NSData) -> NSData {
@@ -416,7 +462,7 @@ public final class EncryptorV3 : NSObject, CryptorType {
 }
 
 @objc(RNDecryptorV3)
-public final class DecryptorV3: NSObject, PasswordDecryptorType {
+public final class DecryptorV3: NSObject, VersionedDecryptorType {
     static let preambleSize = 1
     static func canDecrypt(preamble: NSData) -> Bool {
         assert(preamble.length >= 1)

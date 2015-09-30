@@ -44,7 +44,7 @@ func verify_v3_kdf(vector: [String:String]) {
 
 
 func _verifyPassword(vector: [String:String]) {
-    if Int(vector["version"]!) == Int(V3.version) {
+    if Int(vector["version"]!) == Int(V3.formatVersion) {
         let encryptor = EncryptorV3(password: vector["password"]!,
             encryptionSalt: vector["enc_salt_hex"]!.dataFromHexEncoding!,
             hmacSalt: vector["hmac_salt_hex"]!.dataFromHexEncoding!,
@@ -67,7 +67,7 @@ func verify_v3_password(vector: [String: String]) {
 }
 
 func verify_v3_key(vector: [String: String]) {
-    if Int(vector["version"]!) == Int(V3.version) {
+    if Int(vector["version"]!) == Int(V3.formatVersion) {
         let encryptor = EncryptorV3(
             encryptionKey: vector["enc_key_hex"]!.dataFromHexEncoding!,
             hmacKey: vector["hmac_key_hex"]!.dataFromHexEncoding!,
