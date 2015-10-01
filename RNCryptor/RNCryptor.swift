@@ -279,6 +279,10 @@ public final class Decryptor : NSObject, CryptorType {
 /// "the latest encryptor" with a password, use `Encryptor` instead.
 @objc(RNEncryptorV3)
 public final class EncryptorV3 : NSObject, CryptorType {
+    private var engine: Engine
+    private var hmac: HMACV3
+    private var pendingHeader: NSData?
+
     /// Creates and returns an encryptor.
     ///
     /// - parameter password: Non-empty password string. This will be interpretted as UTF-8.
@@ -330,11 +334,6 @@ public final class EncryptorV3 : NSObject, CryptorType {
         result.appendData(hmac.finalData())
         return result
     }
-
-    private var engine: Engine
-    private var hmac: HMACV3
-
-    private var pendingHeader: NSData?
 
     private init(encryptionKey: NSData, hmacKey: NSData, iv: NSData, header: NSData) {
         precondition(encryptionKey.length == V3.keySize)
@@ -587,7 +586,6 @@ private enum Credential {
     case Keys(encryptionKey: NSData, hmacKey: NSData)
 }
 
-
 private final class DecryptorEngineV3 {
     private let buffer = OverflowingBuffer(capacity: V3.hmacSize)
     private var hmac: HMACV3
@@ -643,7 +641,7 @@ private final class HMACV3 {
 }
 
 // Internal protocol for version-specific decryptors.
-internal protocol VersionedDecryptorType: CryptorType {
+private protocol VersionedDecryptorType: CryptorType {
     static var preambleSize: Int { get }
     static func canDecrypt(preamble: NSData) -> Bool
     init(password: String)
@@ -715,11 +713,11 @@ internal class OverflowingBuffer {
     }
 }
 
-internal extension NSData {
+private extension NSData {
     var bytesView: BytesView { return BytesView(self) }
 }
 
-internal struct BytesView: CollectionType {
+private struct BytesView: CollectionType {
     let data: NSData
     init(_ data: NSData) { self.data = data }
 
@@ -742,7 +740,7 @@ to determine a secret value by considering the time required to compare the valu
 We enumerate over the untrusted values so that the time is proportaional to the attacker's data,
 which provides the attack no informatoin about the length of the secret.
 */
-internal func isEqualInConsistentTime(trusted trusted: NSData, untrusted: NSData) -> Bool {
+private func isEqualInConsistentTime(trusted trusted: NSData, untrusted: NSData) -> Bool {
     // The point of this routine is XOR the bytes of each data and accumulate the results with OR.
     // If any bytes are different, then the OR will accumulate some non-0 value.
 
