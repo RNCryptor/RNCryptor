@@ -123,8 +123,6 @@ public final class FormatV3: NSObject {
     static let hmacSize = Int(CC_SHA256_DIGEST_LENGTH)
     static let keyHeaderSize = 1 + 1 + kCCBlockSizeAES128
     static let passwordHeaderSize = 1 + 1 + 8 + 8 + kCCBlockSizeAES128
-
-
 }
 
 /// Errors thrown by `CryptorType`
@@ -211,29 +209,6 @@ public class RNCryptor: NSObject {
     }
 }
 
-// Internal protocol for version-specific decryptors.
-internal protocol VersionedDecryptorType: CryptorType {
-    static var preambleSize: Int { get }
-    static func canDecrypt(preamble: NSData) -> Bool
-    init(password: String)
-}
-
-private extension CollectionType {
-    // Split collection into ([pass], [fail]) based on predicate.
-    func splitPassFail(pred: Generator.Element -> Bool) -> ([Generator.Element], [Generator.Element]) {
-        var pass: [Generator.Element] = []
-        var fail: [Generator.Element] = []
-        for e in self {
-            if pred(e) {
-                pass.append(e)
-            } else {
-                fail.append(e)
-            }
-        }
-        return (pass, fail)
-    }
-}
-
 /// Password-based decryptor that can handle any supported format.
 @objc(RNDecryptor)
 public final class Decryptor : NSObject, CryptorType {
@@ -296,6 +271,234 @@ public final class Decryptor : NSObject, CryptorType {
             throw RNCryptorError.UnknownHeader
         }
         return try d.finalData()
+    }
+}
+
+/// Format version 3 encryptor. Use this to ensure a specific format verison
+/// or when using keys (which are inherrently versions-specific). To use
+/// "the latest encryptor" with a password, use `Encryptor` instead.
+@objc(RNEncryptorV3)
+public final class EncryptorV3 : NSObject, CryptorType {
+    /// Creates and returns an encryptor.
+    ///
+    /// - parameter password: Non-empty password string. This will be interpretted as UTF-8.
+    public convenience init(password: String) {
+        self.init(
+            password: password,
+            encryptionSalt: RNCryptor.randomDataOfLength(V3.saltSize),
+            hmacSalt: RNCryptor.randomDataOfLength(V3.saltSize),
+            iv: RNCryptor.randomDataOfLength(V3.ivSize))
+    }
+
+    /// Creates and returns an encryptor using keys.
+    ///
+    /// - Attention: This method requires some expertise to use correctly.
+    ///              Most users should use `init(password:)` which is simpler
+    ///              to use securely.
+    ///
+    /// Keys should not be generated directly from strings (`.dataUsingEncoding()` or similar).
+    /// Ideally, keys should be random (`Cryptor.randomDataOfLength()` or some other high-quality
+    /// random generator. If keys must be generated from strings, then use `FormatV3.keyForPassword(salt:)`
+    /// with a random salt, or just use password-based encryption (that's what it's for).
+    ///
+    /// - parameters:
+    ///     - encryptionKey: AES-256 key. Must be exactly FormatV3.keySize (kCCKeySizeAES256, 32 bytes)
+    ///     - hmacKey: HMAC key. Must be exactly FormatV3.keySize (kCCKeySizeAES256, 32 bytes)
+    public convenience init(encryptionKey: NSData, hmacKey: NSData) {
+        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: RNCryptor.randomDataOfLength(V3.ivSize))
+    }
+
+    /// Takes a data, returns a processed data, and invalidates the cryptor.
+    public func encryptData(data: NSData) -> NSData {
+        return try! oneshot(data)
+    }
+
+    /// Updates cryptor with data and returns encrypted data.
+    ///
+    /// - parameter data: Data to process. May be empty.
+    /// - returns: Processed data. May be empty.
+    public func updateWithData(data: NSData) -> NSData {
+        // It should not be possible for this to fail during encryption
+        return try! handle(engine.updateWithData(data))
+    }
+
+    /// Returns trailing data and invalidates the cryptor.
+    ///
+    /// - returns: Trailing data
+    public func finalData() -> NSData {
+        let result = NSMutableData(data: try! handle(engine.finalData()))
+        result.appendData(hmac.finalData())
+        return result
+    }
+
+    private var engine: Engine
+    private var hmac: HMACV3
+
+    private var pendingHeader: NSData?
+
+    private init(encryptionKey: NSData, hmacKey: NSData, iv: NSData, header: NSData) {
+        precondition(encryptionKey.length == V3.keySize)
+        precondition(hmacKey.length == V3.keySize)
+        precondition(iv.length == V3.ivSize)
+        hmac = HMACV3(key: hmacKey)
+        engine = Engine(operation: .Encrypt, key: encryptionKey, iv: iv)
+        pendingHeader = header
+    }
+
+    // Expose random numbers for testing
+    internal convenience init(encryptionKey: NSData, hmacKey: NSData, iv: NSData) {
+        let preamble = [V3.formatVersion, UInt8(0)]
+        let header = NSMutableData(bytes: preamble, length: preamble.count)
+        header.appendData(iv)
+        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
+    }
+
+    // Expose random numbers for testing
+    internal convenience init(password: String, encryptionSalt: NSData, hmacSalt: NSData, iv: NSData) {
+        let encryptionKey = V3.keyForPassword(password, salt: encryptionSalt)
+        let hmacKey = V3.keyForPassword(password, salt: hmacSalt)
+
+        // TODO: This chained-+ is very slow to compile in Swift 2b5 (http://www.openradar.me/21842206)
+        // let header = [V3.version, UInt8(1)] + encryptionSalt + hmacSalt + iv
+        let preamble = [V3.formatVersion, UInt8(1)]
+        let header = NSMutableData(bytes: preamble, length: preamble.count)
+        header.appendData(encryptionSalt)
+        header.appendData(hmacSalt)
+        header.appendData(iv)
+
+        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
+    }
+
+    private func handle(data: NSData) -> NSData {
+        var result: NSData
+        if let ph = pendingHeader {
+            let accum = NSMutableData(data: ph)
+            pendingHeader = nil
+            accum.appendData(data)
+            result = accum
+        } else {
+            result = data
+        }
+        hmac.updateWithData(result)
+        return result
+    }
+}
+
+/// Format version 3 decryptor. This is required in order to decrypt
+/// using keys (since key configuration is version-specific). For password
+/// decryption, `Decryptor` is generally preferred, and will call this
+/// if appropriate.
+@objc(RNDecryptorV3)
+public final class DecryptorV3: NSObject, VersionedDecryptorType {
+    /// Creates and returns a decryptor.
+    ///
+    /// - parameter password: Non-empty password string. This will be interpretted as UTF-8.
+    public init(password: String) {
+        credential = .Password(password)
+    }
+
+    /// Creates and returns a decryptor using keys.
+    ///
+    /// - parameters:
+    ///     - encryptionKey: AES-256 key. Must be exactly FormatV3.keySize (kCCKeySizeAES256, 32 bytes)
+    ///     - hmacKey: HMAC key. Must be exactly FormatV3.keySize (kCCKeySizeAES256, 32 bytes)
+    public init(encryptionKey: NSData, hmacKey: NSData) {
+        precondition(encryptionKey.length == V3.keySize)
+        precondition(hmacKey.length == V3.hmacSize)
+        credential = .Keys(encryptionKey: encryptionKey, hmacKey: hmacKey)
+    }
+
+    public func decryptData(data: NSData) throws -> NSData {
+        return try oneshot(data)
+    }
+
+    public func updateWithData(data: NSData) throws -> NSData {
+        if let e = decryptorEngine {
+            return try e.updateWithData(data)
+        }
+
+        buffer.appendData(data)
+        guard buffer.length >= requiredHeaderSize else {
+            return NSData()
+        }
+
+        let e = try createEngineWithCredential(credential, header: buffer.bytesView[0..<requiredHeaderSize])
+        decryptorEngine = e
+        let body = buffer.bytesView[requiredHeaderSize..<buffer.length]
+        buffer.length = 0
+        return try e.updateWithData(body)
+    }
+
+    public func finalData() throws -> NSData {
+        guard let result = try decryptorEngine?.finalData() else {
+            throw RNCryptorError.MessageTooShort
+        }
+        return result
+    }
+
+    static let preambleSize = 1
+    static func canDecrypt(preamble: NSData) -> Bool {
+        assert(preamble.length >= 1)
+        return preamble.bytesView[0] == 3
+    }
+
+    var requiredHeaderSize: Int {
+        switch credential {
+        case .Password(_): return V3.passwordHeaderSize
+        case .Keys(_, _): return V3.keyHeaderSize
+        }
+    }
+
+    private var buffer = NSMutableData()
+    private var decryptorEngine: DecryptorEngineV3?
+    private let credential: Credential
+
+    private func createEngineWithCredential(credential: Credential, header: NSData) throws -> DecryptorEngineV3 {
+        switch credential {
+        case let .Password(password):
+            return try createEngineWithPassword(password, header: header)
+        case let .Keys(encryptionKey, hmacKey):
+            return try createEngineWithKeys(encryptionKey: encryptionKey, hmacKey: hmacKey, header: header)
+        }
+    }
+
+    private func createEngineWithPassword(password: String, header: NSData) throws -> DecryptorEngineV3 {
+        assert(password != "")
+        precondition(header.length == V3.passwordHeaderSize)
+
+        guard DecryptorV3.canDecrypt(header) else {
+            throw RNCryptorError.UnknownHeader
+        }
+
+        guard header.bytesView[1] == 1 else {
+            throw RNCryptorError.InvalidCredentialType
+        }
+
+        let encryptionSalt = header.bytesView[2...9]
+        let hmacSalt = header.bytesView[10...17]
+        let iv = header.bytesView[18...33]
+
+        let encryptionKey = V3.keyForPassword(password, salt: encryptionSalt)
+        let hmacKey = V3.keyForPassword(password, salt: hmacSalt)
+
+        return DecryptorEngineV3(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
+    }
+
+    private func createEngineWithKeys(encryptionKey encryptionKey: NSData, hmacKey: NSData, header: NSData) throws -> DecryptorEngineV3 {
+        precondition(header.length == V3.keyHeaderSize)
+        precondition(encryptionKey.length == V3.keySize)
+        precondition(hmacKey.length == V3.keySize)
+
+        guard DecryptorV3.canDecrypt(header) else {
+            throw RNCryptorError.UnknownHeader
+        }
+
+        guard header.bytesView[1] == 0 else {
+            throw RNCryptorError.InvalidCredentialType
+        }
+
+        let iv = header.bytesView[2..<18]
+        return DecryptorEngineV3(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
     }
 }
 
@@ -379,194 +582,6 @@ internal final class Engine {
 
 internal typealias V3 = FormatV3
 
-@objc(RNEncryptorV3)
-public final class EncryptorV3 : NSObject, CryptorType {
-    private var engine: Engine
-    private var hmac: HMACV3
-
-    private var pendingHeader: NSData?
-
-    private init(encryptionKey: NSData, hmacKey: NSData, iv: NSData, header: NSData) {
-        precondition(encryptionKey.length == V3.keySize)
-        precondition(hmacKey.length == V3.keySize)
-        precondition(iv.length == V3.ivSize)
-        hmac = HMACV3(key: hmacKey)
-        engine = Engine(operation: .Encrypt, key: encryptionKey, iv: iv)
-        pendingHeader = header
-    }
-
-    // Expose random numbers for testing
-    internal convenience init(encryptionKey: NSData, hmacKey: NSData, iv: NSData) {
-        let preamble = [V3.formatVersion, UInt8(0)]
-        let header = NSMutableData(bytes: preamble, length: preamble.count)
-        header.appendData(iv)
-        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
-    }
-
-    public convenience init(encryptionKey: NSData, hmacKey: NSData) {
-        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: RNCryptor.randomDataOfLength(V3.ivSize))
-    }
-
-    // Expose random numbers for testing
-    internal convenience init(password: String, encryptionSalt: NSData, hmacSalt: NSData, iv: NSData) {
-        let encryptionKey = V3.keyForPassword(password, salt: encryptionSalt)
-        let hmacKey = V3.keyForPassword(password, salt: hmacSalt)
-
-        // TODO: This chained-+ is very slow to compile in Swift 2b5 (http://www.openradar.me/21842206)
-        // let header = [V3.version, UInt8(1)] + encryptionSalt + hmacSalt + iv
-        let preamble = [V3.formatVersion, UInt8(1)]
-        let header = NSMutableData(bytes: preamble, length: preamble.count)
-        header.appendData(encryptionSalt)
-        header.appendData(hmacSalt)
-        header.appendData(iv)
-
-        self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
-    }
-
-    public convenience init(password: String) {
-        self.init(
-            password: password,
-            encryptionSalt: RNCryptor.randomDataOfLength(V3.saltSize),
-            hmacSalt: RNCryptor.randomDataOfLength(V3.saltSize),
-            iv: RNCryptor.randomDataOfLength(V3.ivSize))
-    }
-
-    public func encryptData(data: NSData) -> NSData {
-        return try! oneshot(data)
-    }
-
-    private func handle(data: NSData) -> NSData {
-        var result: NSData
-        if let ph = pendingHeader {
-            let accum = NSMutableData(data: ph)
-            pendingHeader = nil
-            accum.appendData(data)
-            result = accum
-        } else {
-            result = data
-        }
-        hmac.updateWithData(result)
-        return result
-    }
-
-    public func updateWithData(data: NSData) -> NSData {
-        // It should not be possible for this to fail during encryption
-        return try! handle(engine.updateWithData(data))
-    }
-
-    public func finalData() -> NSData {
-        let result = NSMutableData(data: try! handle(engine.finalData()))
-        result.appendData(hmac.finalData())
-        return result
-    }
-}
-
-@objc(RNDecryptorV3)
-public final class DecryptorV3: NSObject, VersionedDecryptorType {
-    static let preambleSize = 1
-    static func canDecrypt(preamble: NSData) -> Bool {
-        assert(preamble.length >= 1)
-        return preamble.bytesView[0] == 3
-    }
-
-    var requiredHeaderSize: Int {
-        switch credential {
-        case .Password(_): return V3.passwordHeaderSize
-        case .Keys(_, _): return V3.keyHeaderSize
-        }
-    }
-
-    private var buffer = NSMutableData()
-    private var decryptorEngine: DecryptorEngineV3?
-    private let credential: Credential
-
-    public init(password: String) {
-        credential = .Password(password)
-    }
-
-    public init(encryptionKey: NSData, hmacKey: NSData) {
-        precondition(encryptionKey.length == V3.keySize)
-        precondition(hmacKey.length == V3.hmacSize)
-        credential = .Keys(encryptionKey: encryptionKey, hmacKey: hmacKey)
-    }
-
-    public func decryptData(data: NSData) throws -> NSData {
-        return try oneshot(data)
-    }
-
-    public func updateWithData(data: NSData) throws -> NSData {
-        if let e = decryptorEngine {
-            return try e.updateWithData(data)
-        }
-
-        buffer.appendData(data)
-        guard buffer.length >= requiredHeaderSize else {
-            return NSData()
-        }
-
-        let e = try createEngineWithCredential(credential, header: buffer.bytesView[0..<requiredHeaderSize])
-        decryptorEngine = e
-        let body = buffer.bytesView[requiredHeaderSize..<buffer.length]
-        buffer.length = 0
-        return try e.updateWithData(body)
-    }
-
-    private func createEngineWithCredential(credential: Credential, header: NSData) throws -> DecryptorEngineV3 {
-        switch credential {
-        case let .Password(password):
-            return try createEngineWithPassword(password, header: header)
-        case let .Keys(encryptionKey, hmacKey):
-            return try createEngineWithKeys(encryptionKey: encryptionKey, hmacKey: hmacKey, header: header)
-        }
-    }
-
-    private func createEngineWithPassword(password: String, header: NSData) throws -> DecryptorEngineV3 {
-        assert(password != "")
-        precondition(header.length == V3.passwordHeaderSize)
-
-        guard DecryptorV3.canDecrypt(header) else {
-            throw RNCryptorError.UnknownHeader
-        }
-
-        guard header.bytesView[1] == 1 else {
-            throw RNCryptorError.InvalidCredentialType
-        }
-
-        let encryptionSalt = header.bytesView[2...9]
-        let hmacSalt = header.bytesView[10...17]
-        let iv = header.bytesView[18...33]
-
-        let encryptionKey = V3.keyForPassword(password, salt: encryptionSalt)
-        let hmacKey = V3.keyForPassword(password, salt: hmacSalt)
-
-        return DecryptorEngineV3(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
-    }
-
-    private func createEngineWithKeys(encryptionKey encryptionKey: NSData, hmacKey: NSData, header: NSData) throws -> DecryptorEngineV3 {
-        precondition(header.length == V3.keyHeaderSize)
-        precondition(encryptionKey.length == V3.keySize)
-        precondition(hmacKey.length == V3.keySize)
-
-        guard DecryptorV3.canDecrypt(header) else {
-            throw RNCryptorError.UnknownHeader
-        }
-
-        guard header.bytesView[1] == 0 else {
-            throw RNCryptorError.InvalidCredentialType
-        }
-
-        let iv = header.bytesView[2..<18]
-        return DecryptorEngineV3(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
-    }
-
-    public func finalData() throws -> NSData {
-        guard let result = try decryptorEngine?.finalData() else {
-            throw RNCryptorError.MessageTooShort
-        }
-        return result
-    }
-}
-
 private enum Credential {
     case Password(String)
     case Keys(encryptionKey: NSData, hmacKey: NSData)
@@ -624,5 +639,28 @@ private final class HMACV3 {
         let hmac = NSMutableData(length: V3.hmacSize)!
         CCHmacFinal(&context, hmac.mutableBytes)
         return hmac
+    }
+}
+
+// Internal protocol for version-specific decryptors.
+internal protocol VersionedDecryptorType: CryptorType {
+    static var preambleSize: Int { get }
+    static func canDecrypt(preamble: NSData) -> Bool
+    init(password: String)
+}
+
+private extension CollectionType {
+    // Split collection into ([pass], [fail]) based on predicate.
+    func splitPassFail(pred: Generator.Element -> Bool) -> ([Generator.Element], [Generator.Element]) {
+        var pass: [Generator.Element] = []
+        var fail: [Generator.Element] = []
+        for e in self {
+            if pred(e) {
+                pass.append(e)
+            } else {
+                fail.append(e)
+            }
+        }
+        return (pass, fail)
     }
 }
