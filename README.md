@@ -29,7 +29,9 @@ it includes:
 * Random IV
 * Encrypt-then-hash HMAC
 
-## Basic Swift Password Usage
+## Basic Password Usage
+
+### Swift
 
 ```swift
 // Encryption
@@ -47,16 +49,15 @@ do {
 
 ```
 
-## Basic ObjC Password Usage
+### Obj-C
 
 ``` objc
 // Encryption
 NSData *data = ...
-NSString *password = "Secret password";
+NSString *password = @"Secret password";
 NSData *ciphertext = [RNCryptor encryptData:data password:password];
 
 // Decryption
-
 NSError *error = nil;
 NSData *plaintext = [RNCryptor decryptData:ciphertext password:password error:&error];
 if (error != nil) {
@@ -69,115 +70,92 @@ if (error != nil) {
 ## Incremental use
 
 RNCryptor suports incremental use, specifically designed to work with
-`NSURLConnection`. This is also useful for cases where the encrypted or decrypted
+`NSURLSession`. This is also useful for cases where the encrypted or decrypted
 data will not comfortably fit in memory.
 
 To operate in incremental mode, you create an `Encryptor` or `Decryptor`,
-call `updateWithData()`
-providing it a handler. This handler will be called as data is encrypted or
-decrypted. As data becomes available, call `addData:`. When you reach the end of
-the data call `finish`.
+call `updateWithData()` repeatedly, gathering its results, and then call
+`finalData()` and gather its result.
 
-``` objc
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-  [self.encryptedData addData:[self.cryptor addData:data]];
-}
+### Swift
 
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-  [self.cryptor finish];
-}
+```swift
+//
+// Encryption
+//
+let password = "Secret password"
+let encryptor = RNCryptor.Encryptor(password: password)
+let ciphertext = NSMutableData()
 
-// Other connection delegates
+// ... Each time data comes in, update the encryptor and accumulate some ciphertext ...
+ciphertext.appendData(encryptor.updateWithData(data))
 
-- (void)decryptionDidFinish {
-  if (self.cryptor.error) {
-    // An error occurred. You cannot trust encryptedData at this point
-  }
-  else {
-    // self.encryptedData is complete. Use it as you like
-  }
-  self.encryptedData = nil;
-  self.cryptor = nil;
-  self.connection = nil;
-}
+// ... When data is done, finish up ...
+ciphertext.appendData(encryptor.finalData())
 
-- (void)decryptRequest:(NSURLRequest *)request {
-  self.encryptedData = [NSMutableData data];
-  self.connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
-  self.cryptor = [[RNDecryptor alloc] initWithPassword:self.password
-                                               handler:^(RNCryptor *cryptor, NSData *data) {
-                                                   [self.decryptedData appendData:data];
-                                                   if (cryptor.isFinished) {
-                                                     [self decryptionDidFinish];
-                                                   }
-                                                 }];
-}
+//
+// Decryption
+//
+let password = "Secret password"
+let decryptor = RNCryptor.Decryptor(password: password)
+let plaintext = NSMutableData()
+
+// ... Each time data comes in, update the decryptor and accumulate some plaintext ...
+try plaintext.appendData(decryptor.updateWithData(data))
+
+// ... When data is done, finish up ...
+try plaintext.appendData(decryptor.finalData())
 ```
 
-## Async and Streams
-
-When performing async operations on streams, the data can come very quickly
-(particularly if you're reading from a local file). If you use RNCryptor in a
-naïve way, you'll queue a work blocks faster than the engine can process them
-and your memory usage will spike. This is particularly true if there's only one
-core, such as on an iPad 1. The solution is to only dispatch new work blocks as
-the previous work blocks complete.
+### Obj-C
 
 ``` objc
-// Make sure that this number is larger than the header + 1 block.
-// 33+16 bytes = 49 bytes. So it shouldn't be a problem.
-int blockSize = 32 * 1024;
+//
+// Encryption
+//
+NSString *password = @"Secret password";
+RNEncryptor *encryptor = [[RNEncryptor alloc] initWithPassword:password];
+NSMutableData *ciphertext = [NSMutableData new];
 
-NSInputStream *cryptedStream = [NSInputStream inputStreamWithFileAtPath:@"C++ Spec.pdf"];
-NSOutputStream *decryptedStream = [NSOutputStream outputStreamToFileAtPath:@"/tmp/C++.crypt" append:NO];
+// ... Each time data comes in, update the encryptor and accumulate some ciphertext ...
+[ciphertext appendData:[encryptor updateWithData:data]];
 
-[cryptedStream open];
-[decryptedStream open];
+// ... When data is done, finish up ...
+[ciphertext appendData:[encryptor finalData]];
 
-// We don't need to keep making new NSData objects. We can just use one repeatedly.
-__block NSMutableData *data = [NSMutableData dataWithLength:blockSize];
-__block RNEncryptor *decryptor = nil;
 
-dispatch_block_t readStreamBlock = ^{
-  [data setLength:blockSize];
-  NSInteger bytesRead = [cryptedStream read:[data mutableBytes] maxLength:blockSize];
-  if (bytesRead < 0) {
-    // Throw an error
-  }
-  else if (bytesRead == 0) {
-    [decryptor finish];
-  }
-  else {
-    [data setLength:bytesRead];
-    [decryptor addData:data];
-    NSLog(@"Sent %ld bytes to decryptor", (unsigned long)bytesRead);
-  }
-};
+//
+// Decryption
+//
+RNDecryptor *decryptor = [[RNDecryptor alloc] initWithPassword:password];
+NSMutableData *plaintext = [NSMutableData new];
 
-decryptor = [[RNEncryptor alloc] initWithSettings:kRNCryptorAES256Settings
-                                         password:@"blah"
-                                          handler:^(RNCryptor *cryptor, NSData *data) {
-                                            NSLog(@"Decryptor recevied %ld bytes", (unsigned long)data.length);
-                                            [decryptedStream write:data.bytes maxLength:data.length];
-                                            if (cryptor.isFinished) {
-                                              [decryptedStream close];
-                                              // call my delegate that I'm finished with decrypting
-                                            }
-                                            else {
-                                              // Might want to put this in a dispatch_async(), but I don't think you need it.
-                                              readStreamBlock();
-                                            }
-                                          }];
 
-// Read the first block to kick things off    
-readStreamBlock();
+// ... Each time data comes in, update the decryptor and accumulate some plaintext ...
+NSError *error = nil;
+NSData *partialPlaintext = [decryptor updateWithData:data error:&error];
+if (error != nil) { 
+    NSLog(@"FAILED DECRYPT: %@", error);
+    return;
+}
+[plaintext appendData:partialPlaintext];
+
+// ... When data is done, finish up ...
+NSError *error = nil;
+NSData *partialPlaintext = [decryptor finalDataAndReturnError:&error];
+if (error != nil) { 
+    NSLog(@"FAILED DECRYPT: %@", error);
+    return;
+}
+
+[ciphertext appendData:partialPlaintext];
+
 ```
-
-I'll eventually get this into the API to simplify things. See [Cyrille's SO
-question](http://stackoverflow.com/a/14586231/97337) for more discussion. Pull
-requests welcome.
 
 ## Building
+
+RNCryptor is a single Swift file (`RNCryptor.swift`) that can be easily dropped
+into any package. You'll need to link with `Security.framework`.
 
 Comes packaged as a static library, but the source files can be dropped into any
 project. The OpenSSL files are not required.
