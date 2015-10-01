@@ -335,15 +335,6 @@ public final class EncryptorV3 : NSObject, CryptorType {
         return result
     }
 
-    private init(encryptionKey: NSData, hmacKey: NSData, iv: NSData, header: NSData) {
-        precondition(encryptionKey.length == V3.keySize)
-        precondition(hmacKey.length == V3.keySize)
-        precondition(iv.length == V3.ivSize)
-        hmac = HMACV3(key: hmacKey)
-        engine = Engine(operation: .Encrypt, key: encryptionKey, iv: iv)
-        pendingHeader = header
-    }
-
     // Expose random numbers for testing
     internal convenience init(encryptionKey: NSData, hmacKey: NSData, iv: NSData) {
         let preamble = [V3.formatVersion, UInt8(0)]
@@ -368,6 +359,15 @@ public final class EncryptorV3 : NSObject, CryptorType {
         self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
     }
 
+    private init(encryptionKey: NSData, hmacKey: NSData, iv: NSData, header: NSData) {
+        precondition(encryptionKey.length == V3.keySize)
+        precondition(hmacKey.length == V3.keySize)
+        precondition(iv.length == V3.ivSize)
+        hmac = HMACV3(key: hmacKey)
+        engine = Engine(operation: .Encrypt, key: encryptionKey, iv: iv)
+        pendingHeader = header
+    }
+
     private func handle(data: NSData) -> NSData {
         var result: NSData
         if let ph = pendingHeader {
@@ -389,6 +389,23 @@ public final class EncryptorV3 : NSObject, CryptorType {
 /// if appropriate.
 @objc(RNDecryptorV3)
 public final class DecryptorV3: NSObject, VersionedDecryptorType {
+    //
+    // Static methods
+    //
+    private static let preambleSize = 1
+    private static func canDecrypt(preamble: NSData) -> Bool {
+        assert(preamble.length >= 1)
+        return preamble.bytesView[0] == 3
+    }
+
+    //
+    // Private properties
+    //
+    private var buffer = NSMutableData()
+    private var decryptorEngine: DecryptorEngineV3?
+    private let credential: Credential
+
+
     /// Creates and returns a decryptor.
     ///
     /// - parameter password: Non-empty password string. This will be interpretted as UTF-8.
@@ -407,10 +424,17 @@ public final class DecryptorV3: NSObject, VersionedDecryptorType {
         credential = .Keys(encryptionKey: encryptionKey, hmacKey: hmacKey)
     }
 
+    /// Decrypt data using password and return decrypted data. Throws if
+    /// password is incorrect or ciphertext is in the wrong format.
+    /// - throws `RNCryptorError`
     public func decryptData(data: NSData) throws -> NSData {
         return try oneshot(data)
     }
 
+    /// Updates cryptor with data and returns encrypted data.
+    ///
+    /// - parameter data: Data to process. May be empty.
+    /// - returns: Processed data. May be empty.
     public func updateWithData(data: NSData) throws -> NSData {
         if let e = decryptorEngine {
             return try e.updateWithData(data)
@@ -428,6 +452,9 @@ public final class DecryptorV3: NSObject, VersionedDecryptorType {
         return try e.updateWithData(body)
     }
 
+    /// Returns trailing data and invalidates the cryptor.
+    ///
+    /// - returns: Trailing data
     public func finalData() throws -> NSData {
         guard let result = try decryptorEngine?.finalData() else {
             throw RNCryptorError.MessageTooShort
@@ -435,22 +462,16 @@ public final class DecryptorV3: NSObject, VersionedDecryptorType {
         return result
     }
 
-    static let preambleSize = 1
-    static func canDecrypt(preamble: NSData) -> Bool {
-        assert(preamble.length >= 1)
-        return preamble.bytesView[0] == 3
-    }
+    //
+    // Private functions
+    //
 
-    var requiredHeaderSize: Int {
+    private var requiredHeaderSize: Int {
         switch credential {
         case .Password(_): return V3.passwordHeaderSize
         case .Keys(_, _): return V3.keyHeaderSize
         }
     }
-
-    private var buffer = NSMutableData()
-    private var decryptorEngine: DecryptorEngineV3?
-    private let credential: Credential
 
     private func createEngineWithCredential(credential: Credential, header: NSData) throws -> DecryptorEngineV3 {
         switch credential {
