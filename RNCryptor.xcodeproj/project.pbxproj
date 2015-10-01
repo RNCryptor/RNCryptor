@@ -22,16 +22,12 @@
 		FB7174D91BA1CD030026EC7F /* RNCryptorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB627FDD1B2B7A1800C3A579 /* RNCryptorTests.swift */; };
 		FB7174DA1BA1CD030026EC7F /* OverfowingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA08AB81B40589400F97862 /* OverfowingBuffer.swift */; };
 		FB7174DC1BA1CDAA0026EC7F /* ByteArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBCF49611B441B0600DCFB19 /* ByteArray.swift */; settings = {ASSET_TAGS = (); }; };
-		FBA08AB51B3F480700F97862 /* OverflowingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA08AB41B3F480700F97862 /* OverflowingBuffer.swift */; };
 		FBA08AB91B40589400F97862 /* OverfowingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA08AB81B40589400F97862 /* OverfowingBuffer.swift */; };
 		FBCF48DE1B43286D00DCFB19 /* RNCryptor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBCF48D41B43286D00DCFB19 /* RNCryptor.framework */; };
 		FBCF48ED1B43293400DCFB19 /* RNCryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB30A1FE1B2B7BF300BE5429 /* RNCryptor.swift */; };
-		FBCF48F01B43293400DCFB19 /* OverflowingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA08AB41B3F480700F97862 /* OverflowingBuffer.swift */; };
 		FBCF49011B432A8000DCFB19 /* CommonCrypto.h in Headers */ = {isa = PBXBuildFile; fileRef = FB30A2071B2B86FD00BE5429 /* CommonCrypto.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FBCF490A1B432AA600DCFB19 /* CommonCrypto.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBCF49061B432A8000DCFB19 /* CommonCrypto.framework */; };
 		FBCF49671B44358100DCFB19 /* ByteArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBCF49611B441B0600DCFB19 /* ByteArray.swift */; };
-		FBE066A31BB998F600B1FAC8 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE066A21BB998F600B1FAC8 /* Data.swift */; settings = {ASSET_TAGS = (); }; };
-		FBE066A41BB9AA4F00B1FAC8 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBE066A21BB998F600B1FAC8 /* Data.swift */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -85,13 +81,11 @@
 		FB627FD81B2B7A1800C3A579 /* RNCryptorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RNCryptorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB627FDD1B2B7A1800C3A579 /* RNCryptorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNCryptorTests.swift; sourceTree = "<group>"; };
 		FB627FDF1B2B7A1800C3A579 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		FBA08AB41B3F480700F97862 /* OverflowingBuffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OverflowingBuffer.swift; sourceTree = "<group>"; };
 		FBA08AB81B40589400F97862 /* OverfowingBuffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OverfowingBuffer.swift; sourceTree = "<group>"; };
 		FBCF48D41B43286D00DCFB19 /* RNCryptor.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RNCryptor.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBCF48DD1B43286D00DCFB19 /* RNCryptor-OSXTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "RNCryptor-OSXTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBCF49061B432A8000DCFB19 /* CommonCrypto.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CommonCrypto.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBCF49611B441B0600DCFB19 /* ByteArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ByteArray.swift; sourceTree = "<group>"; };
-		FBE066A21BB998F600B1FAC8 /* Data.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -202,7 +196,6 @@
 			isa = PBXGroup;
 			children = (
 				FB30A1FE1B2B7BF300BE5429 /* RNCryptor.swift */,
-				FBF74C9F1B41C7650020DEC3 /* Helpers */,
 				FB5E0E031B42DF500088476F /* Support */,
 			);
 			path = RNCryptor;
@@ -221,15 +214,6 @@
 				FB1E41121BBABEB10009A47D /* ObjC.m */,
 			);
 			path = RNCryptorTests;
-			sourceTree = "<group>";
-		};
-		FBF74C9F1B41C7650020DEC3 /* Helpers */ = {
-			isa = PBXGroup;
-			children = (
-				FBA08AB41B3F480700F97862 /* OverflowingBuffer.swift */,
-				FBE066A21BB998F600B1FAC8 /* Data.swift */,
-			);
-			name = Helpers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -486,8 +470,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				FB30A1FF1B2B7BF300BE5429 /* RNCryptor.swift in Sources */,
-				FBE066A31BB998F600B1FAC8 /* Data.swift in Sources */,
-				FBA08AB51B3F480700F97862 /* OverflowingBuffer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -509,8 +491,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				FBCF48ED1B43293400DCFB19 /* RNCryptor.swift in Sources */,
-				FBE066A41BB9AA4F00B1FAC8 /* Data.swift in Sources */,
-				FBCF48F01B43293400DCFB19 /* OverflowingBuffer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

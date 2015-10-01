@@ -664,3 +664,94 @@ private extension CollectionType {
         return (pass, fail)
     }
 }
+
+internal class OverflowingBuffer {
+    private var buffer = NSMutableData()
+    let capacity: Int
+
+    init(capacity: Int) {
+        self.capacity = capacity
+    }
+
+    @warn_unused_result
+    func updateWithData(data: NSData) -> NSData {
+        if data.length >= capacity {
+            return sendAllArray(data)
+        } else if buffer.length + data.length <= capacity {
+            buffer.appendData(data)
+            return NSData()
+        } else {
+            return sendSomeArray(data)
+        }
+    }
+
+    func finalData() -> NSData {
+        let result = buffer
+        buffer = NSMutableData() // Data belongs to caller now.
+        return result
+    }
+
+    private func sendAllArray(data: NSData) -> NSData {
+        let toSend = data.length - capacity
+        assert(toSend >= 0)
+        assert(data.length - toSend <= capacity)
+
+        let result = NSMutableData(data: buffer)
+        result.appendData(data.bytesView[0..<toSend])
+        buffer.length = 0
+        buffer.appendData(data.bytesView[toSend..<data.length])
+        return result
+    }
+
+    private func sendSomeArray(data: NSData) -> NSData {
+        let toSend = (buffer.length + data.length) - capacity
+        assert(toSend > 0) // If it were <= 0, we would have extended the array
+        assert(toSend < buffer.length) // If we would have sent everything, replaceBuffer should have been called
+
+        let result = buffer.bytesView[0..<toSend]
+        buffer.replaceBytesInRange(NSRange(0..<toSend), withBytes: nil, length: 0)
+        buffer.appendData(data)
+        return result
+    }
+}
+
+internal extension NSData {
+    var bytesView: BytesView { return BytesView(self) }
+}
+
+internal struct BytesView: CollectionType {
+    let data: NSData
+    init(_ data: NSData) { self.data = data }
+
+    subscript (position: Int) -> UInt8 {
+        return UnsafePointer<UInt8>(data.bytes)[position]
+    }
+    subscript (bounds: Range<Int>) -> NSData {
+        return data.subdataWithRange(NSRange(bounds))
+    }
+    var startIndex: Int = 0
+    var endIndex: Int { return data.length }
+}
+
+/** Compare two NSData in time proportional to the untrusted data
+
+Equatable-based comparisons genreally stop comparing at the first difference.
+This can be used by attackers, in some situations,
+to determine a secret value by considering the time required to compare the values.
+
+We enumerate over the untrusted values so that the time is proportaional to the attacker's data,
+which provides the attack no informatoin about the length of the secret.
+*/
+internal func isEqualInConsistentTime(trusted trusted: NSData, untrusted: NSData) -> Bool {
+    // The point of this routine is XOR the bytes of each data and accumulate the results with OR.
+    // If any bytes are different, then the OR will accumulate some non-0 value.
+
+    var result: UInt8 = untrusted.length == trusted.length ? 0 : 1  // Start with 0 (equal) only if our lengths are equal
+    for (i, untrustedByte) in untrusted.bytesView.enumerate() {
+        // Use mod to wrap around ourselves if they are longer than we are.
+        // Remember, we already broke equality if our lengths are different.
+        result |= trusted.bytesView[i % trusted.length] ^ untrustedByte
+    }
+
+    return result == 0
+}
