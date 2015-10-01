@@ -152,10 +152,12 @@ if (error != nil) {
 
 ```
 
-## Building
+## Installation
+
+### By hand
 
 RNCryptor is a single Swift file (`RNCryptor.swift`) that can be easily dropped
-into any package. You'll need to link with `Security.framework`.
+into any package. 
 
 Comes packaged as a static library, but the source files can be dropped into any
 project. The OpenSSL files are not required.
