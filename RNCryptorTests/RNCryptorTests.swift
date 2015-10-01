@@ -76,7 +76,7 @@ class RNCryptorTests: XCTestCase {
         let plaintext = "01".dataFromHexEncoding!
         let ciphertext = "03000203 04050607 08090a0b 0c0d0e0f 0001981b 22e7a644 8118d695 bd654f72 e9d6ed75 ec14ae2a a067eed2 a98a56e0 993dfe22 ab5887b3 f6e3cdd4 0767f519 5eb5".dataFromHexEncoding!
 
-        let encryptor = EncryptorV3(encryptionKey: encryptKey, hmacKey: hmacKey, iv: iv)
+        let encryptor = RNCryptor.EncryptorV3(encryptionKey: encryptKey, hmacKey: hmacKey, iv: iv)
         let encrypted = encryptor.encryptData(plaintext)
         XCTAssertEqual(encrypted, ciphertext)
     }
@@ -87,7 +87,7 @@ class RNCryptorTests: XCTestCase {
         let plaintext = "01".dataFromHexEncoding!
         let ciphertext = "03000203 04050607 08090a0b 0c0d0e0f 0001981b 22e7a644 8118d695 bd654f72 e9d6ed75 ec14ae2a a067eed2 a98a56e0 993dfe22 ab5887b3 f6e3cdd4 0767f519 5eb5".dataFromHexEncoding!
 
-        let decryptor = DecryptorV3(encryptionKey: encryptKey, hmacKey: hmacKey)
+        let decryptor = RNCryptor.DecryptorV3(encryptionKey: encryptKey, hmacKey: hmacKey)
         do {
             let decrypted = try decryptor.decryptData(ciphertext)
             XCTAssertEqual(decrypted, plaintext)
@@ -104,7 +104,7 @@ class RNCryptorTests: XCTestCase {
         let plaintext = "01".dataFromHexEncoding!
         let ciphertext = "03010001 02030405 06070102 03040506 07080203 04050607 08090a0b 0c0d0e0f 0001a1f8 730e0bf4 80eb7b70 f690abf2 1e029514 164ad3c4 74a51b30 c7eaa1ca 545b7de3 de5b010a cbad0a9a 13857df6 96a8".dataFromHexEncoding!
 
-        let encryptor = EncryptorV3(password: password, encryptionSalt: encryptionSalt, hmacSalt: hmacSalt, iv: iv)
+        let encryptor = RNCryptor.EncryptorV3(password: password, encryptionSalt: encryptionSalt, hmacSalt: hmacSalt, iv: iv)
 
         let encrypted = encryptor.encryptData(plaintext)
         XCTAssertEqual(encrypted, ciphertext)
@@ -115,7 +115,7 @@ class RNCryptorTests: XCTestCase {
         let plaintext = "01".dataFromHexEncoding!
         let ciphertext = "03010001 02030405 06070102 03040506 07080203 04050607 08090a0b 0c0d0e0f 0001a1f8 730e0bf4 80eb7b70 f690abf2 1e029514 164ad3c4 74a51b30 c7eaa1ca 545b7de3 de5b010a cbad0a9a 13857df6 96a8".dataFromHexEncoding!
 
-        let decryptor = Decryptor(password: password)
+        let decryptor = RNCryptor.Decryptor(password: password)
 
         do {
             let decrypted = try decryptor.decryptData(ciphertext)
@@ -130,11 +130,11 @@ class RNCryptorTests: XCTestCase {
         let hmacKey = RNCryptor.randomDataOfLength(V3.keySize)
         let data = RNCryptor.randomDataOfLength(1024)
 
-        let ciphertext = EncryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey).encryptData(data)
+        let ciphertext = RNCryptor.EncryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey).encryptData(data)
 
         let plaintext: NSData
         do {
-            plaintext = try DecryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey).decryptData(ciphertext)
+            plaintext = try RNCryptor.DecryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey).decryptData(ciphertext)
         } catch {
             plaintext = NSData(bytes: [0xaa])
             XCTFail("Caught: \(error)")
@@ -147,11 +147,11 @@ class RNCryptorTests: XCTestCase {
         let password = "thepassword"
         let data = RNCryptor.randomDataOfLength(1024)
 
-        let ciphertext = Encryptor(password: password).encryptData(data)
+        let ciphertext = RNCryptor.Encryptor(password: password).encryptData(data)
 
         let plaintext: NSData
         do {
-            plaintext = try Decryptor(password: password).decryptData(ciphertext)
+            plaintext = try RNCryptor.Decryptor(password: password).decryptData(ciphertext)
         } catch {
             plaintext = NSData(bytes: [0])
             XCTFail("Caught: \(error)")
@@ -165,7 +165,7 @@ class RNCryptorTests: XCTestCase {
         let datas = (0..<10).map{ _ in RNCryptor.randomDataOfLength(1024) }
         let fullData = datas.reduce(NSMutableData()) { $0.appendData($1); return $0 }
 
-        let encryptor = Encryptor(password: password)
+        let encryptor = RNCryptor.Encryptor(password: password)
         let ciphertext = NSMutableData()
         for data in datas {
             ciphertext.appendData(encryptor.updateWithData(data))
@@ -173,7 +173,7 @@ class RNCryptorTests: XCTestCase {
         ciphertext.appendData(encryptor.finalData())
 
         do {
-            let decrypted = try Decryptor(password: password).decryptData(ciphertext)
+            let decrypted = try RNCryptor.Decryptor(password: password).decryptData(ciphertext)
             XCTAssertEqual(fullData, decrypted)
         } catch {
             XCTFail("Caught: \(error)")
@@ -183,7 +183,7 @@ class RNCryptorTests: XCTestCase {
     func testBadFormat() {
         let data = NSMutableData(length: 1024)!
         do {
-            try Decryptor(password: "password").decryptData(data)
+            try RNCryptor.Decryptor(password: "password").decryptData(data)
             XCTFail("Should not thrown")
         } catch let error as RNCryptorError {
             XCTAssertEqual(error, RNCryptorError.UnknownHeader)
@@ -195,7 +195,7 @@ class RNCryptorTests: XCTestCase {
     func testBadFormatV3() {
         let data = NSMutableData(length: 1024)!
         do {
-            try DecryptorV3(password: "password").decryptData(data)
+            try RNCryptor.DecryptorV3(password: "password").decryptData(data)
             XCTFail("Should not thrown")
         } catch let error as RNCryptorError {
             XCTAssertEqual(error, RNCryptorError.UnknownHeader)

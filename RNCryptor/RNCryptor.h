@@ -31,3 +31,4 @@ FOUNDATION_EXPORT double RNCryptorVersionNumber;
 
 //! Project version string for RNCryptor.
 FOUNDATION_EXPORT const unsigned char RNCryptorVersionString[];
+

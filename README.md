@@ -31,7 +31,7 @@ it includes:
 
 ## Basic Swift Password Usage
 
-``` swift
+```swift
 // Encryption
 let data: NSData = ...
 let password = "Secret password"
@@ -53,33 +53,27 @@ do {
 // Encryption
 NSData *data = ...
 NSString *password = "Secret password";
-NSData *ciphertext = [[[RNEncryptor alloc] initWithPassword:password] encryptData:data];
+NSData *ciphertext = [RNCryptor encryptData:data password:password];
 
 // Decryption
 
-NSData *plaintext = 
+NSError *error = nil;
+NSData *plaintext = [RNCryptor decryptData:ciphertext password:password error:&error];
+if (error != nil) {
+    NSLog(@"ERROR:", error);
+    return
+}
+// ...
 ```
 
-This generates an `NSData` including a header, encryption salt, HMAC salt, IV,
-ciphertext, and HMAC. To decrypt this bundle:
+## Incremental use
 
-``` objc
-NSData *decryptedData = [RNDecryptor decryptData:encryptedData
-                                    withPassword:aPassword
-                                           error:&error];
-```
+RNCryptor suports incremental use, specifically designed to work with
+`NSURLConnection`. This is also useful for cases where the encrypted or decrypted
+data will not comfortably fit in memory.
 
-Note that `RNDecryptor` does not require settings. These are read from the
-header.
-
-## Asynchronous use
-
-`RNCryptor suports asynchronous use, specifically designed to work with
-`NSURLConnection. This is also useful for cases where the encrypted or decrypted
-`data will not comfortably fit in memory. If the data will comfortably fit in
-`memory, asynchronous operation is best acheived using dispatch_async().
-
-To operate in asynchronous mode, you create an `RNEncryptor` or `RNDecryptor`,
+To operate in incremental mode, you create an `Encryptor` or `Decryptor`,
+call `updateWithData()`
 providing it a handler. This handler will be called as data is encrypted or
 decrypted. As data becomes available, call `addData:`. When you reach the end of
 the data call `finish`.

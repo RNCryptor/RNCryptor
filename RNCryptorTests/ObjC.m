@@ -79,7 +79,6 @@ NSData *randomDataOfLength(NSInteger length) {
     XCTAssertEqualObjects(plaintext, data);
 }
 
-
 - (void)testUpdatesPassword {
     NSString *password = @"PASSWORD";
     NSData *data = randomDataOfLength(1024);
@@ -114,6 +113,19 @@ NSData *randomDataOfLength(NSInteger length) {
     NSData *plaintext = [RNCryptor decryptData:data password:password error:&error];
     XCTAssertNil(plaintext);
     XCTAssertEqual(error.code, RNCryptorErrorUnknownHeader);
+}
+
+- (void)testClass {
+    NSString *password = @"PASSWORD";
+    NSData *data = randomDataOfLength(1024);
+
+    NSData *ciphertext = [RNCryptor encryptData:data password:password];
+    XCTAssertNotNil(ciphertext);
+
+    NSError *error = nil;
+    NSData *plaintext = [RNCryptor decryptData:ciphertext password:password error:&error];
+    XCTAssertNil(error);
+    XCTAssertEqualObjects(plaintext, data);
 }
 
 @end
