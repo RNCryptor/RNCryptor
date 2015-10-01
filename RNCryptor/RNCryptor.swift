@@ -27,58 +27,8 @@
 import Foundation
 import CommonCrypto
 
-/// The `RNCryptorType` protocol defines generic API to a mutable,
-/// incremental, password-based encryptor or decryptor. Its generic
-/// usage is as follows:
-///
-///     let cryptor = Encryptor(password: "mypassword")
-///     // or Decryptor()
-///
-///     var result NSMutableData
-///     for data in datas {
-///         result.appendData(try cryptor.update(data))
-///     }
-///     result.appendData(try cryptor.final())
-///
-///  After calling `finalData()`, the cryptor is no longer valid.
-public protocol RNCryptorType {
-
-    /// Creates and returns a cryptor.
-    ///
-    /// - parameter password: Non-empty password string. This will be interpretted as UTF-8.
-    init(password: String)
-
-    /// Updates cryptor with data and returns processed data.
-    ///
-    /// - parameter data: Data to process. May be empty.
-    /// - throws: `Error`
-    /// - returns: Processed data. May be empty.
-    func updateWithData(data: NSData) throws -> NSData
-
-    /// Returns trailing data and invalidates the cryptor.
-    ///
-    /// - throws: `Error`
-    /// - returns: Trailing data
-    func finalData() throws -> NSData
-}
-
-public extension RNCryptorType {
-    /// Simplified, generic interface to `RNCryptorType`. Takes a data,
-    /// returns a processed data. Generally you should use
-    /// `RNCryptor.encryptData(password:)`, or
-    /// `RNCryptor.decryptData(password:)` instead, but this is useful
-    /// for code that is neutral on whether it is encrypting or decrypting.
-    ///
-    /// - throws: `Error`
-    public func oneshot(data: NSData) throws -> NSData {
-        let result = NSMutableData(data: try updateWithData(data))
-        result.appendData(try finalData())
-        return result
-    }
-}
-
-/// Errors thrown by `RNCryptorType`.
 // FIXME: Move this to RNCryptor.Error if @objc can rename it correctly.
+/// Errors thrown by `RNCryptorType`.
 @objc public enum RNCryptorError: Int, ErrorType {
     /// Ciphertext was corrupt or password was incorrect.
     /// It is not possible to distinguish between these cases in the v3 data format.
@@ -129,7 +79,7 @@ public class RNCryptor: NSObject {
     /// than accepting "latest."
     ///
     @objc(RNEncryptor)
-    public final class Encryptor: NSObject, RNCryptorType {
+    public final class Encryptor: NSObject, CryptorType {
         private let encryptor: EncryptorV3
 
         /// Creates and returns a cryptor.
@@ -164,11 +114,11 @@ public class RNCryptor: NSObject {
 
     /// Password-based decryptor that can handle any supported format.
     @objc(RNDecryptor)
-    public final class Decryptor : NSObject, RNCryptorType {
+    public final class Decryptor : NSObject, CryptorType {
         private var decryptors: [VersionedDecryptorType.Type] = [DecryptorV3.self]
 
         private var buffer = NSMutableData()
-        private var decryptor: RNCryptorType?
+        private var decryptor: CryptorType?
         private let password: String
 
         /// Creates and returns a cryptor.
@@ -282,7 +232,7 @@ public extension RNCryptor {
     /// or when using keys (which are inherrently versions-specific). To use
     /// "the latest encryptor" with a password, use `Encryptor` instead.
     @objc(RNEncryptorV3)
-    public final class EncryptorV3 : NSObject, RNCryptorType {
+    public final class EncryptorV3 : NSObject, CryptorType {
         private var engine: Engine
         private var hmac: HMACV3
         private var pendingHeader: NSData?
@@ -527,6 +477,55 @@ public extension RNCryptor {
     }
 }
 
+/// The `RNCryptorType` protocol defines generic API to a mutable,
+/// incremental, password-based encryptor or decryptor. Its generic
+/// usage is as follows:
+///
+///     let cryptor = Encryptor(password: "mypassword")
+///     // or Decryptor()
+///
+///     var result NSMutableData
+///     for data in datas {
+///         result.appendData(try cryptor.update(data))
+///     }
+///     result.appendData(try cryptor.final())
+///
+///  After calling `finalData()`, the cryptor is no longer valid.
+private protocol CryptorType {
+
+    /// Creates and returns a cryptor.
+    ///
+    /// - parameter password: Non-empty password string. This will be interpretted as UTF-8.
+    init(password: String)
+
+    /// Updates cryptor with data and returns processed data.
+    ///
+    /// - parameter data: Data to process. May be empty.
+    /// - throws: `Error`
+    /// - returns: Processed data. May be empty.
+    func updateWithData(data: NSData) throws -> NSData
+
+    /// Returns trailing data and invalidates the cryptor.
+    ///
+    /// - throws: `Error`
+    /// - returns: Trailing data
+    func finalData() throws -> NSData
+}
+
+private extension CryptorType {
+    /// Simplified, generic interface to `RNCryptorType`. Takes a data,
+    /// returns a processed data. Generally you should use
+    /// `RNCryptor.encryptData(password:)`, or
+    /// `RNCryptor.decryptData(password:)` instead, but this is useful
+    /// for code that is neutral on whether it is encrypting or decrypting.
+    ///
+    /// - throws: `Error`
+    private func oneshot(data: NSData) throws -> NSData {
+        let result = NSMutableData(data: try updateWithData(data))
+        result.appendData(try finalData())
+        return result
+    }
+}
 
 private let CCErrorDomain = "com.apple.CommonCrypto"
 
@@ -668,7 +667,7 @@ private final class HMACV3 {
 }
 
 // Internal protocol for version-specific decryptors.
-private protocol VersionedDecryptorType: RNCryptorType {
+private protocol VersionedDecryptorType: CryptorType {
     static var preambleSize: Int { get }
     static func canDecrypt(preamble: NSData) -> Bool
     init(password: String)
