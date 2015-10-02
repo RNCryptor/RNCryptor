@@ -15,6 +15,10 @@ The data format includes all the metadata required to securely implement AES enc
 * Random IV
 * Encrypt-then-hash HMAC
 
+## Format versus implementation
+
+The RNCryptor data format is cross-platform and there are many implementations. The framework named "RNCryptor" is a specific implementation for Swift and Objective-C. Both have version numbers. The current data format is v3. The current framework implementation (which reads the v3 format) is v4. 
+
 ## Basic Password Usage
 
 ### Swift
@@ -153,7 +157,6 @@ This process works for almost any kind of target: iOS and OS X GUI apps, Swift f
 
 You don't need to (and can't) `import RNCryptor` into your code. RNCryptor will be part of your module.
 
-
 ### Installing without a subproject
 
 If you want to keep things as small and simple as possible, you don't need the full RNCryptor project. You just need two things: `RNCryptor.swift` and `CommonCrypto.framework`. You can just copy those into your project.
@@ -169,15 +172,67 @@ no need for complicated package managers.
 
 You don't need to (and can't) `import RNCryptor` into your code. RNCryptor will be part of your module.
 
-### Carthage
-
-"But I need a package manager!"
-
-OK. You can use a package manager. I prefer [Carthage](https://github.com/Carthage/Carthage). See their site for how you import a module. You'll need to copy and link `RNCryptor.framework` and copy `CommonCrypto.framework`. (You can link this version of `CommonCrypto.framework` or not. It doesn't matter.)
+### [Carthage](https://github.com/Carthage/Carthage)
 
     github "RNCryptor/RNCryptor" "~> 4.0"
 
+Don't forget to copy and link `RNCryptor.framework` and at least copy `CommonCrypto.framwork`. (You can link the Carthage version of `CommonCrypto.framework`. It doesn't matter.)
 
+Note that this approach will not work for OS X commandline apps.
+
+### [CocoaPods](https://cocoapods.org)
+
+    pod 'RNCryptor', '~> 4.0'
+
+Note that this approach will not work for OS X commandline apps.
+
+## Advanced use
+
+### Version-specific cryptors
+
+The default `RNCryptor.Encryptor` is the "current" version of the data format (currently v3). If you're interoperating with other implementations, you may need to choose a specific version for compatibility.
+
+To create a version-locked encryptor, just use `RNCryptor.EncryptorV3` instead. The password-based interface is the same. Similarly, the version-locked decryptor is `RNCryptor.DecryptorV3`.
+
+Remember: the version specified here is the *format* version, not the implementation version. The v4 RNCryptor framework reads and writes the v3 RNCryptor data format.
+
+### Key-based encryption
+
+*You need a little expertise to use key-based encryption correctly. The most important rule is that keys must be random. If you're not comfortable with basic cryptographic concepts like AES-CBC, IV, and HMAC, you probably should avoid using key-based encryption.*
+
+Cryptography works with keys, which are random byte sequences of a specific length. The RNCryptor v3 format uses two 256-bit (32-byte) keys to perform encryption and authentication.
+
+Passwords are not "random byte sequences of a specific length." They're not random at all, and they can be a wide variety of lengths. They're very seldom 32 bytes. RNCryptor defines a specific way to convert passwords into keys, and that is one of it's primary features.
+
+Occasionally there are reasons to work directly with random keys. Converting a password into a key is intentionally slow (10s of ms). Password-encrypted messages are also a 16 bytes longer than key-encrypted messages. If your system encrypts and decrypts many short messages, this can be a significant performance impact.
+
+RNCryptor supports direct key-based encryption and decryption. The size and number of keys may change between format versions, so key-based cryptors are version-specific.
+
+In order to be secure, the keys must be a random sequence of bytes. If you're starting with a string of any kind, you are almost certainly doing this wrong.
+
+```swift
+let encryptor = RNCryptor.EncryptorV3(encryptionKey: encryptKey, hmacKey: hmacKey)
+let decryptor = RNCryptor.DecryptorV3(encryptionKey: encryptKey, hmacKey: hmacKey)
+```
+
+```objc
+RNEncryptor *encryptor = [[[RNEncryptorV3 alloc] initWithEncryptionKey:encryptionKey hmacKey:hmacKey];
+RNDecryptor *decryptor = [[[RNDecryptorV3 alloc] initWithEncryptionKey:encryptionKey hmacKey:hmacKey];
+```
+
+## FAQ
+
+### Can I use RNCryptor to read and write my non-RNCryptor data format?
+
+No. RNCryptor implements a specific data format. It is not a general-purpose encryption library. If you have created your own data format, you will need to write specific code to deal with whatever you created. Please make sure the data format you've invented is secure. (This is much harder than it sounds.)
+
+If you're using the OpenSSL encryption format, see [RNOpenSSLCryptor](https://github.com/rnapier/RNOpenSSLCryptor).
+
+### How do I encrypt/decrypt a string?
+
+AES encrypts bytes. It does not encrypt characters, letters, words, pictures, videos, cats, or ennui. It encrypts bytes. You need to convert other data (such as strings) to and from bytes in a consistent way. There are several ways to do that. Some of the most popular are UTF-8 encoding, Base-64 encoding, and Hex encoding. There are many other options. There is no good way for RNCryptor to guess which encoding you want, so it doesn't try. It accepts and returns bytes in the form of `NSData`.
+
+To convert strings to data as UTF-8, use `dataUsingEncoding()` and `init(data:encoding:)`. To convert strings to data as Base-64, use `init(base64EncodedString:options:)` and `base64EncodedStringWithOptions()`.
 
 ## Design considerations
 
@@ -196,7 +251,7 @@ This also requires that it fail correctly and provide good errors.
 ### Best practice security
 
 Wherever possible within the above constraints, the best available algorithms
-are applied. This means AES-256, HMAC+SHA1, and PBKDF2:
+are applied. This means AES-256, HMAC+SHA256, and PBKDF2. (Note that several of these decisions were reasonable for v3, but may change for v4.)
 
 * AES-256. While Bruce Schneier has made some interesting recommendations
 regarding moving to AES-128 due to certain attacks on AES-256, my current
@@ -229,8 +284,7 @@ which represents about 80ms on an iPhone 4.
 
 ### Code simplicity
 
-`RNCryptor endeavors to be implemented as simply as possible, avoiding tricky
-`code. It is designed to be easy to read and code review.
+RNCryptor endeavors to be implemented as simply as possible, avoiding tricky code. It is designed to be easy to read and code review.
 
 ### Performance
 
@@ -242,84 +296,13 @@ and easy to use. Within that, it is as fast and memory-efficient as possible.
 Without sacrificing other goals, it is preferable to read the output format of
 `RNCryptor` on other platforms.
 
-## Version History
-
-* v2.2 Switches to file format v3 to deal with Issue #77.
-* v2.1 Switches to file format v2 to deal with Issue #44.
-* v2.0 adds asynchronous modes.
-* v2.1 backports `RNCryptor` to older versions of Mac OS X (and possibly iOS).
-
-
 ## LICENSE
 
 Except where otherwise indicated in the source code, this code is licensed under
 the MIT License:
 
-```
-Permission is hereby granted, free of charge, to any person obtaining a 
-copy of this software and associated documentation files (the "Software"),
-to deal in the Software without restriction, including without limitation
-the rights to use, copy, modify, merge, publish, distribute, sublicense,
-and/or sell copies of the Software, and to permit persons to whom the
-Software is furnished to do so, subject to the following conditions:
- 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-DEALINGS IN THE SOFTWARE.
-```
+>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-Portions of this code, indicated in the source, are licensed under the following
-license:
-
-```
-/*-
- * Copyright (c) 2008 Damien Bergamini <damien.bergamini@free.fr>
- *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- */
-```
-
-Portions of this code, indicated in the source, are licensed under the APSL
-license:
-
-```
-/*
- * Copyright (c) 2006-2010 Apple Inc. All Rights Reserved.
- *
- * @APPLE_LICENSE_HEADER_START@
- *
- * This file contains Original Code and/or Modifications of Original Code
- * as defined in and that are subject to the Apple Public Source License
- * Version 2.0 (the 'License'). You may not use this file except in
- * compliance with the License. Please obtain a copy of the License at
- * http://www.opensource.apple.com/apsl/ and read it before using this
- * file.
- *
- * The Original Code and all software distributed under the License are
- * distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
- * EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
- * INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR NON-INFRINGEMENT.
- * Please see the License for the specific language governing rights and
- * limitations under the License.
- *
- * @APPLE_LICENSE_HEADER_END@
- */
-```
+>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. ```
