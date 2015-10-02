@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>EncryptorV3 Class Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+  </head>
+  <body>
+    <a name="//apple_ref/swift/Class/EncryptorV3" class="dashAnchor"></a>
+    <a title="EncryptorV3 Class Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="../index.html"> Docs</a> (100% documented)</p>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="../index.html"> Reference</a>
+        <img id="carat" src="../img/carat.png" />
+        EncryptorV3 Class Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+          <a href="../Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Classes/Decryptor.html">Decryptor</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/DecryptorV3.html">DecryptorV3</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/Encryptor.html">Encryptor</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/EncryptorV3.html">EncryptorV3</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/FormatV3.html">FormatV3</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/RNCryptor.html">RNCryptor</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+          <a href="../Enums.html">Enums</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Enums/RNCryptorError.html">RNCryptorError</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+          <a href="../Extensions.html">Extensions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Extensions/CryptorType.html">CryptorType</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+          <a href="../Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Protocols/CryptorType.html">CryptorType</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            <h1>EncryptorV3</h1>
+              <div class="declaration">
+                <div class="Swift">
+                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="kt">EncryptorV3</span> <span class="p">:</span> <span class="kt">NSObject</span><span class="p">,</span> <span class="kt">CryptorType</span></code></pre>
+
+                </div>
+              </div>
+            <p>Format version 3 encryptor. Use this to ensure a specific format verison
+or when using keys (which are inherrently versions-specific). To use
+<q>the latest encryptor</q> with a password, use <code>Encryptor</code> instead.</p>
+
+          </section>
+          <section class="section task-group-section">
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FC9RNCryptor11EncryptorV3cFMS0_FT8passwordSS_S0_"></a>
+                    <a name="//apple_ref/swift/Method/init(password:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FC9RNCryptor11EncryptorV3cFMS0_FT8passwordSS_S0_">init(password:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Creates and returns an encryptor.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="Swift">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="n">convenience</span> <span class="nf">init</span><span class="p">(</span><span class="nv">password</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>password</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Non-empty password string. This will be interpretted as UTF-8.</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FC9RNCryptor11EncryptorV3cFMS0_FT13encryptionKeyCSo6NSData7hmacKeyS1__S0_"></a>
+                    <a name="//apple_ref/swift/Method/init(encryptionKey:hmacKey:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FC9RNCryptor11EncryptorV3cFMS0_FT13encryptionKeyCSo6NSData7hmacKeyS1__S0_">init(encryptionKey:hmacKey:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Creates and returns an encryptor using keys.</p>
+
+<p>Keys should not be generated directly from strings (<code>.dataUsingEncoding()</code> or similar).
+Ideally, keys should be random (<code>Cryptor.randomDataOfLength()</code> or some other high-quality
+random generator. If keys must be generated from strings, then use <code>FormatV3.keyForPassword(salt:)</code>
+with a random salt, or just use password-based encryption (that&rsquo;s what it&rsquo;s for).</p>
+
+<ul>
+<li>parameters:
+
+<ul>
+<li>encryptionKey: AES-256 key. Must be exactly FormatV3.keySize (kCCKeySizeAES256, 32 bytes)</li>
+<li>hmacKey: HMAC key. Must be exactly FormatV3.keySize (kCCKeySizeAES256, 32 bytes)</li>
+</ul></li>
+</ul>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="Swift">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="n">convenience</span> <span class="nf">init</span><span class="p">(</span><span class="nv">encryptionKey</span><span class="p">:</span> <span class="kt">NSData</span><span class="p">,</span> <span class="nv">hmacKey</span><span class="p">:</span> <span class="kt">NSData</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>encryptionKey</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>AES-256 key. Must be exactly FormatV3.keySize (kCCKeySizeAES256, 32 bytes)</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>hmacKey</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>HMAC key. Must be exactly FormatV3.keySize (kCCKeySizeAES256, 32 bytes)</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FC9RNCryptor11EncryptorV311encryptDataFS0_FCSo6NSDataS1_"></a>
+                    <a name="//apple_ref/swift/Method/encryptData(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FC9RNCryptor11EncryptorV311encryptDataFS0_FCSo6NSDataS1_">encryptData(_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Takes a data, returns a processed data, and invalidates the cryptor.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="Swift">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">encryptData</span><span class="p">(</span><span class="nv">data</span><span class="p">:</span> <span class="kt">NSData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">NSData</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FC9RNCryptor11EncryptorV314updateWithDataFS0_FCSo6NSDataS1_"></a>
+                    <a name="//apple_ref/swift/Method/updateWithData(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FC9RNCryptor11EncryptorV314updateWithDataFS0_FCSo6NSDataS1_">updateWithData(_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Updates cryptor with data and returns encrypted data.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="Swift">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">updateWithData</span><span class="p">(</span><span class="nv">data</span><span class="p">:</span> <span class="kt">NSData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">NSData</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>data</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Data to process. May be empty.</p>
+
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Processed data. May be empty.</p>
+
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FC9RNCryptor11EncryptorV39finalDataFS0_FT_CSo6NSData"></a>
+                    <a name="//apple_ref/swift/Method/finalData()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FC9RNCryptor11EncryptorV39finalDataFS0_FT_CSo6NSData">finalData()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Returns trailing data and invalidates the cryptor.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="Swift">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">finalData</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">NSData</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Trailing data</p>
+
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </section>
+        <section id="footer">
+          <p>&copy; 2015 <a class="link" href="" target="_blank" rel="external"></a>. All rights reserved. (Last updated: 2015-10-01)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.3.1</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</div>
+</html>

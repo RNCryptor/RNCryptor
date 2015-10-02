@@ -11,7 +11,6 @@
 		FB1E41141BBABEB10009A47D /* ObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = FB1E41121BBABEB10009A47D /* ObjC.m */; settings = {ASSET_TAGS = (); }; };
 		FB30A1FF1B2B7BF300BE5429 /* RNCryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB30A1FE1B2B7BF300BE5429 /* RNCryptor.swift */; };
 		FB30A2081B2B86FD00BE5429 /* CommonCrypto.h in Headers */ = {isa = PBXBuildFile; fileRef = FB30A2071B2B86FD00BE5429 /* CommonCrypto.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		FB30A2221B2B87C900BE5429 /* CommonCrypto.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB30A2051B2B86FD00BE5429 /* CommonCrypto.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		FB36507F1B41F3DE00F5273F /* RNCryptorGeneratedVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB36507E1B41F3DE00F5273F /* RNCryptorGeneratedVectorTests.swift */; };
 		FB3650811B41F49800F5273F /* VectorTestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB3650801B41F49800F5273F /* VectorTestHelpers.swift */; };
 		FB627FD21B2B7A1700C3A579 /* RNCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB627FD11B2B7A1700C3A579 /* RNCryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -100,7 +99,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FB30A2221B2B87C900BE5429 /* CommonCrypto.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

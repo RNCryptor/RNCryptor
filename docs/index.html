@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>  Reference</title>
+    <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="js/jquery.min.js" defer></script>
+    <script src="js/jazzy.js" defer></script>
+  </head>
+  <body>
+    <a title="  Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="index.html"> Docs</a> (100% documented)</p>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="index.html"> Reference</a>
+        <img id="carat" src="img/carat.png" />
+          Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+          <a href="Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Classes/RNCryptor.html">RNCryptor</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+          <a href="Enums.html">Enums</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Enums/RNCryptorError.html">RNCryptorError</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+          <a href="Extensions.html">Extensions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Extensions/RNCryptor.html">RNCryptor</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            
+            <a href='#rncryptor' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h1 id='rncryptor'>RNCryptor</h1>
+
+<p>Cross-language AES Encryptor/Decryptor <a href="https://github.com/RNCryptor/RNCryptor-Spec/blob/master/RNCryptor-Spec-v3.md">data
+format</a>.</p>
+
+<p>The primary targets are Swift and Objective-C, but implementations are available in
+<a href="https://github.com/RNCryptor/RNCryptor-C">C</a>,
+<a href="https://github.com/RNCryptor/RNCryptor-cpp">C++</a>,
+<a href="https://github.com/RNCryptor/RNCryptor-cs">C#</a>,
+<a href="https://github.com/RNCryptor/RNCryptor-erlang">Erlang</a>,
+<a href="https://github.com/RNCryptor/RNCryptor-go">Go</a>,
+<a href="https://github.com/RNCryptor/rncryptor-hs">Haskell</a>,
+<a href="https://github.com/RNCryptor/JNCryptor">Java</a>,
+<a href="https://github.com/RNCryptor/RNCryptor-php">PHP</a>,
+<a href="https://github.com/RNCryptor/RNCryptor-python">Python</a>,
+<a href="https://github.com/chesstrian/JSCryptor">Javascript</a>,
+and <a href="https://github.com/RNCryptor/ruby_rncryptor">Ruby</a>.</p>
+
+<p>The data format includes all the metadata required to securely implement AES
+encryption, as described in <a href="http://robnapier.net/aes-commoncrypto"><q>Properly encrypting with AES with
+CommonCrypto,</q></a> and <a href="http://iosptl.com"><em>iOS 6
+Programming Pushing the Limits</em></a>, Chapter 15. Specifically,
+it includes:</p>
+
+<ul>
+<li>AES-256 encryption</li>
+<li>CBC mode</li>
+<li>Password stretching with PBKDF2</li>
+<li>Password salting</li>
+<li>Random IV</li>
+<li>Encrypt-then-hash HMAC</li>
+</ul>
+<a href='#basic_swift_password_usage' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='basic_swift_password_usage'>Basic Swift Password Usage</h2>
+<pre class="highlight swift"><code><span class="c1">// Encryption</span>
+<span class="k">let</span> <span class="nv">data</span><span class="p">:</span> <span class="kt">NSData</span> <span class="o">=</span> <span class="o">...</span>
+<span class="k">let</span> <span class="nv">password</span> <span class="o">=</span> <span class="s">"Secret password"</span>
+<span class="k">let</span> <span class="nv">ciphertext</span> <span class="o">=</span> <span class="kt">RNCryptor</span><span class="o">.</span><span class="nf">encryptData</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nv">password</span><span class="p">:</span> <span class="n">password</span><span class="p">)</span>
+
+<span class="c1">// Decryption</span>
+<span class="k">do</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="nv">originalData</span> <span class="o">=</span> <span class="k">try</span> <span class="kt">RNCryptor</span><span class="o">.</span><span class="nf">decryptData</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">,</span> <span class="nv">password</span><span class="p">:</span> <span class="n">password</span><span class="p">)</span>
+    <span class="c1">// ...</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">{</span>
+    <span class="nf">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+<span class="p">}</span>
+
+</code></pre>
+<a href='#basic_objc_password_usage' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='basic_objc_password_usage'>Basic ObjC Password Usage</h2>
+<pre class="highlight objective_c"><code><span class="c1">// Encryption
+</span><span class="n">NSData</span> <span class="o">*</span><span class="n">data</span> <span class="o">=</span> <span class="p">...</span>
+<span class="n">NSString</span> <span class="o">*</span><span class="n">password</span> <span class="o">=</span> <span class="s">"Secret password"</span><span class="p">;</span>
+<span class="n">NSData</span> <span class="o">*</span><span class="n">ciphertext</span> <span class="o">=</span> <span class="p">[</span><span class="n">RNCryptor</span> <span class="nf">encryptData</span><span class="p">:</span><span class="n">data</span> <span class="nf">password</span><span class="p">:</span><span class="n">password</span><span class="p">];</span>
+
+<span class="c1">// Decryption
+</span>
+<span class="n">NSError</span> <span class="o">*</span><span class="n">error</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
+<span class="n">NSData</span> <span class="o">*</span><span class="n">plaintext</span> <span class="o">=</span> <span class="p">[</span><span class="n">RNCryptor</span> <span class="nf">decryptData</span><span class="p">:</span><span class="n">ciphertext</span> <span class="nf">password</span><span class="p">:</span><span class="n">password</span> <span class="nf">error</span><span class="p">:</span><span class="o">&amp;</span><span class="n">error</span><span class="p">];</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">error</span> <span class="o">!=</span> <span class="nb">nil</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">NSLog</span><span class="p">(</span><span class="s">@"ERROR:"</span><span class="p">,</span> <span class="n">error</span><span class="p">);</span>
+    <span class="k">return</span>
+<span class="p">}</span>
+<span class="c1">// ...
+</span></code></pre>
+<a href='#incremental_use' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='incremental_use'>Incremental use</h2>
+
+<p>RNCryptor suports incremental use, specifically designed to work with
+<code>NSURLConnection</code>. This is also useful for cases where the encrypted or decrypted
+data will not comfortably fit in memory.</p>
+
+<p>To operate in incremental mode, you create an <code>Encryptor</code> or <code>Decryptor</code>,
+call <code>updateWithData()</code>
+providing it a handler. This handler will be called as data is encrypted or
+decrypted. As data becomes available, call <code>addData:</code>. When you reach the end of
+the data call <code>finish</code>.</p>
+<pre class="highlight objective_c"><code><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">connection</span><span class="p">:(</span><span class="n">NSURLConnection</span> <span class="o">*</span><span class="p">)</span><span class="nv">connection</span> <span class="nf">didReceiveData</span><span class="p">:(</span><span class="n">NSData</span> <span class="o">*</span><span class="p">)</span><span class="nv">data</span> <span class="p">{</span>
+  <span class="p">[</span><span class="n">self</span><span class="p">.</span><span class="n">encryptedData</span> <span class="nf">addData</span><span class="p">:[</span><span class="n">self</span><span class="p">.</span><span class="n">cryptor</span> <span class="nf">addData</span><span class="p">:</span><span class="n">data</span><span class="p">]];</span>
+<span class="p">}</span>
+
+<span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">connectionDidFinishLoading</span><span class="p">:(</span><span class="n">NSURLConnection</span> <span class="o">*</span><span class="p">)</span><span class="nv">connection</span> <span class="p">{</span>
+  <span class="p">[</span><span class="n">self</span><span class="p">.</span><span class="n">cryptor</span> <span class="nf">finish</span><span class="p">];</span>
+<span class="p">}</span>
+
+<span class="c1">// Other connection delegates
+</span>
+<span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">decryptionDidFinish</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">cryptor</span><span class="p">.</span><span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// An error occurred. You cannot trust encryptedData at this point
+</span>  <span class="p">}</span>
+  <span class="k">else</span> <span class="p">{</span>
+    <span class="c1">// self.encryptedData is complete. Use it as you like
+</span>  <span class="p">}</span>
+  <span class="n">self</span><span class="p">.</span><span class="n">encryptedData</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
+  <span class="n">self</span><span class="p">.</span><span class="n">cryptor</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
+  <span class="n">self</span><span class="p">.</span><span class="n">connection</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="o">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">decryptRequest</span><span class="o">:</span><span class="p">(</span><span class="n">NSURLRequest</span> <span class="o">*</span><span class="p">)</span><span class="n">request</span> <span class="p">{</span>
+  <span class="n">self</span><span class="p">.</span><span class="n">encryptedData</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSMutableData</span> <span class="nf">data</span><span class="p">];</span>
+  <span class="n">self</span><span class="p">.</span><span class="n">connection</span> <span class="o">=</span> <span class="p">[[</span><span class="n">NSURLConnection</span> <span class="nf">alloc</span><span class="p">]</span> <span class="nf">initWithRequest</span><span class="p">:</span><span class="n">request</span> <span class="nf">delegate</span><span class="p">:</span><span class="n">self</span><span class="p">];</span>
+  <span class="n">self</span><span class="p">.</span><span class="n">cryptor</span> <span class="o">=</span> <span class="p">[[</span><span class="n">RNDecryptor</span> <span class="nf">alloc</span><span class="p">]</span> <span class="nf">initWithPassword</span><span class="p">:</span><span class="n">self</span><span class="p">.</span><span class="n">password</span>
+                                               <span class="nf">handler</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="n">RNCryptor</span> <span class="o">*</span><span class="n">cryptor</span><span class="p">,</span> <span class="n">NSData</span> <span class="o">*</span><span class="n">data</span><span class="p">)</span> <span class="p">{</span>
+                                                   <span class="p">[</span><span class="n">self</span><span class="p">.</span><span class="n">decryptedData</span> <span class="nf">appendData</span><span class="p">:</span><span class="n">data</span><span class="p">]</span><span class="err">;</span>
+                                                   <span class="k">if</span> <span class="p">(</span><span class="n">cryptor</span><span class="p">.</span><span class="n">isFinished</span><span class="p">)</span> <span class="p">{</span>
+                                                     <span class="p">[</span><span class="n">self</span> <span class="nf">decryptionDidFinish</span><span class="p">]</span><span class="err">;</span>
+                                                   <span class="p">}</span>
+                                                 <span class="p">}];</span>
+<span class="p">}</span>
+</code></pre>
+<a href='#async_and_streams' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='async_and_streams'>Async and Streams</h2>
+
+<p>When performing async operations on streams, the data can come very quickly
+(particularly if you&rsquo;re reading from a local file). If you use RNCryptor in a
+naïve way, you&rsquo;ll queue a work blocks faster than the engine can process them
+and your memory usage will spike. This is particularly true if there&rsquo;s only one
+core, such as on an iPad 1. The solution is to only dispatch new work blocks as
+the previous work blocks complete.</p>
+<pre class="highlight objective_c"><code><span class="c1">// Make sure that this number is larger than the header + 1 block.
+// 33+16 bytes = 49 bytes. So it shouldn't be a problem.
+</span><span class="kt">int</span> <span class="n">blockSize</span> <span class="o">=</span> <span class="mi">32</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">;</span>
+
+<span class="n">NSInputStream</span> <span class="o">*</span><span class="n">cryptedStream</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSInputStream</span> <span class="nf">inputStreamWithFileAtPath</span><span class="p">:</span><span class="s">@"C++ Spec.pdf"</span><span class="p">];</span>
+<span class="n">NSOutputStream</span> <span class="o">*</span><span class="n">decryptedStream</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSOutputStream</span> <span class="nf">outputStreamToFileAtPath</span><span class="p">:</span><span class="s">@"/tmp/C++.crypt"</span> <span class="nf">append</span><span class="p">:</span><span class="nb">NO</span><span class="p">];</span>
+
+<span class="p">[</span><span class="n">cryptedStream</span> <span class="nf">open</span><span class="p">];</span>
+<span class="p">[</span><span class="n">decryptedStream</span> <span class="nf">open</span><span class="p">];</span>
+
+<span class="c1">// We don't need to keep making new NSData objects. We can just use one repeatedly.
+</span><span class="n">__block</span> <span class="n">NSMutableData</span> <span class="o">*</span><span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSMutableData</span> <span class="nf">dataWithLength</span><span class="p">:</span><span class="n">blockSize</span><span class="p">];</span>
+<span class="n">__block</span> <span class="n">RNEncryptor</span> <span class="o">*</span><span class="n">decryptor</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
+
+<span class="n">dispatch_block_t</span> <span class="n">readStreamBlock</span> <span class="o">=</span> <span class="o">^</span><span class="p">{</span>
+  <span class="p">[</span><span class="n">data</span> <span class="nf">setLength</span><span class="p">:</span><span class="n">blockSize</span><span class="p">];</span>
+  <span class="n">NSInteger</span> <span class="n">bytesRead</span> <span class="o">=</span> <span class="p">[</span><span class="n">cryptedStream</span> <span class="nf">read</span><span class="p">:[</span><span class="n">data</span> <span class="nf">mutableBytes</span><span class="p">]</span> <span class="nf">maxLength</span><span class="p">:</span><span class="n">blockSize</span><span class="p">];</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">bytesRead</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Throw an error
+</span>  <span class="p">}</span>
+  <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">bytesRead</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">[</span><span class="n">decryptor</span> <span class="nf">finish</span><span class="p">];</span>
+  <span class="p">}</span>
+  <span class="k">else</span> <span class="p">{</span>
+    <span class="p">[</span><span class="n">data</span> <span class="nf">setLength</span><span class="p">:</span><span class="n">bytesRead</span><span class="p">];</span>
+    <span class="p">[</span><span class="n">decryptor</span> <span class="nf">addData</span><span class="p">:</span><span class="n">data</span><span class="p">];</span>
+    <span class="n">NSLog</span><span class="p">(</span><span class="s">@"Sent %ld bytes to decryptor"</span><span class="p">,</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span><span class="p">)</span><span class="n">bytesRead</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="n">decryptor</span> <span class="o">=</span> <span class="p">[[</span><span class="n">RNEncryptor</span> <span class="nf">alloc</span><span class="p">]</span> <span class="nf">initWithSettings</span><span class="p">:</span><span class="n">kRNCryptorAES256Settings</span>
+                                         <span class="nf">password</span><span class="p">:</span><span class="s">@"blah"</span>
+                                          <span class="nf">handler</span><span class="p">:</span><span class="o">^</span><span class="p">(</span><span class="n">RNCryptor</span> <span class="o">*</span><span class="n">cryptor</span><span class="p">,</span> <span class="n">NSData</span> <span class="o">*</span><span class="n">data</span><span class="p">)</span> <span class="p">{</span>
+                                            <span class="n">NSLog</span><span class="p">(</span><span class="s">@"Decryptor recevied %ld bytes"</span><span class="p">,</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span><span class="p">)</span><span class="n">data</span><span class="p">.</span><span class="n">length</span><span class="p">)</span><span class="err">;</span>
+                                            <span class="p">[</span><span class="n">decryptedStream</span> <span class="nf">write</span><span class="p">:</span><span class="n">data</span><span class="p">.</span><span class="n">bytes</span> <span class="nf">maxLength</span><span class="p">:</span><span class="n">data</span><span class="p">.</span><span class="n">length</span><span class="p">]</span><span class="err">;</span>
+                                            <span class="k">if</span> <span class="p">(</span><span class="n">cryptor</span><span class="p">.</span><span class="n">isFinished</span><span class="p">)</span> <span class="p">{</span>
+                                              <span class="p">[</span><span class="n">decryptedStream</span> <span class="nf">close</span><span class="p">]</span><span class="err">;</span>
+                                              <span class="c1">// call my delegate that I'm finished with decrypting
+</span>                                            <span class="p">}</span>
+                                            <span class="k">else</span> <span class="p">{</span>
+                                              <span class="c1">// Might want to put this in a dispatch_async(), but I don't think you need it.
+</span>                                              <span class="n">readStreamBlock</span><span class="p">()</span><span class="err">;</span>
+                                            <span class="p">}</span>
+                                          <span class="p">}];</span>
+
+<span class="c1">// Read the first block to kick things off    
+</span><span class="n">readStreamBlock</span><span class="p">();</span>
+</code></pre>
+
+<p>I&rsquo;ll eventually get this into the API to simplify things. See <a href="http://stackoverflow.com/a/14586231/97337">Cyrille&rsquo;s SO
+question</a> for more discussion. Pull
+requests welcome.</p>
+<a href='#building' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='building'>Building</h2>
+
+<p>Comes packaged as a static library, but the source files can be dropped into any
+project. The OpenSSL files are not required.</p>
+
+<p>Requires <code>Security.framework</code>.</p>
+
+<p>Supports 10.6+ and iOS 4+.</p>
+
+<p>The current file format is v3. To read v1 files (see Issue #44), you need to set the compile-time macro <code>RNCRYPTOR_ALLOW_V1_BAD_HMAC</code>. It is not possible to write v1 files anymore.</p>
+<a href='#design_considerations' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='design_considerations'>Design considerations</h2>
+
+<p><code>RNCryptor</code> has several design goals, in order of importance:</p>
+<a href='#easy_to_use_correctly_for_most_common_use_cases' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h3 id='easy_to_use_correctly_for_most_common_use_cases'>Easy to use correctly for most common use cases</h3>
+
+<p>The most critical concern is that it be easy for non-experts to use <code>RNCryptor</code> correctly. A framework that is more secure, but requires a steep learning curve on the developer will either be not used, or used incorrectly. Whenever possible, a single line of code should <q>do the right thing</q> for the most common cases.</p>
+
+<p>This also requires that it fail correctly and provide good errors.</p>
+<a href='#reliance_on_commoncryptor_functionality' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h3 id='reliance_on_commoncryptor_functionality'>Reliance on CommonCryptor functionality</h3>
+
+<p><code>RNCryptor</code> has very little <q>security</q> code. It relies as much as possible on the OS-provided CommonCryptor. If a feature does not exist in CommonCryptor, then it generally will not be provided in <code>RNCryptor</code>.</p>
+<a href='#best_practice_security' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h3 id='best_practice_security'>Best practice security</h3>
+
+<p>Wherever possible within the above constraints, the best available algorithms
+are applied. This means AES-256, HMAC+SHA1, and PBKDF2:</p>
+
+<ul>
+<li><p>AES-256. While Bruce Schneier has made some interesting recommendations
+regarding moving to AES-128 due to certain attacks on AES-256, my current
+thinking is in line with <a href="http://www.daemonology.net/blog/2009-07-31-thoughts-on-AES.html">Colin
+Percival</a>.
+PBKDF2 output is effectively random, which should negate related-keys attacks
+against the kinds of use cases we&rsquo;re interested in.</p></li>
+<li><p>AES-CBC mode. This was a somewhat complex decision, but the ubiquity of CBC
+outweighs other considerations here. There are no major problems with CBC mode,
+and nonce-based modes like CTR have other trade-offs. See <a href="http://robnapier.net/blog/mode-rncryptor"><q>Mode changes for
+RNCryptor</q></a> for more details on this
+decision.</p></li>
+<li><p>Encrypt-then-MAC. If there were a good authenticated AES mode on iOS (GCM for
+instance), I would probably use that for its simplicity. Colin Percival makes
+<a href="http://www.daemonology.net/blog/2009-06-24-encrypt-then-mac.html">good arguments for hand-coding an encrypt-than-
+MAC</a> rather
+than using an authenticated AES mode, but in RNCryptor mananging the HMAC
+actually adds quite a bit of complexity. I&rsquo;d rather the complexity at a more
+broadly peer-reviewed layer like CommonCryptor than at the RNCryptor layer. But
+this isn&rsquo;t an option, so I fall back to my own Encrypt-than-MAC.</p></li>
+<li><p>HMAC+SHA256. No surprises here.</p></li>
+<li><p>PBKDF2. While bcrypt and scrypt may be more secure than PBKDF2, CommonCryptor
+only supports PBKDF2. <a href="http://security.stackexchange.com/questions/4781/do-any-security-experts-recommend-bcrypt-for-password-storage">NIST also continues to recommend
+PBKDF2</a>. We use 10k rounds of PBKDF2
+which represents about 80ms on an iPhone 4.</p></li>
+</ul>
+<a href='#code_simplicity' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h3 id='code_simplicity'>Code simplicity</h3>
+
+<p><code>RNCryptor endeavors to be implemented as simply as possible, avoiding tricky
+</code>code. It is designed to be easy to read and code review.</p>
+<a href='#performance' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h3 id='performance'>Performance</h3>
+
+<p>Performance is a goal, but not the most important goal. The code must be secure
+and easy to use. Within that, it is as fast and memory-efficient as possible.</p>
+<a href='#portability' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h3 id='portability'>Portability</h3>
+
+<p>Without sacrificing other goals, it is preferable to read the output format of
+<code>RNCryptor</code> on other platforms.</p>
+<a href='#version_history' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='version_history'>Version History</h2>
+
+<ul>
+<li>v2.2 Switches to file format v3 to deal with Issue #77.</li>
+<li>v2.1 Switches to file format v2 to deal with Issue #44.</li>
+<li>v2.0 adds asynchronous modes.</li>
+<li>v2.1 backports <code>RNCryptor</code> to older versions of Mac OS X (and possibly iOS).</li>
+</ul>
+<a href='#license' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='license'>LICENSE</h2>
+
+<p>Except where otherwise indicated in the source code, this code is licensed under
+the MIT License:</p>
+<pre class="highlight plaintext"><code>Permission is hereby granted, free of charge, to any person obtaining a 
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+</code></pre>
+
+<p>Portions of this code, indicated in the source, are licensed under the following
+license:</p>
+<pre class="highlight plaintext"><code>/*-
+ * Copyright (c) 2008 Damien Bergamini &lt;damien.bergamini@free.fr&gt;
+ *
+ * Permission to use, copy, modify, and distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+</code></pre>
+
+<p>Portions of this code, indicated in the source, are licensed under the APSL
+license:</p>
+<pre class="highlight plaintext"><code>/*
+ * Copyright (c) 2006-2010 Apple Inc. All Rights Reserved.
+ *
+ * @APPLE_LICENSE_HEADER_START@
+ *
+ * This file contains Original Code and/or Modifications of Original Code
+ * as defined in and that are subject to the Apple Public Source License
+ * Version 2.0 (the 'License'). You may not use this file except in
+ * compliance with the License. Please obtain a copy of the License at
+ * http://www.opensource.apple.com/apsl/ and read it before using this
+ * file.
+ *
+ * The Original Code and all software distributed under the License are
+ * distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
+ * EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
+ * INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR NON-INFRINGEMENT.
+ * Please see the License for the specific language governing rights and
+ * limitations under the License.
+ *
+ * @APPLE_LICENSE_HEADER_END@
+ */
+</code></pre>
+
+          </section>
+        </section>
+        <section id="footer">
+          <p>&copy; 2015 <a class="link" href="" target="_blank" rel="external"></a>. All rights reserved. (Last updated: 2015-10-01)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.3.1</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</div>
+</html>

@@ -1,26 +1,12 @@
 # RNCryptor
 
-Cross-language AES Encryptor/Decryptor [data
-format](https://github.com/RNCryptor/RNCryptor-Spec/blob/master/RNCryptor-Spec-v3.md).
+Cross-language AES Encryptor/Decryptor [data format](https://github.com/RNCryptor/RNCryptor-Spec/blob/master/RNCryptor-Spec-v3.md).
  
-The primary targets are Swift and Objective-C, but implementations are available in
-[C](https://github.com/RNCryptor/RNCryptor-C),
-[C++](https://github.com/RNCryptor/RNCryptor-cpp),
-[C#](https://github.com/RNCryptor/RNCryptor-cs),
-[Erlang](https://github.com/RNCryptor/RNCryptor-erlang),
-[Go](https://github.com/RNCryptor/RNCryptor-go),
-[Haskell](https://github.com/RNCryptor/rncryptor-hs),
-[Java](https://github.com/RNCryptor/JNCryptor),
-[PHP](https://github.com/RNCryptor/RNCryptor-php),
-[Python](https://github.com/RNCryptor/RNCryptor-python),
-[Javascript](https://github.com/chesstrian/JSCryptor),
-and [Ruby](https://github.com/RNCryptor/ruby_rncryptor).
+The primary targets are Swift and Objective-C, but implementations are available in [C](https://github.com/RNCryptor/RNCryptor-C), [C++](https://github.com/RNCryptor/RNCryptor-cpp), [C#](https://github.com/RNCryptor/RNCryptor-cs), [Erlang](https://github.com/RNCryptor/RNCryptor-erlang), [Go](https://github.com/RNCryptor/RNCryptor-go), [Haskell](https://github.com/RNCryptor/rncryptor-hs), [Java](https://github.com/RNCryptor/JNCryptor),
+[PHP](https://github.com/RNCryptor/RNCryptor-php), [Python](https://github.com/RNCryptor/RNCryptor-python),
+[Javascript](https://github.com/chesstrian/JSCryptor), and [Ruby](https://github.com/RNCryptor/ruby_rncryptor).
 
-The data format includes all the metadata required to securely implement AES
-encryption, as described in ["Properly encrypting with AES with
-CommonCrypto,"](http://robnapier.net/aes-commoncrypto) and [*iOS 6
-Programming Pushing the Limits*](http://iosptl.com), Chapter 15. Specifically,
-it includes:
+The data format includes all the metadata required to securely implement AES encryption, as described in ["Properly encrypting with AES with CommonCrypto,"](http://robnapier.net/aes-commoncrypto) and [*iOS 6 Programming Pushing the Limits*](http://iosptl.com), Chapter 15. Specifically, it includes:
 
 * AES-256 encryption
 * CBC mode
@@ -69,13 +55,9 @@ if (error != nil) {
 
 ## Incremental use
 
-RNCryptor suports incremental use, specifically designed to work with
-`NSURLSession`. This is also useful for cases where the encrypted or decrypted
-data will not comfortably fit in memory.
+RNCryptor suports incremental use, specifically designed to work with `NSURLSession`. This is also useful for cases where the encrypted or decrypted data will not comfortably fit in memory.
 
-To operate in incremental mode, you create an `Encryptor` or `Decryptor`,
-call `updateWithData()` repeatedly, gathering its results, and then call
-`finalData()` and gather its result.
+To operate in incremental mode, you create an `Encryptor` or `Decryptor`, call `updateWithData()` repeatedly, gathering its results, and then call `finalData()` and gather its result.
 
 ### Swift
 
@@ -130,7 +112,6 @@ NSMutableData *ciphertext = [NSMutableData new];
 RNDecryptor *decryptor = [[RNDecryptor alloc] initWithPassword:password];
 NSMutableData *plaintext = [NSMutableData new];
 
-
 // ... Each time data comes in, update the decryptor and accumulate some plaintext ...
 NSError *error = nil;
 NSData *partialPlaintext = [decryptor updateWithData:data error:&error];
@@ -154,19 +135,49 @@ if (error != nil) {
 
 ## Installation
 
-### By hand
+### A word about CommonCrypto
 
-RNCryptor is a single Swift file (`RNCryptor.swift`) that can be easily dropped
-into any package. 
+CommonCrypto hates Swift. That may be an overstatment. CommonCrypto is...apathetic about Swift to the point of hostility. Apple only needs to do a few things to make CommonCrypto a fine Swift citizen, but as of Xcode 7.0, those things have not happened, and this makes it difficult to import CommonCrypto into Swift projects.
 
-Comes packaged as a static library, but the source files can be dropped into any
-project. The OpenSSL files are not required.
+The most critical thing is that CommonCrypto is not a module, and Swift can't really handle things that aren't modules. The RNCryptor project comes with a `CommonCrypto.framework` which is basically a fake module. It's only function is to tell Swift where the CommonCrypto headers live. It doesn't contain any CommonCrypto code. You don't even need to link it. For maximum robustness across Xcode versions, `CommonCrypto.framework` points to `/usr/include`. The CommonCrypto headers change very rarely, so this shouldn't cause any problem. Hopefully Apple will finally make a module around CommonCrypto and this won't be necessary in the future.
 
-Requires `Security.framework`.
+### Installing as a subproject
 
-Supports 10.6+ and iOS 4+.
+The easiest way to use RNCryptor is as a subproject. This makes version control very simple if you use submodules, or checkin specific versions of RNCryptor to your repository.
 
-The current file format is v3. To read v1 files (see Issue #44), you need to set the compile-time macro `RNCRYPTOR_ALLOW_V1_BAD_HMAC`. It is not possible to write v1 files anymore.
+This process works for almost any kind of target: iOS and OS X GUI apps, Swift frameworks, and OS X commandline apps. **It is not safe for ObjC frameworks or frameworks that may be imported into ObjC (since it would cause duplicate symbols if some other framework included RNCryptor).**
+
+* Drag `RNCryptor.xcodeproj` into your project
+* Drag `RNCryptor.swift` into your project and link it.
+* In your target build settings, Build Phases, add `CommonCrypto.framework` as a build dependency (but don't link it).
+
+You don't need to (and can't) `import RNCryptor` into your code. RNCryptor will be part of your module.
+
+
+### Installing without a subproject
+
+If you want to keep things as small and simple as possible, you don't need the full RNCryptor project. You just need two things: `RNCryptor.swift` and `CommonCrypto.framework`. You can just copy those into your project.
+
+The same warnings apply as for subprojects: **It is not safe for ObjC frameworks or frameworks that may be imported into ObjC (since it would cause duplicate symbols if some other framework included RNCryptor).**
+
+The easiest way to install RNCryptor is to just add it to your project. There's
+no need for complicated package managers. 
+
+* Copy or link `RNCryptor/RNCryptor.swift` into your project.
+* Copy or link `CommonCrypto.framework` into your project.
+* Go to your target build settings, Build Phases, and delete `CommonCrypto.framework`. You don't actually want to link it.
+
+You don't need to (and can't) `import RNCryptor` into your code. RNCryptor will be part of your module.
+
+### Carthage
+
+"But I need a package manager!"
+
+OK. You can use a package manager. I prefer [Carthage](https://github.com/Carthage/Carthage). See their site for how you import a module. You'll need to copy and link `RNCryptor.framework` and copy `CommonCrypto.framework`. (You can link this version of `CommonCrypto.framework` or not. It doesn't matter.)
+
+    github "RNCryptor/RNCryptor" "~> 4.0"
+
+
 
 ## Design considerations
 
