@@ -164,7 +164,7 @@ The most critical thing is that CommonCrypto is not a module, and Swift can't re
 
 The easiest way to use RNCryptor is as a subproject without a framework. RNCryptor is just one file, and you can skip all the complexity of managing frameworks this way. It also makes version control very simple if you use submodules, or checkin specific versions of RNCryptor to your repository.
 
-This process works for most targets: iOS and OS X GUI apps, Swift frameworks, and OS X commandline apps. **It is not safe for ObjC frameworks or frameworks that may be imported into ObjC (since it would cause duplicate symbols if some other framework includes RNCryptor).**
+This process works for most targets: iOS and OS X GUI apps, Swift frameworks, and OS X commandline apps. **It is not safe for ObjC frameworks or frameworks that may be imported into ObjC, since it would cause duplicate symbols if some other framework includes RNCryptor.**
 
 * Drag `RNCryptor.xcodeproj` into your project
 * Drag `RNCryptor.swift` from `RNCryptor` into your project
@@ -176,7 +176,7 @@ Built this way, you don't need to (and can't) `import RNCryptor` into your code.
 
 If you want to keep things as small and simple as possible, you don't need the full RNCryptor project at all. You just need two things: `RNCryptor.swift` and `CommonCrypto.framework`. You can just copy those into your project.
 
-The same warnings apply as for subprojects: **It is not safe for ObjC frameworks or frameworks that may be imported into ObjC (since it would cause duplicate symbols if some other framework included RNCryptor).**
+The same warnings apply as for subprojects: **It is not safe for ObjC frameworks or frameworks that may be imported into ObjC, since it would cause duplicate symbols if some other framework included RNCryptor.**
 
 * Copy or link `RNCryptor/RNCryptor.swift` into your project.
 * Copy or link `CommonCrypto.framework` into your project.
