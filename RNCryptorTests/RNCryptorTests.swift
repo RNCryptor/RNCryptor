@@ -23,7 +23,6 @@
 //
 
 import XCTest
-import CommonCrypto
 
 @testable import RNCryptor
 
