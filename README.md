@@ -154,15 +154,9 @@ if (error != nil) {
 
 RNCryptor 4 is written in Swift 2, so requires Xcode 7, and can target iOS 7 or later (iOS 8 or later if used as a framework), and OS X 10.9 or later. If you want a pure ObjC implementation that supports older versions of iOS and OS X, see [RNCryptor 3](https://github.com/RNCryptor/RNCryptor/releases/tag/RNCryptor-3.0.1).
 
-### A word about CommonCrypto
-
-CommonCrypto hates Swift. That may be an overstatment. CommonCrypto is...apathetic about Swift to the point of hostility. Apple only needs to do a few things to make CommonCrypto a fine Swift citizen, but as of Xcode 7, those things have not happened, and this makes it difficult to import CommonCrypto into Swift projects.
-
-The most critical thing is that CommonCrypto is not a module, and Swift can't really handle things that aren't modules. The RNCryptor project comes with `CommonCrypto.framework`, which is basically a fake module. Its only function is to tell Swift where the CommonCrypto headers live. It doesn't contain any CommonCrypto code. You don't even need to link it. For maximum robustness across Xcode versions, `CommonCrypto.framework` points to `/usr/include`. The CommonCrypto headers change very rarely, so this shouldn't cause any problem. Hopefully Apple will finally make a module around CommonCrypto and this won't be necessary in the future.
-
 ### Installing as a subproject
 
-The easiest way to use RNCryptor is as a subproject without a framework. RNCryptor is just one file, and you can skip all the complexity of managing frameworks this way. It also makes version control very simple if you use submodules, or checkin specific versions of RNCryptor to your repository.
+The easiest way to use RNCryptor is as a subproject without a framework. RNCryptor is just one swift file and one bridging header, and you can skip all the complexity of managing frameworks this way. It also makes version control very simple if you use submodules, or checkin specific versions of RNCryptor to your repository.
 
 This process works for most targets: iOS and OS X GUI apps, Swift frameworks, and OS X commandline apps. **It is not safe for ObjC frameworks or frameworks that may be imported into ObjC, since it would cause duplicate symbols if some other framework includes RNCryptor.**
 

@@ -47,12 +47,6 @@
 /* Begin PBXFileReference section */
 		FB1E41121BBABEB10009A47D /* ObjC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjC.m; sourceTree = "<group>"; };
 		FB30A1FE1B2B7BF300BE5429 /* RNCryptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNCryptor.swift; sourceTree = "<group>"; };
-		FB30A2071B2B86FD00BE5429 /* CommonCrypto.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommonCrypto.h; sourceTree = "<group>"; };
-		FB30A2091B2B86FD00BE5429 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		FB30A21C1B2B873000BE5429 /* CommonCrypto.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = CommonCrypto.xcconfig; sourceTree = "<group>"; };
-		FB30A21D1B2B876600BE5429 /* iphoneos.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = iphoneos.modulemap; sourceTree = "<group>"; };
-		FB30A21E1B2B878300BE5429 /* iphonesimulator.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = iphonesimulator.modulemap; sourceTree = "<group>"; };
-		FB30A21F1B2B879000BE5429 /* macosx.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = macosx.modulemap; sourceTree = "<group>"; };
 		FB364F5C1B41F0E100F5273F /* GenVectorTests */ = {isa = PBXFileReference; lastKnownFileType = text; path = GenVectorTests; sourceTree = "<group>"; };
 		FB36507E1B41F3DE00F5273F /* RNCryptorGeneratedVectorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNCryptorGeneratedVectorTests.swift; sourceTree = "<group>"; };
 		FB3650801B41F49800F5273F /* VectorTestHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VectorTestHelpers.swift; sourceTree = "<group>"; };
@@ -103,19 +97,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		FB30A2061B2B86FD00BE5429 /* CommonCrypto */ = {
-			isa = PBXGroup;
-			children = (
-				FB30A2071B2B86FD00BE5429 /* CommonCrypto.h */,
-				FB30A2091B2B86FD00BE5429 /* Info.plist */,
-				FB30A21C1B2B873000BE5429 /* CommonCrypto.xcconfig */,
-				FB30A21D1B2B876600BE5429 /* iphoneos.modulemap */,
-				FB30A21E1B2B878300BE5429 /* iphonesimulator.modulemap */,
-				FB30A21F1B2B879000BE5429 /* macosx.modulemap */,
-			);
-			path = CommonCrypto;
-			sourceTree = "<group>";
-		};
 		FB36501F1B41F3DE00F5273F /* Generated */ = {
 			isa = PBXGroup;
 			children = (
@@ -139,7 +120,6 @@
 				FB45A37E1BBB713B00265FD1 /* README.md */,
 				FB627FD01B2B7A1700C3A579 /* RNCryptor */,
 				FB627FDC1B2B7A1800C3A579 /* RNCryptorTests */,
-				FB30A2061B2B86FD00BE5429 /* CommonCrypto */,
 				FB627FCF1B2B7A1700C3A579 /* Products */,
 			);
 			sourceTree = "<group>";
