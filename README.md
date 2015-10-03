@@ -18,22 +18,10 @@ The data format includes all the metadata required to securely implement AES enc
 ## Contents
 
 * [Format Versus Implementation](#format-versus-implementation)
-* [Basic Password Usage](#basic_password_usage)
-	* [Swift](#swift)
-	* [Obj-C](#obj-c)
-* [Incremental usage](#incremental_usage)
-	* [Swift](#swift-1)
-	* [Obj-C](#obj-c-1)
+* [Basic Password Usage](#basic-password-usage)
+* [Incremental Usage](#incremental-usage)
 * [Installation](#installation)
-	* [Requirements](#requirements)
-	* [A word about CommonCrypto](#a-word-about-commoncrypto)
-	* [Installing as a subproject](#installing-as-a-subproject)
-	* [Installing without a subproject](#installing-without-a-subproject)
-	* [Carthage](#carthage)
-	* [CocoaPods](#cocoapods)
-* [Advanced Use](#advanced-use)
-	* [Version-Specific Cryptors](#version-specific-cryptors)
-	* [Key-Based Encryption](#key-based-encryption)
+* [Advanced Usage](#advanced-usage)
 * [FAQ](#faq)
 * [Design Considerations](#design-considerations)
 * [License](#license)
@@ -80,7 +68,7 @@ if (error != nil) {
 // ...
 ```
 
-## Incremental usage
+## Incremental Usage
 
 RNCryptor suports incremental use, specifically designed to work with `NSURLSession`. This is also useful for cases where the encrypted or decrypted data will not comfortably fit in memory.
 
@@ -210,7 +198,7 @@ This approach will not work for OS X commandline apps.
 
 This approach will not work for OS X commandline apps.
 
-## Advanced Use
+## Advanced Usage
 
 ### Version-Specific Cryptors
 
