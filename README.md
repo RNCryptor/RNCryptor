@@ -22,8 +22,21 @@ The data format includes all the metadata required to securely implement AES enc
 	* [Swift](#swift)
 	* [Obj-C](#obj-c)
 * [Incremental usage](#incremental_usage)
-
-
+	* [Swift](#swift-1)
+	* [Obj-C](#obj-c-1)
+* [Installation](#installation)
+	* [Requirements](#requirements)
+	* [A word about CommonCrypto](#a-word-about-commoncrypto)
+	* [Installing as a subproject](#installing-as-a-subproject)
+	* [Installing without a subproject](#installing-without-a-subproject)
+	* [Carthage](#carthage)
+	* [CocoaPods](#cocoapods)
+* [Advanced Use](#advanced-use)
+	* [Version-Specific Cryptors](#version-specific-cryptors)
+	* [Key-Based Encryption](#key-based-encryption)
+* [FAQ](#faq)
+* [Design Considerations](#design-considerations)
+* [License](#license)
 
 ## Format Versus Implementation
 
@@ -197,9 +210,9 @@ This approach will not work for OS X commandline apps.
 
 This approach will not work for OS X commandline apps.
 
-## Advanced use
+## Advanced Use
 
-### Version-specific cryptors
+### Version-Specific Cryptors
 
 The default `RNCryptor.Encryptor` is the "current" version of the data format (currently v3). If you're interoperating with other implementations, you may need to choose a specific format for compatibility.
 
@@ -207,7 +220,7 @@ To create a version-locked cryptor, use `RNCryptor.EncryptorV3` and `RNCryptor.D
 
 Remember: the version specified here is the *format* version, not the implementation version. The v4 RNCryptor framework reads and writes the v3 RNCryptor data format.
 
-### Key-based encryption
+### Key-Based Encryption
 
 *You need a little expertise to use key-based encryption correctly, and it is very easy to make insecure systems that look secure. The most important rule is that keys must be random across all their bytes. If you're not comfortable with basic cryptographic concepts like AES-CBC, IV, and HMAC, you probably should avoid using key-based encryption.*
 
@@ -217,7 +230,7 @@ Passwords are not "random byte sequences of a specific length." They're not rand
 
 Occasionally there are reasons to work directly with random keys. Converting a password into a key is intentionally slow (tens of milliseconds). Password-encrypted messages are also a 16 bytes longer than key-encrypted messages. If your system encrypts and decrypts many short messages, this can be a significant performance impact, particularly on a server.
 
-RNCryptor supports direct key-based encryption and decryption. The size and number of keys may change between format versions, so key-based cryptors are [version-specific](#version_specific_cryptors).
+RNCryptor supports direct key-based encryption and decryption. The size and number of keys may change between format versions, so key-based cryptors are [version-specific](#version-specific-cryptors).
 
 In order to be secure, the keys must be a random sequence of bytes. If you're starting with a string of any kind, you are almost certainly doing this wrong.
 
@@ -257,7 +270,7 @@ That said, it would be fairly easy to build a wrapper around RNCryptor that allo
 
 If there is interest, I may eventually build this as a separate framework. If you have a pressing need sooner than "eventually," please contact me about rates.
 
-## Design considerations
+## Design Considerations
 
 `RNCryptor` has several design goals, in order of importance:
 
@@ -286,7 +299,7 @@ against the kinds of use cases we're interested in.
 * AES-CBC mode. This was a somewhat complex decision, but the ubiquity of CBC
 outweighs other considerations here. There are no major problems with CBC mode,
 and nonce-based modes like CTR have other trade-offs. See ["Mode changes for
-RNCryptor"](http://robnapier.net/blog/mode-rncryptor) for more details on this
+RNCryptor"](http://robnapier.net/mode-rncryptor) for more details on this
 decision.
 
 * Encrypt-then-MAC. If there were a good authenticated AES mode on iOS (GCM for
@@ -319,7 +332,7 @@ and easy to use. Within that, it is as fast and memory-efficient as possible.
 Without sacrificing other goals, it is preferable to read the output format of
 `RNCryptor` on other platforms.
 
-## LICENSE
+## License
 
 Except where otherwise indicated in the source code, this code is licensed under
 the MIT License:
