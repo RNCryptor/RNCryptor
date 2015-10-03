@@ -139,38 +139,39 @@ if (error != nil) {
 
 ## Installation
 
+### Requirements
+
+RNCryptor 4 is written in Swift 2, so requires Xcode 7, and can target iOS 7 or greater and OS X 10.9 or later. If you want a pure ObjC implementation that supports older versions of iOS and OS X, see [RNCryptor 3](https://github.com/RNCryptor/RNCryptor/releases/tag/RNCryptor-3.0.1).
+
 ### A word about CommonCrypto
 
-CommonCrypto hates Swift. That may be an overstatment. CommonCrypto is...apathetic about Swift to the point of hostility. Apple only needs to do a few things to make CommonCrypto a fine Swift citizen, but as of Xcode 7.0, those things have not happened, and this makes it difficult to import CommonCrypto into Swift projects.
+CommonCrypto hates Swift. That may be an overstatment. CommonCrypto is...apathetic about Swift to the point of hostility. Apple only needs to do a few things to make CommonCrypto a fine Swift citizen, but as of Xcode 7, those things have not happened, and this makes it difficult to import CommonCrypto into Swift projects.
 
-The most critical thing is that CommonCrypto is not a module, and Swift can't really handle things that aren't modules. The RNCryptor project comes with a `CommonCrypto.framework` which is basically a fake module. It's only function is to tell Swift where the CommonCrypto headers live. It doesn't contain any CommonCrypto code. You don't even need to link it. For maximum robustness across Xcode versions, `CommonCrypto.framework` points to `/usr/include`. The CommonCrypto headers change very rarely, so this shouldn't cause any problem. Hopefully Apple will finally make a module around CommonCrypto and this won't be necessary in the future.
+The most critical thing is that CommonCrypto is not a module, and Swift can't really handle things that aren't modules. The RNCryptor project comes with `CommonCrypto.framework`, which is basically a fake module. Its only function is to tell Swift where the CommonCrypto headers live. It doesn't contain any CommonCrypto code. You don't even need to link it. For maximum robustness across Xcode versions, `CommonCrypto.framework` points to `/usr/include`. The CommonCrypto headers change very rarely, so this shouldn't cause any problem. Hopefully Apple will finally make a module around CommonCrypto and this won't be necessary in the future.
 
 ### Installing as a subproject
 
-The easiest way to use RNCryptor is as a subproject. This makes version control very simple if you use submodules, or checkin specific versions of RNCryptor to your repository.
+The easiest way to use RNCryptor is as a subproject without a framework. RNCryptor is just one file, and you can skip all the complexity of managing frameworks this way. It also makes version control very simple if you use submodules, or checkin specific versions of RNCryptor to your repository.
 
-This process works for almost any kind of target: iOS and OS X GUI apps, Swift frameworks, and OS X commandline apps. **It is not safe for ObjC frameworks or frameworks that may be imported into ObjC (since it would cause duplicate symbols if some other framework included RNCryptor).**
+This process works for most targets: iOS and OS X GUI apps, Swift frameworks, and OS X commandline apps. **It is not safe for ObjC frameworks or frameworks that may be imported into ObjC (since it would cause duplicate symbols if some other framework includes RNCryptor).**
 
 * Drag `RNCryptor.xcodeproj` into your project
-* Drag `RNCryptor.swift` into your project and link it.
+* Drag `RNCryptor.swift` from `RNCryptor` into your project
 * In your target build settings, Build Phases, add `CommonCrypto.framework` as a build dependency (but don't link it).
 
-You don't need to (and can't) `import RNCryptor` into your code. RNCryptor will be part of your module.
+Built this way, you don't need to (and can't) `import RNCryptor` into your code. RNCryptor will be part of your module.
 
 ### Installing without a subproject
 
-If you want to keep things as small and simple as possible, you don't need the full RNCryptor project. You just need two things: `RNCryptor.swift` and `CommonCrypto.framework`. You can just copy those into your project.
+If you want to keep things as small and simple as possible, you don't need the full RNCryptor project at all. You just need two things: `RNCryptor.swift` and `CommonCrypto.framework`. You can just copy those into your project.
 
 The same warnings apply as for subprojects: **It is not safe for ObjC frameworks or frameworks that may be imported into ObjC (since it would cause duplicate symbols if some other framework included RNCryptor).**
 
-The easiest way to install RNCryptor is to just add it to your project. There's
-no need for complicated package managers. 
-
 * Copy or link `RNCryptor/RNCryptor.swift` into your project.
 * Copy or link `CommonCrypto.framework` into your project.
-* Go to your target build settings, Build Phases, and delete `CommonCrypto.framework`. You don't actually want to link it.
+* Go to your target build settings, Build Phases, and delete `CommonCrypto.framework` from "Link Binary with Libraries." You don't actually want to link it.
 
-You don't need to (and can't) `import RNCryptor` into your code. RNCryptor will be part of your module.
+Built this way, you don't need to (and can't) `import RNCryptor` into your code. RNCryptor will be part of your module.
 
 ### [Carthage](https://github.com/Carthage/Carthage)
 
@@ -178,35 +179,35 @@ You don't need to (and can't) `import RNCryptor` into your code. RNCryptor will 
 
 Don't forget to copy and link `RNCryptor.framework` and at least copy `CommonCrypto.framwork`. (You can link the Carthage version of `CommonCrypto.framework`. It doesn't matter.)
 
-Note that this approach will not work for OS X commandline apps.
+This approach will not work for OS X commandline apps.
 
 ### [CocoaPods](https://cocoapods.org)
 
     pod 'RNCryptor', '~> 4.0'
 
-Note that this approach will not work for OS X commandline apps.
+This approach will not work for OS X commandline apps.
 
 ## Advanced use
 
 ### Version-specific cryptors
 
-The default `RNCryptor.Encryptor` is the "current" version of the data format (currently v3). If you're interoperating with other implementations, you may need to choose a specific version for compatibility.
+The default `RNCryptor.Encryptor` is the "current" version of the data format (currently v3). If you're interoperating with other implementations, you may need to choose a specific format for compatibility.
 
-To create a version-locked encryptor, just use `RNCryptor.EncryptorV3` instead. The password-based interface is the same. Similarly, the version-locked decryptor is `RNCryptor.DecryptorV3`.
+To create a version-locked cryptor, use `RNCryptor.EncryptorV3` and `RNCryptor.DecryptorV3`.
 
 Remember: the version specified here is the *format* version, not the implementation version. The v4 RNCryptor framework reads and writes the v3 RNCryptor data format.
 
 ### Key-based encryption
 
-*You need a little expertise to use key-based encryption correctly. The most important rule is that keys must be random. If you're not comfortable with basic cryptographic concepts like AES-CBC, IV, and HMAC, you probably should avoid using key-based encryption.*
+*You need a little expertise to use key-based encryption correctly, and it is very easy to make insecure systems that look secure. The most important rule is that keys must be random across all their bytes. If you're not comfortable with basic cryptographic concepts like AES-CBC, IV, and HMAC, you probably should avoid using key-based encryption.*
 
 Cryptography works with keys, which are random byte sequences of a specific length. The RNCryptor v3 format uses two 256-bit (32-byte) keys to perform encryption and authentication.
 
-Passwords are not "random byte sequences of a specific length." They're not random at all, and they can be a wide variety of lengths. They're very seldom 32 bytes. RNCryptor defines a specific way to convert passwords into keys, and that is one of it's primary features.
+Passwords are not "random byte sequences of a specific length." They're not random at all, and they can be a wide variety of lengths, very seldom exactly 32. RNCryptor defines a specific and secure way to convert passwords into keys, and that is one of it's primary features.
 
-Occasionally there are reasons to work directly with random keys. Converting a password into a key is intentionally slow (10s of ms). Password-encrypted messages are also a 16 bytes longer than key-encrypted messages. If your system encrypts and decrypts many short messages, this can be a significant performance impact.
+Occasionally there are reasons to work directly with random keys. Converting a password into a key is intentionally slow (tens of milliseconds). Password-encrypted messages are also a 16 bytes longer than key-encrypted messages. If your system encrypts and decrypts many short messages, this can be a significant performance impact, particularly on a server.
 
-RNCryptor supports direct key-based encryption and decryption. The size and number of keys may change between format versions, so key-based cryptors are version-specific.
+RNCryptor supports direct key-based encryption and decryption. The size and number of keys may change between format versions, so key-based cryptors are [version-specific](#version_specific_cryptors).
 
 In order to be secure, the keys must be a random sequence of bytes. If you're starting with a string of any kind, you are almost certainly doing this wrong.
 
@@ -228,11 +229,23 @@ No. RNCryptor implements a specific data format. It is not a general-purpose enc
 
 If you're using the OpenSSL encryption format, see [RNOpenSSLCryptor](https://github.com/rnapier/RNOpenSSLCryptor).
 
+### Can I change the parameters used (algorithm, iterations, etc)?
+
+No. See previous question. The v4 format will permit some control over PBKDF2 iterations, but the only thing configurable in the v3 format is whether a password or key is used. This keeps RNCryptor implementations dramatically simpler and interoperable.
+
 ### How do I encrypt/decrypt a string?
 
 AES encrypts bytes. It does not encrypt characters, letters, words, pictures, videos, cats, or ennui. It encrypts bytes. You need to convert other data (such as strings) to and from bytes in a consistent way. There are several ways to do that. Some of the most popular are UTF-8 encoding, Base-64 encoding, and Hex encoding. There are many other options. There is no good way for RNCryptor to guess which encoding you want, so it doesn't try. It accepts and returns bytes in the form of `NSData`.
 
 To convert strings to data as UTF-8, use `dataUsingEncoding()` and `init(data:encoding:)`. To convert strings to data as Base-64, use `init(base64EncodedString:options:)` and `base64EncodedStringWithOptions()`.
+
+### Does RNCryptor support random access decryption?
+
+The usual use case for this is encrypting media files like video. RNCryptor uses CBC encryption, which prevents easy random-access. While other modes are better for random-access (CTR for instance), they are more complicated to implement correctly and CommonCrypto doesn't directly support using them for random access anyway.
+
+That said, it would be fairly easy to build a wrapper around RNCryptor that allowed random-access to blocks of some fixed size (say 64k), and that could work well for video with modest overhead (see [inferno](http://securitydriven.net/inferno/) for a very similar format in C#). Such a format would be fairly easy to port to other platforms that already support RNCryptor.
+
+If there is interest, I may eventually build this as a separate framework. If you have a pressing need sooner than "eventually," please contact me about rates.
 
 ## Design considerations
 
