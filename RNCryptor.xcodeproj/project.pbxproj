@@ -12,14 +12,10 @@
 		FBBA73891BC0892100400E65 /* RNCryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73861BC0892100400E65 /* RNCryptor.swift */; settings = {ASSET_TAGS = (); }; };
 		FBBA738B1BC0893200400E65 /* RNCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FBBA73851BC0892100400E65 /* RNCryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FBBA738C1BC0893500400E65 /* RNCryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73861BC0892100400E65 /* RNCryptor.swift */; settings = {ASSET_TAGS = (); }; };
-		FBBA73971BC089FA00400E65 /* ByteArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA738E1BC089FA00400E65 /* ByteArray.swift */; settings = {ASSET_TAGS = (); }; };
-		FBBA73981BC089FA00400E65 /* ByteArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA738E1BC089FA00400E65 /* ByteArray.swift */; settings = {ASSET_TAGS = (); }; };
+		FBBA73971BC089FA00400E65 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA738E1BC089FA00400E65 /* Data.swift */; settings = {ASSET_TAGS = (); }; };
+		FBBA73981BC089FA00400E65 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA738E1BC089FA00400E65 /* Data.swift */; settings = {ASSET_TAGS = (); }; };
 		FBBA73991BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73901BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift */; settings = {ASSET_TAGS = (); }; };
 		FBBA739A1BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73901BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift */; settings = {ASSET_TAGS = (); }; };
-		FBBA739B1BC089FA00400E65 /* GenVectorTests in Resources */ = {isa = PBXBuildFile; fileRef = FBBA73911BC089FA00400E65 /* GenVectorTests */; settings = {ASSET_TAGS = (); }; };
-		FBBA739C1BC089FA00400E65 /* GenVectorTests in Resources */ = {isa = PBXBuildFile; fileRef = FBBA73911BC089FA00400E65 /* GenVectorTests */; settings = {ASSET_TAGS = (); }; };
-		FBBA739D1BC089FA00400E65 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = FBBA73921BC089FA00400E65 /* Info.plist */; settings = {ASSET_TAGS = (); }; };
-		FBBA739E1BC089FA00400E65 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = FBBA73921BC089FA00400E65 /* Info.plist */; settings = {ASSET_TAGS = (); }; };
 		FBBA739F1BC089FA00400E65 /* ObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73931BC089FA00400E65 /* ObjC.m */; settings = {ASSET_TAGS = (); }; };
 		FBBA73A01BC089FA00400E65 /* ObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73931BC089FA00400E65 /* ObjC.m */; settings = {ASSET_TAGS = (); }; };
 		FBBA73A11BC089FA00400E65 /* OverfowingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73941BC089FA00400E65 /* OverfowingBuffer.swift */; settings = {ASSET_TAGS = (); }; };
@@ -55,7 +51,7 @@
 		FBBA73841BC0892100400E65 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FBBA73851BC0892100400E65 /* RNCryptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCryptor.h; sourceTree = "<group>"; };
 		FBBA73861BC0892100400E65 /* RNCryptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNCryptor.swift; sourceTree = "<group>"; };
-		FBBA738E1BC089FA00400E65 /* ByteArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ByteArray.swift; sourceTree = "<group>"; };
+		FBBA738E1BC089FA00400E65 /* Data.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
 		FBBA73901BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNCryptorGeneratedVectorTests.swift; sourceTree = "<group>"; };
 		FBBA73911BC089FA00400E65 /* GenVectorTests */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GenVectorTests; sourceTree = "<group>"; };
 		FBBA73921BC089FA00400E65 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -127,7 +123,7 @@
 		FBBA738D1BC089FA00400E65 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				FBBA738E1BC089FA00400E65 /* ByteArray.swift */,
+				FBBA738E1BC089FA00400E65 /* Data.swift */,
 				FBBA738F1BC089FA00400E65 /* Generated */,
 				FBBA73911BC089FA00400E65 /* GenVectorTests */,
 				FBBA73921BC089FA00400E65 /* Info.plist */,
@@ -297,8 +293,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FBBA739D1BC089FA00400E65 /* Info.plist in Resources */,
-				FBBA739B1BC089FA00400E65 /* GenVectorTests in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -313,8 +307,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FBBA739E1BC089FA00400E65 /* Info.plist in Resources */,
-				FBBA739C1BC089FA00400E65 /* GenVectorTests in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -335,7 +327,7 @@
 			files = (
 				FBBA73991BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift in Sources */,
 				FBBA73A11BC089FA00400E65 /* OverfowingBuffer.swift in Sources */,
-				FBBA73971BC089FA00400E65 /* ByteArray.swift in Sources */,
+				FBBA73971BC089FA00400E65 /* Data.swift in Sources */,
 				FBBA73A31BC089FA00400E65 /* RNCryptorTests.swift in Sources */,
 				FBBA73A51BC089FA00400E65 /* VectorTestHelpers.swift in Sources */,
 				FBBA739F1BC089FA00400E65 /* ObjC.m in Sources */,
@@ -356,7 +348,7 @@
 			files = (
 				FBBA739A1BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift in Sources */,
 				FBBA73A21BC089FA00400E65 /* OverfowingBuffer.swift in Sources */,
-				FBBA73981BC089FA00400E65 /* ByteArray.swift in Sources */,
+				FBBA73981BC089FA00400E65 /* Data.swift in Sources */,
 				FBBA73A41BC089FA00400E65 /* RNCryptorTests.swift in Sources */,
 				FBBA73A61BC089FA00400E65 /* VectorTestHelpers.swift in Sources */,
 				FBBA73A01BC089FA00400E65 /* ObjC.m in Sources */,
