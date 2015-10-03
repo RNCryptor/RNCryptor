@@ -10,7 +10,6 @@
 		FB1E41131BBABEB10009A47D /* ObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = FB1E41121BBABEB10009A47D /* ObjC.m */; settings = {ASSET_TAGS = (); }; };
 		FB1E41141BBABEB10009A47D /* ObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = FB1E41121BBABEB10009A47D /* ObjC.m */; settings = {ASSET_TAGS = (); }; };
 		FB30A1FF1B2B7BF300BE5429 /* RNCryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB30A1FE1B2B7BF300BE5429 /* RNCryptor.swift */; };
-		FB30A2081B2B86FD00BE5429 /* CommonCrypto.h in Headers */ = {isa = PBXBuildFile; fileRef = FB30A2071B2B86FD00BE5429 /* CommonCrypto.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FB36507F1B41F3DE00F5273F /* RNCryptorGeneratedVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB36507E1B41F3DE00F5273F /* RNCryptorGeneratedVectorTests.swift */; };
 		FB3650811B41F49800F5273F /* VectorTestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB3650801B41F49800F5273F /* VectorTestHelpers.swift */; };
 		FB627FD21B2B7A1700C3A579 /* RNCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB627FD11B2B7A1700C3A579 /* RNCryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -22,21 +21,13 @@
 		FB7174DA1BA1CD030026EC7F /* OverfowingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA08AB81B40589400F97862 /* OverfowingBuffer.swift */; };
 		FB7174DC1BA1CDAA0026EC7F /* ByteArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBCF49611B441B0600DCFB19 /* ByteArray.swift */; settings = {ASSET_TAGS = (); }; };
 		FBA08AB91B40589400F97862 /* OverfowingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBA08AB81B40589400F97862 /* OverfowingBuffer.swift */; };
+		FBBA735F1BC0778600400E65 /* RNCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FB627FD11B2B7A1700C3A579 /* RNCryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FBCF48DE1B43286D00DCFB19 /* RNCryptor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBCF48D41B43286D00DCFB19 /* RNCryptor.framework */; };
 		FBCF48ED1B43293400DCFB19 /* RNCryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB30A1FE1B2B7BF300BE5429 /* RNCryptor.swift */; };
-		FBCF49011B432A8000DCFB19 /* CommonCrypto.h in Headers */ = {isa = PBXBuildFile; fileRef = FB30A2071B2B86FD00BE5429 /* CommonCrypto.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		FBCF490A1B432AA600DCFB19 /* CommonCrypto.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBCF49061B432A8000DCFB19 /* CommonCrypto.framework */; };
 		FBCF49671B44358100DCFB19 /* ByteArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBCF49611B441B0600DCFB19 /* ByteArray.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		FB30A2201B2B87C000BE5429 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FB627FC51B2B7A1700C3A579 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = FB30A2041B2B86FD00BE5429;
-			remoteInfo = CommonCrypto;
-		};
 		FB627FDA1B2B7A1800C3A579 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = FB627FC51B2B7A1700C3A579 /* Project object */;
@@ -51,19 +42,11 @@
 			remoteGlobalIDString = FBCF48D31B43286D00DCFB19;
 			remoteInfo = "RNCryptor-OSX";
 		};
-		FBCF49081B432A9A00DCFB19 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FB627FC51B2B7A1700C3A579 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = FBCF48FD1B432A8000DCFB19;
-			remoteInfo = "CommonCrypto-OSX";
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		FB1E41121BBABEB10009A47D /* ObjC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjC.m; sourceTree = "<group>"; };
 		FB30A1FE1B2B7BF300BE5429 /* RNCryptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNCryptor.swift; sourceTree = "<group>"; };
-		FB30A2051B2B86FD00BE5429 /* CommonCrypto.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CommonCrypto.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB30A2071B2B86FD00BE5429 /* CommonCrypto.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommonCrypto.h; sourceTree = "<group>"; };
 		FB30A2091B2B86FD00BE5429 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FB30A21C1B2B873000BE5429 /* CommonCrypto.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = CommonCrypto.xcconfig; sourceTree = "<group>"; };
@@ -83,18 +66,10 @@
 		FBA08AB81B40589400F97862 /* OverfowingBuffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OverfowingBuffer.swift; sourceTree = "<group>"; };
 		FBCF48D41B43286D00DCFB19 /* RNCryptor.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RNCryptor.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBCF48DD1B43286D00DCFB19 /* RNCryptor-OSXTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "RNCryptor-OSXTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		FBCF49061B432A8000DCFB19 /* CommonCrypto.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CommonCrypto.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBCF49611B441B0600DCFB19 /* ByteArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ByteArray.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		FB30A2011B2B86FD00BE5429 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		FB627FCA1B2B7A1700C3A579 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -114,7 +89,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FBCF490A1B432AA600DCFB19 /* CommonCrypto.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -123,13 +97,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				FBCF48DE1B43286D00DCFB19 /* RNCryptor.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		FBCF48FF1B432A8000DCFB19 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -182,10 +149,8 @@
 			children = (
 				FB627FCE1B2B7A1700C3A579 /* RNCryptor.framework */,
 				FB627FD81B2B7A1800C3A579 /* RNCryptorTests.xctest */,
-				FB30A2051B2B86FD00BE5429 /* CommonCrypto.framework */,
 				FBCF48D41B43286D00DCFB19 /* RNCryptor.framework */,
 				FBCF48DD1B43286D00DCFB19 /* RNCryptor-OSXTests.xctest */,
-				FBCF49061B432A8000DCFB19 /* CommonCrypto.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -217,14 +182,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		FB30A2021B2B86FD00BE5429 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				FB30A2081B2B86FD00BE5429 /* CommonCrypto.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		FB627FCB1B2B7A1700C3A579 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -237,38 +194,13 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		FBCF49001B432A8000DCFB19 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				FBCF49011B432A8000DCFB19 /* CommonCrypto.h in Headers */,
+				FBBA735F1BC0778600400E65 /* RNCryptor.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		FB30A2041B2B86FD00BE5429 /* CommonCrypto */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = FB30A2161B2B86FD00BE5429 /* Build configuration list for PBXNativeTarget "CommonCrypto" */;
-			buildPhases = (
-				FB30A2001B2B86FD00BE5429 /* Sources */,
-				FB30A2011B2B86FD00BE5429 /* Frameworks */,
-				FB30A2021B2B86FD00BE5429 /* Headers */,
-				FB30A2031B2B86FD00BE5429 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = CommonCrypto;
-			productName = CommonCrypto;
-			productReference = FB30A2051B2B86FD00BE5429 /* CommonCrypto.framework */;
-			productType = "com.apple.product-type.framework";
-		};
 		FB627FCD1B2B7A1700C3A579 /* RNCryptor */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = FB627FE21B2B7A1800C3A579 /* Build configuration list for PBXNativeTarget "RNCryptor" */;
@@ -281,7 +213,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				FB30A2211B2B87C000BE5429 /* PBXTargetDependency */,
 			);
 			name = RNCryptor;
 			productName = RNCryptor;
@@ -318,7 +249,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				FBCF49091B432A9A00DCFB19 /* PBXTargetDependency */,
 			);
 			name = "RNCryptor-OSX";
 			productName = "RNCryptor-OSX";
@@ -343,24 +273,6 @@
 			productReference = FBCF48DD1B43286D00DCFB19 /* RNCryptor-OSXTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		FBCF48FD1B432A8000DCFB19 /* CommonCrypto-OSX */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = FBCF49031B432A8000DCFB19 /* Build configuration list for PBXNativeTarget "CommonCrypto-OSX" */;
-			buildPhases = (
-				FBCF48FE1B432A8000DCFB19 /* Sources */,
-				FBCF48FF1B432A8000DCFB19 /* Frameworks */,
-				FBCF49001B432A8000DCFB19 /* Headers */,
-				FBCF49021B432A8000DCFB19 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "CommonCrypto-OSX";
-			productName = CommonCrypto;
-			productReference = FBCF49061B432A8000DCFB19 /* CommonCrypto.framework */;
-			productType = "com.apple.product-type.framework";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -371,9 +283,6 @@
 				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = "Rob Napier";
 				TargetAttributes = {
-					FB30A2041B2B86FD00BE5429 = {
-						CreatedOnToolsVersion = 7.0;
-					};
 					FB627FCD1B2B7A1700C3A579 = {
 						CreatedOnToolsVersion = 7.0;
 					};
@@ -402,22 +311,13 @@
 			targets = (
 				FB627FCD1B2B7A1700C3A579 /* RNCryptor */,
 				FB627FD71B2B7A1800C3A579 /* RNCryptorTests */,
-				FB30A2041B2B86FD00BE5429 /* CommonCrypto */,
 				FBCF48D31B43286D00DCFB19 /* RNCryptor-OSX */,
 				FBCF48DC1B43286D00DCFB19 /* RNCryptor-OSXTests */,
-				FBCF48FD1B432A8000DCFB19 /* CommonCrypto-OSX */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		FB30A2031B2B86FD00BE5429 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		FB627FCC1B2B7A1700C3A579 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -446,23 +346,9 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FBCF49021B432A8000DCFB19 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		FB30A2001B2B86FD00BE5429 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		FB627FC91B2B7A1700C3A579 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -505,21 +391,9 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FBCF48FE1B432A8000DCFB19 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		FB30A2211B2B87C000BE5429 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = FB30A2041B2B86FD00BE5429 /* CommonCrypto */;
-			targetProxy = FB30A2201B2B87C000BE5429 /* PBXContainerItemProxy */;
-		};
 		FB627FDB1B2B7A1800C3A579 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = FB627FCD1B2B7A1700C3A579 /* RNCryptor */;
@@ -530,50 +404,9 @@
 			target = FBCF48D31B43286D00DCFB19 /* RNCryptor-OSX */;
 			targetProxy = FBCF48DF1B43286D00DCFB19 /* PBXContainerItemProxy */;
 		};
-		FBCF49091B432A9A00DCFB19 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = FBCF48FD1B432A8000DCFB19 /* CommonCrypto-OSX */;
-			targetProxy = FBCF49081B432A9A00DCFB19 /* PBXContainerItemProxy */;
-		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		FB30A2171B2B86FD00BE5429 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = FB30A21C1B2B873000BE5429 /* CommonCrypto.xcconfig */;
-			buildSettings = {
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = CommonCrypto/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = net.robnapier.CommonCrypto;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-			};
-			name = Debug;
-		};
-		FB30A2181B2B86FD00BE5429 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = FB30A21C1B2B873000BE5429 /* CommonCrypto.xcconfig */;
-			buildSettings = {
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = CommonCrypto/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = net.robnapier.CommonCrypto;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-			};
-			name = Release;
-		};
 		FB627FE01B2B7A1800C3A579 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -792,54 +625,9 @@
 			};
 			name = Release;
 		};
-		FBCF49041B432A8000DCFB19 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = FB30A21C1B2B873000BE5429 /* CommonCrypto.xcconfig */;
-			buildSettings = {
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = CommonCrypto/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = net.robnapier.CommonCrypto;
-				PRODUCT_NAME = CommonCrypto;
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-			};
-			name = Debug;
-		};
-		FBCF49051B432A8000DCFB19 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = FB30A21C1B2B873000BE5429 /* CommonCrypto.xcconfig */;
-			buildSettings = {
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = CommonCrypto/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = net.robnapier.CommonCrypto;
-				PRODUCT_NAME = CommonCrypto;
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		FB30A2161B2B86FD00BE5429 /* Build configuration list for PBXNativeTarget "CommonCrypto" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				FB30A2171B2B86FD00BE5429 /* Debug */,
-				FB30A2181B2B86FD00BE5429 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		FB627FC81B2B7A1700C3A579 /* Build configuration list for PBXProject "RNCryptor" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -881,15 +669,6 @@
 			buildConfigurations = (
 				FBCF48E71B43286D00DCFB19 /* Debug */,
 				FBCF48E81B43286D00DCFB19 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		FBCF49031B432A8000DCFB19 /* Build configuration list for PBXNativeTarget "CommonCrypto-OSX" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				FBCF49041B432A8000DCFB19 /* Debug */,
-				FBCF49051B432A8000DCFB19 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

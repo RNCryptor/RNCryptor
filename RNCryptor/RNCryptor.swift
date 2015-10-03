@@ -25,7 +25,7 @@
 //
 
 import Foundation
-import CommonCrypto
+//import CommonCrypto
 
 /// The `RNCryptorType` protocol defines generic API to a mutable,
 /// incremental, password-based encryptor or decryptor. Its generic
