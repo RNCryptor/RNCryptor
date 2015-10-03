@@ -1,0 +1,11 @@
+framework module RNCryptor {
+  umbrella header "RNCryptor.h"
+
+  export *
+  module * { export * }
+}
+
+module CommonCrypto [system] {
+    header "/usr/include/CommonCrypto/CommonCrypto.h"
+    export *
+}
