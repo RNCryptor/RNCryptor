@@ -47,7 +47,6 @@ do {
 } catch {
     print(error)
 }
-
 ```
 
 ### Obj-C
@@ -154,6 +153,10 @@ if (error != nil) {
 
 RNCryptor 4 is written in Swift 2, so requires Xcode 7, and can target iOS 7 or later (iOS 8 or later if used as a framework), and OS X 10.9 or later. If you want a pure ObjC implementation that supports older versions of iOS and OS X, see [RNCryptor 3](https://github.com/RNCryptor/RNCryptor/releases/tag/RNCryptor-3.0.1).
 
+### The Bridging Header
+
+CommonCrypto is not a modular header in Xcode 7. This makes it very challenging to import into Swift. To work around this, the necessary header files have been copied into `RNCryptor.h`, which needs to be bridged into Swift. You can do this either by using RNCryptor as a framework, adding `#import "RNCryptor/RNCryptor.h"` to your existing bridging header, or making `RNCryptor/RNCryptor.h` your bridging header in Build Settings, "Objective-C Bridging Header."
+
 ### Installing as a subproject
 
 The easiest way to use RNCryptor is as a subproject without a framework. RNCryptor is just one swift file and one bridging header, and you can skip all the complexity of managing frameworks this way. It also makes version control very simple if you use submodules, or checkin specific versions of RNCryptor to your repository.
@@ -161,8 +164,9 @@ The easiest way to use RNCryptor is as a subproject without a framework. RNCrypt
 This process works for most targets: iOS and OS X GUI apps, Swift frameworks, and OS X commandline apps. **It is not safe for ObjC frameworks or frameworks that may be imported into ObjC, since it would cause duplicate symbols if some other framework includes RNCryptor.**
 
 * Drag `RNCryptor.xcodeproj` into your project
-* Drag `RNCryptor.swift` from `RNCryptor` into your project
-* In your target build settings, Build Phases, add `CommonCrypto.framework` as a build dependency (but don't link it).
+* Drag `RNCryptor/RNCryptor.swift` into your project
+* If you already have a bridging header file, add `#import "RNCryptor/RNCryptor.h"` 
+* If you don't have a bridging header, in your target's Build Settings, set "Objective-C Bridging Header" to "RNCryptor/RNCryptor.h"
 
 Built this way, you don't need to (and can't) `import RNCryptor` into your code. RNCryptor will be part of your module.
 
@@ -172,9 +176,9 @@ If you want to keep things as small and simple as possible, you don't need the f
 
 The same warnings apply as for subprojects: **It is not safe for ObjC frameworks or frameworks that may be imported into ObjC, since it would cause duplicate symbols if some other framework included RNCryptor.**
 
-* Copy or link `RNCryptor/RNCryptor.swift` into your project.
-* Copy or link `CommonCrypto.framework` into your project.
-* Go to your target build settings, Build Phases, and delete `CommonCrypto.framework` from "Link Binary with Libraries." You don't actually want to link it.
+* Copy or link `RNCryptor/RNCryptor.swift` and `RNCryptor/RNCryptor.h` into your project.
+* If you already have a bridging header file, add `#import "RNCryptor/RNCryptor.h"` 
+* If you don't have a bridging header, in your target's Build Settings, set "Objective-C Bridging Header" to "RNCryptor/RNCryptor.h"
 
 Built this way, you don't need to (and can't) `import RNCryptor` into your code. RNCryptor will be part of your module.
 
@@ -182,7 +186,7 @@ Built this way, you don't need to (and can't) `import RNCryptor` into your code.
 
     github "RNCryptor/RNCryptor" "~> 4.0"
 
-Don't forget to copy and link `RNCryptor.framework` and at least copy `CommonCrypto.framwork`. (You can link the Carthage version of `CommonCrypto.framework`. It doesn't matter.)
+Don't forget to embed `RNCryptor.framework`.
 
 This approach will not work for OS X commandline apps.
 
