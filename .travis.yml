@@ -2,5 +2,4 @@ language: objective-c
 osx_image: xcode7
 xcode_project: RNCryptor.xcodeproj
 xcode_scheme: RNCryptor
-
-
+xcode_sdk: iphonesimulator9.0
