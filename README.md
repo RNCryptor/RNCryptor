@@ -152,7 +152,7 @@ if (error != nil) {
 
 ### Requirements
 
-RNCryptor 4 is written in Swift 2, so requires Xcode 7, and can target iOS 7 or greater and OS X 10.9 or later. If you want a pure ObjC implementation that supports older versions of iOS and OS X, see [RNCryptor 3](https://github.com/RNCryptor/RNCryptor/releases/tag/RNCryptor-3.0.1).
+RNCryptor 4 is written in Swift 2, so requires Xcode 7, and can target iOS 7 or later (iOS 8 or later if used as a framework), and OS X 10.9 or later. If you want a pure ObjC implementation that supports older versions of iOS and OS X, see [RNCryptor 3](https://github.com/RNCryptor/RNCryptor/releases/tag/RNCryptor-3.0.1).
 
 ### A word about CommonCrypto
 

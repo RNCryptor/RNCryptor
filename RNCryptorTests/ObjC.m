@@ -22,6 +22,7 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
+#import <Foundation/Foundation.h>
 #import <XCTest/XCTest.h>
 @import RNCryptor;
 #import <CommonCrypto/CommonCryptor.h>
