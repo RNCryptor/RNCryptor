@@ -81,7 +81,19 @@
 <li>Random IV</li>
 <li>Encrypt-then-hash HMAC</li>
 </ul>
-<a href='#format_versus_implementation' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='format_versus_implementation'>Format versus implementation</h2>
+<a href='#contents' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='contents'>Contents</h2>
+
+<ul>
+<li><a href="#format-versus-implementation">Format Versus Implementation</a></li>
+<li><a href="#basic_password_usage">Basic Password Usage</a>
+
+<ul>
+<li><a href="#swift">Swift</a></li>
+<li><a href="#obj-c">Obj-C</a></li>
+</ul></li>
+<li><a href="#incremental_usage">Incremental usage</a></li>
+</ul>
+<a href='#format_versus_implementation' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='format_versus_implementation'>Format Versus Implementation</h2>
 
 <p>The RNCryptor data format is cross-platform and there are many implementations. The framework named <q>RNCryptor</q> is a specific implementation for Swift and Objective-C. Both have version numbers. The current data format is v3. The current framework implementation (which reads the v3 format) is v4. </p>
 <a href='#basic_password_usage' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='basic_password_usage'>Basic Password Usage</h2>
@@ -115,7 +127,7 @@
 <span class="p">}</span>
 <span class="c1">// ...
 </span></code></pre>
-<a href='#incremental_use' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='incremental_use'>Incremental use</h2>
+<a href='#incremental_usage' class='anchor' aria-hidden=true><span class="header-anchor"></span></a><h2 id='incremental_usage'>Incremental usage</h2>
 
 <p>RNCryptor suports incremental use, specifically designed to work with <code>NSURLSession</code>. This is also useful for cases where the encrypted or decrypted data will not comfortably fit in memory.</p>
 

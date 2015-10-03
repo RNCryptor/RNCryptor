@@ -15,7 +15,17 @@ The data format includes all the metadata required to securely implement AES enc
 * Random IV
 * Encrypt-then-hash HMAC
 
-## Format versus implementation
+## Contents
+
+* [Format Versus Implementation](#format-versus-implementation)
+* [Basic Password Usage](#basic_password_usage)
+	* [Swift](#swift)
+	* [Obj-C](#obj-c)
+* [Incremental usage](#incremental_usage)
+
+
+
+## Format Versus Implementation
 
 The RNCryptor data format is cross-platform and there are many implementations. The framework named "RNCryptor" is a specific implementation for Swift and Objective-C. Both have version numbers. The current data format is v3. The current framework implementation (which reads the v3 format) is v4. 
 
@@ -57,7 +67,7 @@ if (error != nil) {
 // ...
 ```
 
-## Incremental use
+## Incremental usage
 
 RNCryptor suports incremental use, specifically designed to work with `NSURLSession`. This is also useful for cases where the encrypted or decrypted data will not comfortably fit in memory.
 
