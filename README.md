@@ -173,7 +173,7 @@ Built this way, you don't need to (and can't) `import RNCryptor` into your code.
 
 ### [Carthage](https://github.com/Carthage/Carthage)
 
-    github "RNCryptor/RNCryptor" "~> 4.0"
+    github "RNCryptor/RNCryptor" "RNCryptor-4.0.0-beta.1"
 
 Don't forget to embed `RNCryptor.framework`. Built this way, you should add `import RNCryptor` to your code.
 
