@@ -69,7 +69,7 @@ if (error != nil) {
 
 ## Incremental Usage
 
-RNCryptor suports incremental use, specifically designed to work with `NSURLSession`. This is also useful for cases where the encrypted or decrypted data will not comfortably fit in memory.
+RNCryptor supports incremental use, for example when using with `NSURLSession`. This is also useful for cases where the encrypted or decrypted data will not comfortably fit in memory.
 
 To operate in incremental mode, you create an `Encryptor` or `Decryptor`, call `updateWithData()` repeatedly, gathering its results, and then call `finalData()` and gather its result.
 
@@ -231,6 +231,12 @@ RNDecryptor *decryptor = [[[RNDecryptorV3 alloc] initWithEncryptionKey:encryptio
 ```
 
 ## FAQ
+
+### How do I detect an incorrect password?
+
+If you decrypt with the wrong password, you will receive an `HMACMismatch` error. This is the same error you will receive if your ciphertext is corrupted. You won't receive this error until the entire message has been decrypted (during the call to `finalData()`).
+
+The v3 data format has no way to detect incorrect passwords directly. It just decrypts gibberish, and then uses the HMAC (a kind of encrypted hash) to determine that the result is corrupt.
 
 ### Can I use RNCryptor to read and write my non-RNCryptor data format?
 

@@ -326,14 +326,14 @@ public extension RNCryptor {
         /// - returns: Processed data. May be empty.
         public func updateWithData(data: NSData) -> NSData {
             // It should not be possible for this to fail during encryption
-            return try! handle(engine.updateWithData(data))
+            return handle(engine.updateWithData(data))
         }
 
         /// Returns trailing data and invalidates the cryptor.
         ///
         /// - returns: Trailing data
         public func finalData() -> NSData {
-            let result = NSMutableData(data: try! handle(engine.finalData()))
+            let result = NSMutableData(data: handle(engine.finalData()))
             result.appendData(hmac.finalData())
             return result
         }
@@ -440,7 +440,7 @@ public extension RNCryptor {
         /// - returns: Processed data. May be empty.
         public func updateWithData(data: NSData) throws -> NSData {
             if let e = decryptorEngine {
-                return try e.updateWithData(data)
+                return e.updateWithData(data)
             }
 
             buffer.appendData(data)
@@ -452,7 +452,7 @@ public extension RNCryptor {
             decryptorEngine = e
             let body = buffer.bytesView[requiredHeaderSize..<buffer.length]
             buffer.length = 0
-            return try e.updateWithData(body)
+            return e.updateWithData(body)
         }
 
         /// Returns trailing data and invalidates the cryptor.
@@ -526,8 +526,6 @@ public extension RNCryptor {
     }
 }
 
-private let CCErrorDomain = "com.apple.CommonCrypto"
-
 internal enum CryptorOperation: CCOperation {
     case Encrypt = 0 // CCOperation(kCCEncrypt)
     case Decrypt = 1 // CCOperation(kCCDecrypt)
@@ -566,26 +564,24 @@ internal final class Engine {
         return size
     }
 
-    func updateWithData(data: NSData) throws -> NSData {
+    func updateWithData(data: NSData) -> NSData {
         let outputLength = sizeBufferForDataOfLength(data.length)
         var dataOutMoved: Int = 0
 
-        var result: CCCryptorStatus = CCCryptorStatus(kCCUnimplemented)
-
-        result = CCCryptorUpdate(
+        let result = CCCryptorUpdate(
             cryptor,
             data.bytes, data.length,
             buffer.mutableBytes, outputLength,
             &dataOutMoved)
 
         // The only error returned by CCCryptorUpdate is kCCBufferTooSmall, which would be a programming error
-        assert(result == CCCryptorStatus(kCCSuccess))
+        assert(result == CCCryptorStatus(kCCSuccess), "RNCRYPTOR BUG. PLEASE REPORT.")
 
         buffer.length = dataOutMoved
         return buffer
     }
 
-    func finalData() throws -> NSData {
+    func finalData() -> NSData {
         let outputLength = sizeBufferForDataOfLength(0)
         var dataOutMoved: Int = 0
 
@@ -595,9 +591,11 @@ internal final class Engine {
             &dataOutMoved
         )
 
-        guard result == CCCryptorStatus(kCCSuccess) else {
-            throw NSError(domain: CCErrorDomain, code: Int(result), userInfo: nil)
-        }
+        // Note that since iOS 6, CCryptor will never return padding errors or other decode errors.
+        // I'm not aware of any non-catestrophic (MemoryAllocation) situation in which this
+        // can fail. Using assert() just in case, but we'll ignore errors in Release.
+        // https://devforums.apple.com/message/920802#920802
+        assert(result == CCCryptorStatus(kCCSuccess), "RNCRYPTOR BUG. PLEASE REPORT.")
 
         buffer.length = dataOutMoved
         return buffer
@@ -626,14 +624,14 @@ private final class DecryptorEngineV3 {
         engine = Engine(operation: .Decrypt, key: encryptionKey, iv: iv)
     }
 
-    func updateWithData(data: NSData) throws -> NSData {
+    func updateWithData(data: NSData) -> NSData {
         let overflow = buffer.updateWithData(data)
         hmac.updateWithData(overflow)
-        return try engine.updateWithData(overflow)
+        return engine.updateWithData(overflow)
     }
 
     func finalData() throws -> NSData {
-        let result = try engine.finalData()
+        let result = engine.finalData()
         let hash = hmac.finalData()
         if !isEqualInConsistentTime(trusted: hash, untrusted: buffer.finalData()) {
             throw RNCryptorError.HMACMismatch
