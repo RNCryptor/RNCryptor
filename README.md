@@ -181,7 +181,7 @@ This approach will not work for OS X commandline apps.
 
 ### [CocoaPods](https://cocoapods.org)
 
-    pod 'RNCryptor', '~> 4.0'
+    pod 'RNCryptor', '~> 4.0.0-beta'
 
 This approach will not work for OS X commandline apps.
 
