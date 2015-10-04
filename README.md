@@ -234,9 +234,13 @@ RNDecryptor *decryptor = [[[RNDecryptorV3 alloc] initWithEncryptionKey:encryptio
 
 ### How do I detect an incorrect password?
 
-If you decrypt with the wrong password, you will receive an `HMACMismatch` error. This is the same error you will receive if your ciphertext is corrupted. You won't receive this error until the entire message has been decrypted (during the call to `finalData()`).
+If you decrypt with the wrong password, you will receive an `HMACMismatch` error. This is the same error you will receive if your ciphertext is corrupted.
 
-The v3 data format has no way to detect incorrect passwords directly. It just decrypts gibberish, and then uses the HMAC (a kind of encrypted hash) to determine that the result is corrupt.
+The v3 data format has no way to detect incorrect passwords directly. It just decrypts gibberish, and then uses the HMAC (a kind of encrypted hash) to determine that the result is corrupt. You won't discover this until the entire message has been decrypted (during the call to `finalData()`).
+
+This can be inconvenient for the user if they have entered the wrong password to decrypt a very large file. If you have this situation, the recommendation is to encrypt some small, known piece of data with the same password. Test the password on the small ciphertext before decrypting the larger one.
+
+The [v4 data format](https://github.com/RNCryptor/RNCryptor-Spec/blob/master/draft-RNCryptor-Spec-v4.0.md) will provide a faster and more useful mechanism for validating the password or key.
 
 ### Can I use RNCryptor to read and write my non-RNCryptor data format?
 
@@ -246,21 +250,21 @@ If you're using the OpenSSL encryption format, see [RNOpenSSLCryptor](https://gi
 
 ### Can I change the parameters used (algorithm, iterations, etc)?
 
-No. See previous question. The v4 format will permit some control over PBKDF2 iterations, but the only thing configurable in the v3 format is whether a password or key is used. This keeps RNCryptor implementations dramatically simpler and interoperable.
+No. See previous question. The [v4 format](https://github.com/RNCryptor/RNCryptor-Spec/blob/master/draft-RNCryptor-Spec-v4.0.md) will permit some control over PBKDF2 iterations, but the only thing configurable in the v3 format is whether a password or key is used. This keeps RNCryptor implementations dramatically simpler and interoperable.
 
 ### How do I encrypt/decrypt a string?
 
-AES encrypts bytes. It does not encrypt characters, letters, words, pictures, videos, cats, or ennui. It encrypts bytes. You need to convert other data (such as strings) to and from bytes in a consistent way. There are several ways to do that. Some of the most popular are UTF-8 encoding, Base-64 encoding, and Hex encoding. There are many other options. There is no good way for RNCryptor to guess which encoding you want, so it doesn't try. It accepts and returns bytes in the form of `NSData`.
+AES encrypts bytes. It does not encrypt characters, letters, words, pictures, videos, cats, or ennui. It encrypts bytes. You need to convert other things (such as strings) to and from bytes in a consistent way. There are several ways to do that. Some of the most popular are UTF-8 encoding, Base-64 encoding, and Hex encoding. There are many other options. There is no good way for RNCryptor to guess which encoding you want, so it doesn't try. It accepts and returns bytes in the form of `NSData`.
 
 To convert strings to data as UTF-8, use `dataUsingEncoding()` and `init(data:encoding:)`. To convert strings to data as Base-64, use `init(base64EncodedString:options:)` and `base64EncodedStringWithOptions()`.
 
 ### Does RNCryptor support random access decryption?
 
-The usual use case for this is encrypting media files like video. RNCryptor uses CBC encryption, which prevents easy random-access. While other modes are better for random-access (CTR for instance), they are more complicated to implement correctly and CommonCrypto doesn't directly support using them for random access anyway.
+The usual use case for this is encrypting media files like video. RNCryptor uses CBC encryption, which prevents easy random-access. While other modes are better for random-access (CTR for instance), they are more complicated to implement correctly and CommonCrypto doesn't support using them for random access anyway.
 
-That said, it would be fairly easy to build a wrapper around RNCryptor that allowed random-access to blocks of some fixed size (say 64k), and that could work well for video with modest overhead (see [inferno](http://securitydriven.net/inferno/) for a very similar format in C#). Such a format would be fairly easy to port to other platforms that already support RNCryptor.
+It would be fairly easy to build a wrapper around RNCryptor that allowed random-access to blocks of some fixed size (say 64k), and that might work well for video with modest overhead (see [inferno](http://securitydriven.net/inferno/) for a similar idea in C#). Such a format would be fairly easy to port to other platforms that already support RNCryptor.
 
-If there is interest, I may eventually build this as a separate framework. If you have a pressing need sooner than "eventually," please contact me about rates.
+If there is interest, I may eventually build this as a separate framework.
 
 ## Design Considerations
 
