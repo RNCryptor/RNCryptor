@@ -157,26 +157,15 @@ RNCryptor 4 is written in Swift 2, so requires Xcode 7, and can target iOS 7 or 
 
 CommonCrypto is not a modular header in Xcode 7. This makes it very challenging to import into Swift. To work around this, the necessary header files have been copied into `RNCryptor.h`, which needs to be bridged into Swift. You can do this either by using RNCryptor as a framework, adding `#import "RNCryptor/RNCryptor.h"` to your existing bridging header, or making `RNCryptor/RNCryptor.h` your bridging header in Build Settings, "Objective-C Bridging Header."
 
-### Installing as a subproject
+Hopefully Apple will [make CommonCrypto a modular header soon](http://www.openradar.me/22965816). When this happens, the bridging header will not be needed, and RNCryptor will be a single file.
 
-The easiest way to use RNCryptor is as a subproject without a framework. RNCryptor is just one swift file and one bridging header, and you can skip all the complexity of managing frameworks this way. It also makes version control very simple if you use submodules, or checkin specific versions of RNCryptor to your repository.
+### Installing Manually
+
+The easiest way to use RNCryptor is by making it part of your project, without a framework. RNCryptor is just one swift file and one bridging header, and you can skip all the complexity of managing frameworks this way. It also makes version control very simple if you use submodules, or checkin specific versions of RNCryptor to your repository.
 
 This process works for most targets: iOS and OS X GUI apps, Swift frameworks, and OS X commandline apps. **It is not safe for ObjC frameworks or frameworks that may be imported into ObjC, since it would cause duplicate symbols if some other framework includes RNCryptor.**
 
-* Drag `RNCryptor.xcodeproj` into your project
-* Drag `RNCryptor/RNCryptor.swift` into your project
-* If you already have a bridging header file, add `#import "RNCryptor/RNCryptor.h"` 
-* If you don't have a bridging header, in your target's Build Settings, set "Objective-C Bridging Header" to "RNCryptor/RNCryptor.h"
-
-Built this way, you don't need to (and can't) `import RNCryptor` into your code. RNCryptor will be part of your module.
-
-### Installing without a subproject
-
-If you want to keep things as small and simple as possible, you don't need the full RNCryptor project at all. You just need two things: `RNCryptor.swift` and `CommonCrypto.framework`. You can just copy those into your project.
-
-The same warnings apply as for subprojects: **It is not safe for ObjC frameworks or frameworks that may be imported into ObjC, since it would cause duplicate symbols if some other framework included RNCryptor.**
-
-* Copy or link `RNCryptor/RNCryptor.swift` and `RNCryptor/RNCryptor.h` into your project.
+* Drag and link `RNCryptor/RNCryptor.swift` into your project
 * If you already have a bridging header file, add `#import "RNCryptor/RNCryptor.h"` 
 * If you don't have a bridging header, in your target's Build Settings, set "Objective-C Bridging Header" to "RNCryptor/RNCryptor.h"
 
@@ -186,7 +175,7 @@ Built this way, you don't need to (and can't) `import RNCryptor` into your code.
 
     github "RNCryptor/RNCryptor" "~> 4.0"
 
-Don't forget to embed `RNCryptor.framework`.
+Don't forget to embed `RNCryptor.framework`. Built this way, you should add `import RNCryptor` to your code.
 
 This approach will not work for OS X commandline apps.
 
