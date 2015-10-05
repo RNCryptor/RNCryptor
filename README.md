@@ -55,7 +55,7 @@ header.
 `RNCryptor suports asynchronous use, specifically designed to work with
 `NSURLConnection. This is also useful for cases where the encrypted or decrypted
 `data will not comfortably fit in memory. If the data will comfortably fit in
-`memory, asynchronous operation is best acheived using dispatch_async().
+`memory, asynchronous operation is best achieved using dispatch_async().
 
 To operate in asynchronous mode, you create an `RNEncryptor` or `RNDecryptor`,
 providing it a handler. This handler will be called as data is encrypted or
