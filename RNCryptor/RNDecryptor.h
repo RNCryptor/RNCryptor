@@ -37,6 +37,12 @@
 - (RNDecryptor *)initWithPassword:(NSString *)password
                           handler:(RNCryptorHandler)handler;
 
++ (void)ansychronouslyDecryptDataFromPath:(NSString *)fromPath
+                                   toPath:(NSString *)toPath
+                                 password:(NSString *)aPassword
+                             successBlock:(void (^)(NSString *toPath))successBlock
+                             failureBlock:(void (^)(NSError *error))failureBlock;
+
 + (NSData *)decryptData:(NSData *)theCipherText withSettings:(RNCryptorSettings)settings password:(NSString *)aPassword error:(NSError **)anError;
 + (NSData *)decryptData:(NSData *)theCipherText withSettings:(RNCryptorSettings)settings encryptionKey:(NSData *)encryptionKey HMACKey:(NSData *)HMACKey error:(NSError **)anError;
 
