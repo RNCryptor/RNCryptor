@@ -241,6 +241,12 @@ If you're using the OpenSSL encryption format, see [RNOpenSSLCryptor](https://gi
 
 No. See previous question. The [v4 format](https://github.com/RNCryptor/RNCryptor-Spec/blob/master/draft-RNCryptor-Spec-v4.0.md) will permit some control over PBKDF2 iterations, but the only thing configurable in the v3 format is whether a password or key is used. This keeps RNCryptor implementations dramatically simpler and interoperable.
 
+### How do I manually set the IV?
+
+You don't. See the last two questions.
+
+Also note that if you ever reuse a key+IV combination, you risk attackers decrypting the beginning of your message. A static IV makes a key+IV reuse much more likely (guarenteed if you also have a static key). Wikipedia has a [quick overview of this problem](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Initialization_vector_.28IV.29).
+
 ### How do I encrypt/decrypt a string?
 
 AES encrypts bytes. It does not encrypt characters, letters, words, pictures, videos, cats, or ennui. It encrypts bytes. You need to convert other things (such as strings) to and from bytes in a consistent way. There are several ways to do that. Some of the most popular are UTF-8 encoding, Base-64 encoding, and Hex encoding. There are many other options. There is no good way for RNCryptor to guess which encoding you want, so it doesn't try. It accepts and returns bytes in the form of `NSData`.
