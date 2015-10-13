@@ -4,5 +4,5 @@ xcode_project: RNCryptor.xcodeproj
 xcode_scheme: RNCryptor
 xcode_sdk: iphonesimulator9.0
 script:
-- xcodebuild -scheme RNCryptor -sdk iphonesimulator build test
+- xcodebuild -scheme RNCryptor -sdk iphonesimulator -destination name="iPhone 6" build test
 - xcodebuild -scheme RNCryptor-OSX -sdk macosx build test
