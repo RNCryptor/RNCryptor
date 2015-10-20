@@ -261,6 +261,8 @@ It would be fairly easy to build a wrapper around RNCryptor that allowed random-
 
 If there is interest, I may eventually build this as a separate framework.
 
+See also Issue #161 for a much longer discussion of this topic.
+
 ## Design Considerations
 
 `RNCryptor` has several design goals, in order of importance:
