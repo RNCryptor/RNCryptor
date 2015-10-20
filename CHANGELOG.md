@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file. This projec
 
 ## [Unreleased](https://github.com/RNCryptor/RNCryptor/tree/swift)
 
+## [4.0.0](https://github.com/RNCryptor/RNCryptor/releases/tag/4.0.0) - Complete rewrite in Swift with ObjC bridging
+
+* No changes from beta except version bump
+
 ## [4.0.0-beta.1](https://github.com/RNCryptor/RNCryptor/releases/tag/4.0.0-beta.1) - Complete rewrite in Swift with ObjC bridging
 
 ## [3.0.1](https://github.com/RNCryptor/RNCryptor/releases/tag/RNCryptor-3.0.1) - CocoaPods fixes (Current ObjC Version)
