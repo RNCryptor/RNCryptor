@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file. This projec
 ## [Unreleased](https://github.com/RNCryptor/RNCryptor/tree/swift)
 
 * #159 Add WatchOS support to Podspec
+* Better debugging output in case of unexpected cryptor failure
 
 ## [4.0.0](https://github.com/RNCryptor/RNCryptor/releases/tag/4.0.0) - Complete rewrite in Swift with ObjC bridging
 

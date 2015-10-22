@@ -575,7 +575,7 @@ internal final class Engine {
             &dataOutMoved)
 
         // The only error returned by CCCryptorUpdate is kCCBufferTooSmall, which would be a programming error
-        assert(result == CCCryptorStatus(kCCSuccess), "RNCRYPTOR BUG. PLEASE REPORT.")
+        assert(result == CCCryptorStatus(kCCSuccess), "RNCRYPTOR BUG. PLEASE REPORT. (\(result)")
 
         buffer.length = dataOutMoved
         return buffer
@@ -595,7 +595,7 @@ internal final class Engine {
         // I'm not aware of any non-catestrophic (MemoryAllocation) situation in which this
         // can fail. Using assert() just in case, but we'll ignore errors in Release.
         // https://devforums.apple.com/message/920802#920802
-        assert(result == CCCryptorStatus(kCCSuccess), "RNCRYPTOR BUG. PLEASE REPORT.")
+        assert(result == CCCryptorStatus(kCCSuccess), "RNCRYPTOR BUG. PLEASE REPORT. (\(result)")
 
         buffer.length = dataOutMoved
         return buffer
