@@ -24,7 +24,6 @@
 		FBBA73A41BC089FA00400E65 /* RNCryptorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73951BC089FA00400E65 /* RNCryptorTests.swift */; };
 		FBBA73A51BC089FA00400E65 /* VectorTestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73961BC089FA00400E65 /* VectorTestHelpers.swift */; };
 		FBBA73A61BC089FA00400E65 /* VectorTestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73961BC089FA00400E65 /* VectorTestHelpers.swift */; };
-		FBC30B6F1BD937A300D03947 /* CHANGELOG.md in Sources */ = {isa = PBXBuildFile; fileRef = FBC30B6E1BD937A300D03947 /* CHANGELOG.md */; };
 		FBCF48DE1B43286D00DCFB19 /* RNCryptor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBCF48D41B43286D00DCFB19 /* RNCryptor.framework */; };
 /* End PBXBuildFile section */
 
@@ -321,7 +320,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				FBBA73891BC0892100400E65 /* RNCryptor.swift in Sources */,
-				FBC30B6F1BD937A300D03947 /* CHANGELOG.md in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -97,7 +97,7 @@ public extension RNCryptorType {
 }
 
 /// RNCryptor encryption/decryption interface.
-public class RNCryptor: NSObject {
+public final class RNCryptor: NSObject {
 
     /// Encrypt data using password and return encrypted data.
     public static func encryptData(data: NSData, password: String) -> NSData {
@@ -686,7 +686,7 @@ private extension CollectionType {
     }
 }
 
-internal class OverflowingBuffer {
+internal final class OverflowingBuffer {
     private var buffer = NSMutableData()
     let capacity: Int
 

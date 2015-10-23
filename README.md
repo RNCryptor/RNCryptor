@@ -1,7 +1,7 @@
 # RNCryptor
 
 Cross-language AES Encryptor/Decryptor [data format](https://github.com/RNCryptor/RNCryptor-Spec/blob/master/RNCryptor-Spec-v3.md).
- 
+
 The primary targets are Swift and Objective-C, but implementations are available in [C](https://github.com/RNCryptor/RNCryptor-C), [C++](https://github.com/RNCryptor/RNCryptor-cpp), [C#](https://github.com/RNCryptor/RNCryptor-cs), [Erlang](https://github.com/RNCryptor/RNCryptor-erlang), [Go](https://github.com/RNCryptor/RNCryptor-go), [Haskell](https://github.com/RNCryptor/rncryptor-hs), [Java](https://github.com/RNCryptor/JNCryptor),
 [PHP](https://github.com/RNCryptor/RNCryptor-php), [Python](https://github.com/RNCryptor/RNCryptor-python),
 [Javascript](https://github.com/chesstrian/JSCryptor), and [Ruby](https://github.com/RNCryptor/ruby_rncryptor).
@@ -28,7 +28,7 @@ The data format includes all the metadata required to securely implement AES enc
 
 ## Format Versus Implementation
 
-The RNCryptor data format is cross-platform and there are many implementations. The framework named "RNCryptor" is a specific implementation for Swift and Objective-C. Both have version numbers. The current data format is v3. The current framework implementation (which reads the v3 format) is v4. 
+The RNCryptor data format is cross-platform and there are many implementations. The framework named "RNCryptor" is a specific implementation for Swift and Objective-C. Both have version numbers. The current data format is v3. The current framework implementation (which reads the v3 format) is v4.
 
 ## Basic Password Usage
 
@@ -129,7 +129,7 @@ NSMutableData *plaintext = [NSMutableData new];
 // ... Each time data comes in, update the decryptor and accumulate some plaintext ...
 NSError *error = nil;
 NSData *partialPlaintext = [decryptor updateWithData:data error:&error];
-if (error != nil) { 
+if (error != nil) {
     NSLog(@"FAILED DECRYPT: %@", error);
     return;
 }
@@ -138,14 +138,17 @@ if (error != nil) {
 // ... When data is done, finish up ...
 NSError *error = nil;
 NSData *partialPlaintext = [decryptor finalDataAndReturnError:&error];
-if (error != nil) { 
+if (error != nil) {
     NSLog(@"FAILED DECRYPT: %@", error);
     return;
 }
 
 [ciphertext appendData:partialPlaintext];
-
 ```
+
+### Importing into Swift
+
+Most RNCryptor symbols are nested inside an `RNCryptor` namespace.
 
 ## Installation
 
@@ -166,7 +169,7 @@ The easiest way to use RNCryptor is by making it part of your project, without a
 This process works for most targets: iOS and OS X GUI apps, Swift frameworks, and OS X commandline apps. **It is not safe for ObjC frameworks or frameworks that may be imported into ObjC, since it would cause duplicate symbols if some other framework includes RNCryptor.**
 
 * Drag and link `RNCryptor/RNCryptor.swift` into your project
-* If you already have a bridging header file, add `#import "RNCryptor/RNCryptor.h"` 
+* If you already have a bridging header file, add `#import "RNCryptor/RNCryptor.h"`
 * If you don't have a bridging header, in your target's Build Settings, set "Objective-C Bridging Header" to "RNCryptor/RNCryptor.h"
 
 Built this way, you don't need to (and can't) `import RNCryptor` into your code. RNCryptor will be part of your module.
@@ -207,7 +210,7 @@ Occasionally there are reasons to work directly with random keys. Converting a p
 
 RNCryptor supports direct key-based encryption and decryption. The size and number of keys may change between format versions, so key-based cryptors are [version-specific](#version-specific-cryptors).
 
-In order to be secure, the keys must be a random sequence of bytes. If you're starting with a string of any kind, you are almost certainly doing this wrong.
+In order to be secure, the keys must be a random sequence of bytes. See [Converting a Password to a Key](#converting-a-password-to-a-key) for how to create random sequences of bytes if you only have a password.
 
 ```swift
 let encryptor = RNCryptor.EncryptorV3(encryptionKey: encryptKey, hmacKey: hmacKey)
@@ -215,8 +218,8 @@ let decryptor = RNCryptor.DecryptorV3(encryptionKey: encryptKey, hmacKey: hmacKe
 ```
 
 ```objc
-RNEncryptor *encryptor = [[[RNEncryptorV3 alloc] initWithEncryptionKey:encryptionKey hmacKey:hmacKey];
-RNDecryptor *decryptor = [[[RNDecryptorV3 alloc] initWithEncryptionKey:encryptionKey hmacKey:hmacKey];
+RNEncryptor *encryptor = [[RNEncryptorV3 alloc] initWithEncryptionKey:encryptionKey hmacKey:hmacKey];
+RNDecryptor *decryptor = [[RNDecryptorV3 alloc] initWithEncryptionKey:encryptionKey hmacKey:hmacKey];
 ```
 
 ## FAQ

@@ -6,6 +6,9 @@ All notable changes to this project will be documented in this file. This projec
 
 * #159 Add WatchOS support to Podspec
 * Better debugging output in case of unexpected cryptor failure
+* Added Examples/KeyDerivation to explain how to manually derive keys
+* Marked `RNCryptor` class as `final`. Techincally this could be considered a breaking change if someone derived a subclass of `RNCryptor`, but that wouldn't make any sense. It's not a real class; it's just a namespace.
+* Marked internal `OverflowingBuffer` class as `final` (the compiler likely already did that anyway).
 
 ## [4.0.0](https://github.com/RNCryptor/RNCryptor/releases/tag/4.0.0) - Complete rewrite in Swift with ObjC bridging
 
