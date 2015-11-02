@@ -238,6 +238,14 @@ This can be inconvenient for the user if they have entered the wrong password to
 
 The [v4 data format](https://github.com/RNCryptor/RNCryptor-Spec/blob/master/draft-RNCryptor-Spec-v4.0.md) will provide a faster and more useful mechanism for validating the password or key.
 
+### What is an "HMAC Error?" (Error code 1)
+
+See previous question. Either your data is corrupted or you have the wrong password.
+
+The most common cause of this error (if your password is correct) is that you have misunderstood how [Base64 encoding](https://en.wikipedia.org/wiki/Base64) works while transferring data to or from the server. If you have a string like "YXR0YWNrIGF0IGRhd24=", this is not "data." This is a string. It is probably Base64 encoded, which is a mechanism for converting data into strings. Some languages (JavaScript, PHP) have a habit of implicitly converting between data into Base64 strings, which is confusing and error-prone (and the source of many of these issues). Simple rule: if you can print it out without your terminal going crazy, it's not encrypted data.
+
+If you convert a Base64-encoded string to data using `dataUsingEncoding()`, you will get gibberish as far as RNCryptor is concerned. You need to use `init?(base64EncodedData:options:)`. Depending on the options on the iOS side or the server side, spaces and newlines may matter. You need to verify that precisely the bytes that came out of the encryptor are the bytes that go into the decryptor.
+
 ### Can I use RNCryptor to read and write my non-RNCryptor data format?
 
 No. RNCryptor implements a specific data format. It is not a general-purpose encryption library. If you have created your own data format, you will need to write specific code to deal with whatever you created. Please make sure the data format you've invented is secure. (This is much harder than it sounds.)
