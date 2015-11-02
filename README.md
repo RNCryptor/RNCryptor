@@ -168,9 +168,13 @@ The easiest way to use RNCryptor is by making it part of your project, without a
 
 This process works for most targets: iOS and OS X GUI apps, Swift frameworks, and OS X commandline apps. **It is not safe for ObjC frameworks or frameworks that may be imported into ObjC, since it would cause duplicate symbols if some other framework includes RNCryptor.**
 
-* Drag and link `RNCryptor/RNCryptor.swift` into your project
-* If you already have a bridging header file, add `#import "RNCryptor/RNCryptor.h"`
-* If you don't have a bridging header, in your target's Build Settings, set "Objective-C Bridging Header" to "RNCryptor/RNCryptor.h"
+* Drag and link `RNCryptor/RNCryptor.swift` and `RNCryptor.h` into your project
+* If you already have a bridging header file, add `#import "RNCryptor.h"` (or the path to which you copied `RNCryptor.h`).
+* If you don't have a bridging header:
+  * Swift project: In your target's Build Settings, set "Objective-C Bridging Header" to your path for `RNCryptor.h`. (Or create a bridiging header and follow instructions above.)
+  * ObjC project: Xcode will ask if you want to create a bridging header. Allow it to, and add `#import "RNCryptor.h"` to the header (or the path to which you copied `RNCryptor.h`)
+* To access RNCryptor from Swift, you don't need to import anything. It's just part of your module.
+* To acces RNCryptor from ObjC, import your Swift header (*modulename*-Swift.h). For example: `#import "MyApp-Swift.h"`.
 
 Built this way, you don't need to (and can't) `import RNCryptor` into your code. RNCryptor will be part of your module.
 
