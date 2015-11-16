@@ -174,15 +174,17 @@ This process works for most targets: iOS and OS X GUI apps, Swift frameworks, an
   * Swift project: In your target's Build Settings, set "Objective-C Bridging Header" to your path for `RNCryptor.h`. (Or create a bridiging header and follow instructions above.)
   * ObjC project: Xcode will ask if you want to create a bridging header. Allow it to, and add `#import "RNCryptor.h"` to the header (or the path to which you copied `RNCryptor.h`)
 * To access RNCryptor from Swift, you don't need to import anything. It's just part of your module.
-* To acces RNCryptor from ObjC, import your Swift header (*modulename*-Swift.h). For example: `#import "MyApp-Swift.h"`.
+* To access RNCryptor from ObjC, import your Swift header (*modulename*-Swift.h). For example: `#import "MyApp-Swift.h"`.
 
 Built this way, you don't need to (and can't) `import RNCryptor` into your code. RNCryptor will be part of your module.
 
 ### [Carthage](https://github.com/Carthage/Carthage)
 
-    github "RNCryptor/RNCryptor" "RNCryptor-4.0.0-beta.1"
+    github "RNCryptor/RNCryptor" "RNCryptor-4.0.0"
 
-Don't forget to embed `RNCryptor.framework`. Built this way, you should add `import RNCryptor` to your code.
+This approach will not work for OS X commandline apps. Don't forget to embed `RNCryptor.framework`. 
+
+Built this way, you should add `@import RNCryptor;` to your ObjC or `import RNCryptor` to your Swift code.
 
 This approach will not work for OS X commandline apps.
 
@@ -191,6 +193,8 @@ This approach will not work for OS X commandline apps.
     pod 'RNCryptor', '~> 4.0.0-beta'
 
 This approach will not work for OS X commandline apps.
+
+Built this way, you should add `@import RNCryptor;` to your ObjC or `import RNCryptor` to your Swift code.
 
 ## Advanced Usage
 
