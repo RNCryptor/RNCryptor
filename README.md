@@ -61,7 +61,7 @@ NSData *ciphertext = [RNCryptor encryptData:data password:password];
 NSError *error = nil;
 NSData *plaintext = [RNCryptor decryptData:ciphertext password:password error:&error];
 if (error != nil) {
-    NSLog(@"ERROR:", error);
+    NSLog(@"ERROR:%@", error);
     return
 }
 // ...
