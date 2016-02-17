@@ -316,8 +316,7 @@ decision.
 
 * Encrypt-then-MAC. If there were a good authenticated AES mode on iOS (GCM for
 instance), I would probably use that for its simplicity. Colin Percival makes
-[good arguments for hand-coding an encrypt-than-
-MAC](http://www.daemonology.net/blog/2009-06-24-encrypt-then-mac.html) rather
+[good arguments for hand-coding an encrypt-then-MAC](http://www.daemonology.net/blog/2009-06-24-encrypt-then-mac.html) rather
 than using an authenticated AES mode, but in RNCryptor mananging the HMAC
 actually adds quite a bit of complexity. I'd rather the complexity at a more
 broadly peer-reviewed layer like CommonCryptor than at the RNCryptor layer. But
