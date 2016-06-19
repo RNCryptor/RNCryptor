@@ -3,13 +3,12 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 47;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		FB627FD91B2B7A1800C3A579 /* RNCryptor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB627FCE1B2B7A1700C3A579 /* RNCryptor.framework */; };
 		FB7F2FB41D17438400A6283E /* RNCryptorPerformance.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB7F2FAC1D17422300A6283E /* RNCryptorPerformance.swift */; };
-		FB7F2FB51D17438400A6283E /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA738E1BC089FA00400E65 /* Data.swift */; };
 		FB7F2FBA1D17438400A6283E /* RNCryptor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB627FCE1B2B7A1700C3A579 /* RNCryptor.framework */; };
 		FBBA73881BC0892100400E65 /* RNCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FBBA73851BC0892100400E65 /* RNCryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FBBA73891BC0892100400E65 /* RNCryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73861BC0892100400E65 /* RNCryptor.swift */; };
@@ -312,7 +311,7 @@
 				};
 			};
 			buildConfigurationList = FB627FC81B2B7A1700C3A579 /* Build configuration list for PBXProject "RNCryptor" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 6.3";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -397,7 +396,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				FB7F2FB41D17438400A6283E /* RNCryptorPerformance.swift in Sources */,
-				FB7F2FB51D17438400A6283E /* Data.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
