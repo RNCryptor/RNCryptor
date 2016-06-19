@@ -450,7 +450,7 @@ public extension RNCryptor {
                 return Data()
             }
 
-            let e = try createEngineWithCredential(credential, header: buffer.subdata(in: 0..<requiredHeaderSize))
+            let e = try makeEngine(credential: credential, header: buffer.subdata(in: 0..<requiredHeaderSize))
             decryptorEngine = e
             let body = buffer.subdata(in: requiredHeaderSize..<buffer.count)
             buffer.count = 0
@@ -478,16 +478,16 @@ public extension RNCryptor {
             }
         }
 
-        private func createEngineWithCredential(_ credential: Credential, header: Data) throws -> DecryptorEngineV3 {
+        private func makeEngine(credential: Credential, header: Data) throws -> DecryptorEngineV3 {
             switch credential {
             case let .password(password):
-                return try createEngineWithPassword(password, header: header)
+                return try makeEngine(password: password, header: header)
             case let .keys(encryptionKey, hmacKey):
-                return try createEngineWithKeys(encryptionKey, hmacKey: hmacKey, header: header)
+                return try makeEngine(encryptionKey: encryptionKey, hmacKey: hmacKey, header: header)
             }
         }
 
-        private func createEngineWithPassword(_ password: String, header: Data) throws -> DecryptorEngineV3 {
+        private func makeEngine(password: String, header: Data) throws -> DecryptorEngineV3 {
             assert(password != "")
             precondition(header.count == V3.passwordHeaderSize)
 
@@ -509,7 +509,7 @@ public extension RNCryptor {
             return DecryptorEngineV3(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
         }
 
-        private func createEngineWithKeys(_ encryptionKey: Data, hmacKey: Data, header: Data) throws -> DecryptorEngineV3 {
+        private func makeEngine(encryptionKey: Data, hmacKey: Data, header: Data) throws -> DecryptorEngineV3 {
             precondition(header.count == V3.keyHeaderSize)
             precondition(encryptionKey.count == V3.keySize)
             precondition(hmacKey.count == V3.keySize)
