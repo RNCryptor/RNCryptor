@@ -471,8 +471,8 @@ public extension RNCryptor {
 
         private var requiredHeaderSize: Int {
             switch credential {
-            case .password(_): return V3.passwordHeaderSize
-            case .keys(_, _): return V3.keyHeaderSize
+            case .password: return V3.passwordHeaderSize
+            case .keys: return V3.keyHeaderSize
             }
         }
 
