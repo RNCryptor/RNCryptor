@@ -196,7 +196,7 @@ public final class RNCryptor: NSObject {
             buffer.append(data)
 
             let toCheck:[VersionedDecryptorType.Type]
-            (toCheck, decryptors) = decryptors.splitPassFail{ self.buffer.count >= $0.preambleSize }
+            (toCheck, decryptors) = decryptors.splitPassFail { self.buffer.count >= $0.preambleSize }
 
             for decryptorType in toCheck {
                 if decryptorType.canDecrypt(preamble: buffer.subdata(in: 0..<decryptorType.preambleSize)) {
@@ -686,11 +686,11 @@ private protocol VersionedDecryptorType: RNCryptorType {
 
 private extension Collection {
     // Split collection into ([pass], [fail]) based on predicate.
-    func splitPassFail(_ pred: (Iterator.Element) -> Bool) -> ([Iterator.Element], [Iterator.Element]) {
+    func splitPassFail(forPredicate predicate: (Iterator.Element) -> Bool) -> ([Iterator.Element], [Iterator.Element]) {
         var pass: [Iterator.Element] = []
         var fail: [Iterator.Element] = []
         for e in self {
-            if pred(e) {
+            if predicate(e) {
                 pass.append(e)
             } else {
                 fail.append(e)
