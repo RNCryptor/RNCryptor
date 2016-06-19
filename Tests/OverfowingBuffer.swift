@@ -31,7 +31,7 @@ class OverflowingBufferTest: XCTestCase {
     func testShort() {
         let buffer = OverflowingBuffer(capacity: 4)
         let data = Data(bytes: [1,2,3])
-        let out = buffer.updateWithData(data)
+        let out = buffer.update(withData: data)
         XCTAssert(out.count == 0)
         XCTAssertEqual(buffer.finalData(), Data(bytes: [1,2,3]))
     }
@@ -40,7 +40,7 @@ class OverflowingBufferTest: XCTestCase {
     func testExactly() {
         let buffer = OverflowingBuffer(capacity: 4)
         let data = Data(bytes: [1,2,3,4])
-        let out = buffer.updateWithData(data)
+        let out = buffer.update(withData: data)
         XCTAssert(out.count == 0)
         XCTAssertEqual(buffer.finalData(), Data(bytes: [1,2,3,4]))
     }
@@ -49,7 +49,7 @@ class OverflowingBufferTest: XCTestCase {
     func testOverflow() {
         let buffer = OverflowingBuffer(capacity: 4)
         let data = Data(bytes: [1,2,3,4,5])
-        let out = buffer.updateWithData(data)
+        let out = buffer.update(withData: data)
         XCTAssertEqual(out, Data(bytes: [1]))
         XCTAssertEqual(buffer.finalData(), Data(bytes: [2,3,4,5]))
     }
@@ -57,8 +57,8 @@ class OverflowingBufferTest: XCTestCase {
     // When a OverflowingBuffer receives less than its capacity in multiple writes, it outputs nothing and holds everything
     func testMultiShort() {
         let buffer = OverflowingBuffer(capacity: 4)
-        let out = NSMutableData(data:buffer.updateWithData(Data(bytes:[1])))
-        out.append(buffer.updateWithData(Data(bytes: [2,3])))
+        let out = NSMutableData(data:buffer.update(withData: Data(bytes:[1])))
+        out.append(buffer.update(withData: Data(bytes: [2,3])))
         XCTAssert(out.length == 0)
         XCTAssertEqual(buffer.finalData(), Data(bytes: [1,2,3]))
     }
@@ -66,10 +66,10 @@ class OverflowingBufferTest: XCTestCase {
     // When a OverflowingBuffer receives more than its capacity in multiple writes, it outputs the earliest bytes and holds the rest
     func testMultiOverflow() {
         let buffer = OverflowingBuffer(capacity: 4)
-        let out = NSMutableData(data: buffer.updateWithData(Data(bytes: [1,2,3])))
+        let out = NSMutableData(data: buffer.update(withData: Data(bytes: [1,2,3])))
         XCTAssertEqual(out.length, 0)
 
-        out.append(buffer.updateWithData(Data(bytes: [4,5,6])))
+        out.append(buffer.update(withData: Data(bytes: [4,5,6])))
         XCTAssertEqual(out, Data(bytes: [1,2]))
         XCTAssertEqual(buffer.finalData(), Data(bytes: [3,4,5,6]))
     }
@@ -77,10 +77,10 @@ class OverflowingBufferTest: XCTestCase {
     // When a OverflowingBuffer receives more than its capacity when it already had elements, it outputs the earliest bytes and holds the rest
     func testMultiMegaOverflow() {
         let buffer = OverflowingBuffer(capacity: 4)
-        let out = NSMutableData(data: buffer.updateWithData(Data(bytes:[1,2,3])))
+        let out = NSMutableData(data: buffer.update(withData: Data(bytes:[1,2,3])))
         XCTAssertEqual(out.length, 0)
 
-        out.append(buffer.updateWithData(Data(bytes: [4,5,6,7,8,9])))
+        out.append(buffer.update(withData: Data(bytes: [4,5,6,7,8,9])))
         XCTAssertEqual(out, Data(bytes: [1,2,3,4,5]))
         XCTAssertEqual(buffer.finalData(), Data(bytes: [6,7,8,9]))
     }

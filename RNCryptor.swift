@@ -52,7 +52,7 @@ public protocol RNCryptorType {
     /// - parameter data: Data to process. May be empty.
     /// - throws: `Error`
     /// - returns: Processed data. May be empty.
-    func updateWithData(_ data: Data) throws -> Data
+    func update(withData data: Data) throws -> Data
 
     /// Returns trailing data and invalidates the cryptor.
     ///
@@ -70,7 +70,7 @@ public extension RNCryptorType {
     ///
     /// - throws: `Error`
     private func oneshot(_ data: Data) throws -> Data {
-        var result = NSData(data: try updateWithData(data)) as Data
+        var result = try update(withData: data)
         result.append(try finalData())
         return result
     }
@@ -88,7 +88,7 @@ public final class RNCryptor: NSObject {
         /// Unrecognized data format. Usually this means the data is corrupt.
         case unknownHeader = 2
 
-        /// `final()` was called before sufficient data was passed to `updateWithData()`
+        /// `final()` was called before sufficient data was passed to `update(withData:)`
         case messageTooShort
 
         /// Memory allocation failure. This should never happen.
@@ -141,8 +141,8 @@ public final class RNCryptor: NSObject {
         ///
         /// - parameter data: Data to process. May be empty.
         /// - returns: Processed data. May be empty.
-        public func updateWithData(_ data: Data) -> Data {
-            return encryptor.updateWithData(data)
+        public func update(withData data: Data) -> Data {
+            return encryptor.update(withData: data)
         }
 
         /// Returns trailing data and invalidates the cryptor.
@@ -188,9 +188,9 @@ public final class RNCryptor: NSObject {
         /// - parameter data: Data to process. May be empty.
         /// - throws: `Error`
         /// - returns: Processed data. May be empty.
-        public func updateWithData(_ data: Data) throws -> Data {
+        public func update(withData data: Data) throws -> Data {
             if let d = decryptor {
-                return try d.updateWithData(data)
+                return try d.update(withData: data)
             }
 
             buffer.append(data)
@@ -202,7 +202,7 @@ public final class RNCryptor: NSObject {
                 if decryptorType.canDecrypt(buffer.subdata(in: 0..<decryptorType.preambleSize)) {
                     let d = decryptorType.init(password: password)
                     decryptor = d
-                    let result = try d.updateWithData(buffer as Data)
+                    let result = try d.update(withData: buffer)
                     buffer.count = 0
                     return result
                 }
@@ -327,9 +327,9 @@ public extension RNCryptor {
         ///
         /// - parameter data: Data to process. May be empty.
         /// - returns: Processed data. May be empty.
-        public func updateWithData(_ data: Data) -> Data {
+        public func update(withData data: Data) -> Data {
             // It should not be possible for this to fail during encryption
-            return handle(engine.updateWithData(data))
+            return handle(engine.update(withData: data))
         }
 
         /// Returns trailing data and invalidates the cryptor.
@@ -384,7 +384,7 @@ public extension RNCryptor {
             } else {
                 result = data
             }
-            hmac.updateWithData(result)
+            hmac.update(withData: result)
             return result
         }
     }
@@ -441,9 +441,9 @@ public extension RNCryptor {
         ///
         /// - parameter data: Data to process. May be empty.
         /// - returns: Processed data. May be empty.
-        public func updateWithData(_ data: Data) throws -> Data {
+        public func update(withData data: Data) throws -> Data {
             if let e = decryptorEngine {
-                return e.updateWithData(data)
+                return e.update(withData: data)
             }
 
             buffer.append(data)
@@ -455,7 +455,7 @@ public extension RNCryptor {
             decryptorEngine = e
             let body = buffer.subdata(in: requiredHeaderSize..<buffer.count)
             buffer.count = 0
-            return e.updateWithData(body)
+            return e.update(withData: body)
         }
 
         /// Returns trailing data and invalidates the cryptor.
@@ -573,7 +573,7 @@ internal final class Engine {
         return size
     }
 
-    func updateWithData(_ data: Data) -> Data {
+    func update(withData data: Data) -> Data {
         let outputLength = sizeBufferForDataOfLength(data.count)
         var dataOutMoved: Int = 0
 
@@ -631,14 +631,14 @@ private final class DecryptorEngineV3 {
         precondition(iv.count == V3.ivSize)
 
         hmac = HMACV3(key: hmacKey)
-        hmac.updateWithData(header)
+        hmac.update(withData: header)
         engine = Engine(operation: .decrypt, key: encryptionKey, iv: iv)
     }
 
-    func updateWithData(_ data: Data) -> Data {
-        let overflow = buffer.updateWithData(data)
-        hmac.updateWithData(overflow)
-        return engine.updateWithData(overflow)
+    func update(withData data: Data) -> Data {
+        let overflow = buffer.update(withData: data)
+        hmac.update(withData: overflow)
+        return engine.update(withData: overflow)
     }
 
     func finalData() throws -> Data {
@@ -665,7 +665,7 @@ private final class HMACV3 {
         }
     }
 
-    func updateWithData(_ data: Data) {
+    func update(withData data: Data) {
         CCHmacUpdate(&context, (data as NSData).bytes, data.count)
     }
 
@@ -708,7 +708,7 @@ internal final class OverflowingBuffer {
     }
 
     @warn_unused_result
-    func updateWithData(_ data: Data) -> Data {
+    func update(withData data: Data) -> Data {
         if data.count >= capacity {
             return sendAllArray(data)
         } else if buffer.count + data.count <= capacity {
