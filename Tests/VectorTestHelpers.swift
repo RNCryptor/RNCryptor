@@ -32,8 +32,8 @@ func verifyVector(_ vector: [String:String], key:String, equals actual:Data, nam
 }
 
 func _verifyKDF(_ vector: [String:String], name:String) {
-    let key = V3.keyForPassword(vector["password"]!,
-        salt:vector["salt_hex"]!.dataFromHexEncoding!)
+    let key = V3.makeKey(forPassword: vector["password"]!,
+                         withSalt: vector["salt_hex"]!.dataFromHexEncoding!)
     verifyVector(vector, key:"key_hex", equals:key, name: name)
 }
 

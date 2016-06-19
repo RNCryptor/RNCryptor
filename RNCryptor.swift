@@ -241,7 +241,7 @@ public extension RNCryptor {
         ///     - password: Password to convert
         ///     - salt: Salt. Generally constructed with RNCryptor.randomDataOfLength(FormatV3.saltSize)
         /// - returns: Key of length FormatV3.keySize
-        public static func keyForPassword(_ password: String, salt: Data) -> Data {
+        public static func makeKey(forPassword password: String, withSalt salt: Data) -> Data {
 
             var derivedKey = Data(count: keySize)!
             let passwordData = password.data(using: String.Encoding.utf8)!
@@ -351,8 +351,8 @@ public extension RNCryptor {
 
         // Expose random numbers for testing
         internal convenience init(password: String, encryptionSalt: Data, hmacSalt: Data, iv: Data) {
-            let encryptionKey = V3.keyForPassword(password, salt: encryptionSalt)
-            let hmacKey = V3.keyForPassword(password, salt: hmacSalt)
+            let encryptionKey = V3.makeKey(forPassword: password, withSalt: encryptionSalt)
+            let hmacKey = V3.makeKey(forPassword: password, withSalt: hmacSalt)
 
             let preamble = [V3.formatVersion, UInt8(1)]
             var header = Data(bytes: preamble)
@@ -501,8 +501,8 @@ public extension RNCryptor {
             let hmacSalt = header.subdata(in: Range(10...17))
             let iv = header.subdata(in: Range(18...33))
 
-            let encryptionKey = V3.keyForPassword(password, salt: encryptionSalt)
-            let hmacKey = V3.keyForPassword(password, salt: hmacSalt)
+            let encryptionKey = V3.makeKey(forPassword: password, withSalt: encryptionSalt)
+            let hmacKey = V3.makeKey(forPassword: password, withSalt: hmacSalt)
 
             return DecryptorEngineV3(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
         }
