@@ -285,8 +285,8 @@ public extension RNCryptor {
     /// "the latest encryptor" with a password, use `Encryptor` instead.
     @objc(RNEncryptorV3)
     public final class EncryptorV3 : NSObject, RNCryptorType {
-        private var engine: Engine
-        private var hmac: HMACV3
+        private let engine: Engine
+        private let hmac: HMACV3
         private var pendingHeader: Data?
 
         /// Creates and returns an encryptor.
@@ -373,7 +373,7 @@ public extension RNCryptor {
         }
 
         private func handle(data: Data) -> Data {
-            var result: Data
+            let result: Data
             if var accum = pendingHeader {
                 pendingHeader = nil
                 accum.append(data)
@@ -588,7 +588,7 @@ internal final class Engine {
         assert(result == CCCryptorStatus(kCCSuccess), "RNCRYPTOR BUG. PLEASE REPORT. (\(result)")
 
         buffer.count = dataOutMoved
-        return buffer as Data
+        return buffer
     }
 
     func finalData() -> Data {
@@ -623,8 +623,8 @@ private enum Credential {
 
 private final class DecryptorEngineV3 {
     private let buffer = OverflowingBuffer(capacity: V3.hmacSize)
-    private var hmac: HMACV3
-    private var engine: Engine
+    private let hmac: HMACV3
+    private let engine: Engine
 
     init(encryptionKey: Data, hmacKey: Data, iv: Data, header: Data) {
         precondition(encryptionKey.count == V3.keySize)
@@ -653,7 +653,7 @@ private final class DecryptorEngineV3 {
 }
 
 private final class HMACV3 {
-    var context: CCHmacContext = CCHmacContext()
+    var context = CCHmacContext()
 
     init(key: Data) {
         key.withUnsafeBytes {
