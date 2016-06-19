@@ -645,7 +645,7 @@ private final class DecryptorEngineV3 {
     func finalData() throws -> Data {
         let result = engine.finalData()
         let hash = hmac.finalData()
-        if !isEqualInConsistentTime(hash, untrusted: buffer.finalData()) {
+        if !isEqualInConsistentTime(trusted: hash, untrusted: buffer.finalData()) {
             throw RNCryptor.Error.hmacMismatch
         }
         return result
@@ -760,7 +760,7 @@ to determine a secret value by considering the time required to compare the valu
 We enumerate over the untrusted values so that the time is proportaional to the attacker's data,
 which provides the attack no informatoin about the length of the secret.
 */
-private func isEqualInConsistentTime(_ trusted: Data, untrusted: Data) -> Bool {
+private func isEqualInConsistentTime(trusted: Data, untrusted: Data) -> Bool {
     // The point of this routine is XOR the bytes of each data and accumulate the results with OR.
     // If any bytes are different, then the OR will accumulate some non-0 value.
     
