@@ -199,7 +199,7 @@ public final class RNCryptor: NSObject {
             (toCheck, decryptors) = decryptors.splitPassFail{ self.buffer.count >= $0.preambleSize }
 
             for decryptorType in toCheck {
-                if decryptorType.canDecrypt(buffer.subdata(in: 0..<decryptorType.preambleSize)) {
+                if decryptorType.canDecrypt(preamble: buffer.subdata(in: 0..<decryptorType.preambleSize)) {
                     let d = decryptorType.init(password: password)
                     decryptor = d
                     let result = try d.update(withData: buffer)
@@ -396,7 +396,7 @@ public extension RNCryptor {
         // Static methods
         //
         private static let preambleSize = 1
-        private static func canDecrypt(_ preamble: Data) -> Bool {
+        private static func canDecrypt(preamble: Data) -> Bool {
             assert(preamble.count >= 1)
             return preamble[0] == 3
         }
@@ -489,7 +489,7 @@ public extension RNCryptor {
             assert(password != "")
             precondition(header.count == V3.passwordHeaderSize)
 
-            guard DecryptorV3.canDecrypt(header) else {
+            guard DecryptorV3.canDecrypt(preamble: header) else {
                 throw Error.unknownHeader
             }
 
@@ -512,7 +512,7 @@ public extension RNCryptor {
             precondition(encryptionKey.count == V3.keySize)
             precondition(hmacKey.count == V3.keySize)
 
-            guard DecryptorV3.canDecrypt(header) else {
+            guard DecryptorV3.canDecrypt(preamble: header) else {
                 throw Error.unknownHeader
             }
 
@@ -680,7 +680,7 @@ private final class HMACV3 {
 // Internal protocol for version-specific decryptors.
 private protocol VersionedDecryptorType: RNCryptorType {
     static var preambleSize: Int { get }
-    static func canDecrypt(_ preamble: Data) -> Bool
+    static func canDecrypt(preamble: Data) -> Bool
     init(password: String)
 }
 
