@@ -52,13 +52,13 @@ public protocol RNCryptorType {
     /// - parameter data: Data to process. May be empty.
     /// - throws: `Error`
     /// - returns: Processed data. May be empty.
-    func updateWithData(data: NSData) throws -> NSData
+    func updateWithData(_ data: Data) throws -> Data
 
     /// Returns trailing data and invalidates the cryptor.
     ///
     /// - throws: `Error`
     /// - returns: Trailing data
-    func finalData() throws -> NSData
+    func finalData() throws -> Data
 }
 
 public extension RNCryptorType {
@@ -69,57 +69,56 @@ public extension RNCryptorType {
     /// for code that is neutral on whether it is encrypting or decrypting.
     ///
     /// - throws: `Error`
-    private func oneshot(data: NSData) throws -> NSData {
-        let result = NSMutableData(data: try updateWithData(data))
-        result.appendData(try finalData())
+    private func oneshot(_ data: Data) throws -> Data {
+        var result = NSData(data: try updateWithData(data)) as Data
+        result.append(try finalData())
         return result
     }
 }
 
 // FIXME: Move this to RNCryptor.Error if @objc can rename it correctly.
 /// Errors thrown by `RNCryptorType`.
-@objc public enum RNCryptorError: Int, ErrorType {
+@objc public enum RNCryptorError: Int, ErrorProtocol {
     /// Ciphertext was corrupt or password was incorrect.
     /// It is not possible to distinguish between these cases in the v3 data format.
-    case HMACMismatch = 1
+    case hmacMismatch = 1
 
     /// Unrecognized data format. Usually this means the data is corrupt.
-    case UnknownHeader = 2
+    case unknownHeader = 2
 
     /// `final()` was called before sufficient data was passed to `updateWithData()`
-    case MessageTooShort
+    case messageTooShort
 
     /// Memory allocation failure. This should never happen.
-    case MemoryFailure
+    case memoryFailure
 
     /// A password-based decryptor was used on a key-based ciphertext, or vice-versa.
-    case InvalidCredentialType
+    case invalidCredentialType
 }
 
 /// RNCryptor encryption/decryption interface.
 public final class RNCryptor: NSObject {
 
     /// Encrypt data using password and return encrypted data.
-    public static func encryptData(data: NSData, password: String) -> NSData {
+    public static func encryptData(_ data: Data, password: String) -> Data {
         return Encryptor(password: password).encryptData(data)
     }
 
     /// Decrypt data using password and return decrypted data. Throws if
     /// password is incorrect or ciphertext is in the wrong format.
     /// - throws `Error`
-    public static func decryptData(data: NSData, password: String) throws -> NSData {
+    public static func decryptData(_ data: Data, password: String) throws -> Data {
         return try Decryptor(password: password).decryptData(data)
     }
 
     /// Generates random NSData of given length
     /// Crashes if `length` is larger than allocatable memory, or if the system random number generator is not available.
-    public static func randomDataOfLength(length: Int) -> NSData {
-        let data = NSMutableData(length: length)!
-        let result = SecRandomCopyBytes(kSecRandomDefault, length, UnsafeMutablePointer<UInt8>(data.mutableBytes))
+    public static func randomData(ofLength length: Int) -> Data {
+        var data = Data(count: length)!
+        let result = data.withUnsafeMutableBytes { return SecRandomCopyBytes(kSecRandomDefault, length, $0) }
         guard result == errSecSuccess else {
             fatalError("SECURITY FAILURE: Could not generate secure random numbers: \(result).")
         }
-
         return data
     }
 
@@ -143,20 +142,20 @@ public final class RNCryptor: NSObject {
         ///
         /// - parameter data: Data to process. May be empty.
         /// - returns: Processed data. May be empty.
-        public func updateWithData(data: NSData) -> NSData {
+        public func updateWithData(_ data: Data) -> Data {
             return encryptor.updateWithData(data)
         }
 
         /// Returns trailing data and invalidates the cryptor.
         ///
         /// - returns: Trailing data
-        public func finalData() -> NSData {
+        public func finalData() -> Data {
             return encryptor.finalData()
         }
 
         /// Simplified, generic interface to `RNCryptorType`. Takes a data,
         /// returns a processed data, and invalidates the cryptor.
-        public func encryptData(data: NSData) -> NSData {
+        public func encryptData(_ data: Data) -> Data {
             return encryptor.encryptData(data)
         }
     }
@@ -166,7 +165,7 @@ public final class RNCryptor: NSObject {
     public final class Decryptor : NSObject, RNCryptorType {
         private var decryptors: [VersionedDecryptorType.Type] = [DecryptorV3.self]
 
-        private var buffer = NSMutableData()
+        private var buffer = Data()
         private var decryptor: RNCryptorType?
         private let password: String
 
@@ -181,7 +180,7 @@ public final class RNCryptor: NSObject {
         /// Decrypt data using password and return decrypted data, invalidating decryptor. Throws if
         /// password is incorrect or ciphertext is in the wrong format.
         /// - throws `Error`
-        public func decryptData(data: NSData) throws -> NSData {
+        public func decryptData(_ data: Data) throws -> Data {
             return try oneshot(data)
         }
 
@@ -190,37 +189,37 @@ public final class RNCryptor: NSObject {
         /// - parameter data: Data to process. May be empty.
         /// - throws: `Error`
         /// - returns: Processed data. May be empty.
-        public func updateWithData(data: NSData) throws -> NSData {
+        public func updateWithData(_ data: Data) throws -> Data {
             if let d = decryptor {
                 return try d.updateWithData(data)
             }
 
-            buffer.appendData(data)
+            buffer.append(data)
 
             let toCheck:[VersionedDecryptorType.Type]
-            (toCheck, decryptors) = decryptors.splitPassFail{ self.buffer.length >= $0.preambleSize }
+            (toCheck, decryptors) = decryptors.splitPassFail{ self.buffer.count >= $0.preambleSize }
 
             for decryptorType in toCheck {
-                if decryptorType.canDecrypt(buffer.bytesView[0..<decryptorType.preambleSize]) {
+                if decryptorType.canDecrypt(buffer.subdata(in: 0..<decryptorType.preambleSize)) {
                     let d = decryptorType.init(password: password)
                     decryptor = d
-                    let result = try d.updateWithData(buffer)
-                    buffer.length = 0
+                    let result = try d.updateWithData(buffer as Data)
+                    buffer.count = 0
                     return result
                 }
             }
 
-            guard !decryptors.isEmpty else { throw RNCryptorError.UnknownHeader }
-            return NSData()
+            guard !decryptors.isEmpty else { throw RNCryptorError.unknownHeader }
+            return Data()
         }
 
         /// Returns trailing data and invalidates the cryptor.
         ///
         /// - throws: `Error`
         /// - returns: Trailing data
-        public func finalData() throws -> NSData {
+        public func finalData() throws -> Data {
             guard let d = decryptor else {
-                throw RNCryptorError.UnknownHeader
+                throw RNCryptorError.unknownHeader
             }
             return try d.finalData()
         }
@@ -243,26 +242,31 @@ public extension RNCryptor {
         ///     - password: Password to convert
         ///     - salt: Salt. Generally constructed with RNCryptor.randomDataOfLength(FormatV3.saltSize)
         /// - returns: Key of length FormatV3.keySize
-        public static func keyForPassword(password: String, salt: NSData) -> NSData {
-            let derivedKey = NSMutableData(length: keySize)!
-            let derivedKeyPtr = UnsafeMutablePointer<UInt8>(derivedKey.mutableBytes)
+        public static func keyForPassword(_ password: String, salt: Data) -> Data {
 
-            let passwordData = password.dataUsingEncoding(NSUTF8StringEncoding)!
-            let passwordPtr = UnsafePointer<Int8>(passwordData.bytes)
+            var derivedKey = Data(count: keySize)!
+            let passwordData = password.data(using: String.Encoding.utf8)!
 
-            let saltPtr = UnsafePointer<UInt8>(salt.bytes)
+            let result: CCCryptorStatus = derivedKey.withUnsafeMutableBytes { (derivedKeyPtr : UnsafeMutablePointer<UInt8>) in
+                passwordData.withUnsafeBytes { (passwordPtr : UnsafePointer<Int8>) in
+                    salt.withUnsafeBytes { (saltPtr : UnsafePointer<UInt8>) in
 
-            // All the crazy casting because CommonCryptor hates Swift
-            let algorithm     = CCPBKDFAlgorithm(kCCPBKDF2)
-            let prf           = CCPseudoRandomAlgorithm(kCCPRFHmacAlgSHA1)
-            let pbkdf2Rounds  = UInt32(10000)
+                        // All the crazy casting because CommonCryptor hates Swift
+                        let algorithm     = CCPBKDFAlgorithm(kCCPBKDF2)
+                        let prf           = CCPseudoRandomAlgorithm(kCCPRFHmacAlgSHA1)
+                        let pbkdf2Rounds  = UInt32(10000)
 
-            let result = CCKeyDerivationPBKDF(
-                algorithm,
-                passwordPtr,   passwordData.length,
-                saltPtr,       salt.length,
-                prf,           pbkdf2Rounds,
-                derivedKeyPtr, derivedKey.length)
+                        return CCCryptorStatus(
+                            CCKeyDerivationPBKDF(
+                            algorithm,
+                            passwordPtr,   passwordData.count,
+                            saltPtr,       salt.count,
+                            prf,           pbkdf2Rounds,
+                            derivedKeyPtr, derivedKey.count)
+                        )
+                    }
+                }
+            }
 
             guard result == CCCryptorStatus(kCCSuccess) else {
                 fatalError("SECURITY FAILURE: Could not derive secure password (\(result)): \(derivedKey).")
@@ -284,7 +288,7 @@ public extension RNCryptor {
     public final class EncryptorV3 : NSObject, RNCryptorType {
         private var engine: Engine
         private var hmac: HMACV3
-        private var pendingHeader: NSData?
+        private var pendingHeader: Data?
 
         /// Creates and returns an encryptor.
         ///
@@ -292,9 +296,9 @@ public extension RNCryptor {
         public convenience init(password: String) {
             self.init(
                 password: password,
-                encryptionSalt: RNCryptor.randomDataOfLength(V3.saltSize),
-                hmacSalt: RNCryptor.randomDataOfLength(V3.saltSize),
-                iv: RNCryptor.randomDataOfLength(V3.ivSize))
+                encryptionSalt: RNCryptor.randomData(ofLength: V3.saltSize),
+                hmacSalt: RNCryptor.randomData(ofLength: V3.saltSize),
+                iv: RNCryptor.randomData(ofLength: V3.ivSize))
         }
 
         /// Creates and returns an encryptor using keys.
@@ -311,12 +315,12 @@ public extension RNCryptor {
         /// - parameters:
         ///     - encryptionKey: AES-256 key. Must be exactly FormatV3.keySize (kCCKeySizeAES256, 32 bytes)
         ///     - hmacKey: HMAC key. Must be exactly FormatV3.keySize (kCCKeySizeAES256, 32 bytes)
-        public convenience init(encryptionKey: NSData, hmacKey: NSData) {
-            self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: RNCryptor.randomDataOfLength(V3.ivSize))
+        public convenience init(encryptionKey: Data, hmacKey: Data) {
+            self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: RNCryptor.randomData(ofLength: V3.ivSize))
         }
 
         /// Takes a data, returns a processed data, and invalidates the cryptor.
-        public func encryptData(data: NSData) -> NSData {
+        public func encryptData(_ data: Data) -> Data {
             return try! oneshot(data)
         }
 
@@ -324,7 +328,7 @@ public extension RNCryptor {
         ///
         /// - parameter data: Data to process. May be empty.
         /// - returns: Processed data. May be empty.
-        public func updateWithData(data: NSData) -> NSData {
+        public func updateWithData(_ data: Data) -> Data {
             // It should not be possible for this to fail during encryption
             return handle(engine.updateWithData(data))
         }
@@ -332,22 +336,22 @@ public extension RNCryptor {
         /// Returns trailing data and invalidates the cryptor.
         ///
         /// - returns: Trailing data
-        public func finalData() -> NSData {
-            let result = NSMutableData(data: handle(engine.finalData()))
-            result.appendData(hmac.finalData())
+        public func finalData() -> Data {
+            var result = NSData(data: handle(engine.finalData())) as Data
+            result.append(hmac.finalData())
             return result
         }
 
         // Expose random numbers for testing
-        internal convenience init(encryptionKey: NSData, hmacKey: NSData, iv: NSData) {
-            let preamble = [V3.formatVersion, UInt8(0)]
-            let header = NSMutableData(bytes: preamble, length: preamble.count)
-            header.appendData(iv)
+        internal convenience init(encryptionKey: Data, hmacKey: Data, iv: Data) {
+            var preamble = [V3.formatVersion, UInt8(0)]
+            var header = Data(bytes: &preamble, count: preamble.count)
+            header.append(iv)
             self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
         }
 
         // Expose random numbers for testing
-        internal convenience init(password: String, encryptionSalt: NSData, hmacSalt: NSData, iv: NSData) {
+        internal convenience init(password: String, encryptionSalt: Data, hmacSalt: Data, iv: Data) {
             let encryptionKey = V3.keyForPassword(password, salt: encryptionSalt)
             let hmacKey = V3.keyForPassword(password, salt: hmacSalt)
 
@@ -355,28 +359,28 @@ public extension RNCryptor {
             // let header = [V3.version, UInt8(1)] + encryptionSalt + hmacSalt + iv
             let preamble = [V3.formatVersion, UInt8(1)]
             let header = NSMutableData(bytes: preamble, length: preamble.count)
-            header.appendData(encryptionSalt)
-            header.appendData(hmacSalt)
-            header.appendData(iv)
+            header.append(encryptionSalt)
+            header.append(hmacSalt)
+            header.append(iv)
 
-            self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
+            self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header as Data)
         }
 
-        private init(encryptionKey: NSData, hmacKey: NSData, iv: NSData, header: NSData) {
-            precondition(encryptionKey.length == V3.keySize)
-            precondition(hmacKey.length == V3.keySize)
-            precondition(iv.length == V3.ivSize)
+        private init(encryptionKey: Data, hmacKey: Data, iv: Data, header: Data) {
+            precondition(encryptionKey.count == V3.keySize)
+            precondition(hmacKey.count == V3.keySize)
+            precondition(iv.count == V3.ivSize)
             hmac = HMACV3(key: hmacKey)
-            engine = Engine(operation: .Encrypt, key: encryptionKey, iv: iv)
+            engine = Engine(operation: .encrypt, key: encryptionKey, iv: iv)
             pendingHeader = header
         }
 
-        private func handle(data: NSData) -> NSData {
-            var result: NSData
+        private func handle(_ data: Data) -> Data {
+            var result: Data
             if let ph = pendingHeader {
-                let accum = NSMutableData(data: ph)
+                var accum = NSData(data: ph) as Data
                 pendingHeader = nil
-                accum.appendData(data)
+                accum.append(data)
                 result = accum
             } else {
                 result = data
@@ -396,15 +400,15 @@ public extension RNCryptor {
         // Static methods
         //
         private static let preambleSize = 1
-        private static func canDecrypt(preamble: NSData) -> Bool {
-            assert(preamble.length >= 1)
-            return preamble.bytesView[0] == 3
+        private static func canDecrypt(_ preamble: Data) -> Bool {
+            assert(preamble.count >= 1)
+            return preamble[0] == 3
         }
 
         //
         // Private properties
         //
-        private var buffer = NSMutableData()
+        private var buffer = Data()
         private var decryptorEngine: DecryptorEngineV3?
         private let credential: Credential
 
@@ -413,7 +417,7 @@ public extension RNCryptor {
         ///
         /// - parameter password: Non-empty password string. This will be interpretted as UTF-8.
         public init(password: String) {
-            credential = .Password(password)
+            credential = .password(password)
         }
 
         /// Creates and returns a decryptor using keys.
@@ -421,16 +425,16 @@ public extension RNCryptor {
         /// - parameters:
         ///     - encryptionKey: AES-256 key. Must be exactly FormatV3.keySize (kCCKeySizeAES256, 32 bytes)
         ///     - hmacKey: HMAC key. Must be exactly FormatV3.keySize (kCCKeySizeAES256, 32 bytes)
-        public init(encryptionKey: NSData, hmacKey: NSData) {
-            precondition(encryptionKey.length == V3.keySize)
-            precondition(hmacKey.length == V3.hmacSize)
-            credential = .Keys(encryptionKey: encryptionKey, hmacKey: hmacKey)
+        public init(encryptionKey: Data, hmacKey: Data) {
+            precondition(encryptionKey.count == V3.keySize)
+            precondition(hmacKey.count == V3.hmacSize)
+            credential = .keys(encryptionKey: encryptionKey, hmacKey: hmacKey)
         }
 
         /// Decrypt data using password and return decrypted data. Throws if
         /// password is incorrect or ciphertext is in the wrong format.
         /// - throws `Error`
-        public func decryptData(data: NSData) throws -> NSData {
+        public func decryptData(_ data: Data) throws -> Data {
             return try oneshot(data)
         }
 
@@ -438,29 +442,29 @@ public extension RNCryptor {
         ///
         /// - parameter data: Data to process. May be empty.
         /// - returns: Processed data. May be empty.
-        public func updateWithData(data: NSData) throws -> NSData {
+        public func updateWithData(_ data: Data) throws -> Data {
             if let e = decryptorEngine {
                 return e.updateWithData(data)
             }
 
-            buffer.appendData(data)
-            guard buffer.length >= requiredHeaderSize else {
-                return NSData()
+            buffer.append(data)
+            guard buffer.count >= requiredHeaderSize else {
+                return Data()
             }
 
-            let e = try createEngineWithCredential(credential, header: buffer.bytesView[0..<requiredHeaderSize])
+            let e = try createEngineWithCredential(credential, header: buffer.subdata(in: 0..<requiredHeaderSize))
             decryptorEngine = e
-            let body = buffer.bytesView[requiredHeaderSize..<buffer.length]
-            buffer.length = 0
+            let body = buffer.subdata(in: requiredHeaderSize..<buffer.count)
+            buffer.count = 0
             return e.updateWithData(body)
         }
 
         /// Returns trailing data and invalidates the cryptor.
         ///
         /// - returns: Trailing data
-        public func finalData() throws -> NSData {
+        public func finalData() throws -> Data {
             guard let result = try decryptorEngine?.finalData() else {
-                throw RNCryptorError.MessageTooShort
+                throw RNCryptorError.messageTooShort
             }
             return result
         }
@@ -471,35 +475,35 @@ public extension RNCryptor {
 
         private var requiredHeaderSize: Int {
             switch credential {
-            case .Password(_): return V3.passwordHeaderSize
-            case .Keys(_, _): return V3.keyHeaderSize
+            case .password(_): return V3.passwordHeaderSize
+            case .keys(_, _): return V3.keyHeaderSize
             }
         }
 
-        private func createEngineWithCredential(credential: Credential, header: NSData) throws -> DecryptorEngineV3 {
+        private func createEngineWithCredential(_ credential: Credential, header: Data) throws -> DecryptorEngineV3 {
             switch credential {
-            case let .Password(password):
+            case let .password(password):
                 return try createEngineWithPassword(password, header: header)
-            case let .Keys(encryptionKey, hmacKey):
-                return try createEngineWithKeys(encryptionKey: encryptionKey, hmacKey: hmacKey, header: header)
+            case let .keys(encryptionKey, hmacKey):
+                return try createEngineWithKeys(encryptionKey, hmacKey: hmacKey, header: header)
             }
         }
 
-        private func createEngineWithPassword(password: String, header: NSData) throws -> DecryptorEngineV3 {
+        private func createEngineWithPassword(_ password: String, header: Data) throws -> DecryptorEngineV3 {
             assert(password != "")
-            precondition(header.length == V3.passwordHeaderSize)
+            precondition(header.count == V3.passwordHeaderSize)
 
             guard DecryptorV3.canDecrypt(header) else {
-                throw RNCryptorError.UnknownHeader
+                throw RNCryptorError.unknownHeader
             }
 
-            guard header.bytesView[1] == 1 else {
-                throw RNCryptorError.InvalidCredentialType
+            guard header[1] == 1 else {
+                throw RNCryptorError.invalidCredentialType
             }
 
-            let encryptionSalt = header.bytesView[2...9]
-            let hmacSalt = header.bytesView[10...17]
-            let iv = header.bytesView[18...33]
+            let encryptionSalt = header.subdata(in: Range(2...9))
+            let hmacSalt = header.subdata(in: Range(10...17))
+            let iv = header.subdata(in: Range(18...33))
 
             let encryptionKey = V3.keyForPassword(password, salt: encryptionSalt)
             let hmacKey = V3.keyForPassword(password, salt: hmacSalt)
@@ -507,81 +511,89 @@ public extension RNCryptor {
             return DecryptorEngineV3(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
         }
 
-        private func createEngineWithKeys(encryptionKey encryptionKey: NSData, hmacKey: NSData, header: NSData) throws -> DecryptorEngineV3 {
-            precondition(header.length == V3.keyHeaderSize)
-            precondition(encryptionKey.length == V3.keySize)
-            precondition(hmacKey.length == V3.keySize)
+        private func createEngineWithKeys(_ encryptionKey: Data, hmacKey: Data, header: Data) throws -> DecryptorEngineV3 {
+            precondition(header.count == V3.keyHeaderSize)
+            precondition(encryptionKey.count == V3.keySize)
+            precondition(hmacKey.count == V3.keySize)
 
             guard DecryptorV3.canDecrypt(header) else {
-                throw RNCryptorError.UnknownHeader
+                throw RNCryptorError.unknownHeader
             }
 
-            guard header.bytesView[1] == 0 else {
-                throw RNCryptorError.InvalidCredentialType
+            guard header[1] == 0 else {
+                throw RNCryptorError.invalidCredentialType
             }
 
-            let iv = header.bytesView[2..<18]
+            let iv = header.subdata(in: 2..<18)
             return DecryptorEngineV3(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
         }
     }
 }
 
 internal enum CryptorOperation: CCOperation {
-    case Encrypt = 0 // CCOperation(kCCEncrypt)
-    case Decrypt = 1 // CCOperation(kCCDecrypt)
+    case encrypt = 0 // CCOperation(kCCEncrypt)
+    case decrypt = 1 // CCOperation(kCCDecrypt)
 }
 
 internal final class Engine {
-    private let cryptor: CCCryptorRef
+    private let cryptor: CCCryptorRef?
     private var buffer = NSMutableData()
 
-    init(operation: CryptorOperation, key: NSData, iv: NSData) {
-        var cryptorOut = CCCryptorRef()
-        let result = CCCryptorCreate(
-            operation.rawValue,
-            CCAlgorithm(kCCAlgorithmAES128), CCOptions(kCCOptionPKCS7Padding),
-            key.bytes, key.length,
-            iv.bytes,
-            &cryptorOut
-        )
-        cryptor = cryptorOut
+    init(operation: CryptorOperation, key: Data, iv: Data) {
 
-        // It is a programming error to create us with illegal values
-        // This is an internal class, so we can constrain what is sent to us.
-        // If this is ever made public, it should throw instead of asserting.
-        assert(result == CCCryptorStatus(kCCSuccess))
+        cryptor = key.withUnsafeBytes { (keyPtr: UnsafePointer<UInt8>) -> CCCryptorRef? in
+            iv.withUnsafeBytes { (ivPtr: UnsafePointer<UInt8>) -> CCCryptorRef? in
+
+                var cryptorOut: CCCryptorRef?
+                let result = CCCryptorCreate(
+                    operation.rawValue,
+                    CCAlgorithm(kCCAlgorithmAES128), CCOptions(kCCOptionPKCS7Padding),
+                    keyPtr, key.count,
+                    ivPtr,
+                    &cryptorOut
+                )
+
+                // It is a programming error to create us with illegal values
+                // This is an internal class, so we can constrain what is sent to us.
+                // If this is ever made public, it should throw instead of asserting.
+                assert(result == CCCryptorStatus(kCCSuccess))
+                return cryptorOut
+            }
+        }
     }
 
     deinit {
-        if cryptor != CCCryptorRef() {
+        if cryptor != nil {
             CCCryptorRelease(cryptor)
         }
     }
 
-    func sizeBufferForDataOfLength(length: Int) -> Int {
+    func sizeBufferForDataOfLength(_ length: Int) -> Int {
         let size = CCCryptorGetOutputLength(cryptor, length, true)
         buffer.length = size
         return size
     }
 
-    func updateWithData(data: NSData) -> NSData {
-        let outputLength = sizeBufferForDataOfLength(data.length)
+    func updateWithData(_ data: Data) -> Data {
+        let outputLength = sizeBufferForDataOfLength(data.count)
         var dataOutMoved: Int = 0
 
-        let result = CCCryptorUpdate(
-            cryptor,
-            data.bytes, data.length,
-            buffer.mutableBytes, outputLength,
-            &dataOutMoved)
+        let result = data.withUnsafeBytes {
+            return CCCryptorUpdate(
+                cryptor,
+                $0, data.count,
+                buffer.mutableBytes, outputLength,
+                &dataOutMoved)
+        }
 
         // The only error returned by CCCryptorUpdate is kCCBufferTooSmall, which would be a programming error
         assert(result == CCCryptorStatus(kCCSuccess), "RNCRYPTOR BUG. PLEASE REPORT. (\(result)")
 
         buffer.length = dataOutMoved
-        return buffer
+        return buffer as Data
     }
 
-    func finalData() -> NSData {
+    func finalData() -> Data {
         let outputLength = sizeBufferForDataOfLength(0)
         var dataOutMoved: Int = 0
 
@@ -598,15 +610,15 @@ internal final class Engine {
         assert(result == CCCryptorStatus(kCCSuccess), "RNCRYPTOR BUG. PLEASE REPORT. (\(result)")
 
         buffer.length = dataOutMoved
-        return buffer
+        return buffer as Data
     }
 }
 
 internal typealias V3 = RNCryptor.FormatV3
 
 private enum Credential {
-    case Password(String)
-    case Keys(encryptionKey: NSData, hmacKey: NSData)
+    case password(String)
+    case keys(encryptionKey: Data, hmacKey: Data)
 }
 
 private final class DecryptorEngineV3 {
@@ -614,27 +626,27 @@ private final class DecryptorEngineV3 {
     private var hmac: HMACV3
     private var engine: Engine
 
-    init(encryptionKey: NSData, hmacKey: NSData, iv: NSData, header: NSData) {
-        precondition(encryptionKey.length == V3.keySize)
-        precondition(hmacKey.length == V3.hmacSize)
-        precondition(iv.length == V3.ivSize)
+    init(encryptionKey: Data, hmacKey: Data, iv: Data, header: Data) {
+        precondition(encryptionKey.count == V3.keySize)
+        precondition(hmacKey.count == V3.hmacSize)
+        precondition(iv.count == V3.ivSize)
 
         hmac = HMACV3(key: hmacKey)
         hmac.updateWithData(header)
-        engine = Engine(operation: .Decrypt, key: encryptionKey, iv: iv)
+        engine = Engine(operation: .decrypt, key: encryptionKey, iv: iv)
     }
 
-    func updateWithData(data: NSData) -> NSData {
+    func updateWithData(_ data: Data) -> Data {
         let overflow = buffer.updateWithData(data)
         hmac.updateWithData(overflow)
         return engine.updateWithData(overflow)
     }
 
-    func finalData() throws -> NSData {
+    func finalData() throws -> Data {
         let result = engine.finalData()
         let hash = hmac.finalData()
-        if !isEqualInConsistentTime(trusted: hash, untrusted: buffer.finalData()) {
-            throw RNCryptorError.HMACMismatch
+        if !isEqualInConsistentTime(hash, untrusted: buffer.finalData()) {
+            throw RNCryptorError.hmacMismatch
         }
         return result
     }
@@ -643,38 +655,40 @@ private final class DecryptorEngineV3 {
 private final class HMACV3 {
     var context: CCHmacContext = CCHmacContext()
 
-    init(key: NSData) {
-        CCHmacInit(
-            &context,
-            CCHmacAlgorithm(kCCHmacAlgSHA256),
-            key.bytes,
-            key.length
-        )
+    init(key: Data) {
+        key.withUnsafeBytes {
+            CCHmacInit(
+                &context,
+                CCHmacAlgorithm(kCCHmacAlgSHA256),
+                $0,
+                key.count
+            )
+        }
     }
 
-    func updateWithData(data: NSData) {
-        CCHmacUpdate(&context, data.bytes, data.length)
+    func updateWithData(_ data: Data) {
+        CCHmacUpdate(&context, (data as NSData).bytes, data.count)
     }
 
-    func finalData() -> NSData {
+    func finalData() -> Data {
         let hmac = NSMutableData(length: V3.hmacSize)!
         CCHmacFinal(&context, hmac.mutableBytes)
-        return hmac
+        return hmac as Data
     }
 }
 
 // Internal protocol for version-specific decryptors.
 private protocol VersionedDecryptorType: RNCryptorType {
     static var preambleSize: Int { get }
-    static func canDecrypt(preamble: NSData) -> Bool
+    static func canDecrypt(_ preamble: Data) -> Bool
     init(password: String)
 }
 
-private extension CollectionType {
+private extension Collection {
     // Split collection into ([pass], [fail]) based on predicate.
-    func splitPassFail(pred: Generator.Element -> Bool) -> ([Generator.Element], [Generator.Element]) {
-        var pass: [Generator.Element] = []
-        var fail: [Generator.Element] = []
+    func splitPassFail(_ pred: (Iterator.Element) -> Bool) -> ([Iterator.Element], [Iterator.Element]) {
+        var pass: [Iterator.Element] = []
+        var fail: [Iterator.Element] = []
         for e in self {
             if pred(e) {
                 pass.append(e)
@@ -687,7 +701,7 @@ private extension CollectionType {
 }
 
 internal final class OverflowingBuffer {
-    private var buffer = NSMutableData()
+    private var buffer = Data()
     let capacity: Int
 
     init(capacity: Int) {
@@ -695,63 +709,46 @@ internal final class OverflowingBuffer {
     }
 
     @warn_unused_result
-    func updateWithData(data: NSData) -> NSData {
-        if data.length >= capacity {
+    func updateWithData(_ data: Data) -> Data {
+        if data.count >= capacity {
             return sendAllArray(data)
-        } else if buffer.length + data.length <= capacity {
-            buffer.appendData(data)
-            return NSData()
+        } else if buffer.count + data.count <= capacity {
+            buffer.append(data)
+            return Data()
         } else {
             return sendSomeArray(data)
         }
     }
 
-    func finalData() -> NSData {
+    func finalData() -> Data {
         let result = buffer
-        buffer = NSMutableData() // Data belongs to caller now.
+        buffer.count = 0
         return result
     }
 
-    private func sendAllArray(data: NSData) -> NSData {
-        let toSend = data.length - capacity
+    private func sendAllArray(_ data: Data) -> Data {
+        let toSend = data.count - capacity
         assert(toSend >= 0)
-        assert(data.length - toSend <= capacity)
+        assert(data.count - toSend <= capacity)
 
-        let result = NSMutableData(data: buffer)
-        result.appendData(data.bytesView[0..<toSend])
-        buffer.length = 0
-        buffer.appendData(data.bytesView[toSend..<data.length])
+        var result = buffer
+        result.append(data.subdata(in: 0..<toSend))
+
+        buffer.count = 0
+        buffer.append(data.subdata(in: toSend..<data.count)) // TODO: Appending here to avoid later buffer growth, but maybe just buffer = data.subdata would be better
         return result
     }
 
-    private func sendSomeArray(data: NSData) -> NSData {
-        let toSend = (buffer.length + data.length) - capacity
+    private func sendSomeArray(_ data: Data) -> Data {
+        let toSend = (buffer.count + data.count) - capacity
         assert(toSend > 0) // If it were <= 0, we would have extended the array
-        assert(toSend < buffer.length) // If we would have sent everything, replaceBuffer should have been called
+        assert(toSend < buffer.count) // If we would have sent everything, replaceBuffer should have been called
 
-        let result = buffer.bytesView[0..<toSend]
-        buffer.replaceBytesInRange(NSRange(0..<toSend), withBytes: nil, length: 0)
-        buffer.appendData(data)
+        let result = buffer.subdata(in: 0..<toSend)
+        buffer.replaceBytes(in: 0..<toSend, with: Data())
+        buffer.append(data)
         return result
     }
-}
-
-private extension NSData {
-    var bytesView: BytesView { return BytesView(self) }
-}
-
-private struct BytesView: CollectionType {
-    let data: NSData
-    init(_ data: NSData) { self.data = data }
-    
-    subscript (position: Int) -> UInt8 {
-        return UnsafePointer<UInt8>(data.bytes)[position]
-    }
-    subscript (bounds: Range<Int>) -> NSData {
-        return data.subdataWithRange(NSRange(bounds))
-    }
-    var startIndex: Int = 0
-    var endIndex: Int { return data.length }
 }
 
 /** Compare two NSData in time proportional to the untrusted data
@@ -763,16 +760,28 @@ to determine a secret value by considering the time required to compare the valu
 We enumerate over the untrusted values so that the time is proportaional to the attacker's data,
 which provides the attack no informatoin about the length of the secret.
 */
-private func isEqualInConsistentTime(trusted trusted: NSData, untrusted: NSData) -> Bool {
+private func isEqualInConsistentTime(_ trusted: Data, untrusted: Data) -> Bool {
     // The point of this routine is XOR the bytes of each data and accumulate the results with OR.
     // If any bytes are different, then the OR will accumulate some non-0 value.
     
-    var result: UInt8 = untrusted.length == trusted.length ? 0 : 1  // Start with 0 (equal) only if our lengths are equal
-    for (i, untrustedByte) in untrusted.bytesView.enumerate() {
+    var result: UInt8 = untrusted.count == trusted.count ? 0 : 1  // Start with 0 (equal) only if our lengths are equal
+    for (i, untrustedByte) in untrusted.enumerated() {
         // Use mod to wrap around ourselves if they are longer than we are.
         // Remember, we already broke equality if our lengths are different.
-        result |= trusted.bytesView[i % trusted.length] ^ untrustedByte
+        result |= trusted[i % trusted.count] ^ untrustedByte
     }
     
     return result == 0
+}
+
+// From https://github.com/apple/swift-corelibs-foundation/blob/swift-3/Foundation/Data.swift#L285
+// Remove when added to Xcode
+private extension Data {
+    init?(count: Int) {
+        if let memory = malloc(count) {
+            self.init(bytesNoCopy: UnsafeMutablePointer<UInt8>(memory), count: count, deallocator: .free)
+        } else {
+            return nil
+        }
+    }
 }

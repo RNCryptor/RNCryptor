@@ -26,25 +26,19 @@
 
 import Foundation
 
-internal extension NSData {
-    convenience init(bytes: [UInt8]) {
-        self.init(bytes: bytes, length: bytes.count)
-    }
-}
-
 internal extension String {
-    var dataFromHexEncoding: NSData? {
+    var dataFromHexEncoding: Data? {
         let strip = [Character]([" ", "<", ">", "\n", "\t"])
         let input = characters.filter { c in !strip.contains(c)}
 
         guard input.count % 2 == 0 else { return nil }
 
         let data = NSMutableData()
-        for i in 0.stride(to: input.count, by: 2) {
+        for i in stride(from: 0, to: input.count, by: 2) {
             guard var value = UInt8(String(input[i...i+1]), radix: 16) else { return nil }
-            data.appendBytes(&value, length:1)
+            data.append(&value, length:1)
         }
 
-        return data
+        return data as Data
     }
 }
