@@ -33,7 +33,7 @@ import Foundation
 ///     let cryptor = Encryptor(password: "mypassword")
 ///     // or Decryptor()
 ///
-///     var result NSMutableData
+///     var result = Data()
 ///     for data in datas {
 ///         result.appendData(try cryptor.update(data))
 ///     }
@@ -343,8 +343,8 @@ public extension RNCryptor {
 
         // Expose random numbers for testing
         internal convenience init(encryptionKey: Data, hmacKey: Data, iv: Data) {
-            var preamble = [V3.formatVersion, UInt8(0)]
-            var header = Data(bytes: &preamble, count: preamble.count)
+            let preamble = [V3.formatVersion, UInt8(0)]
+            var header = Data(bytes: preamble)
             header.append(iv)
             self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
         }
@@ -354,15 +354,13 @@ public extension RNCryptor {
             let encryptionKey = V3.keyForPassword(password, salt: encryptionSalt)
             let hmacKey = V3.keyForPassword(password, salt: hmacSalt)
 
-            // TODO: This chained-+ is very slow to compile in Swift 2b5 (http://www.openradar.me/21842206)
-            // let header = [V3.version, UInt8(1)] + encryptionSalt + hmacSalt + iv
             let preamble = [V3.formatVersion, UInt8(1)]
-            let header = NSMutableData(bytes: preamble, length: preamble.count)
+            var header = Data(bytes: preamble)
             header.append(encryptionSalt)
             header.append(hmacSalt)
             header.append(iv)
 
-            self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header as Data)
+            self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
         }
 
         private init(encryptionKey: Data, hmacKey: Data, iv: Data, header: Data) {
@@ -535,7 +533,7 @@ internal enum CryptorOperation: CCOperation {
 
 internal final class Engine {
     private let cryptor: CCCryptorRef?
-    private var buffer = NSMutableData()
+    private var buffer = Data()
 
     init(operation: CryptorOperation, key: Data, iv: Data) {
 
@@ -568,7 +566,7 @@ internal final class Engine {
 
     func sizeBuffer(forDataLength length: Int) -> Int {
         let size = CCCryptorGetOutputLength(cryptor, length, true)
-        buffer.length = size
+        buffer.count = size
         return size
     }
 
@@ -576,18 +574,20 @@ internal final class Engine {
         let outputLength = sizeBuffer(forDataLength: data.count)
         var dataOutMoved = 0
 
-        let result = data.withUnsafeBytes {
-            return CCCryptorUpdate(
-                cryptor,
-                $0, data.count,
-                buffer.mutableBytes, outputLength,
-                &dataOutMoved)
+        let result = data.withUnsafeBytes { dataPtr in
+            buffer.withUnsafeMutableBytes { bufferPtr in
+                return CCCryptorUpdate(
+                    cryptor,
+                    dataPtr, data.count,
+                    bufferPtr, outputLength,
+                    &dataOutMoved)
+            }
         }
 
         // The only error returned by CCCryptorUpdate is kCCBufferTooSmall, which would be a programming error
         assert(result == CCCryptorStatus(kCCSuccess), "RNCRYPTOR BUG. PLEASE REPORT. (\(result)")
 
-        buffer.length = dataOutMoved
+        buffer.count = dataOutMoved
         return buffer as Data
     }
 
@@ -595,11 +595,13 @@ internal final class Engine {
         let outputLength = sizeBuffer(forDataLength: 0)
         var dataOutMoved = 0
 
-        let result = CCCryptorFinal(
-            cryptor,
-            buffer.mutableBytes, outputLength,
-            &dataOutMoved
-        )
+        let result = buffer.withUnsafeMutableBytes {
+            CCCryptorFinal(
+                cryptor,
+                $0, outputLength,
+                &dataOutMoved
+            )
+        }
 
         // Note that since iOS 6, CCryptor will never return padding errors or other decode errors.
         // I'm not aware of any non-catestrophic (MemoryAllocation) situation in which this
@@ -607,8 +609,8 @@ internal final class Engine {
         // https://devforums.apple.com/message/920802#920802
         assert(result == CCCryptorStatus(kCCSuccess), "RNCRYPTOR BUG. PLEASE REPORT. (\(result)")
 
-        buffer.length = dataOutMoved
-        return buffer as Data
+        buffer.count = dataOutMoved
+        return buffer
     }
 }
 
@@ -669,9 +671,9 @@ private final class HMACV3 {
     }
 
     func finalData() -> Data {
-        let hmac = NSMutableData(length: V3.hmacSize)!
-        CCHmacFinal(&context, hmac.mutableBytes)
-        return hmac as Data
+        var hmac = Data(count: V3.hmacSize)!
+        hmac.withUnsafeMutableBytes { CCHmacFinal(&context, $0) }
+        return hmac
     }
 }
 
