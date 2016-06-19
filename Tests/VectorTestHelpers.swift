@@ -78,7 +78,7 @@ func verify_v3_key(_ vector: [String: String]) {
         encryptionKey: vector["enc_key_hex"]!.dataFromHexEncoding!,
         hmacKey: vector["hmac_key_hex"]!.dataFromHexEncoding!)
     do {
-        let plaintext = try decryptor.decryptData(vector["ciphertext_hex"]!.dataFromHexEncoding!)
+        let plaintext = try decryptor.decrypt(data: vector["ciphertext_hex"]!.dataFromHexEncoding!)
         verifyVector(vector, key:"plaintext_hex", equals:plaintext, name:"key decrypt")
     } catch {
         XCTFail("\(error)")

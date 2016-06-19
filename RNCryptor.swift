@@ -107,7 +107,7 @@ public final class RNCryptor: NSObject {
     /// password is incorrect or ciphertext is in the wrong format.
     /// - throws `Error`
     public static func decrypt(data: Data, withPassword password: String) throws -> Data {
-        return try Decryptor(password: password).decryptData(data)
+        return try Decryptor(password: password).decrypt(data: data)
     }
 
     /// Generates random Data of given length
@@ -179,7 +179,7 @@ public final class RNCryptor: NSObject {
         /// Decrypt data using password and return decrypted data, invalidating decryptor. Throws if
         /// password is incorrect or ciphertext is in the wrong format.
         /// - throws `Error`
-        public func decryptData(_ data: Data) throws -> Data {
+        public func decrypt(data: Data) throws -> Data {
             return try oneshot(data)
         }
 
@@ -432,7 +432,7 @@ public extension RNCryptor {
         /// Decrypt data using password and return decrypted data. Throws if
         /// password is incorrect or ciphertext is in the wrong format.
         /// - throws `Error`
-        public func decryptData(_ data: Data) throws -> Data {
+        public func decrypt(data: Data) throws -> Data {
             return try oneshot(data)
         }
 
