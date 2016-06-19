@@ -69,7 +69,7 @@ public extension RNCryptorType {
     /// for code that is neutral on whether it is encrypting or decrypting.
     ///
     /// - throws: `Error`
-    private func oneshot(_ data: Data) throws -> Data {
+    private func oneshot(data: Data) throws -> Data {
         var result = try update(withData: data)
         result.append(try finalData())
         return result
@@ -180,7 +180,7 @@ public final class RNCryptor: NSObject {
         /// password is incorrect or ciphertext is in the wrong format.
         /// - throws `Error`
         public func decrypt(data: Data) throws -> Data {
-            return try oneshot(data)
+            return try oneshot(data: data)
         }
 
         /// Updates cryptor with data and returns processed data.
@@ -320,7 +320,7 @@ public extension RNCryptor {
 
         /// Takes a data, returns a processed data, and invalidates the cryptor.
         public func encrypt(data: Data) -> Data {
-            return try! oneshot(data)
+            return try! oneshot(data: data)
         }
 
         /// Updates cryptor with data and returns encrypted data.
@@ -431,7 +431,7 @@ public extension RNCryptor {
         /// password is incorrect or ciphertext is in the wrong format.
         /// - throws `Error`
         public func decrypt(data: Data) throws -> Data {
-            return try oneshot(data)
+            return try oneshot(data: data)
         }
 
         /// Updates cryptor with data and returns encrypted data.
