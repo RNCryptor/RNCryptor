@@ -329,14 +329,14 @@ public extension RNCryptor {
         /// - returns: Processed data. May be empty.
         public func update(withData data: Data) -> Data {
             // It should not be possible for this to fail during encryption
-            return handle(engine.update(withData: data))
+            return handle(data: engine.update(withData: data))
         }
 
         /// Returns trailing data and invalidates the cryptor.
         ///
         /// - returns: Trailing data
         public func finalData() -> Data {
-            var result = handle(engine.finalData())
+            var result = handle(data: engine.finalData())
             result.append(hmac.finalData())
             return result
         }
@@ -372,7 +372,7 @@ public extension RNCryptor {
             pendingHeader = header
         }
 
-        private func handle(_ data: Data) -> Data {
+        private func handle(data: Data) -> Data {
             var result: Data
             if var accum = pendingHeader {
                 pendingHeader = nil
