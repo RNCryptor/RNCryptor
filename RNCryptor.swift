@@ -711,12 +711,12 @@ internal final class OverflowingBuffer {
     @warn_unused_result
     func update(withData data: Data) -> Data {
         if data.count >= capacity {
-            return sendAllArray(data)
+            return sendAll(data: data)
         } else if buffer.count + data.count <= capacity {
             buffer.append(data)
             return Data()
         } else {
-            return sendSomeArray(data)
+            return sendSome(data: data)
         }
     }
 
@@ -726,7 +726,7 @@ internal final class OverflowingBuffer {
         return result
     }
 
-    private func sendAllArray(_ data: Data) -> Data {
+    private func sendAll(data: Data) -> Data {
         let toSend = data.count - capacity
         assert(toSend >= 0)
         assert(data.count - toSend <= capacity)
@@ -739,7 +739,7 @@ internal final class OverflowingBuffer {
         return result
     }
 
-    private func sendSomeArray(_ data: Data) -> Data {
+    private func sendSome(data: Data) -> Data {
         let toSend = (buffer.count + data.count) - capacity
         assert(toSend > 0) // If it were <= 0, we would have extended the array
         assert(toSend < buffer.count) // If we would have sent everything, replaceBuffer should have been called
