@@ -708,7 +708,6 @@ internal final class OverflowingBuffer {
         self.capacity = capacity
     }
 
-    @warn_unused_result
     func update(withData data: Data) -> Data {
         if data.count >= capacity {
             return sendAll(data: data)
