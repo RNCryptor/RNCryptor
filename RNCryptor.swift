@@ -539,8 +539,8 @@ internal final class Engine {
 
     init(operation: CryptorOperation, key: Data, iv: Data) {
 
-        cryptor = key.withUnsafeBytes { (keyPtr: UnsafePointer<UInt8>) -> CCCryptorRef? in
-            iv.withUnsafeBytes { (ivPtr: UnsafePointer<UInt8>) -> CCCryptorRef? in
+        cryptor = key.withUnsafeBytes { (keyPtr: UnsafePointer<UInt8>) in
+            iv.withUnsafeBytes { (ivPtr: UnsafePointer<UInt8>) in
 
                 var cryptorOut: CCCryptorRef?
                 let result = CCCryptorCreate(
@@ -566,15 +566,15 @@ internal final class Engine {
         }
     }
 
-    func sizeBufferForDataOfLength(_ length: Int) -> Int {
+    func sizeBuffer(forDataLength length: Int) -> Int {
         let size = CCCryptorGetOutputLength(cryptor, length, true)
         buffer.length = size
         return size
     }
 
     func update(withData data: Data) -> Data {
-        let outputLength = sizeBufferForDataOfLength(data.count)
-        var dataOutMoved: Int = 0
+        let outputLength = sizeBuffer(forDataLength: data.count)
+        var dataOutMoved = 0
 
         let result = data.withUnsafeBytes {
             return CCCryptorUpdate(
@@ -592,8 +592,8 @@ internal final class Engine {
     }
 
     func finalData() -> Data {
-        let outputLength = sizeBufferForDataOfLength(0)
-        var dataOutMoved: Int = 0
+        let outputLength = sizeBuffer(forDataLength: 0)
+        var dataOutMoved = 0
 
         let result = CCCryptorFinal(
             cryptor,
