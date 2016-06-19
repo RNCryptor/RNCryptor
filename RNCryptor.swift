@@ -76,28 +76,27 @@ public extension RNCryptorType {
     }
 }
 
-// FIXME: Move this to RNCryptor.Error if @objc can rename it correctly.
-/// Errors thrown by `RNCryptorType`.
-@objc public enum RNCryptorError: Int, ErrorProtocol {
-    /// Ciphertext was corrupt or password was incorrect.
-    /// It is not possible to distinguish between these cases in the v3 data format.
-    case hmacMismatch = 1
-
-    /// Unrecognized data format. Usually this means the data is corrupt.
-    case unknownHeader = 2
-
-    /// `final()` was called before sufficient data was passed to `updateWithData()`
-    case messageTooShort
-
-    /// Memory allocation failure. This should never happen.
-    case memoryFailure
-
-    /// A password-based decryptor was used on a key-based ciphertext, or vice-versa.
-    case invalidCredentialType
-}
-
 /// RNCryptor encryption/decryption interface.
 public final class RNCryptor: NSObject {
+
+    /// Errors thrown by `RNCryptorType`.
+    @objc(RNCryptorError) public enum Error: Int, ErrorProtocol {
+        /// Ciphertext was corrupt or password was incorrect.
+        /// It is not possible to distinguish between these cases in the v3 data format.
+        case hmacMismatch = 1
+
+        /// Unrecognized data format. Usually this means the data is corrupt.
+        case unknownHeader = 2
+
+        /// `final()` was called before sufficient data was passed to `updateWithData()`
+        case messageTooShort
+
+        /// Memory allocation failure. This should never happen.
+        case memoryFailure
+
+        /// A password-based decryptor was used on a key-based ciphertext, or vice-versa.
+        case invalidCredentialType
+    }
 
     /// Encrypt data using password and return encrypted data.
     public static func encryptData(_ data: Data, password: String) -> Data {
@@ -209,7 +208,7 @@ public final class RNCryptor: NSObject {
                 }
             }
 
-            guard !decryptors.isEmpty else { throw RNCryptorError.unknownHeader }
+            guard !decryptors.isEmpty else { throw Error.unknownHeader }
             return Data()
         }
 
@@ -219,7 +218,7 @@ public final class RNCryptor: NSObject {
         /// - returns: Trailing data
         public func finalData() throws -> Data {
             guard let d = decryptor else {
-                throw RNCryptorError.unknownHeader
+                throw Error.unknownHeader
             }
             return try d.finalData()
         }
@@ -464,7 +463,7 @@ public extension RNCryptor {
         /// - returns: Trailing data
         public func finalData() throws -> Data {
             guard let result = try decryptorEngine?.finalData() else {
-                throw RNCryptorError.messageTooShort
+                throw Error.messageTooShort
             }
             return result
         }
@@ -494,11 +493,11 @@ public extension RNCryptor {
             precondition(header.count == V3.passwordHeaderSize)
 
             guard DecryptorV3.canDecrypt(header) else {
-                throw RNCryptorError.unknownHeader
+                throw Error.unknownHeader
             }
 
             guard header[1] == 1 else {
-                throw RNCryptorError.invalidCredentialType
+                throw Error.invalidCredentialType
             }
 
             let encryptionSalt = header.subdata(in: Range(2...9))
@@ -517,11 +516,11 @@ public extension RNCryptor {
             precondition(hmacKey.count == V3.keySize)
 
             guard DecryptorV3.canDecrypt(header) else {
-                throw RNCryptorError.unknownHeader
+                throw Error.unknownHeader
             }
 
             guard header[1] == 0 else {
-                throw RNCryptorError.invalidCredentialType
+                throw Error.invalidCredentialType
             }
 
             let iv = header.subdata(in: 2..<18)
@@ -646,7 +645,7 @@ private final class DecryptorEngineV3 {
         let result = engine.finalData()
         let hash = hmac.finalData()
         if !isEqualInConsistentTime(hash, untrusted: buffer.finalData()) {
-            throw RNCryptorError.hmacMismatch
+            throw RNCryptor.Error.hmacMismatch
         }
         return result
     }

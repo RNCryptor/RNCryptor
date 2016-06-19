@@ -184,8 +184,8 @@ class RNCryptorTests: XCTestCase {
         do {
             try _ = RNCryptor.Decryptor(password: "password").decryptData(data as Data)
             XCTFail("Should not thrown")
-        } catch let error as RNCryptorError {
-            XCTAssertEqual(error, RNCryptorError.unknownHeader)
+        } catch let error as RNCryptor.Error {
+            XCTAssertEqual(error, RNCryptor.Error.unknownHeader)
         } catch {
             XCTFail("Threw wrong thing \(error)")
         }
@@ -196,8 +196,8 @@ class RNCryptorTests: XCTestCase {
         do {
             try _ = RNCryptor.DecryptorV3(password: "password").decryptData(data as Data)
             XCTFail("Should not thrown")
-        } catch let error as RNCryptorError {
-            XCTAssertEqual(error, RNCryptorError.unknownHeader)
+        } catch let error as RNCryptor.Error {
+            XCTAssertEqual(error, RNCryptor.Error.unknownHeader)
         } catch {
             XCTFail("Threw wrong thing \(error)")
         }
@@ -212,8 +212,8 @@ class RNCryptorTests: XCTestCase {
         do {
             let _ = try RNCryptor.Decryptor(password: "wrongpassword").decryptData(ciphertext)
             XCTFail("Should have failed to decrypt")
-        } catch let err as RNCryptorError {
-            XCTAssertEqual(err, RNCryptorError.hmacMismatch)
+        } catch let err as RNCryptor.Error {
+            XCTAssertEqual(err, RNCryptor.Error.hmacMismatch)
         } catch {
             XCTFail("Wrong error: \(error)")
         }
