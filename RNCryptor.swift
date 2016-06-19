@@ -110,7 +110,7 @@ public final class RNCryptor: NSObject {
         return try Decryptor(password: password).decryptData(data)
     }
 
-    /// Generates random NSData of given length
+    /// Generates random Data of given length
     /// Crashes if `length` is larger than allocatable memory, or if the system random number generator is not available.
     public static func randomData(ofLength length: Int) -> Data {
         var data = Data(count: length)!
@@ -336,7 +336,7 @@ public extension RNCryptor {
         ///
         /// - returns: Trailing data
         public func finalData() -> Data {
-            var result = NSData(data: handle(engine.finalData())) as Data
+            var result = handle(engine.finalData())
             result.append(hmac.finalData())
             return result
         }
@@ -376,8 +376,7 @@ public extension RNCryptor {
 
         private func handle(_ data: Data) -> Data {
             var result: Data
-            if let ph = pendingHeader {
-                var accum = NSData(data: ph) as Data
+            if var accum = pendingHeader {
                 pendingHeader = nil
                 accum.append(data)
                 result = accum
@@ -666,7 +665,7 @@ private final class HMACV3 {
     }
 
     func update(withData data: Data) {
-        CCHmacUpdate(&context, (data as NSData).bytes, data.count)
+        data.withUnsafeBytes { CCHmacUpdate(&context, $0, data.count) }
     }
 
     func finalData() -> Data {
@@ -750,7 +749,7 @@ internal final class OverflowingBuffer {
     }
 }
 
-/** Compare two NSData in time proportional to the untrusted data
+/** Compare two Datas in time proportional to the untrusted data
 
 Equatable-based comparisons genreally stop comparing at the first difference.
 This can be used by attackers, in some situations,
