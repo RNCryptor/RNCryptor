@@ -64,8 +64,8 @@ public protocol RNCryptorType {
 public extension RNCryptorType {
     /// Simplified, generic interface to `RNCryptorType`. Takes a data,
     /// returns a processed data. Generally you should use
-    /// `RNCryptor.encryptData(password:)`, or
-    /// `RNCryptor.decryptData(password:)` instead, but this is useful
+    /// `RNCryptor.encrypt(data:withPassword:)`, or
+    /// `RNCryptor.decrypt(data:withPassword:)` instead, but this is useful
     /// for code that is neutral on whether it is encrypting or decrypting.
     ///
     /// - throws: `Error`
@@ -100,7 +100,7 @@ public final class RNCryptor: NSObject {
 
     /// Encrypt data using password and return encrypted data.
     public static func encrypt(data: Data, withPassword password: String) -> Data {
-        return Encryptor(password: password).encryptData(data)
+        return Encryptor(password: password).encrypt(data: data)
     }
 
     /// Decrypt data using password and return decrypted data. Throws if
@@ -154,8 +154,8 @@ public final class RNCryptor: NSObject {
 
         /// Simplified, generic interface to `RNCryptorType`. Takes a data,
         /// returns a processed data, and invalidates the cryptor.
-        public func encryptData(_ data: Data) -> Data {
-            return encryptor.encryptData(data)
+        public func encrypt(data: Data) -> Data {
+            return encryptor.encrypt(data: data)
         }
     }
 
@@ -319,7 +319,7 @@ public extension RNCryptor {
         }
 
         /// Takes a data, returns a processed data, and invalidates the cryptor.
-        public func encryptData(_ data: Data) -> Data {
+        public func encrypt(data: Data) -> Data {
             return try! oneshot(data)
         }
 

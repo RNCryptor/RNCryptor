@@ -48,7 +48,7 @@ func _verifyPassword(_ vector: [String:String]) {
             encryptionSalt: vector["enc_salt_hex"]!.dataFromHexEncoding!,
             hmacSalt: vector["hmac_salt_hex"]!.dataFromHexEncoding!,
             iv: vector["iv_hex"]!.dataFromHexEncoding!)
-        let ciphertext = encryptor.encryptData(vector["plaintext_hex"]!.dataFromHexEncoding!)
+        let ciphertext = encryptor.encrypt(data: vector["plaintext_hex"]!.dataFromHexEncoding!)
         verifyVector(vector, key:"ciphertext_hex", equals:ciphertext, name:"password encrypt")
     }
 
@@ -70,7 +70,7 @@ func verify_v3_key(_ vector: [String: String]) {
             encryptionKey: vector["enc_key_hex"]!.dataFromHexEncoding!,
             hmacKey: vector["hmac_key_hex"]!.dataFromHexEncoding!,
             iv: vector["iv_hex"]!.dataFromHexEncoding!)
-        let ciphertext = encryptor.encryptData(vector["plaintext_hex"]!.dataFromHexEncoding!)
+        let ciphertext = encryptor.encrypt(data: vector["plaintext_hex"]!.dataFromHexEncoding!)
         verifyVector(vector, key:"ciphertext_hex", equals:ciphertext, name:"key encrypt")
     }
 

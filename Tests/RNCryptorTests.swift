@@ -76,7 +76,7 @@ class RNCryptorTests: XCTestCase {
         let ciphertext = "03000203 04050607 08090a0b 0c0d0e0f 0001981b 22e7a644 8118d695 bd654f72 e9d6ed75 ec14ae2a a067eed2 a98a56e0 993dfe22 ab5887b3 f6e3cdd4 0767f519 5eb5".dataFromHexEncoding!
 
         let encryptor = RNCryptor.EncryptorV3(encryptionKey: encryptKey, hmacKey: hmacKey, iv: iv)
-        let encrypted = encryptor.encryptData(plaintext)
+        let encrypted = encryptor.encrypt(data: plaintext)
         XCTAssertEqual(encrypted, ciphertext)
     }
 
@@ -105,7 +105,7 @@ class RNCryptorTests: XCTestCase {
 
         let encryptor = RNCryptor.EncryptorV3(password: password, encryptionSalt: encryptionSalt, hmacSalt: hmacSalt, iv: iv)
 
-        let encrypted = encryptor.encryptData(plaintext)
+        let encrypted = encryptor.encrypt(data: plaintext)
         XCTAssertEqual(encrypted, ciphertext)
     }
 
@@ -129,7 +129,7 @@ class RNCryptorTests: XCTestCase {
         let hmacKey = RNCryptor.randomData(ofLength: V3.keySize)
         let data = randomData()
 
-        let ciphertext = RNCryptor.EncryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey).encryptData(data)
+        let ciphertext = RNCryptor.EncryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey).encrypt(data: data)
 
         let plaintext: Data
         do {
@@ -146,7 +146,7 @@ class RNCryptorTests: XCTestCase {
         let password = "thepassword"
         let data = randomData()
 
-        let ciphertext = RNCryptor.Encryptor(password: password).encryptData(data)
+        let ciphertext = RNCryptor.Encryptor(password: password).encrypt(data: data)
 
         let plaintext: Data
         do {
@@ -207,7 +207,7 @@ class RNCryptorTests: XCTestCase {
         let password = "thepassword"
         let data = randomData()
 
-        let ciphertext = RNCryptor.Encryptor(password: password).encryptData(data)
+        let ciphertext = RNCryptor.Encryptor(password: password).encrypt(data: data)
 
         do {
             let _ = try RNCryptor.Decryptor(password: "wrongpassword").decryptData(ciphertext)
