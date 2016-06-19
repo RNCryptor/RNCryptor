@@ -99,14 +99,14 @@ public final class RNCryptor: NSObject {
     }
 
     /// Encrypt data using password and return encrypted data.
-    public static func encryptData(_ data: Data, password: String) -> Data {
+    public static func encrypt(data: Data, withPassword password: String) -> Data {
         return Encryptor(password: password).encryptData(data)
     }
 
     /// Decrypt data using password and return decrypted data. Throws if
     /// password is incorrect or ciphertext is in the wrong format.
     /// - throws `Error`
-    public static func decryptData(_ data: Data, password: String) throws -> Data {
+    public static func decrypt(data: Data, withPassword password: String) throws -> Data {
         return try Decryptor(password: password).decryptData(data)
     }
 

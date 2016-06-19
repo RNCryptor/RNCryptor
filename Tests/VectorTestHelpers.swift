@@ -53,7 +53,7 @@ func _verifyPassword(_ vector: [String:String]) {
     }
 
     do {
-        let plaintext = try RNCryptor.decryptData(vector["ciphertext_hex"]!.dataFromHexEncoding!, password: vector["password"]!)
+        let plaintext = try RNCryptor.decrypt(data: vector["ciphertext_hex"]!.dataFromHexEncoding!, withPassword: vector["password"]!)
         verifyVector(vector, key:"plaintext_hex", equals:plaintext, name:"password decrypt")
     } catch {
         XCTFail("\(error)")

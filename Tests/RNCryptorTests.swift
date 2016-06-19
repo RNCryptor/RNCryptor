@@ -183,7 +183,7 @@ class RNCryptorTests: XCTestCase {
         let data = NSMutableData(length: randomLength())!
         do {
             try _ = RNCryptor.Decryptor(password: "password").decryptData(data as Data)
-            XCTFail("Should not thrown")
+            XCTFail("Should have thrown")
         } catch let error as RNCryptor.Error {
             XCTAssertEqual(error, RNCryptor.Error.unknownHeader)
         } catch {
@@ -216,6 +216,20 @@ class RNCryptorTests: XCTestCase {
             XCTAssertEqual(err, RNCryptor.Error.hmacMismatch)
         } catch {
             XCTFail("Wrong error: \(error)")
+        }
+    }
+
+    func testOneShot() {
+        let password = "thepassword"
+        let data = randomData()
+
+        let ciphertext = RNCryptor.encrypt(data: data, withPassword: password)
+
+        do {
+            let decrypted = try RNCryptor.decrypt(data: ciphertext, withPassword: password)
+            XCTAssertEqual(decrypted, data)
+        } catch {
+            XCTFail("Caught: \(error)")
         }
     }
 }
