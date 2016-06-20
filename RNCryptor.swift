@@ -610,6 +610,7 @@ internal final class Engine {
         assert(result == CCCryptorStatus(kCCSuccess), "RNCRYPTOR BUG. PLEASE REPORT. (\(result)")
 
         buffer.count = dataOutMoved
+        defer { buffer = Data() }
         return buffer
     }
 }
