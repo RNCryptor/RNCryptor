@@ -18,14 +18,15 @@ func measure(block: () -> Void) {
     print("FINISH: \(finish.timeIntervalSince(start))")
 }
 
-func _blocks(ofSize size: Int, count: Int) -> [Data] {
-    return (1...count).map { _ in RNCryptor.randomData(ofLength: size) }
-}
+func _testIncremental(blocksOfSize blockSize: Int, count: Int) {
+    var plainText = Data()
+    plainText.count = blockSize
 
-func _testIncremental(blocks: [Data]) {
     let encryptor = RNCryptor.Encryptor(password: password)
-    for block in blocks {
-        _ = encryptor.update(withData: block)
+    for _ in 1...count {
+        autoreleasepool {
+        _ = encryptor.update(withData: plainText)
+        }
     }
     _ = encryptor.finalData()
 }
@@ -38,24 +39,22 @@ func testOneshot() {
 }
 
 func testSmallBlocks() {
-    let blocks = _blocks(ofSize: 1_000, count: 100_000)
     measure {
-        _testIncremental(blocks: blocks)
+        _testIncremental(blocksOfSize: 1_000, count: 1_000_000)
     }
 }
 
 func testLargeBlocks() {
-    let blocks = _blocks(ofSize: 1_000_000, count: 100)
     measure {
-        _testIncremental(blocks: blocks)
+        _testIncremental(blocksOfSize: 1_000_000, count: 100)
     }
 }
 
-print("oneshot")
-testOneshot()
+//print("oneshot")
+//testOneshot()
 //
-//print("smallBlocks")
-//testSmallBlocks()
+print("smallBlocks")
+testSmallBlocks()
 
 //print("largeBlocks")
 //testLargeBlocks()
