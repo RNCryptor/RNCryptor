@@ -536,7 +536,7 @@ internal final class Engine {
     private var buffer = NSMutableData()
 
     init(operation: CryptorOperation, key: NSData, iv: NSData) {
-        var cryptorOut = CCCryptorRef()
+        var cryptorOut:CCCryptorRef = nil
         let result = CCCryptorCreate(
             operation.rawValue,
             CCAlgorithm(kCCAlgorithmAES128), CCOptions(kCCOptionPKCS7Padding),
@@ -553,7 +553,7 @@ internal final class Engine {
     }
 
     deinit {
-        if cryptor != CCCryptorRef() {
+        if cryptor != nil {
             CCCryptorRelease(cryptor)
         }
     }
