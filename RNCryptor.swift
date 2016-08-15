@@ -69,7 +69,7 @@ public extension RNCryptorType {
     /// for code that is neutral on whether it is encrypting or decrypting.
     ///
     /// - throws: `Error`
-    private func oneshot(data: Data) throws -> Data {
+    fileprivate func oneshot(data: Data) throws -> Data {
         var result = try update(withData: data)
         result.append(try finalData())
         return result
@@ -80,7 +80,7 @@ public extension RNCryptorType {
 public final class RNCryptor: NSObject {
 
     /// Errors thrown by `RNCryptorType`.
-    @objc(RNCryptorError) public enum Error: Int, ErrorProtocol {
+    @objc(RNCryptorError) public enum Error: Int, Swift.Error {
         /// Ciphertext was corrupt or password was incorrect.
         /// It is not possible to distinguish between these cases in the v3 data format.
         case hmacMismatch = 1
@@ -395,8 +395,8 @@ public extension RNCryptor {
         //
         // Static methods
         //
-        private static let preambleSize = 1
-        private static func canDecrypt(preamble: Data) -> Bool {
+        fileprivate static let preambleSize = 1
+        fileprivate static func canDecrypt(preamble: Data) -> Bool {
             assert(preamble.count >= 1)
             return preamble[0] == 3
         }
@@ -745,7 +745,7 @@ internal final class OverflowingBuffer {
         assert(toSend < buffer.count) // If we would have sent everything, replaceBuffer should have been called
 
         let result = buffer.subdata(in: 0..<toSend)
-        buffer.replaceBytes(in: 0..<toSend, with: Data())
+        buffer.replaceSubrange(0..<toSend, with: Data())
         buffer.append(data)
         return result
     }
@@ -779,7 +779,7 @@ private func isEqualInConsistentTime(trusted: Data, untrusted: Data) -> Bool {
 private extension Data {
     init?(count: Int) {
         if let memory = malloc(count) {
-            self.init(bytesNoCopy: UnsafeMutablePointer<UInt8>(memory), count: count, deallocator: .free)
+            self.init(bytesNoCopy: memory, count: count, deallocator: .free)
         } else {
             return nil
         }

@@ -66,8 +66,8 @@ class OverflowingBufferTest: XCTestCase {
     // When a OverflowingBuffer receives more than its capacity in multiple writes, it outputs the earliest bytes and holds the rest
     func testMultiOverflow() {
         let buffer = OverflowingBuffer(capacity: 4)
-        let out = NSMutableData(data: buffer.update(withData: Data(bytes: [1,2,3])))
-        XCTAssertEqual(out.length, 0)
+        var out = buffer.update(withData: Data(bytes: [1,2,3]))
+        XCTAssertEqual(out.count, 0)
 
         out.append(buffer.update(withData: Data(bytes: [4,5,6])))
         XCTAssertEqual(out, Data(bytes: [1,2]))
@@ -77,8 +77,8 @@ class OverflowingBufferTest: XCTestCase {
     // When a OverflowingBuffer receives more than its capacity when it already had elements, it outputs the earliest bytes and holds the rest
     func testMultiMegaOverflow() {
         let buffer = OverflowingBuffer(capacity: 4)
-        let out = NSMutableData(data: buffer.update(withData: Data(bytes:[1,2,3])))
-        XCTAssertEqual(out.length, 0)
+        var out = buffer.update(withData: Data(bytes:[1,2,3]))
+        XCTAssertEqual(out.count, 0)
 
         out.append(buffer.update(withData: Data(bytes: [4,5,6,7,8,9])))
         XCTAssertEqual(out, Data(bytes: [1,2,3,4,5]))
