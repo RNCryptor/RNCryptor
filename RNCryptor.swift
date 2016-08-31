@@ -29,33 +29,33 @@ import Foundation
 /// The `RNCryptorType` protocol defines generic API to a mutable,
 /// incremental, password-based encryptor or decryptor. Its generic
 /// usage is as follows:
-///
+/// 
 ///     let cryptor = Encryptor(password: "mypassword")
 ///     // or Decryptor()
-///
+/// 
 ///     var result NSMutableData
 ///     for data in datas {
 ///         result.appendData(try cryptor.update(data))
 ///     }
 ///     result.appendData(try cryptor.final())
-///
+/// 
 ///  After calling `finalData()`, the cryptor is no longer valid.
 public protocol RNCryptorType {
 
     /// Creates and returns a cryptor.
-    ///
+    /// 
     /// - parameter password: Non-empty password string. This will be interpretted as UTF-8.
     init(password: String)
 
     /// Updates cryptor with data and returns processed data.
-    ///
+    /// 
     /// - parameter data: Data to process. May be empty.
     /// - throws: `Error`
     /// - returns: Processed data. May be empty.
     func updateWithData(data: NSData) throws -> NSData
 
     /// Returns trailing data and invalidates the cryptor.
-    ///
+    /// 
     /// - throws: `Error`
     /// - returns: Trailing data
     func finalData() throws -> NSData
@@ -67,7 +67,7 @@ public extension RNCryptorType {
     /// `RNCryptor.encryptData(password:)`, or
     /// `RNCryptor.decryptData(password:)` instead, but this is useful
     /// for code that is neutral on whether it is encrypting or decrypting.
-    ///
+    /// 
     /// - throws: `Error`
     private func oneshot(data: NSData) throws -> NSData {
         let result = NSMutableData(data: try updateWithData(data))
@@ -126,13 +126,13 @@ public final class RNCryptor: NSObject {
     /// A encryptor for the latest data format. If compatibility with other RNCryptor
     /// implementations is required, you may wish to use the specific encryptor version rather
     /// than accepting "latest."
-    ///
+    /// 
     @objc(RNEncryptor)
     public final class Encryptor: NSObject, RNCryptorType {
         private let encryptor: EncryptorV3
 
         /// Creates and returns a cryptor.
-        ///
+        /// 
         /// - parameter password: Non-empty password string. This will be interpretted as UTF-8.
         public init(password: String) {
             precondition(password != "")
@@ -140,7 +140,7 @@ public final class RNCryptor: NSObject {
         }
 
         /// Updates cryptor with data and returns processed data.
-        ///
+        /// 
         /// - parameter data: Data to process. May be empty.
         /// - returns: Processed data. May be empty.
         public func updateWithData(data: NSData) -> NSData {
@@ -148,7 +148,7 @@ public final class RNCryptor: NSObject {
         }
 
         /// Returns trailing data and invalidates the cryptor.
-        ///
+        /// 
         /// - returns: Trailing data
         public func finalData() -> NSData {
             return encryptor.finalData()
@@ -163,7 +163,7 @@ public final class RNCryptor: NSObject {
 
     /// Password-based decryptor that can handle any supported format.
     @objc(RNDecryptor)
-    public final class Decryptor : NSObject, RNCryptorType {
+    public final class Decryptor: NSObject, RNCryptorType {
         private var decryptors: [VersionedDecryptorType.Type] = [DecryptorV3.self]
 
         private var buffer = NSMutableData()
@@ -171,7 +171,7 @@ public final class RNCryptor: NSObject {
         private let password: String
 
         /// Creates and returns a cryptor.
-        ///
+        /// 
         /// - parameter password: Non-empty password string. This will be interpretted as UTF-8.
         public init(password: String) {
             assert(password != "")
@@ -186,7 +186,7 @@ public final class RNCryptor: NSObject {
         }
 
         /// Updates cryptor with data and returns processed data.
-        ///
+        /// 
         /// - parameter data: Data to process. May be empty.
         /// - throws: `Error`
         /// - returns: Processed data. May be empty.
@@ -197,8 +197,8 @@ public final class RNCryptor: NSObject {
 
             buffer.appendData(data)
 
-            let toCheck:[VersionedDecryptorType.Type]
-            (toCheck, decryptors) = decryptors.splitPassFail{ self.buffer.length >= $0.preambleSize }
+            let toCheck: [VersionedDecryptorType.Type]
+            (toCheck, decryptors) = decryptors.splitPassFail { self.buffer.length >= $0.preambleSize }
 
             for decryptorType in toCheck {
                 if decryptorType.canDecrypt(buffer.bytesView[0..<decryptorType.preambleSize]) {
@@ -215,7 +215,7 @@ public final class RNCryptor: NSObject {
         }
 
         /// Returns trailing data and invalidates the cryptor.
-        ///
+        /// 
         /// - throws: `Error`
         /// - returns: Trailing data
         public func finalData() throws -> NSData {
@@ -259,9 +259,9 @@ public extension RNCryptor {
 
             let result = CCKeyDerivationPBKDF(
                 algorithm,
-                passwordPtr,   passwordData.length,
-                saltPtr,       salt.length,
-                prf,           pbkdf2Rounds,
+                passwordPtr, passwordData.length,
+                saltPtr, salt.length,
+                prf, pbkdf2Rounds,
                 derivedKeyPtr, derivedKey.length)
 
             guard result == CCCryptorStatus(kCCSuccess) else {
@@ -281,13 +281,13 @@ public extension RNCryptor {
     /// or when using keys (which are inherrently versions-specific). To use
     /// "the latest encryptor" with a password, use `Encryptor` instead.
     @objc(RNEncryptorV3)
-    public final class EncryptorV3 : NSObject, RNCryptorType {
+    public final class EncryptorV3: NSObject, RNCryptorType {
         private var engine: Engine
         private var hmac: HMACV3
         private var pendingHeader: NSData?
 
         /// Creates and returns an encryptor.
-        ///
+        /// 
         /// - parameter password: Non-empty password string. This will be interpretted as UTF-8.
         public convenience init(password: String) {
             self.init(
@@ -298,16 +298,16 @@ public extension RNCryptor {
         }
 
         /// Creates and returns an encryptor using keys.
-        ///
+        /// 
         /// - Attention: This method requires some expertise to use correctly.
         ///              Most users should use `init(password:)` which is simpler
         ///              to use securely.
-        ///
+        /// 
         /// Keys should not be generated directly from strings (`.dataUsingEncoding()` or similar).
         /// Ideally, keys should be random (`Cryptor.randomDataOfLength()` or some other high-quality
         /// random generator. If keys must be generated from strings, then use `FormatV3.keyForPassword(salt:)`
         /// with a random salt, or just use password-based encryption (that's what it's for).
-        ///
+        /// 
         /// - parameters:
         ///     - encryptionKey: AES-256 key. Must be exactly FormatV3.keySize (kCCKeySizeAES256, 32 bytes)
         ///     - hmacKey: HMAC key. Must be exactly FormatV3.keySize (kCCKeySizeAES256, 32 bytes)
@@ -321,7 +321,7 @@ public extension RNCryptor {
         }
 
         /// Updates cryptor with data and returns encrypted data.
-        ///
+        /// 
         /// - parameter data: Data to process. May be empty.
         /// - returns: Processed data. May be empty.
         public func updateWithData(data: NSData) -> NSData {
@@ -330,7 +330,7 @@ public extension RNCryptor {
         }
 
         /// Returns trailing data and invalidates the cryptor.
-        ///
+        /// 
         /// - returns: Trailing data
         public func finalData() -> NSData {
             let result = NSMutableData(data: handle(engine.finalData()))
@@ -408,16 +408,15 @@ public extension RNCryptor {
         private var decryptorEngine: DecryptorEngineV3?
         private let credential: Credential
 
-
         /// Creates and returns a decryptor.
-        ///
+        /// 
         /// - parameter password: Non-empty password string. This will be interpretted as UTF-8.
         public init(password: String) {
             credential = .Password(password)
         }
 
         /// Creates and returns a decryptor using keys.
-        ///
+        /// 
         /// - parameters:
         ///     - encryptionKey: AES-256 key. Must be exactly FormatV3.keySize (kCCKeySizeAES256, 32 bytes)
         ///     - hmacKey: HMAC key. Must be exactly FormatV3.keySize (kCCKeySizeAES256, 32 bytes)
@@ -435,7 +434,7 @@ public extension RNCryptor {
         }
 
         /// Updates cryptor with data and returns encrypted data.
-        ///
+        /// 
         /// - parameter data: Data to process. May be empty.
         /// - returns: Processed data. May be empty.
         public func updateWithData(data: NSData) throws -> NSData {
@@ -456,7 +455,7 @@ public extension RNCryptor {
         }
 
         /// Returns trailing data and invalidates the cryptor.
-        ///
+        /// 
         /// - returns: Trailing data
         public func finalData() throws -> NSData {
             guard let result = try decryptorEngine?.finalData() else {
@@ -536,7 +535,7 @@ internal final class Engine {
     private var buffer = NSMutableData()
 
     init(operation: CryptorOperation, key: NSData, iv: NSData) {
-        var cryptorOut:CCCryptorRef = nil
+        var cryptorOut: CCCryptorRef = nil
         let result = CCCryptorCreate(
             operation.rawValue,
             CCAlgorithm(kCCAlgorithmAES128), CCOptions(kCCOptionPKCS7Padding),
@@ -743,11 +742,11 @@ private extension NSData {
 private struct BytesView: CollectionType {
     let data: NSData
     init(_ data: NSData) { self.data = data }
-    
-    subscript (position: Int) -> UInt8 {
+
+    subscript(position: Int) -> UInt8 {
         return UnsafePointer<UInt8>(data.bytes)[position]
     }
-    subscript (bounds: Range<Int>) -> NSData {
+    subscript(bounds: Range<Int>) -> NSData {
         return data.subdataWithRange(NSRange(bounds))
     }
     var startIndex: Int = 0
@@ -756,23 +755,23 @@ private struct BytesView: CollectionType {
 
 /** Compare two NSData in time proportional to the untrusted data
 
-Equatable-based comparisons genreally stop comparing at the first difference.
-This can be used by attackers, in some situations,
-to determine a secret value by considering the time required to compare the values.
+ Equatable-based comparisons genreally stop comparing at the first difference.
+ This can be used by attackers, in some situations,
+ to determine a secret value by considering the time required to compare the values.
 
-We enumerate over the untrusted values so that the time is proportaional to the attacker's data,
-which provides the attack no informatoin about the length of the secret.
-*/
+ We enumerate over the untrusted values so that the time is proportaional to the attacker's data,
+ which provides the attack no informatoin about the length of the secret.
+ */
 private func isEqualInConsistentTime(trusted trusted: NSData, untrusted: NSData) -> Bool {
     // The point of this routine is XOR the bytes of each data and accumulate the results with OR.
     // If any bytes are different, then the OR will accumulate some non-0 value.
-    
+
     var result: UInt8 = untrusted.length == trusted.length ? 0 : 1  // Start with 0 (equal) only if our lengths are equal
     for (i, untrustedByte) in untrusted.bytesView.enumerate() {
         // Use mod to wrap around ourselves if they are longer than we are.
         // Remember, we already broke equality if our lengths are different.
         result |= trusted.bytesView[i % trusted.length] ^ untrustedByte
     }
-    
+
     return result == 0
 }

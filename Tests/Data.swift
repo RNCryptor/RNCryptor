@@ -35,14 +35,14 @@ internal extension NSData {
 internal extension String {
     var dataFromHexEncoding: NSData? {
         let strip = [Character]([" ", "<", ">", "\n", "\t"])
-        let input = characters.filter { c in !strip.contains(c)}
+        let input = characters.filter { c in !strip.contains(c) }
 
         guard input.count % 2 == 0 else { return nil }
 
         let data = NSMutableData()
         for i in 0.stride(to: input.count, by: 2) {
-            guard var value = UInt8(String(input[i...i+1]), radix: 16) else { return nil }
-            data.appendBytes(&value, length:1)
+            guard var value = UInt8(String(input[i...i + 1]), radix: 16) else { return nil }
+            data.appendBytes(&value, length: 1)
         }
 
         return data
