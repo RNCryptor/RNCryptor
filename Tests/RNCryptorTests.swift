@@ -63,7 +63,7 @@ class RNCryptorTests: XCTestCase {
         encrypted.appendData(encryptor.finalData())
 
         let decryptor = Engine(operation: .Decrypt, key: encryptKey, iv: iv)
-        let decrypted = NSMutableData(data:decryptor.updateWithData(encrypted))
+        let decrypted = NSMutableData(data: decryptor.updateWithData(encrypted))
         decrypted.appendData(decryptor.finalData())
         XCTAssertEqual(decrypted, data)
     }
@@ -155,13 +155,13 @@ class RNCryptorTests: XCTestCase {
             plaintext = NSData(bytes: [0])
             XCTFail("Caught: \(error)")
         }
-        
+
         XCTAssertEqual(plaintext, data)
     }
 
     func testMultipleUpdateWithData() {
         let password = "thepassword"
-        let datas = (0..<10).map{ _ in randomData() }
+        let datas = (0..<10).map { _ in randomData() }
         let fullData = datas.reduce(NSMutableData()) { $0.appendData($1); return $0 }
 
         let encryptor = RNCryptor.Encryptor(password: password)
