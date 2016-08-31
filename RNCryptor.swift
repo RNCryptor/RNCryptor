@@ -125,8 +125,7 @@ public final class RNCryptor: NSObject {
     /// implementations is required, you may wish to use the specific encryptor version rather
     /// than accepting "latest."
     ///
-    @objc(RNEncryptor)
-    public final class Encryptor: NSObject, RNCryptorType {
+    public final class Encryptor: RNCryptorType {
         private let encryptor: EncryptorV3
 
         /// Creates and returns a cryptor.
@@ -160,8 +159,7 @@ public final class RNCryptor: NSObject {
     }
 
     /// Password-based decryptor that can handle any supported format.
-    @objc(RNDecryptor)
-    public final class Decryptor : NSObject, RNCryptorType {
+    public final class Decryptor : RNCryptorType {
         private var decryptors: [VersionedDecryptorType.Type] = [DecryptorV3.self]
 
         private var buffer = Data()
@@ -228,8 +226,7 @@ public final class RNCryptor: NSObject {
 // V3 implementaion
 public extension RNCryptor {
     /// V3 format settings
-    @objc(RNCryptorFormatV3)
-    public final class FormatV3: NSObject {
+    public final class FormatV3 {
         /// Size of AES and HMAC keys
         public static let keySize = kCCKeySizeAES256
 
@@ -283,8 +280,7 @@ public extension RNCryptor {
     /// Format version 3 encryptor. Use this to ensure a specific format verison
     /// or when using keys (which are inherrently versions-specific). To use
     /// "the latest encryptor" with a password, use `Encryptor` instead.
-    @objc(RNEncryptorV3)
-    public final class EncryptorV3 : NSObject, RNCryptorType {
+    public final class EncryptorV3 : RNCryptorType {
         private let engine: Engine
         private let hmac: HMACV3
         private var pendingHeader: Data?
@@ -390,8 +386,7 @@ public extension RNCryptor {
     /// using keys (since key configuration is version-specific). For password
     /// decryption, `Decryptor` is generally preferred, and will call this
     /// if appropriate.
-    @objc(RNDecryptorV3)
-    public final class DecryptorV3: NSObject, VersionedDecryptorType {
+    public final class DecryptorV3: VersionedDecryptorType {
         //
         // Static methods
         //
