@@ -77,10 +77,10 @@ public extension RNCryptorType {
 }
 
 /// RNCryptor encryption/decryption interface.
-public final class RNCryptor: NSObject {
+public enum RNCryptor {
 
     /// Errors thrown by `RNCryptorType`.
-    @objc(RNCryptorError) public enum Error: Int, Swift.Error {
+    public enum Error: Int, Swift.Error {
         /// Ciphertext was corrupt or password was incorrect.
         /// It is not possible to distinguish between these cases in the v3 data format.
         case hmacMismatch = 1

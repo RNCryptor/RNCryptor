@@ -18,8 +18,6 @@
 		FBBA73981BC089FA00400E65 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA738E1BC089FA00400E65 /* Data.swift */; };
 		FBBA73991BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73901BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift */; };
 		FBBA739A1BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73901BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift */; };
-		FBBA739F1BC089FA00400E65 /* ObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73931BC089FA00400E65 /* ObjC.m */; };
-		FBBA73A01BC089FA00400E65 /* ObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73931BC089FA00400E65 /* ObjC.m */; };
 		FBBA73A11BC089FA00400E65 /* OverfowingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73941BC089FA00400E65 /* OverfowingBuffer.swift */; };
 		FBBA73A21BC089FA00400E65 /* OverfowingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73941BC089FA00400E65 /* OverfowingBuffer.swift */; };
 		FBBA73A31BC089FA00400E65 /* RNCryptorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73951BC089FA00400E65 /* RNCryptorTests.swift */; };
@@ -66,7 +64,6 @@
 		FBBA73901BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNCryptorGeneratedVectorTests.swift; sourceTree = "<group>"; };
 		FBBA73911BC089FA00400E65 /* GenVectorTests */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GenVectorTests; sourceTree = "<group>"; };
 		FBBA73921BC089FA00400E65 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		FBBA73931BC089FA00400E65 /* ObjC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjC.m; sourceTree = "<group>"; };
 		FBBA73941BC089FA00400E65 /* OverfowingBuffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OverfowingBuffer.swift; sourceTree = "<group>"; };
 		FBBA73951BC089FA00400E65 /* RNCryptorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNCryptorTests.swift; sourceTree = "<group>"; };
 		FBBA73961BC089FA00400E65 /* VectorTestHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VectorTestHelpers.swift; sourceTree = "<group>"; };
@@ -149,7 +146,6 @@
 				FBBA738F1BC089FA00400E65 /* Generated */,
 				FBBA73911BC089FA00400E65 /* GenVectorTests */,
 				FBBA73921BC089FA00400E65 /* Info.plist */,
-				FBBA73931BC089FA00400E65 /* ObjC.m */,
 				FBBA73941BC089FA00400E65 /* OverfowingBuffer.swift */,
 				FBBA73951BC089FA00400E65 /* RNCryptorTests.swift */,
 				FBBA73961BC089FA00400E65 /* VectorTestHelpers.swift */,
@@ -393,7 +389,6 @@
 				FBBA73971BC089FA00400E65 /* Data.swift in Sources */,
 				FBBA73A31BC089FA00400E65 /* RNCryptorTests.swift in Sources */,
 				FBBA73A51BC089FA00400E65 /* VectorTestHelpers.swift in Sources */,
-				FBBA739F1BC089FA00400E65 /* ObjC.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -422,7 +417,6 @@
 				FBBA73981BC089FA00400E65 /* Data.swift in Sources */,
 				FBBA73A41BC089FA00400E65 /* RNCryptorTests.swift in Sources */,
 				FBBA73A61BC089FA00400E65 /* VectorTestHelpers.swift in Sources */,
-				FBBA73A01BC089FA00400E65 /* ObjC.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -489,6 +483,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -529,6 +524,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -611,6 +607,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = net.robnapier.RNCryptorTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -624,6 +621,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = net.robnapier.RNCryptorTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
@@ -645,6 +643,7 @@
 				PRODUCT_NAME = RNCryptor;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -667,6 +666,7 @@
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
@@ -683,6 +683,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -699,6 +700,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
