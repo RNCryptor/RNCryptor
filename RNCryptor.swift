@@ -639,12 +639,11 @@ private final class DecryptorEngineV3 {
     }
 
     func finalData() throws -> Data {
-        let result = engine.finalData()
         let hash = hmac.finalData()
         if !isEqualInConsistentTime(trusted: hash, untrusted: buffer.finalData()) {
             throw RNCryptor.Error.hmacMismatch
         }
-        return result
+        return engine.finalData()
     }
 }
 
