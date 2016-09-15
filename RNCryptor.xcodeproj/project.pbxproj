@@ -9,21 +9,21 @@
 /* Begin PBXBuildFile section */
 		FB627FD91B2B7A1800C3A579 /* RNCryptor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB627FCE1B2B7A1700C3A579 /* RNCryptor.framework */; };
 		FBBA73881BC0892100400E65 /* RNCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FBBA73851BC0892100400E65 /* RNCryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		FBBA73891BC0892100400E65 /* RNCryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73861BC0892100400E65 /* RNCryptor.swift */; settings = {ASSET_TAGS = (); }; };
+		FBBA73891BC0892100400E65 /* RNCryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73861BC0892100400E65 /* RNCryptor.swift */; };
 		FBBA738B1BC0893200400E65 /* RNCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FBBA73851BC0892100400E65 /* RNCryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		FBBA738C1BC0893500400E65 /* RNCryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73861BC0892100400E65 /* RNCryptor.swift */; settings = {ASSET_TAGS = (); }; };
-		FBBA73971BC089FA00400E65 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA738E1BC089FA00400E65 /* Data.swift */; settings = {ASSET_TAGS = (); }; };
-		FBBA73981BC089FA00400E65 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA738E1BC089FA00400E65 /* Data.swift */; settings = {ASSET_TAGS = (); }; };
-		FBBA73991BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73901BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift */; settings = {ASSET_TAGS = (); }; };
-		FBBA739A1BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73901BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift */; settings = {ASSET_TAGS = (); }; };
-		FBBA739F1BC089FA00400E65 /* ObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73931BC089FA00400E65 /* ObjC.m */; settings = {ASSET_TAGS = (); }; };
-		FBBA73A01BC089FA00400E65 /* ObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73931BC089FA00400E65 /* ObjC.m */; settings = {ASSET_TAGS = (); }; };
-		FBBA73A11BC089FA00400E65 /* OverfowingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73941BC089FA00400E65 /* OverfowingBuffer.swift */; settings = {ASSET_TAGS = (); }; };
-		FBBA73A21BC089FA00400E65 /* OverfowingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73941BC089FA00400E65 /* OverfowingBuffer.swift */; settings = {ASSET_TAGS = (); }; };
-		FBBA73A31BC089FA00400E65 /* RNCryptorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73951BC089FA00400E65 /* RNCryptorTests.swift */; settings = {ASSET_TAGS = (); }; };
-		FBBA73A41BC089FA00400E65 /* RNCryptorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73951BC089FA00400E65 /* RNCryptorTests.swift */; settings = {ASSET_TAGS = (); }; };
-		FBBA73A51BC089FA00400E65 /* VectorTestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73961BC089FA00400E65 /* VectorTestHelpers.swift */; settings = {ASSET_TAGS = (); }; };
-		FBBA73A61BC089FA00400E65 /* VectorTestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73961BC089FA00400E65 /* VectorTestHelpers.swift */; settings = {ASSET_TAGS = (); }; };
+		FBBA738C1BC0893500400E65 /* RNCryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73861BC0892100400E65 /* RNCryptor.swift */; };
+		FBBA73971BC089FA00400E65 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA738E1BC089FA00400E65 /* Data.swift */; };
+		FBBA73981BC089FA00400E65 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA738E1BC089FA00400E65 /* Data.swift */; };
+		FBBA73991BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73901BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift */; };
+		FBBA739A1BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73901BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift */; };
+		FBBA739F1BC089FA00400E65 /* ObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73931BC089FA00400E65 /* ObjC.m */; };
+		FBBA73A01BC089FA00400E65 /* ObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73931BC089FA00400E65 /* ObjC.m */; };
+		FBBA73A11BC089FA00400E65 /* OverfowingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73941BC089FA00400E65 /* OverfowingBuffer.swift */; };
+		FBBA73A21BC089FA00400E65 /* OverfowingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73941BC089FA00400E65 /* OverfowingBuffer.swift */; };
+		FBBA73A31BC089FA00400E65 /* RNCryptorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73951BC089FA00400E65 /* RNCryptorTests.swift */; };
+		FBBA73A41BC089FA00400E65 /* RNCryptorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73951BC089FA00400E65 /* RNCryptorTests.swift */; };
+		FBBA73A51BC089FA00400E65 /* VectorTestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73961BC089FA00400E65 /* VectorTestHelpers.swift */; };
+		FBBA73A61BC089FA00400E65 /* VectorTestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73961BC089FA00400E65 /* VectorTestHelpers.swift */; };
 		FBCF48DE1B43286D00DCFB19 /* RNCryptor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FBCF48D41B43286D00DCFB19 /* RNCryptor.framework */; };
 /* End PBXBuildFile section */
 
@@ -475,6 +475,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 2.3;
 			};
 			name = Debug;
 		};
@@ -492,6 +493,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = net.robnapier.RNCryptor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 2.3;
 			};
 			name = Release;
 		};
