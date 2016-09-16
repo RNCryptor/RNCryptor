@@ -10,7 +10,7 @@
   "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "CF2260EC-9B90-4F14-BED5-A3759CE0EADF",
   "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
     "9C4A3E9BC49D7F0902A368DCB345E812E4B26F3F" : "RNCryptor\/Spec\/",
-    "DEDD58F0BAF28034A74179391A23AC2E0219CDC3" : "RNCryptor"
+    "DEDD58F0BAF28034A74179391A23AC2E0219CDC3" : "RNCryptor\/"
   },
   "DVTSourceControlWorkspaceBlueprintNameKey" : "RNCryptor",
   "DVTSourceControlWorkspaceBlueprintVersion" : 204,
