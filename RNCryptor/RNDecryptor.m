@@ -264,15 +264,24 @@ static const NSUInteger kPreambleSize = 2;
   [[data _RNConsumeToIndex:kPreambleSize] mutableCopy]; // Throw away the preamble
 
   NSError *error = nil;
-  if (self.options & kRNCryptorOptionHasPassword) {
-    NSAssert(!self.encryptionKey && !self.HMACKey, @"Both password and the key (%d) or HMACKey (%d) are set.", self.encryptionKey != nil, self.HMACKey != nil);
-
-    NSData *encryptionKeySalt = [data _RNConsumeToIndex:self.settings.keySettings.saltSize];
-    NSData *HMACKeySalt = [data _RNConsumeToIndex:self.settings.HMACKeySettings.saltSize];
-    self.encryptionKey = [[self class] keyForPassword:self.password salt:encryptionKeySalt settings:self.settings.keySettings];
-    self.HMACKey = [[self class] keyForPassword:self.password salt:HMACKeySalt settings:self.settings.HMACKeySettings];
-
-    self.password = nil;  // Don't need this anymore.
+  //if (self.options & kRNCryptorOptionHasPassword) {
+  //
+  //The below incorrectly asserts when attempting to decrypt data that is corrupted/random/not encrypted with the encryption key AND
+  //bytes[0] is interpreted as a 'preamble' and happens to == kRNCryptorFileVersion -> then options is set to bytes[1] -> if this > 0 ->
+  //kRNCryptorOptionHasPassword is incorrectly set
+  //
+  //Checking for self.password != nil here, does not solve the root problem, but prevents the incorrect assertion here and an subsequent indirectly correct
+  //assertion following [... keyForPassword:nil ..]
+  //
+  if ((self.options & kRNCryptorOptionHasPassword) && self.password) {
+      NSAssert(!self.encryptionKey && !self.HMACKey, @"Both password and the key (%d) or HMACKey (%d) are set.", self.encryptionKey != nil, self.HMACKey != nil);
+      
+      NSData *encryptionKeySalt = [data _RNConsumeToIndex:self.settings.keySettings.saltSize];
+      NSData *HMACKeySalt = [data _RNConsumeToIndex:self.settings.HMACKeySettings.saltSize];
+      self.encryptionKey = [[self class] keyForPassword:self.password salt:encryptionKeySalt settings:self.settings.keySettings];
+      self.HMACKey = [[self class] keyForPassword:self.password salt:HMACKeySalt settings:self.settings.HMACKeySettings];
+      
+      self.password = nil;  // Don't need this anymore.
   }
 
   NSData *IV = [data _RNConsumeToIndex:self.settings.IVSize];
