@@ -303,6 +303,20 @@ static const NSUInteger kPreambleSize = 2;
 
   dispatch_async(self.queue, ^{
     NSError *error = nil;
+      
+    if (self.hasHMAC) {
+      NSMutableData *HMACData = [NSMutableData dataWithLength:self.HMACLength];
+      CCHmacFinal(&_HMACContext, [HMACData mutableBytes]);
+      
+      if (![HMACData rnc_isEqualInConsistentTime:self.inData]) {
+          [self cleanupAndNotifyWithError:[NSError errorWithDomain:kRNCryptorErrorDomain
+                                                              code:kRNCryptorHMACMismatch
+                                                          userInfo:[NSDictionary dictionaryWithObject:@"HMAC Mismatch" /* DNL */
+                                                                                               forKey:NSLocalizedDescriptionKey]]];
+          return;
+      }
+    }
+
     NSData *decryptedData = [self.engine finishWithError:&error];
 
     if (!decryptedData) {
@@ -310,19 +324,6 @@ static const NSUInteger kPreambleSize = 2;
       return;
     }
     [self.outData appendData:decryptedData];
-
-    if (self.hasHMAC) {
-      NSMutableData *HMACData = [NSMutableData dataWithLength:self.HMACLength];
-      CCHmacFinal(&_HMACContext, [HMACData mutableBytes]);
-
-      if (![HMACData rnc_isEqualInConsistentTime:self.inData]) {
-        [self cleanupAndNotifyWithError:[NSError errorWithDomain:kRNCryptorErrorDomain
-                                                            code:kRNCryptorHMACMismatch
-                                                        userInfo:[NSDictionary dictionaryWithObject:@"HMAC Mismatch" /* DNL */
-                                                                                             forKey:NSLocalizedDescriptionKey]]];
-        return;
-      }
-    }
 
     [self cleanupAndNotifyWithError:nil];
   });
