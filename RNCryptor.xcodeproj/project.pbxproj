@@ -18,6 +18,8 @@
 		FBBA73981BC089FA00400E65 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA738E1BC089FA00400E65 /* Data.swift */; };
 		FBBA73991BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73901BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift */; };
 		FBBA739A1BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73901BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift */; };
+		FBBA739F1BC089FA00400E65 /* ObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73931BC089FA00400E65 /* ObjC.m */; };
+		FBBA73A01BC089FA00400E65 /* ObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73931BC089FA00400E65 /* ObjC.m */; };
 		FBBA73A11BC089FA00400E65 /* OverfowingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73941BC089FA00400E65 /* OverfowingBuffer.swift */; };
 		FBBA73A21BC089FA00400E65 /* OverfowingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73941BC089FA00400E65 /* OverfowingBuffer.swift */; };
 		FBBA73A31BC089FA00400E65 /* RNCryptorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73951BC089FA00400E65 /* RNCryptorTests.swift */; };
@@ -548,7 +550,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 2.3;
 			};
 			name = Debug;
 		};
@@ -567,8 +569,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = net.robnapier.RNCryptor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 2.3;
 			};
 			name = Release;
 		};
