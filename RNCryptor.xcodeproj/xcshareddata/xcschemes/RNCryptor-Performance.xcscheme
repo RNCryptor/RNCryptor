@@ -20,27 +20,49 @@
                ReferencedContainer = "container:RNCryptor.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "FB7F2FAE1D17438400A6283E"
+               BuildableName = "RNCryptorPerfTests.xctest"
+               BlueprintName = "RNCryptorPerfTests"
+               ReferencedContainer = "container:RNCryptor.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
-      buildConfiguration = "Debug"
-      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
-      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES"
-      codeCoverageEnabled = "YES">
+      buildConfiguration = "Release"
+      selectedDebuggerIdentifier = ""
+      selectedLauncherIdentifier = "Xcode.IDEFoundation.Launcher.PosixSpawn"
+      shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
          <TestableReference
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "FB627FD71B2B7A1800C3A579"
-               BuildableName = "RNCryptorTests.xctest"
-               BlueprintName = "RNCryptorTests"
+               BlueprintIdentifier = "FB7F2FAE1D17438400A6283E"
+               BuildableName = "RNCryptorPerfTests.xctest"
+               BlueprintName = "RNCryptorPerfTests"
                ReferencedContainer = "container:RNCryptor.xcodeproj">
             </BuildableReference>
             <SkippedTests>
                <Test
-                  Identifier = "RNCryptorPerformance">
+                  Identifier = "GeneratedVectorTests">
+               </Test>
+               <Test
+                  Identifier = "ObjC">
+               </Test>
+               <Test
+                  Identifier = "OverflowingBufferTest">
+               </Test>
+               <Test
+                  Identifier = "RNCryptorTests">
                </Test>
             </SkippedTests>
          </TestableReference>
@@ -58,7 +80,7 @@
       </AdditionalOptions>
    </TestAction>
    <LaunchAction
-      buildConfiguration = "Debug"
+      buildConfiguration = "Release"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
@@ -84,7 +106,8 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
-      debugDocumentVersioning = "YES">
+      debugDocumentVersioning = "YES"
+      enableTestabilityWhenProfilingTests = "No">
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"

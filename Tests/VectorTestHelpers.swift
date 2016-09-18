@@ -25,52 +25,52 @@
 import XCTest
 @testable import RNCryptor
 
-func verifyVector(vector: [String:String], key:String, equals actual:NSData, name:String) {
+func verifyVector(_ vector: [String:String], key:String, equals actual:Data, name:String) {
     let version = vector["version"]!
     let title = vector["title"]!
     XCTAssertEqual(actual, vector[key]!.dataFromHexEncoding!, "Failed \(name) test (v\(version)): \(title)")
 }
 
-func _verifyKDF(vector: [String:String], name:String) {
-    let key = V3.keyForPassword(vector["password"]!,
-        salt:vector["salt_hex"]!.dataFromHexEncoding!)
+func _verifyKDF(_ vector: [String:String], name:String) {
+    let key = V3.makeKey(forPassword: vector["password"]!,
+                         withSalt: vector["salt_hex"]!.dataFromHexEncoding!)
     verifyVector(vector, key:"key_hex", equals:key, name: name)
 }
 
 
-func verify_v3_kdf(vector: [String:String]) {
+func verify_v3_kdf(_ vector: [String:String]) {
     _verifyKDF(vector, name:"kdf")
 }
 
-func _verifyPassword(vector: [String:String]) {
+func _verifyPassword(_ vector: [String:String]) {
     if Int(vector["version"]!) == Int(V3.formatVersion) {
         let encryptor = RNCryptor.EncryptorV3(password: vector["password"]!,
             encryptionSalt: vector["enc_salt_hex"]!.dataFromHexEncoding!,
             hmacSalt: vector["hmac_salt_hex"]!.dataFromHexEncoding!,
             iv: vector["iv_hex"]!.dataFromHexEncoding!)
-        let ciphertext = encryptor.encryptData(vector["plaintext_hex"]!.dataFromHexEncoding!)
+        let ciphertext = encryptor.encrypt(data: vector["plaintext_hex"]!.dataFromHexEncoding!)
         verifyVector(vector, key:"ciphertext_hex", equals:ciphertext, name:"password encrypt")
     }
 
     do {
-        let plaintext = try RNCryptor.decryptData(vector["ciphertext_hex"]!.dataFromHexEncoding!, password: vector["password"]!)
+        let plaintext = try RNCryptor.decrypt(data: vector["ciphertext_hex"]!.dataFromHexEncoding!, withPassword: vector["password"]!)
         verifyVector(vector, key:"plaintext_hex", equals:plaintext, name:"password decrypt")
     } catch {
         XCTFail("\(error)")
     }
 }
 
-func verify_v3_password(vector: [String: String]) {
+func verify_v3_password(_ vector: [String: String]) {
     _verifyPassword(vector)
 }
 
-func verify_v3_key(vector: [String: String]) {
+func verify_v3_key(_ vector: [String: String]) {
     if Int(vector["version"]!) == Int(V3.formatVersion) {
         let encryptor = RNCryptor.EncryptorV3(
             encryptionKey: vector["enc_key_hex"]!.dataFromHexEncoding!,
             hmacKey: vector["hmac_key_hex"]!.dataFromHexEncoding!,
             iv: vector["iv_hex"]!.dataFromHexEncoding!)
-        let ciphertext = encryptor.encryptData(vector["plaintext_hex"]!.dataFromHexEncoding!)
+        let ciphertext = encryptor.encrypt(data: vector["plaintext_hex"]!.dataFromHexEncoding!)
         verifyVector(vector, key:"ciphertext_hex", equals:ciphertext, name:"key encrypt")
     }
 
@@ -78,7 +78,7 @@ func verify_v3_key(vector: [String: String]) {
         encryptionKey: vector["enc_key_hex"]!.dataFromHexEncoding!,
         hmacKey: vector["hmac_key_hex"]!.dataFromHexEncoding!)
     do {
-        let plaintext = try decryptor.decryptData(vector["ciphertext_hex"]!.dataFromHexEncoding!)
+        let plaintext = try decryptor.decrypt(data: vector["ciphertext_hex"]!.dataFromHexEncoding!)
         verifyVector(vector, key:"plaintext_hex", equals:plaintext, name:"key decrypt")
     } catch {
         XCTFail("\(error)")

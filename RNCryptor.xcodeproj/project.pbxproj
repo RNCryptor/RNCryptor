@@ -3,11 +3,13 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 47;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		FB627FD91B2B7A1800C3A579 /* RNCryptor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB627FCE1B2B7A1700C3A579 /* RNCryptor.framework */; };
+		FB7F2FB41D17438400A6283E /* RNCryptorPerformance.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB7F2FAC1D17422300A6283E /* RNCryptorPerformance.swift */; };
+		FB7F2FBA1D17438400A6283E /* RNCryptor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB627FCE1B2B7A1700C3A579 /* RNCryptor.framework */; };
 		FBBA73881BC0892100400E65 /* RNCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FBBA73851BC0892100400E65 /* RNCryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FBBA73891BC0892100400E65 /* RNCryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73861BC0892100400E65 /* RNCryptor.swift */; };
 		FBBA738B1BC0893200400E65 /* RNCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FBBA73851BC0892100400E65 /* RNCryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -16,8 +18,6 @@
 		FBBA73981BC089FA00400E65 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA738E1BC089FA00400E65 /* Data.swift */; };
 		FBBA73991BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73901BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift */; };
 		FBBA739A1BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73901BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift */; };
-		FBBA739F1BC089FA00400E65 /* ObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73931BC089FA00400E65 /* ObjC.m */; };
-		FBBA73A01BC089FA00400E65 /* ObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73931BC089FA00400E65 /* ObjC.m */; };
 		FBBA73A11BC089FA00400E65 /* OverfowingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73941BC089FA00400E65 /* OverfowingBuffer.swift */; };
 		FBBA73A21BC089FA00400E65 /* OverfowingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73941BC089FA00400E65 /* OverfowingBuffer.swift */; };
 		FBBA73A31BC089FA00400E65 /* RNCryptorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73951BC089FA00400E65 /* RNCryptorTests.swift */; };
@@ -29,6 +29,13 @@
 
 /* Begin PBXContainerItemProxy section */
 		FB627FDA1B2B7A1800C3A579 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FB627FC51B2B7A1700C3A579 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FB627FCD1B2B7A1700C3A579;
+			remoteInfo = RNCryptor;
+		};
+		FB7F2FB01D17438400A6283E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = FB627FC51B2B7A1700C3A579 /* Project object */;
 			proxyType = 1;
@@ -48,6 +55,8 @@
 		FB45A37E1BBB713B00265FD1 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		FB627FCE1B2B7A1700C3A579 /* RNCryptor.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RNCryptor.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB627FD81B2B7A1800C3A579 /* RNCryptorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RNCryptorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FB7F2FAC1D17422300A6283E /* RNCryptorPerformance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNCryptorPerformance.swift; sourceTree = "<group>"; };
+		FB7F2FBF1D17438400A6283E /* RNCryptorPerfTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RNCryptorPerfTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBBA73841BC0892100400E65 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FBBA73851BC0892100400E65 /* RNCryptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCryptor.h; sourceTree = "<group>"; };
 		FBBA73861BC0892100400E65 /* RNCryptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNCryptor.swift; sourceTree = "<group>"; };
@@ -55,7 +64,6 @@
 		FBBA73901BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNCryptorGeneratedVectorTests.swift; sourceTree = "<group>"; };
 		FBBA73911BC089FA00400E65 /* GenVectorTests */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GenVectorTests; sourceTree = "<group>"; };
 		FBBA73921BC089FA00400E65 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		FBBA73931BC089FA00400E65 /* ObjC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ObjC.m; sourceTree = "<group>"; };
 		FBBA73941BC089FA00400E65 /* OverfowingBuffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OverfowingBuffer.swift; sourceTree = "<group>"; };
 		FBBA73951BC089FA00400E65 /* RNCryptorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNCryptorTests.swift; sourceTree = "<group>"; };
 		FBBA73961BC089FA00400E65 /* VectorTestHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VectorTestHelpers.swift; sourceTree = "<group>"; };
@@ -77,6 +85,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				FB627FD91B2B7A1800C3A579 /* RNCryptor.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FB7F2FB91D17438400A6283E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FB7F2FBA1D17438400A6283E /* RNCryptor.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -118,6 +134,7 @@
 				FB627FD81B2B7A1800C3A579 /* RNCryptorTests.xctest */,
 				FBCF48D41B43286D00DCFB19 /* RNCryptor.framework */,
 				FBCF48DD1B43286D00DCFB19 /* RNCryptor-OSXTests.xctest */,
+				FB7F2FBF1D17438400A6283E /* RNCryptorPerfTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -129,10 +146,10 @@
 				FBBA738F1BC089FA00400E65 /* Generated */,
 				FBBA73911BC089FA00400E65 /* GenVectorTests */,
 				FBBA73921BC089FA00400E65 /* Info.plist */,
-				FBBA73931BC089FA00400E65 /* ObjC.m */,
 				FBBA73941BC089FA00400E65 /* OverfowingBuffer.swift */,
 				FBBA73951BC089FA00400E65 /* RNCryptorTests.swift */,
 				FBBA73961BC089FA00400E65 /* VectorTestHelpers.swift */,
+				FBE34C0E1D17518800F436B4 /* Performance */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -143,6 +160,14 @@
 				FBBA73901BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift */,
 			);
 			path = Generated;
+			sourceTree = "<group>";
+		};
+		FBE34C0E1D17518800F436B4 /* Performance */ = {
+			isa = PBXGroup;
+			children = (
+				FB7F2FAC1D17422300A6283E /* RNCryptorPerformance.swift */,
+			);
+			name = Performance;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -203,6 +228,24 @@
 			productReference = FB627FD81B2B7A1800C3A579 /* RNCryptorTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		FB7F2FAE1D17438400A6283E /* RNCryptorPerfTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FB7F2FBC1D17438400A6283E /* Build configuration list for PBXNativeTarget "RNCryptorPerfTests" */;
+			buildPhases = (
+				FB7F2FB11D17438400A6283E /* Sources */,
+				FB7F2FB91D17438400A6283E /* Frameworks */,
+				FB7F2FBB1D17438400A6283E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FB7F2FAF1D17438400A6283E /* PBXTargetDependency */,
+			);
+			name = RNCryptorPerfTests;
+			productName = RNCryptorTests;
+			productReference = FB7F2FBF1D17438400A6283E /* RNCryptorPerfTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		FBCF48D31B43286D00DCFB19 /* RNCryptor-OSX */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = FBCF48E91B43286D00DCFB19 /* Build configuration list for PBXNativeTarget "RNCryptor-OSX" */;
@@ -246,14 +289,20 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0700;
-				LastUpgradeCheck = 0700;
+				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = "Rob Napier";
 				TargetAttributes = {
 					FB627FCD1B2B7A1700C3A579 = {
 						CreatedOnToolsVersion = 7.0;
+						DevelopmentTeam = J374TBL6J6;
+						DevelopmentTeamName = "Rob Napier";
+						LastSwiftMigration = 0800;
 					};
 					FB627FD71B2B7A1800C3A579 = {
 						CreatedOnToolsVersion = 7.0;
+						DevelopmentTeam = J374TBL6J6;
+						DevelopmentTeamName = "Rob Napier";
+						LastSwiftMigration = 0800;
 					};
 					FBCF48D31B43286D00DCFB19 = {
 						CreatedOnToolsVersion = 7.0;
@@ -264,7 +313,7 @@
 				};
 			};
 			buildConfigurationList = FB627FC81B2B7A1700C3A579 /* Build configuration list for PBXProject "RNCryptor" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 6.3";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -279,6 +328,7 @@
 				FB627FD71B2B7A1800C3A579 /* RNCryptorTests */,
 				FBCF48D31B43286D00DCFB19 /* RNCryptor-OSX */,
 				FBCF48DC1B43286D00DCFB19 /* RNCryptor-OSXTests */,
+				FB7F2FAE1D17438400A6283E /* RNCryptorPerfTests */,
 			);
 		};
 /* End PBXProject section */
@@ -292,6 +342,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		FB627FD61B2B7A1800C3A579 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FB7F2FBB1D17438400A6283E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -332,7 +389,14 @@
 				FBBA73971BC089FA00400E65 /* Data.swift in Sources */,
 				FBBA73A31BC089FA00400E65 /* RNCryptorTests.swift in Sources */,
 				FBBA73A51BC089FA00400E65 /* VectorTestHelpers.swift in Sources */,
-				FBBA739F1BC089FA00400E65 /* ObjC.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FB7F2FB11D17438400A6283E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FB7F2FB41D17438400A6283E /* RNCryptorPerformance.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -353,7 +417,6 @@
 				FBBA73981BC089FA00400E65 /* Data.swift in Sources */,
 				FBBA73A41BC089FA00400E65 /* RNCryptorTests.swift in Sources */,
 				FBBA73A61BC089FA00400E65 /* VectorTestHelpers.swift in Sources */,
-				FBBA73A01BC089FA00400E65 /* ObjC.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -364,6 +427,11 @@
 			isa = PBXTargetDependency;
 			target = FB627FCD1B2B7A1700C3A579 /* RNCryptor */;
 			targetProxy = FB627FDA1B2B7A1800C3A579 /* PBXContainerItemProxy */;
+		};
+		FB7F2FAF1D17438400A6283E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FB627FCD1B2B7A1700C3A579 /* RNCryptor */;
+			targetProxy = FB7F2FB01D17438400A6283E /* PBXContainerItemProxy */;
 		};
 		FBCF48E01B43286D00DCFB19 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -415,6 +483,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -455,6 +524,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -478,6 +548,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -496,6 +567,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = net.robnapier.RNCryptor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
@@ -508,6 +581,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = net.robnapier.RNCryptorTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -519,6 +593,35 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = net.robnapier.RNCryptorTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Release;
+		};
+		FB7F2FBD1D17438400A6283E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				INFOPLIST_FILE = Tests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = net.robnapier.RNCryptorTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		FB7F2FBE1D17438400A6283E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				ENABLE_TESTABILITY = YES;
+				INFOPLIST_FILE = Tests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = net.robnapier.RNCryptorTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
@@ -540,6 +643,7 @@
 				PRODUCT_NAME = RNCryptor;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -561,15 +665,17 @@
 				PRODUCT_NAME = RNCryptor;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
 		FBCF48E71B43286D00DCFB19 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
-				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
@@ -577,21 +683,24 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
 		FBCF48E81B43286D00DCFB19 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
-				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_BUNDLE_IDENTIFIER = "net.robnapier.RNCryptor-OSXTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
@@ -621,6 +730,15 @@
 			buildConfigurations = (
 				FB627FE61B2B7A1800C3A579 /* Debug */,
 				FB627FE71B2B7A1800C3A579 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FB7F2FBC1D17438400A6283E /* Build configuration list for PBXNativeTarget "RNCryptorPerfTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FB7F2FBD1D17438400A6283E /* Debug */,
+				FB7F2FBE1D17438400A6283E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

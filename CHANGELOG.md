@@ -4,11 +4,13 @@ All notable changes to this project will be documented in this file. This projec
 
 ## [Unreleased](https://github.com/RNCryptor/RNCryptor/tree/swift)
 
+## [5.0.0](https://github.com/RNCryptor/RNCryptor/releases/tag/5.0.0) Swift 3.0. Drop ObjC bridge.
+
+* Rework for Swift 3
+* Drops ObjC bridging. There are too many problems with the Swift compiler at this point to support this cleanly. ObjC code should use [RNCryptor-ObjC](https://github.com/RNCryptor/RNCryptor-ObjC).
 * #159 Add WatchOS support to Podspec
 * Better debugging output in case of unexpected cryptor failure
 * Added Examples/KeyDerivation to explain how to manually derive keys
-* Marked `RNCryptor` class as `final`. Techincally this could be considered a breaking change if someone derived a subclass of `RNCryptor`, but that wouldn't make any sense. It's not a real class; it's just a namespace.
-* Marked internal `OverflowingBuffer` class as `final` (the compiler likely already did that anyway).
 
 ## [4.0.0](https://github.com/RNCryptor/RNCryptor/releases/tag/4.0.0) - Complete rewrite in Swift with ObjC bridging
 
