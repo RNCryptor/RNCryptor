@@ -338,7 +338,7 @@ NSString *const kBadPassword = @"NotThePassword";
   NSString *plaintext = @"Attack at dawn";
   NSString *password = @"中文密码";
   NSData *v2EncryptionWithPasswordTrunction =
-  [[NSData alloc] initWithBase64Encoding:@"AgHOKe1rygDPDDk5DBInKERD85Ezo1EAU5uj+PyEz22o2dtFAjPyaJhY3jW0BXD4W9L4GnAhiscr8PKZ+zOzWDbTFB3/6alv2LWQ1TCG4cpT0g=="];
+  [[NSData alloc] initWithBase64EncodedString:@"AgHOKe1rygDPDDk5DBInKERD85Ezo1EAU5uj+PyEz22o2dtFAjPyaJhY3jW0BXD4W9L4GnAhiscr8PKZ+zOzWDbTFB3/6alv2LWQ1TCG4cpT0g==" options:0];
 
   NSError *decryptionError = nil;
   NSData *decryptedData = [RNDecryptor decryptData:v2EncryptionWithPasswordTrunction withPassword:password error:&decryptionError];
