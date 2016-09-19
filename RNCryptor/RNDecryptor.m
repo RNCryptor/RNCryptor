@@ -264,15 +264,9 @@ static const NSUInteger kPreambleSize = 2;
   [[data _RNConsumeToIndex:kPreambleSize] mutableCopy]; // Throw away the preamble
 
   NSError *error = nil;
-  //if (self.options & kRNCryptorOptionHasPassword) {
-  //
-  //The below incorrectly asserts when attempting to decrypt data that is corrupted/random/not encrypted with the encryption key AND
-  //bytes[0] is interpreted as a 'preamble' and happens to == kRNCryptorFileVersion -> then options is set to bytes[1] -> if this > 0 ->
-  //kRNCryptorOptionHasPassword is incorrectly set
-  //
-  //Checking for self.password != nil here, does not solve the root problem, but prevents the incorrect assertion here and an subsequent indirectly correct
-  //assertion following [... keyForPassword:nil ..]
-  //
+
+  // If we were called with a password and the format thinks there's a password
+  // (The format might think there's a password because it's corrupt, and we don't want to assert in that case.)
   if ((self.options & kRNCryptorOptionHasPassword) && self.password) {
       NSAssert(!self.encryptionKey && !self.HMACKey, @"Both password and the key (%d) or HMACKey (%d) are set.", self.encryptionKey != nil, self.HMACKey != nil);
       
