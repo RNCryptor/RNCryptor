@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file. This projec
 
 ## [Unreleased](https://github.com/RNCryptor/RNCryptor/tree/swift)
 
+* Fix CocoaPods
+
 ## [5.0.0](https://github.com/RNCryptor/RNCryptor/releases/tag/5.0.0) Swift 3.0. Drop ObjC bridge.
 
 * Rework for Swift 3
