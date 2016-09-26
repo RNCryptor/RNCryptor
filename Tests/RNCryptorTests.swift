@@ -232,33 +232,4 @@ class RNCryptorTests: XCTestCase {
             XCTFail("Caught: \(error)")
         }
     }
-
-    func testTwoDecodesOnOneDecryptorV3() {
-        let encryptionKey = RNCryptor.randomData(ofLength: RNCryptor.FormatV3.keySize)
-        let hmacKey = RNCryptor.randomData(ofLength: RNCryptor.FormatV3.keySize)
-
-        let message = "Attack at dawn".data(using: .utf8)!
-
-        // Encrypting
-        let ciphertext = RNCryptor.EncryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey)
-            .encrypt(data: message)
-
-        // try example with storing and reusing decryptor
-        let decryptor = RNCryptor.DecryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey)
-        let plaintext = try! decryptor.decrypt(data: ciphertext)
-
-        var plaintextReuse = Data()
-        do {
-            plaintextReuse = try decryptor.decrypt(data: ciphertext)
-            XCTFail("Should not decrypt")
-        } catch let error as RNCryptor.Error {
-            XCTAssertEqual(error, .finalizedCryptor)
-        } catch {
-            XCTFail("Error = \(error)")
-        }
-
-        // Did it work? Should be true
-        XCTAssertEqual(plaintext, message, "First decrypt should work")
-        XCTAssertEqual(plaintextReuse, Data(), "Second decrypt should not")
-    }
 }
