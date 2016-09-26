@@ -96,6 +96,9 @@ public enum RNCryptor {
 
         /// A password-based decryptor was used on a key-based ciphertext, or vice-versa.
         case invalidCredentialType
+
+        /// Cryptor has been finalized already. It cannot be reused
+        case finalizedCryptor
     }
 
     /// Encrypt data using password and return encrypted data.
@@ -402,6 +405,7 @@ public extension RNCryptor {
         private var buffer = Data()
         private var decryptorEngine: DecryptorEngineV3?
         private let credential: Credential
+        private var finalized = false
 
 
         /// Creates and returns a decryptor.
@@ -434,6 +438,9 @@ public extension RNCryptor {
         /// - parameter data: Data to process. May be empty.
         /// - returns: Processed data. May be empty.
         public func update(withData data: Data) throws -> Data {
+            guard !finalized else {
+                throw Error.finalizedCryptor
+            }
             if let e = decryptorEngine {
                 return e.update(withData: data)
             }
@@ -454,9 +461,13 @@ public extension RNCryptor {
         ///
         /// - returns: Trailing data
         public func finalData() throws -> Data {
+            guard !finalized else {
+                throw Error.finalizedCryptor
+            }
             guard let result = try decryptorEngine?.finalData() else {
                 throw Error.messageTooShort
             }
+            finalized = true
             return result
         }
 
