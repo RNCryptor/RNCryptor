@@ -1,5 +1,7 @@
 # RNCryptor
 
+[![BuddyBuild](https://dashboard.buddybuild.com/api/statusImage?appID=57ea731dbd45750100873fb1&branch=master&build=latest)](https://dashboard.buddybuild.com/apps/57ea731dbd45750100873fb1/build/latest)
+
 Cross-language AES Encryptor/Decryptor [data format](https://github.com/RNCryptor/RNCryptor-Spec/blob/master/RNCryptor-Spec-v3.md).
 
 The primary targets are Swift and Objective-C, but implementations are available in [C](https://github.com/RNCryptor/RNCryptor-C), [C++](https://github.com/RNCryptor/RNCryptor-cpp), [C#](https://github.com/RNCryptor/RNCryptor-cs), [Erlang](https://github.com/RNCryptor/RNCryptor-erlang), [Go](https://github.com/RNCryptor/RNCryptor-go), [Haskell](https://github.com/RNCryptor/rncryptor-hs), [Java](https://github.com/RNCryptor/JNCryptor),
