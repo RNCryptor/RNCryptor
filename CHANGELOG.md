@@ -2,8 +2,9 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased](https://github.com/RNCryptor/RNCryptor/tree/swift)
+## [5.0.1](https://github.com/RNCryptor/RNCryptor/tree/swift)
 
+* Perform final decryption after HMAC validation. Fixes #185. This improves security very slightly. There is no known or proposed attack that could exploit the previous behavior, but where possible it is better to validate prior to decryption.
 * Fix CocoaPods
 
 ## [5.0.0](https://github.com/RNCryptor/RNCryptor/releases/tag/5.0.0) Swift 3.0. Drop ObjC bridge.
