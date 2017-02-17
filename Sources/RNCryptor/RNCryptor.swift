@@ -25,7 +25,10 @@
 //
 
 import Foundation
+#if SWIFT_PACKAGE
 import Cryptor
+#endif
+
 
 /// The `RNCryptorType` protocol defines generic API to a mutable,
 /// incremental, password-based encryptor or decryptor. Its generic
