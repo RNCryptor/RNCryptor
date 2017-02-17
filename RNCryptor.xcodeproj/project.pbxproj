@@ -10,9 +10,9 @@
 		FB627FD91B2B7A1800C3A579 /* RNCryptor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB627FCE1B2B7A1700C3A579 /* RNCryptor.framework */; };
 		FB7F2FB41D17438400A6283E /* RNCryptorPerformance.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB7F2FAC1D17422300A6283E /* RNCryptorPerformance.swift */; };
 		FB7F2FBA1D17438400A6283E /* RNCryptor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB627FCE1B2B7A1700C3A579 /* RNCryptor.framework */; };
-		FBBA73881BC0892100400E65 /* RNCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FBBA73851BC0892100400E65 /* RNCryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FBBA73881BC0892100400E65 /* Cryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FBBA73851BC0892100400E65 /* Cryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FBBA73891BC0892100400E65 /* RNCryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73861BC0892100400E65 /* RNCryptor.swift */; };
-		FBBA738B1BC0893200400E65 /* RNCryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FBBA73851BC0892100400E65 /* RNCryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FBBA738B1BC0893200400E65 /* Cryptor.h in Headers */ = {isa = PBXBuildFile; fileRef = FBBA73851BC0892100400E65 /* Cryptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FBBA738C1BC0893500400E65 /* RNCryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA73861BC0892100400E65 /* RNCryptor.swift */; };
 		FBBA73971BC089FA00400E65 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA738E1BC089FA00400E65 /* Data.swift */; };
 		FBBA73981BC089FA00400E65 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBBA738E1BC089FA00400E65 /* Data.swift */; };
@@ -58,8 +58,8 @@
 		FB7F2FAC1D17422300A6283E /* RNCryptorPerformance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNCryptorPerformance.swift; sourceTree = "<group>"; };
 		FB7F2FBF1D17438400A6283E /* RNCryptorPerfTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RNCryptorPerfTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FBBA73841BC0892100400E65 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		FBBA73851BC0892100400E65 /* RNCryptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNCryptor.h; sourceTree = "<group>"; };
-		FBBA73861BC0892100400E65 /* RNCryptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNCryptor.swift; sourceTree = "<group>"; };
+		FBBA73851BC0892100400E65 /* Cryptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Cryptor.h; path = Sources/Cryptor/include/Cryptor.h; sourceTree = "<group>"; };
+		FBBA73861BC0892100400E65 /* RNCryptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RNCryptor.swift; path = Sources/RNCryptor/RNCryptor.swift; sourceTree = "<group>"; };
 		FBBA738E1BC089FA00400E65 /* Data.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
 		FBBA73901BC089FA00400E65 /* RNCryptorGeneratedVectorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNCryptorGeneratedVectorTests.swift; sourceTree = "<group>"; };
 		FBBA73911BC089FA00400E65 /* GenVectorTests */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GenVectorTests; sourceTree = "<group>"; };
@@ -120,7 +120,7 @@
 				FBC30B6E1BD937A300D03947 /* CHANGELOG.md */,
 				FB45A37E1BBB713B00265FD1 /* README.md */,
 				FBBA73861BC0892100400E65 /* RNCryptor.swift */,
-				FBBA73851BC0892100400E65 /* RNCryptor.h */,
+				FBBA73851BC0892100400E65 /* Cryptor.h */,
 				FBBA73841BC0892100400E65 /* Info.plist */,
 				FBBA738D1BC089FA00400E65 /* Tests */,
 				FB627FCF1B2B7A1700C3A579 /* Products */,
@@ -177,7 +177,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FBBA73881BC0892100400E65 /* RNCryptor.h in Headers */,
+				FBBA73881BC0892100400E65 /* Cryptor.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -185,7 +185,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FBBA738B1BC0893200400E65 /* RNCryptor.h in Headers */,
+				FBBA738B1BC0893200400E65 /* Cryptor.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
