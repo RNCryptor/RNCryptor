@@ -24,14 +24,6 @@
 //  DEALINGS IN THE SOFTWARE.
 //
 
-@import Foundation;
-
-//! Project version number for RNCryptor.
-FOUNDATION_EXPORT double RNCryptorVersionNumber;
-
-//! Project version string for RNCryptor.
-FOUNDATION_EXPORT const unsigned char RNCryptorVersionString[];
-
 //
 //  CommonCryptoError.h
 //  CommonCrypto
@@ -193,7 +185,7 @@ extern "C" {
 #ifndef KERNEL
 #include <stddef.h>
 #endif /* KERNEL */
-#include <Availability.h>
+#include <CoreFoundation/CFAvailability.h>
 
 #ifdef __cplusplus
 extern "C" {
