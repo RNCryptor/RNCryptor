@@ -8,4 +8,4 @@
 
 #import <Foundation/Foundation.h>
 
-NSString * CreateTemporaryFilePath();
+NSString * CreateTemporaryFilePath(void);

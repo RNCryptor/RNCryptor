@@ -58,13 +58,17 @@ const RNCryptorSettings kRNCryptorAES256Settings = {
     }
 };
 
+// Provide internal symbols for 10.6. These were made available in 10.7.
+#ifdef __MAC_OS_X_VERSION_MAX_ALLOWED
+#if __MAC_OS_X_VERSION_MAX_ALLOWED <= 1060
 extern int SecRandomCopyBytes(SecRandomRef rnd, size_t count, uint8_t *bytes) __attribute__((weak_import));
 extern int
 CCKeyDerivationPBKDF( CCPBKDFAlgorithm algorithm, const char *password, size_t passwordLen,
                      const uint8_t *salt, size_t saltLen,
                      CCPseudoRandomAlgorithm prf, uint rounds,
                      uint8_t *derivedKey, size_t derivedKeyLen) __attribute__((weak_import));
-
+#endif
+#endif
 
 NSString *const kRNCryptorErrorDomain = @"net.robnapier.RNCryptManager";
 const uint8_t kRNCryptorFileVersion = 3;
@@ -388,7 +392,7 @@ static int RN_SecRandomCopyBytes(void *rnd, size_t count, uint8_t *bytes) {
   NSMutableData *data = [NSMutableData dataWithLength:length];
 
   int result;
-  if (SecRandomCopyBytes != NULL) {
+  if (&SecRandomCopyBytes != NULL) {
     result = SecRandomCopyBytes(NULL, length, data.mutableBytes);
   }
   else {
