@@ -1,3 +1,6 @@
+* Remove non-modular header from framework header #11
+* Add watchOS and tvOS support. #8
+
 # Version 3.0.3
 
 * Upgrade to build on Xcode 9b1
