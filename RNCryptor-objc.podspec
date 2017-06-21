@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'RNCryptor-objc'
-  s.version = '3.0.2'
+  s.version = '3.0.4'
   s.summary = 'Encryptor/Decryptor for iOS.'
   s.authors = {'Rob Napier' => 'robnapier@gmail.com'}
   s.license = { 

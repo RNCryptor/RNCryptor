@@ -1,3 +1,5 @@
+# Version 3.0.4
+
 * Remove non-modular header from framework header #11
 * Add watchOS and tvOS support. #8
 
