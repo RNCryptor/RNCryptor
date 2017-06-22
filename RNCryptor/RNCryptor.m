@@ -317,7 +317,10 @@ RN_CCKeyDerivationPBKDF( CCPBKDFAlgorithm algorithm, const char *password, size_
                CCPseudoRandomAlgorithm prf, uint rounds,
                uint8_t *derivedKey, size_t derivedKeyLen);
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunreachable-code"
   PBKDF = CCKeyDerivationPBKDF ?: RN_CCKeyDerivationPBKDF;
+#pragma clang diagnostic pop
 
   result = PBKDF(keySettings.PBKDFAlgorithm,         // algorithm
                  passwordData.bytes,                 // password
@@ -396,7 +399,10 @@ static int RN_SecRandomCopyBytes(void *rnd, size_t count, uint8_t *bytes) {
     result = SecRandomCopyBytes(NULL, length, data.mutableBytes);
   }
   else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunreachable-code"
     result = RN_SecRandomCopyBytes(NULL, length, data.mutableBytes);
+#pragma clang diagnostic pop
   }
   NSAssert(result == 0, @"Unable to generate random bytes: %d", errno);
 

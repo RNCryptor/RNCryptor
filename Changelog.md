@@ -1,3 +1,7 @@
+# Version 3.0.5
+
+# Clean up warnings for CocoaPods
+
 # Version 3.0.4
 
 * Remove non-modular header from framework header #11
