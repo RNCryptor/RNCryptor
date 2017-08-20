@@ -34,39 +34,19 @@ The RNCryptor data format is cross-platform and there are many implementations. 
 
 ## Basic Password Usage
 
-### Swift
-
 ```swift
 // Encryption
 let data: NSData = ...
 let password = "Secret password"
-let ciphertext = RNCryptor.encryptData(data, password: password)
+let ciphertext = RNCryptor.encrypt(data: data, withPassword: password)
 
 // Decryption
 do {
-    let originalData = try RNCryptor.decryptData(ciphertext, password: password)
+    let originalData = try RNCryptor.decrypt(data: ciphertext, withPassword: password)
     // ...
 } catch {
     print(error)
 }
-```
-
-### Obj-C
-
-``` objc
-// Encryption
-NSData *data = ...
-NSString *password = @"Secret password";
-NSData *ciphertext = [RNCryptor encryptData:data password:password];
-
-// Decryption
-NSError *error = nil;
-NSData *plaintext = [RNCryptor decryptData:ciphertext password:password error:&error];
-if (error != nil) {
-    NSLog(@"ERROR:%@", error);
-    return
-}
-// ...
 ```
 
 ## Incremental Usage
@@ -74,8 +54,6 @@ if (error != nil) {
 RNCryptor supports incremental use, for example when using with `NSURLSession`. This is also useful for cases where the encrypted or decrypted data will not comfortably fit in memory.
 
 To operate in incremental mode, you create an `Encryptor` or `Decryptor`, call `updateWithData()` repeatedly, gathering its results, and then call `finalData()` and gather its result.
-
-### Swift
 
 ```swift
 //
@@ -103,49 +81,6 @@ try plaintext.appendData(decryptor.updateWithData(data))
 
 // ... When data is done, finish up ...
 try plaintext.appendData(decryptor.finalData())
-```
-
-### Obj-C
-
-``` objc
-//
-// Encryption
-//
-NSString *password = @"Secret password";
-RNEncryptor *encryptor = [[RNEncryptor alloc] initWithPassword:password];
-NSMutableData *ciphertext = [NSMutableData new];
-
-// ... Each time data comes in, update the encryptor and accumulate some ciphertext ...
-[ciphertext appendData:[encryptor updateWithData:data]];
-
-// ... When data is done, finish up ...
-[ciphertext appendData:[encryptor finalData]];
-
-
-//
-// Decryption
-//
-RNDecryptor *decryptor = [[RNDecryptor alloc] initWithPassword:password];
-NSMutableData *plaintext = [NSMutableData new];
-
-// ... Each time data comes in, update the decryptor and accumulate some plaintext ...
-NSError *error = nil;
-NSData *partialPlaintext = [decryptor updateWithData:data error:&error];
-if (error != nil) {
-    NSLog(@"FAILED DECRYPT: %@", error);
-    return;
-}
-[plaintext appendData:partialPlaintext];
-
-// ... When data is done, finish up ...
-NSError *error = nil;
-NSData *partialPlaintext = [decryptor finalDataAndReturnError:&error];
-if (error != nil) {
-    NSLog(@"FAILED DECRYPT: %@", error);
-    return;
-}
-
-[ciphertext appendData:partialPlaintext];
 ```
 
 ### Importing into Swift
@@ -223,11 +158,6 @@ In order to be secure, the keys must be a random sequence of bytes. See [Convert
 ```swift
 let encryptor = RNCryptor.EncryptorV3(encryptionKey: encryptKey, hmacKey: hmacKey)
 let decryptor = RNCryptor.DecryptorV3(encryptionKey: encryptKey, hmacKey: hmacKey)
-```
-
-```objc
-RNEncryptor *encryptor = [[RNEncryptorV3 alloc] initWithEncryptionKey:encryptionKey hmacKey:hmacKey];
-RNDecryptor *decryptor = [[RNDecryptorV3 alloc] initWithEncryptionKey:encryptionKey hmacKey:hmacKey];
 ```
 
 ## FAQ
