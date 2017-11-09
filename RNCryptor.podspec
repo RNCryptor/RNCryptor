@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 	s.name = 'RNCryptor'
-	s.version = '5.0.1'
+	s.version = '5.0.2'
 	s.summary = 'Cross-language AES Encryptor/Decryptor data format.'
 	s.authors = {'Rob Napier' => 'robnapier@gmail.com'}
 	s.social_media_url = 'https://twitter.com/cocoaphony'
