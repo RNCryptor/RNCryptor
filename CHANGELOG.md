@@ -2,7 +2,16 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [5.0.1](https://github.com/RNCryptor/RNCryptor/tree/swift)
+## [5.0.2](https://github.com/RNCryptor/RNCryptor/releases/tag/5.0.2)
+
+* Update Swift Package Manager support
+* Update Linux support
+* Add tvOS support
+* Update to Xcode 9.1 settings
+* Update to Swift 4 (no code changes; completely backward compatible)
+* Remove code coverage from Release builds (necessary for Carthage)
+
+## [5.0.1](https://github.com/RNCryptor/RNCryptor/releases/tag/5.0.1)
 
 * Perform final decryption after HMAC validation. Fixes #185. This improves security very slightly. There is no known or proposed attack that could exploit the previous behavior, but where possible it is better to validate prior to decryption.
 * Fix CocoaPods
