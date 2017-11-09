@@ -26,19 +26,48 @@
 
 import Foundation
 
-internal extension String {
-    var dataFromHexEncoding: Data? {
-        let strip = [Character]([" ", "<", ">", "\n", "\t"])
-        let input = characters.filter { c in !strip.contains(c)}
+// https://stackoverflow.com/questions/40276322/hex-binary-string-conversion-in-swift/40278391#40278391
+extension Data {
 
-        guard input.count % 2 == 0 else { return nil }
+    init?(hexEncodedString string: String) {
 
-        let data = NSMutableData()
-        for i in stride(from: 0, to: input.count, by: 2) {
-            guard var value = UInt8(String(input[i...i+1]), radix: 16) else { return nil }
-            data.append(&value, length:1)
+        let strip = CharacterSet(charactersIn: " <>\n\t")
+        let input = string.unicodeScalars.filter { !strip.contains($0) }.map { $0.utf16 }.joined()
+
+        // Convert 0 ... 9, a ... f, A ...F to their decimal value,
+        // return nil for all other input characters
+        func decodeNibble(u: UInt16) -> UInt8? {
+            switch(u) {
+            case 0x30 ... 0x39:
+                return UInt8(u - 0x30)
+            case 0x41 ... 0x46:
+                return UInt8(u - 0x41 + 10)
+            case 0x61 ... 0x66:
+                return UInt8(u - 0x61 + 10)
+            default:
+                return nil
+            }
         }
 
-        return data as Data
+        self.init(capacity: input.count/2)
+        var even = true
+        var byte: UInt8 = 0
+        for c in input {
+            guard let val = decodeNibble(u: c) else { return nil }
+            if even {
+                byte = val << 4
+            } else {
+                byte += val
+                self.append(byte)
+            }
+            even = !even
+        }
+        guard even else { return nil }
+    }
+}
+
+internal extension String {
+    var dataFromHexEncoding: Data? {
+        return Data(hexEncodedString: self)
     }
 }
