@@ -1,0 +1,16 @@
+language: objective-c
+
+before_install:
+  - git submodule update --init --recursive
+  - brew update
+  - brew upgrade xctool
+
+xcode_project: RNCryptor.xcodeproj
+xcode_scheme: RNCryptor
+xcode_sdk: iphonesimulator7.1
+
+matrix:
+  include:
+    - script: xctool -project RNCryptor.xcodeproj -scheme RNCryptor -sdk iphonesimulator7.0 build
+    - script: xctool -project RNCryptor.xcodeproj -scheme "RNCryptor OS X" -sdk macosx10.9 build
+    - script: xctool -project RNCryptor.xcodeproj -scheme "RNCryptor OS X" -sdk macosx10.10 build

@@ -53,3 +53,13 @@ Icon
 .Trashes
 
 *.xcuserdatad
+.idea
+
+# Eclipse files
+.buildpath
+.project
+.settings/
+
+# MACOS files
+.DS_Store
+
