@@ -244,34 +244,32 @@ public extension RNCryptor {
         /// - returns: Key of length FormatV3.keySize
         public static func makeKey(forPassword password: String, withSalt salt: Data) -> Data {
 
-            var derivedKey = Data(count: keySize)
-            let passwordData = password.data(using: String.Encoding.utf8)!
+            let passwordData = Data(password.utf8)
 
-            let result: CCCryptorStatus = derivedKey.withUnsafeMutableBytes { (derivedKeyPtr : UnsafeMutablePointer<UInt8>) in
-                passwordData.withUnsafeBytes { (passwordPtr : UnsafePointer<Int8>) in
-                    salt.withUnsafeBytes { (saltPtr : UnsafePointer<UInt8>) in
-
+            return passwordData.withUnsafeBytes { (passwordPtr : UnsafePointer<Int8>) in
+                salt.withUnsafeBytes { (saltPtr : UnsafePointer<UInt8>) in
+                    var derivedKey = Data(count: keySize)
+                    derivedKey.withUnsafeMutableBytes { (derivedKeyPtr : UnsafeMutablePointer<UInt8>) in
                         // All the crazy casting because CommonCryptor hates Swift
-                        let algorithm     = CCPBKDFAlgorithm(kCCPBKDF2)
-                        let prf           = CCPseudoRandomAlgorithm(kCCPRFHmacAlgSHA1)
-                        let pbkdf2Rounds  = UInt32(10000)
+                        let algorithm    = CCPBKDFAlgorithm(kCCPBKDF2)
+                        let prf          = CCPseudoRandomAlgorithm(kCCPRFHmacAlgSHA1)
+                        let pbkdf2Rounds = UInt32(10000)
 
-                        return CCCryptorStatus(
+                        let result = CCCryptorStatus(
                             CCKeyDerivationPBKDF(
-                            algorithm,
-                            passwordPtr,   passwordData.count,
-                            saltPtr,       salt.count,
-                            prf,           pbkdf2Rounds,
-                            derivedKeyPtr, derivedKey.count)
+                                algorithm,
+                                passwordPtr,   passwordData.count,
+                                saltPtr,       salt.count,
+                                prf,           pbkdf2Rounds,
+                                derivedKeyPtr, keySize)
                         )
+                        guard result == CCCryptorStatus(kCCSuccess) else {
+                            fatalError("SECURITY FAILURE: Could not derive secure password (\(result))")
+                        }
                     }
+                    return derivedKey
                 }
             }
-
-            guard result == CCCryptorStatus(kCCSuccess) else {
-                fatalError("SECURITY FAILURE: Could not derive secure password (\(result)): \(derivedKey).")
-            }
-            return derivedKey
         }
 
         static let formatVersion = UInt8(3)
