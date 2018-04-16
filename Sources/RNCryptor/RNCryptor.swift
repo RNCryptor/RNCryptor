@@ -117,7 +117,7 @@ public enum RNCryptor {
     /// Generates random Data of given length
     /// Crashes if `length` is larger than allocatable memory, or if the system random number generator is not available.
     public static func randomData(ofLength length: Int) -> Data {
-        var data = Data(count: length)!
+        var data = Data(count: length)
         let result = data.withUnsafeMutableBytes { return SecRandomCopyBytes(kSecRandomDefault, length, $0) }
         guard result == errSecSuccess else {
             fatalError("SECURITY FAILURE: Could not generate secure random numbers: \(result).")
@@ -244,7 +244,7 @@ public extension RNCryptor {
         /// - returns: Key of length FormatV3.keySize
         public static func makeKey(forPassword password: String, withSalt salt: Data) -> Data {
 
-            var derivedKey = Data(count: keySize)!
+            var derivedKey = Data(count: keySize)
             let passwordData = password.data(using: String.Encoding.utf8)!
 
             let result: CCCryptorStatus = derivedKey.withUnsafeMutableBytes { (derivedKeyPtr : UnsafeMutablePointer<UInt8>) in
@@ -670,7 +670,7 @@ private final class HMACV3 {
     }
 
     func finalData() -> Data {
-        var hmac = Data(count: V3.hmacSize)!
+        var hmac = Data(count: V3.hmacSize)
         hmac.withUnsafeMutableBytes { CCHmacFinal(&context, $0) }
         return hmac
     }
@@ -770,16 +770,4 @@ private func isEqualInConsistentTime(trusted: Data, untrusted: Data) -> Bool {
     }
     
     return result == 0
-}
-
-// From https://github.com/apple/swift-corelibs-foundation/blob/swift-3/Foundation/Data.swift#L285
-// Remove when added to Xcode
-private extension Data {
-    init?(count: Int) {
-        if let memory = malloc(count) {
-            self.init(bytesNoCopy: memory, count: count, deallocator: .free)
-        } else {
-            return nil
-        }
-    }
 }
