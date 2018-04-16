@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [5.0.3](https://github.com/RNCryptor/RNCryptor/releases/tag/5.0.3)
+
+*  #272. Correct warnings related to incorrect memory access. The previous code was invalid Swift (it accessed a value inside its own `withUnsafeBytes` block), but happened to work.
+* Removes a `Data.init` work-around that is no longer needed.
+
 ## [5.0.2](https://github.com/RNCryptor/RNCryptor/releases/tag/5.0.2)
 
 * Update Swift Package Manager support
