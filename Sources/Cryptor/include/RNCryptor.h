@@ -59,6 +59,7 @@
  */
 
 #include <stdint.h>
+#include <CommonCrypto/CommonHMAC.h>
 
 #if defined(__cplusplus)
 extern "C" {
@@ -1244,15 +1245,15 @@ extern "C" {
      @constant   kCCHmacAlgSHA512    HMAC with SHA512 digest
      @constant   kCCHmacAlgSHA224    HMAC with SHA224 digest
      */
-    enum {
-        kCCHmacAlgSHA1,
-        kCCHmacAlgMD5,
-        kCCHmacAlgSHA256,
-        kCCHmacAlgSHA384,
-        kCCHmacAlgSHA512,
-        kCCHmacAlgSHA224
-    };
-    typedef uint32_t CCHmacAlgorithm;
+//    enum {
+//        kCCHmacAlgSHA1,
+//        kCCHmacAlgMD5,
+//        kCCHmacAlgSHA256,
+//        kCCHmacAlgSHA384,
+//        kCCHmacAlgSHA512,
+//        kCCHmacAlgSHA224
+//    };
+//    typedef uint32_t CCHmacAlgorithm;
 
     /*!
      @typedef    CCHmacContext
