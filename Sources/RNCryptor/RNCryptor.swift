@@ -25,6 +25,9 @@
 //
 
 import Foundation
+#if canImport(CommonCrypto)
+importCommonCrypto
+#endif
 #if SWIFT_PACKAGE
 import Cryptor
 #endif
