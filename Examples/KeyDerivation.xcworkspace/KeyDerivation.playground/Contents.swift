@@ -31,7 +31,7 @@ This gives us three major scenarios:
 * Random keys
 * Random passwords
 */
-
+import Foundation
 import RNCryptor
 
 /*: 
@@ -46,41 +46,41 @@ Usually you would put an envelope around the RNCryptor output that included the 
 
 _ = {
     let password = "password" // Humans are terrible at picking passwords
-    let message = "Attack at dawn".dataUsingEncoding(NSUTF8StringEncoding)!
+    let message = Data("Attack at dawn".utf8)
 
     // Encrypting
-    let ciphertext: NSData = {
-        func randomSaltAndKeyForPassword(password: String) -> (salt: NSData, key: NSData) {
-            let salt = RNCryptor.randomDataOfLength(RNCryptor.FormatV3.saltSize)
-            let key = RNCryptor.FormatV3.keyForPassword(password, salt: salt)
+    let ciphertext: Data = {
+        func randomSaltAndKeyForPassword(password: String) -> (salt: Data, key: Data) {
+            let salt = RNCryptor.randomData(ofLength: RNCryptor.FormatV3.saltSize)
+            let key = RNCryptor.FormatV3.makeKey(forPassword: password, withSalt: salt)
             return (salt, key)
         }
 
-        let (encryptionSalt, encryptionKey) = randomSaltAndKeyForPassword(password)
-        let (hmacSalt, hmacKey) = randomSaltAndKeyForPassword(password)
+        let (encryptionSalt, encryptionKey) = randomSaltAndKeyForPassword(password: password)
+        let (hmacSalt, hmacKey) = randomSaltAndKeyForPassword(password: password)
         let encryptor = RNCryptor.EncryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey)
 
-        let ciphertext = NSMutableData(data: encryptionSalt)
-        ciphertext.appendData(hmacSalt)
-        ciphertext.appendData(encryptor.encryptData(message))
+        var ciphertext = Data(encryptionSalt)
+        ciphertext.append(hmacSalt)
+        ciphertext.append(encryptor.encrypt(data: message))
         return ciphertext
     }()
 
     // Decrypting
-    let plaintext: NSData = {
-        let encryptionSaltRange = NSRange(location: 0, length: RNCryptor.FormatV3.saltSize)
-        let hmacSaltRange = NSRange(location: NSMaxRange(encryptionSaltRange), length: RNCryptor.FormatV3.saltSize)
-        let bodyRange = NSRange(NSMaxRange(hmacSaltRange)..<ciphertext.length)
+    let plaintext: Data = {
+        let encryptionSaltRange = 0..<RNCryptor.FormatV3.saltSize
+        let hmacSaltRange = encryptionSaltRange.upperBound..<(encryptionSaltRange.upperBound + RNCryptor.FormatV3.saltSize)
+        let bodyRange = hmacSaltRange.upperBound..<ciphertext.count
 
-        let encryptionSalt = ciphertext.subdataWithRange(encryptionSaltRange)
-        let hmacSalt = ciphertext.subdataWithRange(hmacSaltRange)
-        let body = ciphertext.subdataWithRange(bodyRange)
+        let encryptionSalt = ciphertext[encryptionSaltRange]
+        let hmacSalt = ciphertext[hmacSaltRange]
+        let body = ciphertext[bodyRange]
 
-        let encryptionKey = RNCryptor.FormatV3.keyForPassword(password, salt: encryptionSalt)
-        let hmacKey = RNCryptor.FormatV3.keyForPassword(password, salt: hmacSalt)
+        let encryptionKey = RNCryptor.FormatV3.makeKey(forPassword: password, withSalt: encryptionSalt)
+        let hmacKey = RNCryptor.FormatV3.makeKey(forPassword: password, withSalt: hmacSalt)
 
         return try! RNCryptor.DecryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey)
-            .decryptData(body)
+            .decrypt(data: body)
     }()
 
     // Did it work? Should be true
@@ -101,18 +101,18 @@ entropy of random bytes of the same length.**
 
 _ = {
     // Obviously you need to store the results of these somewhere
-    let encryptionKey = RNCryptor.randomDataOfLength(RNCryptor.FormatV3.keySize)
-    let hmacKey = RNCryptor.randomDataOfLength(RNCryptor.FormatV3.keySize)
+    let encryptionKey = RNCryptor.randomData(ofLength: RNCryptor.FormatV3.keySize)
+    let hmacKey = RNCryptor.randomData(ofLength: RNCryptor.FormatV3.keySize)
 
-    let message = "Attack at dawn".dataUsingEncoding(NSUTF8StringEncoding)!
+    let message = Data("Attack at dawn".utf8)
 
     // Encrypting
     let ciphertext = RNCryptor.EncryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey)
-        .encryptData(message)
+        .encrypt(data: message)
 
     // Decrypting
     let plaintext = try! RNCryptor.DecryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey)
-        .decryptData(ciphertext)
+        .decrypt(data: ciphertext)
 
     // Did it work? Should be true
     plaintext == message
@@ -137,18 +137,18 @@ _ = {
                             // This will be dramatically more secure than a human-chosen
                             // password of equivalent length.
 
-    let randomPassword = RNCryptor.randomDataOfLength(passwordLength)
-        .base64EncodedStringWithOptions([])
+    let randomPassword = RNCryptor.randomData(ofLength: passwordLength)
+        .base64EncodedString()
 
     // At this point, you could just use this random password with RNCryptor's password-based API.
     // But if you're trying to only run the KDF one time, here's how to generate the keys with static
     // salts.
 
-    let encryptionSalt = "com.example.mygreatapp.encrypt".dataUsingEncoding(NSUTF8StringEncoding)!
-    let hmacSalt = "com.example.mygreatapp.hmac".dataUsingEncoding(NSUTF8StringEncoding)!
+    let encryptionSalt = Data("com.example.mygreatapp.encrypt".utf8)
+    let hmacSalt = Data("com.example.mygreatapp.hmac".utf8)
 
-    let encryptionKey = RNCryptor.FormatV3.keyForPassword(randomPassword, salt: encryptionSalt)
-    let hmacKey = RNCryptor.FormatV3.keyForPassword(randomPassword, salt: hmacSalt)
+    /* let encryptionKey */ _ = RNCryptor.FormatV3.makeKey(forPassword: randomPassword, withSalt: encryptionSalt)
+    /* let hmacKey */ _ = RNCryptor.FormatV3.makeKey(forPassword: randomPassword, withSalt: hmacSalt)
 
     // Encryption and decryption as with random keys
 }()
