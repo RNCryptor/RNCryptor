@@ -340,7 +340,7 @@ public extension RNCryptor {
         // Expose random numbers for testing
         internal convenience init(encryptionKey: Data, hmacKey: Data, iv: Data) {
             let preamble = [V3.formatVersion, UInt8(0)]
-            var header = Data(bytes: preamble)
+            var header = Data(preamble)
             header.append(iv)
             self.init(encryptionKey: encryptionKey, hmacKey: hmacKey, iv: iv, header: header)
         }
@@ -351,7 +351,7 @@ public extension RNCryptor {
             let hmacKey = V3.makeKey(forPassword: password, withSalt: hmacSalt)
 
             let preamble = [V3.formatVersion, UInt8(1)]
-            var header = Data(bytes: preamble)
+            var header = Data(preamble)
             header.append(encryptionSalt)
             header.append(hmacSalt)
             header.append(iv)

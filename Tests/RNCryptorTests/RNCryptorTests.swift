@@ -135,7 +135,7 @@ class RNCryptorTests: XCTestCase {
         do {
             plaintext = try RNCryptor.DecryptorV3(encryptionKey: encryptionKey, hmacKey: hmacKey).decrypt(data: ciphertext)
         } catch {
-            plaintext = Data(bytes: [0xaa])
+            plaintext = Data([0xaa])
             XCTFail("Caught: \(error)")
         }
 
@@ -152,7 +152,7 @@ class RNCryptorTests: XCTestCase {
         do {
             plaintext = try RNCryptor.Decryptor(password: password).decrypt(data: ciphertext)
         } catch {
-            plaintext = Data(bytes: [0])
+            plaintext = Data([0])
             XCTFail("Caught: \(error)")
         }
         
