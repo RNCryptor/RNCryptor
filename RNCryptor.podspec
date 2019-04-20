@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
 	s.description = 'Implements a secure encryption format based on AES, PBKDF2, and HMAC.'
 	s.homepage = 'https://github.com/rnapier/RNCryptor'
 	s.source_files = 'Sources/RNCryptor/RNCryptor.swift', 'Sources/Cryptor/include/RNCryptor.h'
-	s.swift_version = '4.1'
+	s.swift_version = '5.0'
 	s.ios.deployment_target = '8.0'
 	s.osx.deployment_target = '10.9'
 	s.watchos.deployment_target = '2.0'
