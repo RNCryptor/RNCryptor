@@ -232,7 +232,7 @@ public enum RNCryptor {
 // V3 implementaion
 public extension RNCryptor {
     /// V3 format settings
-    public final class FormatV3 {
+    final class FormatV3 {
         /// Size of AES and HMAC keys
         public static let keySize = kCCKeySizeAES256
 
@@ -280,7 +280,7 @@ public extension RNCryptor {
     /// Format version 3 encryptor. Use this to ensure a specific format verison
     /// or when using keys (which are inherrently versions-specific). To use
     /// "the latest encryptor" with a password, use `Encryptor` instead.
-    public final class EncryptorV3 : RNCryptorType {
+    final class EncryptorV3 : RNCryptorType {
         private let engine: Engine
         private let hmac: HMACV3
         private var pendingHeader: Data?
@@ -386,7 +386,7 @@ public extension RNCryptor {
     /// using keys (since key configuration is version-specific). For password
     /// decryption, `Decryptor` is generally preferred, and will call this
     /// if appropriate.
-    public final class DecryptorV3: VersionedDecryptorType {
+    final class DecryptorV3: VersionedDecryptorType {
         //
         // Static methods
         //
