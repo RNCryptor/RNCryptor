@@ -120,7 +120,7 @@ public enum RNCryptor {
     /// Crashes if `length` is larger than allocatable memory, or if the system random number generator is not available.
     public static func randomData(ofLength length: Int) -> Data {
         var data = Data(count: length)
-        let result = data.withUnsafeMutableBytes { return SecRandomCopyBytes(kSecRandomDefault, length, $0) }
+        let result = data.withUnsafeMutableBytes { SecRandomCopyBytes(kSecRandomDefault, length, $0.baseAddress!) }
         guard result == errSecSuccess else {
             fatalError("SECURITY FAILURE: Could not generate secure random numbers: \(result).")
         }
@@ -246,32 +246,28 @@ public extension RNCryptor {
         /// - returns: Key of length FormatV3.keySize
         public static func makeKey(forPassword password: String, withSalt salt: Data) -> Data {
 
-            let passwordData = Data(password.utf8)
+            let passwordArray = password.utf8.map(Int8.init)
+            let saltArray = Array(salt)
 
-            return passwordData.withUnsafeBytes { (passwordPtr : UnsafePointer<Int8>) in
-                salt.withUnsafeBytes { (saltPtr : UnsafePointer<UInt8>) in
-                    var derivedKey = Data(count: keySize)
-                    derivedKey.withUnsafeMutableBytes { (derivedKeyPtr : UnsafeMutablePointer<UInt8>) in
-                        // All the crazy casting because CommonCryptor hates Swift
-                        let algorithm    = CCPBKDFAlgorithm(kCCPBKDF2)
-                        let prf          = CCPseudoRandomAlgorithm(kCCPRFHmacAlgSHA1)
-                        let pbkdf2Rounds = UInt32(10000)
+            var derivedKey = Array<UInt8>(repeating: 0, count: keySize)
 
-                        let result = CCCryptorStatus(
-                            CCKeyDerivationPBKDF(
-                                algorithm,
-                                passwordPtr,   passwordData.count,
-                                saltPtr,       salt.count,
-                                prf,           pbkdf2Rounds,
-                                derivedKeyPtr, keySize)
-                        )
-                        guard result == CCCryptorStatus(kCCSuccess) else {
-                            fatalError("SECURITY FAILURE: Could not derive secure password (\(result))")
-                        }
-                    }
-                    return derivedKey
-                }
+            // All the crazy casting because CommonCryptor hates Swift
+            let algorithm    = CCPBKDFAlgorithm(kCCPBKDF2)
+            let prf          = CCPseudoRandomAlgorithm(kCCPRFHmacAlgSHA1)
+            let pbkdf2Rounds = UInt32(10000)
+
+            let result = CCCryptorStatus(
+                CCKeyDerivationPBKDF(
+                    algorithm,
+                    passwordArray, passwordArray.count,
+                    saltArray,     saltArray.count,
+                    prf,           pbkdf2Rounds,
+                    &derivedKey,   keySize)
+            )
+            guard result == CCCryptorStatus(kCCSuccess) else {
+                fatalError("SECURITY FAILURE: Could not derive secure password (\(result))")
             }
+            return Data(derivedKey)
         }
 
         static let formatVersion = UInt8(3)
@@ -536,15 +532,15 @@ internal final class Engine {
 
     init(operation: CryptorOperation, key: Data, iv: Data) {
 
-        cryptor = key.withUnsafeBytes { (keyPtr: UnsafePointer<UInt8>) in
-            iv.withUnsafeBytes { (ivPtr: UnsafePointer<UInt8>) in
+        cryptor = key.withUnsafeBytes { (keyPtr) in
+            iv.withUnsafeBytes { (ivPtr) in
 
                 var cryptorOut: CCCryptorRef?
                 let result = CCCryptorCreate(
                     operation.rawValue,
                     CCAlgorithm(kCCAlgorithmAES128), CCOptions(kCCOptionPKCS7Padding),
-                    keyPtr, key.count,
-                    ivPtr,
+                    keyPtr.baseAddress!, keyPtr.count,
+                    ivPtr.baseAddress!,
                     &cryptorOut
                 )
 
@@ -577,8 +573,8 @@ internal final class Engine {
             buffer.withUnsafeMutableBytes { bufferPtr in
                 return CCCryptorUpdate(
                     cryptor,
-                    dataPtr, data.count,
-                    bufferPtr, outputLength,
+                    dataPtr.baseAddress!, dataPtr.count,
+                    bufferPtr.baseAddress!, outputLength,
                     &dataOutMoved)
             }
         }
@@ -597,7 +593,7 @@ internal final class Engine {
         let result = buffer.withUnsafeMutableBytes {
             CCCryptorFinal(
                 cryptor,
-                $0, outputLength,
+                $0.baseAddress!, outputLength,
                 &dataOutMoved
             )
         }
@@ -659,19 +655,19 @@ private final class HMACV3 {
             CCHmacInit(
                 &context,
                 CCHmacAlgorithm(kCCHmacAlgSHA256),
-                $0,
+                $0.baseAddress!,
                 key.count
             )
         }
     }
 
     func update(withData data: Data) {
-        data.withUnsafeBytes { CCHmacUpdate(&context, $0, data.count) }
+        data.withUnsafeBytes { CCHmacUpdate(&context, $0.baseAddress!, data.count) }
     }
 
     func finalData() -> Data {
         var hmac = Data(count: V3.hmacSize)
-        hmac.withUnsafeMutableBytes { CCHmacFinal(&context, $0) }
+        hmac.withUnsafeMutableBytes { CCHmacFinal(&context, $0.baseAddress!) }
         return hmac
     }
 }
