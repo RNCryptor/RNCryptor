@@ -25,11 +25,7 @@
 //
 
 import Foundation
-#if canImport(CommonCrypto)
 import CommonCrypto
-#elseif SWIFT_PACKAGE
-import Cryptor
-#endif
 
 
 /// The `RNCryptorType` protocol defines generic API to a mutable,
