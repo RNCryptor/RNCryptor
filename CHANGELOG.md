@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file. This projec
 ## [5.1.0](https://github.com/RNCryptor/RNCryptor/releases/tag/5.1.0)
 
 * Update to Swift 5
+* Uses CommonCrypto modular headers (available since 4.2)
 
 ## [5.0.3](https://github.com/RNCryptor/RNCryptor/releases/tag/5.0.3)
 
