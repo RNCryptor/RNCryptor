@@ -25,7 +25,9 @@
 //
 
 import Foundation
-#if SWIFT_PACKAGE
+#if canImport(CommonCrypto)
+import CommonCrypto
+#elseif SWIFT_PACKAGE
 import Cryptor
 #endif
 
@@ -601,7 +603,7 @@ internal final class Engine {
         }
 
         // Note that since iOS 6, CCryptor will never return padding errors or other decode errors.
-        // I'm not aware of any non-catestrophic (MemoryAllocation) situation in which this
+        // I'm not aware of any non-catastrophic (MemoryAllocation) situation in which this
         // can fail. Using assert() just in case, but we'll ignore errors in Release.
         // https://devforums.apple.com/message/920802#920802
         assert(result == CCCryptorStatus(kCCSuccess), "RNCRYPTOR BUG. PLEASE REPORT. (\(result)")
@@ -749,12 +751,12 @@ internal final class OverflowingBuffer {
 
 /** Compare two Datas in time proportional to the untrusted data
 
-Equatable-based comparisons genreally stop comparing at the first difference.
+Equatable-based comparisons generally stop comparing at the first difference.
 This can be used by attackers, in some situations,
 to determine a secret value by considering the time required to compare the values.
 
 We enumerate over the untrusted values so that the time is proportaional to the attacker's data,
-which provides the attack no informatoin about the length of the secret.
+which provides the attack no information about the length of the secret.
 */
 private func isEqualInConsistentTime(trusted: Data, untrusted: Data) -> Bool {
     // The point of this routine is XOR the bytes of each data and accumulate the results with OR.
