@@ -131,6 +131,16 @@ This approach will not work for OS X commandline apps.
 
 Built this way, you should add `import RNCryptor` to your Swift code.
 
+### [Swift Package Manager](https://swift.org/package-manager)
+
+    dependencies: [
+        .package(url: "https://github.com/RNCryptor/RNCryptor.git", .upToNextMajor(from: "5.0.0"))
+    ]
+
+Swift Package Manager support requires Xcode 12.5 or higher.
+
+Built this way, you should add `import RNCryptor` to your Swift code.
+
 ## Advanced Usage
 
 ### Version-Specific Cryptors
