@@ -6,7 +6,7 @@ Cross-language AES Encryptor/Decryptor [data format](https://github.com/RNCrypto
 
 The primary targets are Swift and Objective-C, but implementations are available in [C](https://github.com/RNCryptor/RNCryptor-C), [C++](https://github.com/RNCryptor/RNCryptor-cpp), [C#](https://github.com/RNCryptor/RNCryptor-cs), [Erlang](https://github.com/RNCryptor/RNCryptor-erlang), [Go](https://github.com/RNCryptor/RNCryptor-go), [Haskell](https://github.com/RNCryptor/rncryptor-hs), [Java](https://github.com/RNCryptor/JNCryptor),
 [PHP](https://github.com/RNCryptor/RNCryptor-php), [Python](https://github.com/RNCryptor/RNCryptor-python),
-[Javascript](https://github.com/chesstrian/JSCryptor), and [Ruby](https://github.com/RNCryptor/ruby_rncryptor).
+[Javascript](https://github.com/chesstrian/JSCryptor), [Ruby](https://github.com/RNCryptor/ruby_rncryptor), and [Dart](https://github.com/tzraikov/flutter_rncryptor).
 
 The data format includes all the metadata required to securely implement AES encryption, as described in ["Properly encrypting with AES with CommonCrypto,"](http://robnapier.net/aes-commoncrypto) and [*iOS 6 Programming Pushing the Limits*](http://iosptl.com), Chapter 15. Specifically, it includes:
 
