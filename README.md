@@ -115,7 +115,7 @@ Built this way, you don't need to (and can't) `import RNCryptor` into your code.
 
 ### [Carthage](https://github.com/Carthage/Carthage)
 
-    github "RNCryptor/RNCryptor" ~> 5.0
+    github "RNCryptor/RNCryptor" ~> 5.2
 
 This approach will not work for OS X commandline apps. Don't forget to embed `RNCryptor.framework`. 
 
@@ -125,7 +125,7 @@ This approach will not work for OS X commandline apps.
 
 ### [CocoaPods](https://cocoapods.org)
 
-    pod 'RNCryptor', '~> 5.0'
+    pod 'RNCryptor', '~> 5.2'
 
 This approach will not work for OS X commandline apps.
 
@@ -134,7 +134,7 @@ Built this way, you should add `import RNCryptor` to your Swift code.
 ### [Swift Package Manager](https://swift.org/package-manager)
 
     dependencies: [
-        .package(url: "https://github.com/RNCryptor/RNCryptor.git", .upToNextMajor(from: "5.0.0"))
+        .package(url: "https://github.com/RNCryptor/RNCryptor.git", .upToNextMajor(from: "5.2.0"))
     ]
 
 Swift Package Manager support requires Xcode 12.5 or higher.
